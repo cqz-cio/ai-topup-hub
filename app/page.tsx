@@ -1,0 +1,15 @@
+'use client';
+import productsData from '../data/products.json';
+import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription, DialogClose } from '@/components/ui/dialog';
+
+type Product = {name:string;price:number;stock:string;image:string;detail?:{text:string;html?:string;url:string;images:string[];links?:{url:string;label:string}[]}};
+const products:Product[]=productsData;
+export default function Home(){return <>
+<header className="masthead"><a href="#" className="brand">智享<span>A</span>社<span className="brand-note">AI SERVICES</span></a><span className="edition">商品目录 / 静态预览</span></header>
+<main><section className="intro"><div><p className="eyebrow">THE SERVICE COLLECTION</p><h1>探索你的 AI 工具箱<span>。</span></h1><p className="intro-copy">账号、订阅与创作服务。查看商品详情，了解使用条件与购买须知。</p></div><div className="snapshot"><strong>{products.length}<small>件商品</small></strong><span>资料采集于 2026.09.05<br/>价格与库存为采集时快照</span></div></section>
+<div className="catalog-heading"><h2>全部商品 <span>{products.length.toString().padStart(2,'0')}</span></h2><p>原站标价 · 尚未加价 · 暂未开放购买</p></div>
+<section className="catalog" aria-label="商品目录">{products.map((p,i)=><article className="product" key={p.name}>
+<div className="cover"><img src={p.image} alt={p.name.split('（')[0]} loading={i<4?'eager':'lazy'}/><span className="item-number">{String(i+1).padStart(2,'0')}</span></div>
+<div className="product-body"><div className="stock"><span className={p.stock==='缺货'?'dot empty':'dot'}/>{p.stock}<span>采集时</span></div><h3>{p.name}</h3><div className="product-bottom"><div className="price"><small>¥</small>{p.price.toFixed(2)}</div><Dialog><DialogTrigger className="detail-button">查看详情 <span aria-hidden="true">↗</span></DialogTrigger><DialogContent className="product-dialog" showCloseButton={false}><div className="dialog-top"><span>商品详情 / {String(i+1).padStart(2,'0')}</span><DialogClose className="close" aria-label="关闭商品详情">关闭 ×</DialogClose></div><div className="dialog-scroll"><div className="detail-overview"><img src={p.image} alt="商品原图"/><div><DialogTitle className="detail-title">{p.name}</DialogTitle><p className="detail-price">¥{p.price.toFixed(2)}</p><DialogDescription>原站标价 · {p.stock}（采集时）</DialogDescription></div></div><div className="notice-heading"><h4>购买须知与商品说明</h4><span>原商家说明</span></div>{p.detail?<div className="notice-text">{p.detail.text}</div>:<p className="notice-text">购买说明正在整理。</p>}{p.detail?.images?.map(src=><img className="detail-image" key={src} src={src} alt="原商家商品说明图片" loading="lazy"/>)}{p.detail?.links && p.detail.links.length>0 && <div className="reference-links"><h4>原说明中的相关链接</h4>{p.detail.links.map(l=><a key={l.url} href={l.url} target="_blank" rel="noreferrer">{l.label || l.url} ↗</a>)}</div>}<p className="detail-footnote">本页为静态资料预览，未接入支付或自动采购。购买须知中的售后承诺及联系方式来自原商家，不代表本站新增承诺。</p></div></DialogContent></Dialog></div></div></article>)}</section>
+<footer><div><strong>智享A社</strong><p>商品资料静态预览</p></div><p>资料来源：Ai2You智友社 · 链动小铺<br/><a href="https://wzyp.cn/shop/282D9KDL" target="_blank" rel="noreferrer">查看原店铺 ↗</a></p><p>2026.09.05<br/>价格未含原站结算手续费</p></footer></main></>}
+
