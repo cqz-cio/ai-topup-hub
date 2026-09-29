@@ -10,6 +10,7 @@ import (
 
 // PaymentChannel 支付渠道配置
 type PaymentChannel struct {
+	ManagedKey         *string           `gorm:"size:64;uniqueIndex" json:"-"`                            // 可选的系统渠道唯一标记
 	ID                 uint              `gorm:"primarykey" json:"id"`                                    // 主键
 	Name               string            `gorm:"not null" json:"name"`                                    // 渠道名称
 	Icon               string            `gorm:"type:varchar(512);default:''" json:"icon"`                // 渠道图标（可选）

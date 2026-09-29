@@ -136,6 +136,10 @@ type fixture struct {
 }
 
 func setup(t *testing.T, c contract.Cards) *fixture {
+	return setupWithBinding(t, c, contract.Binding{SKUID: 9, Plan: "chatgptplusplan", Region: "US", RegionVersion: 12, Channel: "3", CardRule: "plus-us", CancelAfterSuccess: true})
+}
+
+func setupWithBinding(t *testing.T, c contract.Cards, binding contract.Binding) *fixture {
 	t.Helper()
 	db, err := gorm.Open(sqlite.Open(filepath.Join(t.TempDir(), "test.db")), &gorm.Config{})
 	if err != nil {
@@ -151,7 +155,7 @@ func setup(t *testing.T, c contract.Cards) *fixture {
 		t.Fatal(err)
 	}
 	f := &fixture{store: gormstore.New(db), db: db, orders: &orders{paid: true}, partner: &partner{result: &contract.Result{OperationID: "op_1", State: "queued"}}}
-	f.s, err = app.New(app.Options{Store: f.store, Orders: f.orders, Cards: c, Partner: f.partner, Secret: strings.Repeat("k", 32), Bindings: []contract.Binding{{SKUID: 9, Plan: "chatgptplusplan", Region: "US", RegionVersion: 12, Channel: "3", CardRule: "plus-us", CancelAfterSuccess: true}}})
+	f.s, err = app.New(app.Options{Store: f.store, Orders: f.orders, Cards: c, Partner: f.partner, Secret: strings.Repeat("k", 32), Bindings: []contract.Binding{binding}})
 	if err != nil {
 		t.Fatal(err)
 	}

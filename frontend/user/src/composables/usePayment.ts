@@ -198,8 +198,10 @@ export function usePayment() {
   })
 
   const paymentResultTitle = computed(() => t(resolvePaymentResultTitleKey(interactionMode.value)))
-  const paymentGuideTitle = computed(() => paymentPresentationMode.value === 'redirect' ? t('payment.redirectTitle') : t('payment.qrTitle'))
-  const paymentGuideTip = computed(() => paymentPresentationMode.value === 'redirect' ? t('payment.redirectTip') : t('payment.qrTip'))
+  const paymentGuideTitle = computed(() => paymentProviderType.value === 'bscusdt' ? '使用 USDT · BEP-20 转账' : paymentPresentationMode.value === 'redirect' ? t('payment.redirectTitle') : t('payment.qrTitle'))
+  const paymentGuideTip = computed(() => paymentProviderType.value === 'bscusdt'
+    ? '请选择 BNB Smart Chain（BEP-20），在订单到期前按下方完整 USDT 金额转账，不要省略小数尾数；尾数用于识别订单。请确保扣除平台手续费后的到账金额一致。链上确认后自动更新订单并发货，请勿重复转账。'
+    : paymentPresentationMode.value === 'redirect' ? t('payment.redirectTip') : t('payment.qrTip'))
 
   const showPayLink = computed(() => {
     return paymentPresentationMode.value === 'redirect' || Boolean(payLink.value)
@@ -234,7 +236,7 @@ export function usePayment() {
       base: 'Base',
       ethereum: 'Ethereum',
       eth: 'Ethereum',
-      bsc: 'BNB Smart Chain',
+      bsc: 'BNB Smart Chain (BEP-20)',
       polygon: 'Polygon',
     }
     return labels[normalized] || value
@@ -260,7 +262,7 @@ export function usePayment() {
       details.push({
         key: 'amount',
         label: t('payment.cryptoAmount'),
-        value: cryptoChainAmount.value,
+        value: paymentProviderType.value === 'bscusdt' ? `${cryptoChainAmount.value} USDT` : cryptoChainAmount.value,
       })
     }
     if (cryptoWalletAddress.value) {

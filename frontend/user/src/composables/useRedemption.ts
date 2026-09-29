@@ -1,6 +1,6 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { createRedemptionAPI, RedemptionError, type RedemptionRecord } from '../api/redemption'
-import { needsAccountCheck, normalizeRedemptionCode, shouldPoll, validSession } from '../utils/redemption'
+import { needsAccountCheck, normalizeRedemptionCode, planLabel, shouldPoll, subscriptionLabel, validSession } from '../utils/redemption'
 
 export function useRedemption() {
   const api = createRedemptionAPI(import.meta.env.VITE_API_BASE_URL || '')
@@ -72,7 +72,7 @@ export function useRedemption() {
       if (!current(version)) return
       record.value = value
       if (value.reason === 'existing_subscription_not_supported') {
-        error.value = '该账号已有订阅，本卡密仅支持新开通。请核对账号或联系商城客服。'
+        error.value = `检测到账号当前订阅：${subscriptionLabel(value.account?.current_plan || '')}。此卡密可兑换 ${planLabel(value.plan)}，仅支持免费账号新开通；当前账号不符合条件。请核对账号或联系商城客服。`
         return
       }
       if (value.state !== 'awaiting_confirmation' || !value.account?.account_id || value.account.current_plan !== 'free'

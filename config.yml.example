@@ -192,6 +192,13 @@ web:
 # 自动充值（默认关闭；卡台尚未接入时任务停在 waiting_card，不会扣款）。
 # API 密钥通过环境变量 AICDK_API_KEY 提供，不写入此文件。
 # 使用 manual 交付商品；一个叶子订单只能包含一个 SKU，数量为 1。
+bsc_usdt:
+  enabled: false # 部署并验证 RPC 后开启；自动创建 USDT BEP-20 收款渠道
+  recipient: "0x66a8bab15067eab1efc948ac03684f0397c8416f"
+  cny_per_usdt: "6.66" # 1 USDT = 6.66 CNY；每笔支付单保存此汇率
+  confirmations: 15 # 同时要求 RPC finalized，不只检查区块数量
+# BSC_RPC_URL 服务端环境变量可覆盖公开 RPC；无需钱包私钥/助记词
+
 auto_recharge:
   enabled: false
   redeem_url: "" # 启用前填写实际 HTTPS 兑换页面地址

@@ -24,6 +24,12 @@ export function planLabel(plan: string): string {
   return ({ chatgptplusplan: 'ChatGPT Plus', chatgptprolite: 'ChatGPT Pro 5x', chatgptpro: 'ChatGPT Pro 20x' } as Record<string, string>)[plan] || '订阅套餐'
 }
 
+export function subscriptionLabel(plan: string): string {
+  return ({ free: '免费版', plus: 'ChatGPT Plus', pro: 'ChatGPT Pro',
+    chatgptplusplan: 'ChatGPT Plus', chatgptprolite: 'ChatGPT Pro 5x', chatgptpro: 'ChatGPT Pro 20x',
+    team: 'ChatGPT Team', business: 'ChatGPT Business', enterprise: 'ChatGPT Enterprise' } as Record<string, string>)[plan] || '其他订阅（类型待核实）'
+}
+
 export function needsAccountCheck(state: string): boolean {
   return state === 'issued' || state === 'awaiting_confirmation'
 }

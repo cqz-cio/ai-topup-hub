@@ -31,6 +31,7 @@ type GatewayCreateInput struct {
 
 // GatewayCreateResult 是统一支付网关创建结果。
 type GatewayCreateResult struct {
+	ExpiresAt          *time.Time
 	ProviderRef        string
 	RedirectURL        string
 	QRCodeURL          string

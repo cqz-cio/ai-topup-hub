@@ -29,6 +29,7 @@ import (
 	notificationtransport "github.com/dujiao-next/internal/modules/notification/transport/http"
 	ordertransport "github.com/dujiao-next/internal/modules/order/transport/http"
 	paymenttransport "github.com/dujiao-next/internal/modules/payment/transport/http"
+	chainhttp "github.com/dujiao-next/internal/modules/payment/transport/http/chain"
 	procurementtransport "github.com/dujiao-next/internal/modules/procurement/transport/http"
 	promotiontransport "github.com/dujiao-next/internal/modules/promotion/transport/http"
 	reconciliationtransport "github.com/dujiao-next/internal/modules/reconciliation/transport/http"
@@ -96,6 +97,9 @@ func registerAdminRoutes(
 	// 支付/财务相关受保护子组：未确认合规声明时拦截
 	// 注：admin.Use(...) 已 mutate admin 自身，新 Group 继承 JWT + RBAC 中间件
 	paymentProtected := admin.Group("", middleware.PaymentComplianceRequired(c.ComplianceService))
+	if c.BSCUSDTService != nil {
+		chainhttp.RegisterBSCUSDTRoutes(paymentProtected, c.BSCUSDTService)
+	}
 	if c.AutoRechargeService != nil {
 		rechargehttp.RegisterAdminRoutes(paymentProtected, rechargehttp.New(c.AutoRechargeService))
 	}

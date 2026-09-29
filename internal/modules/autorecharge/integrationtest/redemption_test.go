@@ -13,11 +13,66 @@ import (
 	"testing"
 	"time"
 
+	app "github.com/dujiao-next/internal/modules/autorecharge/application"
 	"github.com/dujiao-next/internal/modules/autorecharge/contract"
 	"github.com/dujiao-next/internal/modules/autorecharge/domain"
 	rechargehttp "github.com/dujiao-next/internal/modules/autorecharge/transport/http"
 	"github.com/gin-gonic/gin"
 )
+
+type recordingCards struct {
+	cards
+	rule string
+}
+
+func (c *recordingCards) Reserve(_ context.Context, _ string, rule string) (string, error) {
+	c.rule = rule
+	return "card-reference", nil
+}
+
+func TestCodeKeepsPurchasedPlanAndCardRuleAfterConfigurationChange(t *testing.T) {
+	for _, plan := range []string{"chatgptplusplan", "chatgptprolite", "chatgptpro"} {
+		t.Run(plan, func(t *testing.T) {
+			ctx := context.Background()
+			provider := &recordingCards{}
+			original := contract.Binding{SKUID: 9, Plan: plan, Region: "US", RegionVersion: 12, Channel: "3", CardRule: plan + "-cards"}
+			f := setupWithBinding(t, provider, original)
+			code := f.orders.code
+			changed := original
+			changed.Plan, changed.CardRule, changed.Region, changed.Channel = "chatgptpro", "replacement-cards", "GB", "1"
+			if plan == changed.Plan {
+				changed.Plan = "chatgptplusplan"
+			}
+			var err error
+			f.s, err = app.New(app.Options{Store: f.store, Orders: f.orders, Cards: provider, Partner: f.partner, Secret: strings.Repeat("k", 32), Bindings: []contract.Binding{changed}})
+			if err != nil {
+				t.Fatal(err)
+			}
+			if err = f.s.CreateForOrder(1); err != nil {
+				t.Fatal(err)
+			}
+			lookup, err := f.s.LookupCode(ctx, code)
+			if err != nil || lookup.Plan != plan {
+				t.Fatalf("lookup lost purchased plan: %+v %v", lookup, err)
+			}
+			checked, err := f.s.CheckAccount(ctx, code, session)
+			if err != nil || checked.Plan != plan {
+				t.Fatalf("account check changed plan: %+v %v", checked, err)
+			}
+			confirmed, err := f.s.ConfirmCode(ctx, code, checked.ConfirmationToken)
+			if err != nil || confirmed.Plan != plan {
+				t.Fatalf("confirmation changed plan: %+v %v", confirmed, err)
+			}
+			f.advance(t)
+			if f.partner.calls != 1 || f.partner.request.Plan != plan || provider.rule != original.CardRule || f.partner.request.Region != original.Region || f.partner.request.Channel != original.Channel {
+				t.Fatal("recharge did not use the purchased entitlement snapshot")
+			}
+			if f.orders.code != code || f.orders.done != 1 {
+				t.Fatal("configuration change issued another code")
+			}
+		})
+	}
+}
 
 func TestTwoCodesCannotChargeSameAccountConcurrently(t *testing.T) {
 	f := setup(t, cards{})

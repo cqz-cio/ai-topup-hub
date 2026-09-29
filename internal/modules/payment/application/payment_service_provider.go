@@ -197,6 +197,9 @@ func (s *PaymentService) applyProviderPayment(input CreatePaymentInput, order *o
 	if result.Payload != nil {
 		payment.ProviderPayload = result.Payload
 	}
+	if result.ExpiresAt != nil {
+		payment.ExpiredAt = result.ExpiresAt
+	}
 	// DisplayChannelType 是 adapter 返回的“展示用渠道类型”。
 	// 例如 BEpusdt 新格式的 payment.channel_type 固定为 bepusdt，
 	// 但交易模式实际展示应使用 config_json.trade_type（如 usdt.arbitrum）。

@@ -1,9 +1,20 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { createRedemptionAPI, RedemptionError } from '../src/api/redemption.ts'
-import { normalizeRedemptionCode, validSession, shouldPoll, needsAccountCheck, statusPresentation, isRedemptionPath } from '../src/utils/redemption.ts'
+import { normalizeRedemptionCode, validSession, shouldPoll, needsAccountCheck, statusPresentation, isRedemptionPath, planLabel, subscriptionLabel } from '../src/utils/redemption.ts'
 
 const code = 'K7M2P-R8W4X-6NQ9T-H3V5C-Y2D8F'
+test('purchased plans and detected subscriptions remain distinct', () => {
+  assert.equal(planLabel('chatgptplusplan'), 'ChatGPT Plus')
+  assert.equal(planLabel('chatgptprolite'), 'ChatGPT Pro 5x')
+  assert.equal(planLabel('chatgptpro'), 'ChatGPT Pro 20x')
+  assert.equal(subscriptionLabel('free'), '免费版')
+  assert.equal(subscriptionLabel('plus'), 'ChatGPT Plus')
+  assert.equal(subscriptionLabel('pro'), 'ChatGPT Pro')
+  for (const plan of ['', 'unknown', 'private-provider-value']) {
+    assert.equal(subscriptionLabel(plan), '其他订阅（类型待核实）')
+  }
+})
 test('redeem code normalization matches the backend format', () => {
   for (const input of [code, code.toLowerCase(), code.replaceAll('-', ''), ` \n${code}\t`]) assert.equal(normalizeRedemptionCode(input), code)
   for (const input of ['', code.slice(1), code.replace('7', '0'), code.replace('K', 'I'), code.replace('K', 'ſ'), code.replace('-', ''), 'AAAAA-AAAAA-AAAAA-AAAAA-AAAAA', '22222-22222-22222-22222-22222']) assert.equal(normalizeRedemptionCode(input), null)

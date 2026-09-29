@@ -59,6 +59,7 @@ import (
 	ordercontract "github.com/dujiao-next/internal/modules/order/contract"
 	orderriskapp "github.com/dujiao-next/internal/modules/orderrisk/application"
 	paymentapp "github.com/dujiao-next/internal/modules/payment/application"
+	"github.com/dujiao-next/internal/modules/payment/application/bscusdt"
 	paymentcontract "github.com/dujiao-next/internal/modules/payment/contract"
 	paymentprovider "github.com/dujiao-next/internal/modules/payment/infrastructure/gateway/provider"
 	procurementapp "github.com/dujiao-next/internal/modules/procurement/application"
@@ -86,6 +87,7 @@ import (
 // Container 声明应用运行期共享的依赖表面；具体构造过程按职责拆分在同包装配文件中。
 type Container struct {
 	AutoRechargeService *autorechargeapp.Service
+	BSCUSDTService      *bscusdt.Service
 	Config              *config.Config
 	QueueClient         *queue.Client
 

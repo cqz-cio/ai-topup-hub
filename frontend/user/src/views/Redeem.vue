@@ -3,7 +3,7 @@ import { computed, ref, watch, nextTick } from 'vue'
 import { useHead } from '@unhead/vue'
 import { Check, ArrowRight, ArrowLeft, Info, Sparkles, LoaderCircle, CircleAlert, CircleCheck, X } from 'lucide-vue-next'
 import { useRedemption } from '../composables/useRedemption'
-import { needsAccountCheck, planLabel, shouldPoll, statusPresentation } from '../utils/redemption'
+import { needsAccountCheck, planLabel, shouldPoll, statusPresentation, subscriptionLabel } from '../utils/redemption'
 
 const { codeInput, activeCode, sessionInput, authorized, confirmed, record, proof, step, busy, error, notice,
   uncertain, proofValid, canConfirm, canRefresh, maskedCode, lookup, checkAccount, editAccount, confirmRecharge, refresh, reset } = useRedemption()
@@ -54,7 +54,7 @@ watch(step, async () => { await nextTick(); heading.value?.focus({ preventScroll
           </template>
 
           <template v-else-if="step === 2">
-            <div class="cardhead"><div><h2 ref="heading" tabindex="-1">核验你的 GPT 账号</h2><p class="note">提交账号资料后，先查看账号及当前订阅。</p></div><span class="tag"><Check :size="12"/>卡密有效</span></div>
+            <div class="cardhead"><div><h2 ref="heading" tabindex="-1">核验你的 GPT 账号</h2><p class="note">此卡密可兑换 {{ product }}，套餐已由购买订单锁定。请确认与所购套餐一致，再核验账号当前订阅；如不一致，请先联系商城客服。</p></div><span class="tag"><Check :size="12"/>卡密有效</span></div>
             <form autocomplete="off" @submit.prevent="checkAccount">
               <label for="redemption-session" class="field-label">账号 Session</label>
               <textarea id="redemption-session" v-model="sessionInput" class="text-input session-input" rows="6" maxlength="65536" autocomplete="off" autocapitalize="off" :spellcheck="false" :disabled="!!busy" placeholder="粘贴完整的 Session JSON" aria-describedby="session-hint" :aria-invalid="!!error" />
@@ -68,14 +68,14 @@ watch(step, async () => { await nextTick(); heading.value?.focus({ preventScroll
           </template>
 
           <template v-else-if="step === 3">
-            <div class="cardhead"><div><h2 ref="heading" tabindex="-1">确认你的充值账号</h2><p class="note">请核对目标账号，确认后将开始处理。</p></div><span class="tag" :class="{ expired: !proofValid }">{{ proofValid ? '核验通过' : '核验已过期' }}</span></div>
-            <div class="account"><span class="label">已核验的账号标识</span><div class="mono account-id">{{ proof?.account?.account_id }}</div><div class="fields"><div><span class="label">当前订阅</span><b>免费版 · 符合新开通条件</b></div><div><span class="label">本次兑换</span><b>{{ product }}</b></div></div></div>
+            <div class="cardhead"><div><h2 ref="heading" tabindex="-1">确认充值账号与套餐</h2><p class="note">请同时核对目标账号和本次充值套餐，确认后将开始处理。</p></div><span class="tag" :class="{ expired: !proofValid }">{{ proofValid ? '核验通过' : '核验已过期' }}</span></div>
+            <div class="account"><span class="label">已核验的账号标识</span><div class="mono account-id">{{ proof?.account?.account_id }}</div><div class="fields"><div><span class="label">检测到的当前订阅</span><b>{{ subscriptionLabel(proof?.account?.current_plan || '') }} · 符合新开通条件</b></div><div><span class="label">本次充值套餐（卡密绑定）</span><b>{{ product }}</b></div></div></div>
             <p class="note" :class="{ 'expired-note': !proofValid }" aria-live="polite">{{ proofValid ? '核验结果在 10 分钟内有效。请确认这是你要充值的账号。' : '核验结果已过期，请重新核验账号后再确认。' }}</p>
             <button class="text-button change" type="button" :disabled="!!busy" @click="editAccount">{{ proofValid ? '账号不对？返回重新核验' : '重新核验账号' }} <ArrowRight :size="14"/></button>
             <div class="divider"></div><div class="row"><span>卡密状态</span><strong class="valid">有效，尚未兑换</strong></div><div class="row"><span>兑换方式</span><span>充值至上方已核验账号</span></div>
-            <form @submit.prevent="confirmRecharge"><label class="consent"><input v-model="confirmed" type="checkbox" :disabled="!!busy || !proofValid"/><span>我已核对目标账号，并确认使用本次卡密为该账号充值。</span></label>
+            <form @submit.prevent="confirmRecharge"><label class="consent"><input v-model="confirmed" type="checkbox" :disabled="!!busy || !proofValid"/><span>我已核对目标账号，确认 {{ product }} 与所购套餐一致，并使用此卡密为该账号开通该套餐。</span></label>
               <p v-if="error" class="error" role="alert">{{ error }}</p>
-              <button class="primary" type="submit" :disabled="!canConfirm"><LoaderCircle v-if="busy" class="spin" :size="17"/>{{ busy ? '正在提交，请勿重复操作' : '确认账号并充值' }}<ArrowRight v-if="!busy" :size="16"/></button><p class="button-note">确认后请勿重复提交，可随时回来查询进度。</p>
+              <button class="primary" type="submit" :disabled="!canConfirm"><LoaderCircle v-if="busy" class="spin" :size="17"/>{{ busy ? '正在提交，请勿重复操作' : '确认账号与套餐并充值' }}<ArrowRight v-if="!busy" :size="16"/></button><p class="button-note">确认后请勿重复提交，可随时回来查询进度。</p>
             </form>
           </template>
 
