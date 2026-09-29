@@ -1,0 +1,20 @@
+.git
+.github
+.idea
+.vscode
+.DS_Store
+
+# 运行时数据，不属于构建上下文
+db/
+uploads/
+logs/
+config.yml
+*.db
+*.log
+
+# 构建产物：前端 dist 由镜像内的 frontend 阶段重新生成，
+# internal/web/dist 由 COPY --from=frontend 填充，都不能从宿主机带进来
+dist/
+frontend/*/dist/
+frontend/*/node_modules/
+internal/web/dist/

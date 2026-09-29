@@ -1,0 +1,191 @@
+# Dujiao-Next 配置文件
+#
+# 首次启动前必须把下面三个占位密钥替换为彼此不同的强随机值，否则服务会拒绝启动。
+# 可分别执行三次：openssl rand -hex 32
+
+app:
+  secret_key: your-secret-key-change-in-production-please # 务必修改，用于 AES-256 加密敏感数据
+  totp_issuer: Dujiao-Next                          # 后台 2FA 验证器中显示的发行方名称（避免 & 等特殊字符）
+
+server:
+  host: 0.0.0.0
+  port: 8080
+  mode: debug  # debug 或 release
+  # 仅信任实际反向代理的地址或网段。留空表示完全不信任转发头、直接使用 TCP 来源地址。
+  # 同机 Nginx 使用下面默认值；Docker/CDN 部署必须改成真实代理网段，禁止配置 0.0.0.0/0 或 ::/0。
+  trusted_proxies:
+    - 127.0.0.1/32
+    - ::1/128
+
+log:
+  dir: ""  # 为空时使用当前运行目录/logs
+  filename: app.log
+  max_size_mb: 100
+  max_backups: 7
+  max_age_days: 30
+  compress: true
+
+database:
+  driver: sqlite  # sqlite / postgres
+  dsn: ./db/dujiao.db
+  pool:
+    max_open_conns: 1
+    max_idle_conns: 1
+    conn_max_lifetime_seconds: 0  # 0 表示不限制
+    conn_max_idle_time_seconds: 0  # 0 表示不限制
+
+jwt:
+  secret: your-secret-key-change-in-production-please
+  expire_hours: 24  # Token 有效期（小时）
+
+user_jwt:
+  secret: user-secret-key-change-in-production-please
+  expire_hours: 24  # 用户 Token 有效期（小时）
+  remember_me_expire_hours: 168  # 记住我 Token 有效期（小时）
+
+bootstrap:
+  default_admin_username: ""  # 首次初始化管理员用户名（可选）
+  default_admin_password: ""  # 首次初始化管理员密码（建议生产配置）
+
+telegram_auth:
+  enabled: false
+  bot_username: ""  # Telegram Bot 用户名（不含 @）
+  bot_token: ""     # Telegram Bot Token（敏感）
+  # 新版 OIDC 登录（可选）：在 @BotFather → Bot Settings → Web Login 获取 Client Secret，
+  # 并把本商城域名 origin 与下面的回调地址都加入 Allowed URLs。
+  # 同时填写 client_secret + oidc_redirect_uri 后自动切换为新版 OIDC 登录；否则沿用旧版 Login Widget。
+  client_secret: ""        # OIDC Client Secret（敏感）
+  oidc_redirect_uri: ""    # 形如 https://你的商城域名/auth/telegram/callback
+  mini_app_url: ""  # Telegram Mini App 页面地址（需与 BotFather Web App URL 保持一致）
+  login_expire_seconds: 300
+  replay_ttl_seconds: 300
+
+google_auth:
+  enabled: false
+  # Google Identity Services Web Client ID。登录只校验 credential ID Token，
+  # 不需要 Client Secret，也不需要申请 Gmail API 权限。
+  # 请在 Google Cloud Console 为主站及每个白标域名分别登记：
+  # 1. Authorized JavaScript origin，例如 https://shop.example.com
+  # 2. Authorized redirect URI，例如
+  #    https://shop.example.com/api/v1/auth/google/redirect/callback
+  # 桌面与 Android 使用 popup/FedCM；iOS/iPadOS 使用 redirect form_post，
+  # 后者依赖已启用且可用的 Redis 7（一次性状态通过 GETDEL 消费）。
+  client_id: ""
+
+redis:
+  enabled: true
+  host: 127.0.0.1
+  port: 6379
+  password: ""
+  db: 0
+  prefix: "dj"
+
+queue:
+  enabled: true
+  host: 127.0.0.1
+  port: 6379
+  password: ""
+  db: 1
+  concurrency: 10
+  queues:
+    default: 10
+    critical: 5
+  upstream_sync_interval: "5m"  # 上游库存同步间隔（如 1m、5m、10m）
+
+upload:
+  max_size: 10485760  # 最大上传文件大小（字节，默认 10MB）
+  allowed_types:
+    - image/jpeg
+    - image/png
+    - image/gif
+    - image/webp
+    # - image/svg+xml  # SVG 可携带脚本，默认关闭；如需开启请同时放开下方 .svg 扩展名
+  allowed_extensions:
+    - .jpg
+    - .jpeg
+    - .png
+    - .gif
+    - .webp
+    # - .svg
+  max_width: 4096
+  max_height: 4096
+
+cors:
+  allowed_origins:
+    - "*"
+  allowed_methods:
+    - GET
+    - POST
+    - PUT
+    - PATCH
+    - DELETE
+    - OPTIONS
+  allowed_headers:
+    - Content-Type
+    - Content-Length
+    - Accept-Encoding
+    - Authorization
+    - Cache-Control
+    - X-Requested-With
+    - X-CSRF-Token
+  allow_credentials: true
+  max_age: 600
+
+security:
+  login_rate_limit:
+    window_seconds: 300
+    max_attempts: 5
+    block_seconds: 900
+  password_policy:
+    min_length: 8
+    require_upper: true
+    require_lower: true
+    require_number: true
+    require_special: false
+
+email:
+  enabled: true
+  host: smtp.xxx.com
+  port: 465
+  username: your-username
+  password: your-password
+  from: your-email
+  from_name: your-name
+  use_tls: false
+  use_ssl: true
+  verify_code:
+    expire_minutes: 10
+    send_interval_seconds: 60
+    max_attempts: 5
+    length: 6
+
+order:
+  payment_expire_minutes: 15
+  max_refund_days: 30
+
+reseller:
+  enabled: false
+  # 主站域名列表。启用分销模式后，请把正式主站域名写入这里。
+  # 命中 main_hosts 的请求按主站上下文处理；未命中则尝试解析 reseller_domains。
+  main_hosts:
+    - localhost
+    - 127.0.0.1
+    - "::1"
+  # 只有反向代理可信并正确传递 Host 时才开启。
+  # false 时使用原始 Host；true 时优先使用 X-Forwarded-Host。
+  trusted_forwarded_host: false
+  # 管理员为分销商分配系统二级域名时使用的基础域名，例如 hello.{subdomain_base}。
+  # 生产启用前请配置为已经做好 wildcard DNS/TLS 的域名，例如 shop.example.com。
+  subdomain_base: ""
+  # 是否允许普通用户在个人中心自助提交分销商申请。
+  self_apply_enabled: true
+  # 分销利润入账后转为「可提现」的确认天数（0 表示即时到账，最大 3650）。
+  # 退款扣减会与同一订单的未到账利润一起在确认时生效，确认期内退款不会误冻结账户。
+  settlement_confirm_days: 7
+
+# Web 路由配置（仅在 fullstack 二进制模式下生效；普通 Docker 镜像部署忽略此段）
+web:
+  # 后台访问路径前缀
+  # 强烈建议改成不易猜测的字符串以降低自动化扫描风险
+  # 例如: "/dj-mgmt-7x9k2" 或 "/console-private"
+  admin_path: "/admin"

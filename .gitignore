@@ -1,0 +1,24 @@
+.vscode/
+config.yml
+.idea
+db
+uploads
+*.db
+*.log
+.env
+.DS_Store
+node_modules/
+# Added by goreleaser init:
+dist/
+
+# 前端构建产物与依赖（frontend/{admin,user}）
+frontend/*/dist/
+frontend/*/node_modules/
+frontend/*/*.local
+
+# Fullstack 嵌入产物：由前端构建拷贝而来，不进 git 历史
+internal/web/dist/
+
+# Agents 配置
+.agents/
+skills-lock.json

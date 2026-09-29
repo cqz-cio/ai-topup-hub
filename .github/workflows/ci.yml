@@ -1,0 +1,169 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  installer:
+    name: Verify installer
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install shell test dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-yaml shellcheck
+
+      - name: Check Bash syntax and ShellCheck
+        run: |
+          bash -n scripts/dujiao-next-manager.sh
+          bash -n scripts/tests/dujiao-next-manager_test.sh
+          shellcheck -x -S warning scripts/dujiao-next-manager.sh scripts/tests/dujiao-next-manager_test.sh
+
+      - name: Run installer tests
+        run: sudo bash scripts/tests/dujiao-next-manager_test.sh
+
+      - name: Check release archive includes installer
+        run: |
+          python3 - <<'PY'
+          import yaml
+
+          with open('.goreleaser.yaml', encoding='utf-8') as handle:
+              config = yaml.safe_load(handle)
+          files = config['archives'][0]['files']
+          assert './scripts/dujiao-next-manager.sh' in files, files
+          PY
+
+  api:
+    name: Verify API
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Download dependencies
+        run: go mod download
+
+      # 用 git ls-files 限定范围，避免 gofmt 递归遍历 frontend/*/node_modules
+      - name: Check formatting
+        shell: bash
+        run: |
+          unformatted="$(gofmt -l $(git ls-files '*.go'))"
+          if [[ -n "$unformatted" ]]; then
+            echo "::error::The following Go files are not formatted:"
+            printf '%s\n' "$unformatted"
+            exit 1
+          fi
+
+      - name: Run vet
+        run: go vet ./...
+
+      - name: Run tests
+        run: go test ./...
+
+      - name: Build server
+        run: go build ./cmd/server
+
+  # 发布配置只在打 tag 时才会被 GoReleaser 读取，普通 CI 覆盖不到。
+  # 而配置解析失败是在构建开始前就中止的，等到 tag 那一刻才发现代价最高，
+  # 所以这里用与 release.yml 完全相同的 distribution/version 提前验一次。
+  release-config:
+    name: Verify release config
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Check .goreleaser.yaml
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: latest
+          args: check
+
+  fullstack:
+    name: Verify fullstack build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.11.1'
+
+      # 用子 shell cd 而非 `pnpm --dir`：后者不会读取子目录的 packageManager 字段，
+      # 在启用 corepack 的环境下会用错 pnpm 版本
+      - name: Install frontend dependencies
+        run: |
+          (cd frontend/admin && pnpm install --frozen-lockfile)
+          (cd frontend/user  && pnpm install --frozen-lockfile)
+
+      # release notes 的 sanitizer 是后台唯一一处 v-html，攻击向量必须每次 CI 都跑一遍
+      - name: Run admin frontend tests
+        run: (cd frontend/admin && pnpm run test)
+
+      - name: Run user frontend tests
+        run: (cd frontend/user && pnpm run test)
+
+      # 两个 build 脚本都以 `vue-tsc -b` 开头，因此这一步同时覆盖了类型检查
+      - name: Build frontends
+        run: |
+          (cd frontend/admin && pnpm run build:fullstack)
+          (cd frontend/user  && pnpm run build)
+
+      - name: Embed frontend assets
+        run: |
+          mkdir -p internal/web/dist
+          cp -r frontend/admin/dist internal/web/dist/admin
+          cp -r frontend/user/dist  internal/web/dist/user
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      # 只有带 fullstack tag 才会编译 embed_fullstack.go，
+      # 默认构建覆盖不到，必须在这里单独验证一次完整的嵌入链路。
+      - name: Build fullstack binary
+        run: go build -tags release,fullstack ./cmd/server
