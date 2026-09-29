@@ -6,6 +6,7 @@ import { debounceAsync } from '../utils/debounce'
 import { useConfirmDialog } from './useConfirmDialog'
 import { toast } from './useToast'
 import { useOrderDisplayHelpers } from './useOrderDisplayHelpers'
+import { createOrderDetailPolling, needsOrderDetailRefresh } from '../utils/orderDetailPolling'
 
 /**
  * 已登录用户订单详情逻辑（classic + vault 共用）。
@@ -19,6 +20,8 @@ export function useOrderDetail() {
   const loading = ref(true)
   const order = ref<any>(null)
   const fulfillmentDownloading = ref(false)
+  let disposed = false
+  let requestVersion = 0
 
   const helpers = useOrderDisplayHelpers(order)
 
@@ -39,17 +42,30 @@ export function useOrderDetail() {
     }
   }
 
-  const loadOrder = async () => {
-    loading.value = true
+  const loadOrder = async (options?: { silent?: boolean }) => {
+    const silent = options?.silent === true
+    const version = ++requestVersion
+    const orderNo = String(route.params.order_no || '').trim()
+    const isCurrent = () => !disposed && version === requestVersion && orderNo === String(route.params.order_no || '').trim()
+    if (!silent) loading.value = true
     try {
-      const response = await userOrderAPI.detail(String(route.params.order_no || '').trim())
+      const response = await userOrderAPI.detail(orderNo)
+      if (!isCurrent()) return
       order.value = response.data.data
     } catch (error) {
-      order.value = null
+      if (isCurrent() && !silent) order.value = null
     } finally {
-      loading.value = false
+      if (isCurrent()) {
+        if (!silent) loading.value = false
+        polling.schedule()
+      }
     }
   }
+
+  const polling = createOrderDetailPolling(
+    () => loadOrder({ silent: true }),
+    () => !loading.value && needsOrderDetailRefresh(order.value),
+  )
 
   const debouncedLoadOrder = debounceAsync(loadOrder, 300)
 
@@ -80,6 +96,8 @@ export function useOrderDetail() {
   })
 
   onUnmounted(() => {
+    disposed = true
+    polling.stop()
     debouncedLoadOrder.cancel()
   })
 

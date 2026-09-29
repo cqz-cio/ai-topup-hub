@@ -6,6 +6,7 @@ import { debounceAsync } from '../utils/debounce'
 import { clearGuestOrderAuth, loadGuestOrderAuth, saveGuestOrderAuth } from '../utils/guestOrderAuth'
 import { resolveGuestOrderDetailViewState } from '../utils/guestOrderDetailState'
 import { useOrderDisplayHelpers } from './useOrderDisplayHelpers'
+import { createOrderDetailPolling, needsOrderDetailRefresh } from '../utils/orderDetailPolling'
 
 /**
  * 游客订单详情逻辑（classic + vault 共用）。
@@ -23,6 +24,8 @@ export function useGuestOrderDetail() {
     order_password: '',
   })
   const fulfillmentDownloading = ref(false)
+  let disposed = false
+  let requestVersion = 0
 
   const helpers = useOrderDisplayHelpers(order)
 
@@ -58,27 +61,42 @@ export function useGuestOrderDetail() {
     showAuthForm: showAuthForm.value,
   }))
 
-  const loadOrder = async () => {
-    loading.value = true
+  const loadOrder = async (options?: { silent?: boolean }) => {
+    const silent = options?.silent === true
+    const version = ++requestVersion
+    const orderNo = String(route.params.order_no || '').trim()
+    const credentials = { ...auth.value }
+    const isCurrent = () => !disposed && version === requestVersion
+      && orderNo === String(route.params.order_no || '').trim()
+      && credentials.email === auth.value.email && credentials.order_password === auth.value.order_password
+    if (!silent) loading.value = true
     try {
       if (!hasAuth.value) {
         order.value = null
         authError.value = t('guestOrderDetail.authRequired')
         return
       }
-      const response = await guestOrderAPI.detail(String(route.params.order_no || '').trim(), {
-        email: auth.value.email,
-        order_password: auth.value.order_password,
-      })
+      const response = await guestOrderAPI.detail(orderNo, credentials)
+      if (!isCurrent()) return
       order.value = response.data.data
       authError.value = ''
     } catch (error) {
-      order.value = null
-      authError.value = t('guestOrderDetail.authInvalid')
+      if (isCurrent() && !silent) {
+        order.value = null
+        authError.value = t('guestOrderDetail.authInvalid')
+      }
     } finally {
-      loading.value = false
+      if (isCurrent()) {
+        if (!silent) loading.value = false
+        polling.schedule()
+      }
     }
   }
+
+  const polling = createOrderDetailPolling(
+    () => loadOrder({ silent: true }),
+    () => !loading.value && hasAuth.value && !authError.value && needsOrderDetailRefresh(order.value),
+  )
 
   const debouncedLoadOrder = debounceAsync(loadOrder, 300)
 
@@ -101,6 +119,8 @@ export function useGuestOrderDetail() {
   }
 
   const clearAuth = () => {
+    requestVersion += 1
+    loading.value = false
     clearGuestOrderAuth()
     auth.value = { email: '', order_password: '' }
     order.value = null
@@ -117,6 +137,8 @@ export function useGuestOrderDetail() {
   })
 
   onUnmounted(() => {
+    disposed = true
+    polling.stop()
     debouncedLoadOrder.cancel()
   })
 
