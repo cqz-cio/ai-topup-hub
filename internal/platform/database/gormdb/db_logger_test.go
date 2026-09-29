@@ -19,27 +19,31 @@ func (recorder *gormLogRecorder) Printf(format string, args ...interface{}) {
 }
 
 func TestReleaseGORMLoggerDoesNotExposeQueryParameters(t *testing.T) {
-	recorder := &gormLogRecorder{}
-	db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{
-		Logger: newGORMLogger(" release ", recorder),
-	})
-	if err != nil {
-		t.Fatalf("open sqlite: %v", err)
-	}
+	for _, mode := range []string{" release ", "debug"} {
+		t.Run(mode, func(t *testing.T) {
+			recorder := &gormLogRecorder{}
+			db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{
+				Logger: newGORMLogger(mode, recorder),
+			})
+			if err != nil {
+				t.Fatalf("open sqlite: %v", err)
+			}
 
-	secret := "must-not-appear-in-production-database-logs"
-	if err := db.Exec("INSERT INTO missing_table (secret) VALUES (?)", secret).Error; err == nil {
-		t.Fatal("expected missing-table error")
-	}
+			secret := "must-not-appear-in-production-database-logs"
+			if err := db.Exec("INSERT INTO missing_table (secret) VALUES (?)", secret).Error; err == nil {
+				t.Fatal("expected missing-table error")
+			}
 
-	output := recorder.String()
-	if output == "" {
-		t.Fatal("expected database error to be logged")
-	}
-	if strings.Contains(output, secret) {
-		t.Fatalf("release database log exposed a query parameter: %s", output)
-	}
-	if !strings.Contains(output, "missing_table") {
-		t.Fatalf("release database log should retain useful query context: %s", output)
+			output := recorder.String()
+			if output == "" {
+				t.Fatal("expected database error to be logged")
+			}
+			if strings.Contains(output, secret) {
+				t.Fatalf("release database log exposed a query parameter: %s", output)
+			}
+			if !strings.Contains(output, "missing_table") {
+				t.Fatalf("release database log should retain useful query context: %s", output)
+			}
+		})
 	}
 }

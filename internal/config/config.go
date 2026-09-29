@@ -14,6 +14,7 @@ import (
 
 // Config 应用配置结构
 type Config struct {
+	AutoRecharge AutoRechargeConfig `mapstructure:"auto_recharge"`
 	App          AppConfig          `mapstructure:"app"`
 	Server       ServerConfig       `mapstructure:"server"`
 	Log          LogConfig          `mapstructure:"log"`

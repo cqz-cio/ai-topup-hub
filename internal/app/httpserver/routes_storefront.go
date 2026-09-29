@@ -8,6 +8,7 @@ import (
 	affiliatetransport "github.com/dujiao-next/internal/modules/affiliate/transport/http"
 	apicredentialtransport "github.com/dujiao-next/internal/modules/apicredential/transport/http"
 	auditlogtransport "github.com/dujiao-next/internal/modules/auditlog/transport/http"
+	rechargehttp "github.com/dujiao-next/internal/modules/autorecharge/transport/http"
 	captchatransport "github.com/dujiao-next/internal/modules/captcha/transport/http"
 	carttransport "github.com/dujiao-next/internal/modules/cart/transport/http"
 	categoryhttp "github.com/dujiao-next/internal/modules/catalog/category/transport/http"
@@ -68,6 +69,10 @@ func registerStorefrontRoutes(
 ) {
 	storefront := apiV1.Group("")
 	storefront.Use(middleware.ResellerTenantMiddleware(c.ResellerDomainResolver))
+	if c.AutoRechargeService != nil {
+		redemption := storefront.Group("/recharge/redemptions", middleware.RateLimitMiddleware(redisClient, middleware.RateLimitRule{Prefix: "recharge-redemption", WindowSeconds: 60, MaxRequests: 30, BlockSeconds: 60}, middleware.KeyByIP))
+		rechargehttp.RegisterRedemptionRoutes(redemption, rechargehttp.New(c.AutoRechargeService))
+	}
 	affiliateHandler := affiliatebootstrap.NewStorefrontHandler(c)
 
 	// 公开接口
@@ -115,6 +120,9 @@ func registerStorefrontRoutes(
 	// 用户接口（需鉴权）
 	user := storefront.Group("")
 	user.Use(middleware.UserJWTAuthMiddleware(cfg.UserJWT.SecretKey, c.UserStore))
+	if c.AutoRechargeService != nil {
+		rechargehttp.RegisterUserRoutes(user, rechargehttp.New(c.AutoRechargeService))
+	}
 	{
 		userauthtransport.RegisterUserProfileRoutes(user, userProfileHandler)
 		auditlogtransport.RegisterUserRoutes(user, userAuditLogHandler)

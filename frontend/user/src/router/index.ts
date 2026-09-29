@@ -113,6 +113,12 @@ const router = createRouter({
     },
     routes: [
         {
+            path: '/redeem',
+            name: 'redemption',
+            component: () => import('../views/Redeem.vue'),
+            meta: { standalone: true },
+        },
+        {
             path: '/',
             name: 'home',
             component: templateView('Home', homeViewLoader),
@@ -327,10 +333,17 @@ const router = createRouter({
 })
 
 // Navigation Guard
-router.beforeEach(async (to, _from, next) => {
+router.beforeEach(async (to, from, next) => {
+    // Start a fresh document across this boundary so storefront custom scripts
+    // cannot survive into a page accepting Session credentials.
+    if (from.name && to.name !== from.name && (to.name === 'redemption' || from.name === 'redemption')) {
+        window.location.assign(router.resolve(to).href)
+        next(false)
+        return
+    }
     const userAuthStore = useUserAuthStore()
     const appStore = useAppStore()
-    void captureAffiliateFromRoute(to)
+    if (to.name !== 'redemption') void captureAffiliateFromRoute(to)
 
     // Ensure config is loaded before checking template mode
     if (!appStore.config) {

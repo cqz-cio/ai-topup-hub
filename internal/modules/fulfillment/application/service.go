@@ -87,6 +87,19 @@ func (s *Service) CreateManual(input CreateManualInput) (*fulfillmentdomain.Fulf
 	if input.OrderID == 0 || input.AdminID == 0 {
 		return nil, ErrFulfillmentInvalid
 	}
+	return s.createManual(input)
+}
+
+// DeliverRechargeCode is an internal entry point for paid redemption entitlements.
+// A system delivery has no fabricated administrator identity.
+func (s *Service) DeliverRechargeCode(orderID uint, payload string) (*fulfillmentdomain.Fulfillment, error) {
+	if orderID == 0 {
+		return nil, ErrFulfillmentInvalid
+	}
+	return s.createManual(CreateManualInput{OrderID: orderID, Payload: payload})
+}
+
+func (s *Service) createManual(input CreateManualInput) (*fulfillmentdomain.Fulfillment, error) {
 	payload := strings.TrimSpace(input.Payload)
 	deliveryData := normalizeManualDeliveryData(input.DeliveryData)
 	if payload == "" && len(deliveryData) == 0 {
@@ -119,19 +132,30 @@ func (s *Service) CreateManual(input CreateManualInput) (*fulfillmentdomain.Fulf
 
 	var created *fulfillmentdomain.Fulfillment
 	err = s.orderStore.WithinTransaction(func(tx ordercontract.Transaction) error {
+		locked, lockErr := tx.Orders().GetByIDForUpdate(input.OrderID)
+		if lockErr != nil {
+			return lockErr
+		}
+		if locked == nil || (locked.Status != constants.OrderStatusPaid && locked.Status != constants.OrderStatusFulfilling) || locked.RefundedAmount.IsPositive() {
+			return ErrOrderStatusInvalid
+		}
 		if _, found, err := tx.Fulfillments().FindByOrderIDForUpdate(input.OrderID); err != nil {
 			return err
 		} else if found {
 			return ErrFulfillmentExists
 		}
 
+		var deliveredBy *uint
+		if input.AdminID != 0 {
+			deliveredBy = &input.AdminID
+		}
 		fulfillment := &fulfillmentdomain.Fulfillment{
 			OrderID:       input.OrderID,
 			Type:          ftype,
 			Status:        constants.FulfillmentStatusDelivered,
 			Payload:       payload,
 			LogisticsJSON: deliveryData,
-			DeliveredBy:   &input.AdminID,
+			DeliveredBy:   deliveredBy,
 			DeliveredAt:   deliveredAt,
 			CreatedAt:     now,
 			UpdatedAt:     now,

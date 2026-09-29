@@ -5,6 +5,7 @@ import (
 	affiliatedomain "github.com/dujiao-next/internal/modules/affiliate/domain"
 	apicredentialdomain "github.com/dujiao-next/internal/modules/apicredential/domain"
 	auditlogdomain "github.com/dujiao-next/internal/modules/auditlog/domain"
+	autorechargedomain "github.com/dujiao-next/internal/modules/autorecharge/domain"
 	cardsecretdomain "github.com/dujiao-next/internal/modules/cardsecret/domain"
 	cartdomain "github.com/dujiao-next/internal/modules/cart/domain"
 	categorydomain "github.com/dujiao-next/internal/modules/catalog/category/domain"
@@ -43,6 +44,7 @@ import (
 func AutoMigrate() error {
 	db := gormdb.DB
 	if err := db.AutoMigrate(
+		&autorechargedomain.Task{},
 		&admindomain.Admin{},
 		&userdomain.User{},
 		&externalidentitydomain.Identity{},

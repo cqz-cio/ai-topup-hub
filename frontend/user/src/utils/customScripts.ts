@@ -1,3 +1,5 @@
+import { isRedemptionPath } from './redemption'
+
 type ScriptPosition = 'head' | 'body_end'
 
 type CustomScript = {
@@ -99,6 +101,7 @@ export const clearCustomScripts = () => {
 
 export const applyCustomScripts = (rawScripts: unknown) => {
   if (typeof document === 'undefined') return
+  if (typeof window !== 'undefined' && isRedemptionPath(window.location.pathname)) return
 
   clearCustomScripts()
   const scripts = normalizeCustomScripts(rawScripts)

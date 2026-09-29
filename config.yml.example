@@ -189,3 +189,17 @@ web:
   # 强烈建议改成不易猜测的字符串以降低自动化扫描风险
   # 例如: "/dj-mgmt-7x9k2" 或 "/console-private"
   admin_path: "/admin"
+# 自动充值（默认关闭；卡台尚未接入时任务停在 waiting_card，不会扣款）。
+# API 密钥通过环境变量 AICDK_API_KEY 提供，不写入此文件。
+# 使用 manual 交付商品；一个叶子订单只能包含一个 SKU，数量为 1。
+auto_recharge:
+  enabled: false
+  redeem_url: "" # 启用前填写实际 HTTPS 兑换页面地址
+  bindings: []
+  # - sku_id: 123
+  #   plan: chatgptplusplan
+  #   region: US
+  #   region_version: 12  # 启用前从 https://www.aicdkshop.com/api/config 获取当前值
+  #   channel: "3"
+  #   card_rule: plus-us
+  #   cancel_after_success: true

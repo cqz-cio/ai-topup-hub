@@ -22,6 +22,9 @@ func BuildRunner(cfg *config.Config, mode string) (*Runner, error) {
 	}
 
 	var services []Service
+	if dependencies.AutoRechargeService != nil && (mode == ModeAll || mode == ModeWorker) {
+		services = append(services, &autoRechargeWorker{service: dependencies.AutoRechargeService})
+	}
 
 	// 初始化 HTTP 服务
 	if mode == ModeAll || mode == ModeAPI {

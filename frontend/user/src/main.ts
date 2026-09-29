@@ -7,6 +7,7 @@ import router, { warmupCommonRoutes } from './router'
 import i18n, { detectLocale, setI18nLocale, warmupLocaleMessages } from './i18n'
 import { useTelegramMiniAppStore } from './stores/telegramMiniApp'
 import { initTemplateOverride } from './templates/registry'
+import { isRedemptionPath } from './utils/redemption'
 
 // 预览用：?template=vault 持久化激活模板（站长正式切换走站点配置）
 initTemplateOverride()
@@ -30,7 +31,7 @@ app.use(i18n)
 
 // 非默认语言的语言包为懒加载 chunk，挂载前并行加载，避免首屏文案闪现兜底语言
 Promise.all([
-  useTelegramMiniAppStore(pinia).init(),
+  isRedemptionPath(window.location.pathname) ? Promise.resolve() : useTelegramMiniAppStore(pinia).init(),
   setI18nLocale(detectLocale()),
 ]).then(() => {
   app.mount('#app')

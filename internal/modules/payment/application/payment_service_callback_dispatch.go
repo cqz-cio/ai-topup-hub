@@ -23,6 +23,12 @@ func (s *PaymentService) enqueueOrderPaidAsync(order *orderdomain.Order, payment
 	if order == nil {
 		return
 	}
+	// Independent of Redis: the recharge worker recovers tasks from the database.
+	if s.autoRechargeSvc != nil {
+		if err := s.autoRechargeSvc.CreateForOrder(order.ID); err != nil {
+			log.Warnw("auto_recharge_schedule_failed", "order_id", order.ID)
+		}
+	}
 	if s.affiliateSvc != nil {
 		if err := s.affiliateSvc.HandleOrderPaid(order.ID); err != nil {
 			log.Warnw("affiliate_handle_order_paid_failed",

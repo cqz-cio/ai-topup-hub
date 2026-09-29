@@ -11,4 +11,4 @@ This repository is cqz-cio/ai-topup-hub.
 
 Imported as a source archive into an independent Git history. The source repository is not configured as a Git remote, submodule, or GitHub fork. The only configured remote is origin: https://github.com/cqz-cio/ai-topup-hub.git.
 
-Application source files are unchanged from this release. Source URLs retained in documentation and application code are separate from Git remote configuration.
+The initial import preserved application source files from this release. Subsequent project changes are recorded separately in this repository. Source URLs retained in documentation and application code are separate from Git remote configuration.

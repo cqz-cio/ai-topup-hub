@@ -62,6 +62,7 @@ type PaymentService struct {
 	affiliateSvc            AffiliatePaymentLifecycle
 	notificationSvc         notificationcontract.NotificationEnqueuer
 	procurementSvc          ProcurementCreator
+	autoRechargeSvc         ProcurementCreator
 	downstreamCallbackSvc   DownstreamCallbackEnqueuer
 	memberLevelSvc          MemberLevelProgressor
 	paymentProviderRegistry paymentcontract.GatewayRegistry
@@ -94,6 +95,11 @@ type resellerAccountingTransactions interface {
 // SetProcurementService 设置采购单服务（解决循环依赖）
 func (s *PaymentService) SetProcurementService(svc ProcurementCreator) {
 	s.procurementSvc = svc
+}
+
+// SetAutoRechargeService attaches the durable paid-order recharge scheduler.
+func (s *PaymentService) SetAutoRechargeService(svc ProcurementCreator) {
+	s.autoRechargeSvc = svc
 }
 
 // SetDownstreamCallbackService 设置下游回调服务（解决循环依赖）

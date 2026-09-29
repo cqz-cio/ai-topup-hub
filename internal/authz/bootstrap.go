@@ -37,6 +37,17 @@ func BuiltinRoleSeeds() []RoleSeed {
 			Immutable: true,
 		},
 		{
+			Role:     "recharge_operator",
+			Inherits: []string{"readonly_auditor"},
+			Policies: []Policy{
+				{Object: "/admin/orders/:id/auto-recharge", Action: "GET"},
+				{Object: "/admin/orders/:id/auto-recharge/advance", Action: "POST"},
+				{Object: "/admin/orders/:id/auto-recharge/verification", Action: "GET"},
+				{Object: "/admin/orders/:id/auto-recharge/finalize", Action: "POST"},
+			},
+			Immutable: true,
+		},
+		{
 			Role:     "operations",
 			Inherits: []string{"readonly_auditor"},
 			Policies: []Policy{

@@ -1,7 +1,8 @@
 <template>
   <div id="app" class="min-h-screen bg-background text-foreground flex flex-col">
+    <ErrorBoundary v-if="isStandalone"><RouterView /></ErrorBoundary>
     <!-- vault 模板：自带顶栏/页脚的外壳包裹页面（控制台仍走下方分支） -->
-    <VaultLayout v-if="isVault && !isResellerConsole">
+    <VaultLayout v-else-if="isVault && !isResellerConsole">
       <ErrorBoundary>
         <RouterView v-slot="{ Component }">
           <Transition name="page-fade" mode="out-in">
@@ -55,6 +56,7 @@ const VaultLayout = defineAsyncComponent(() => import('./templates/vault/layout/
 const appStore = useAppStore()
 const route = useRoute()
 const isResellerConsole = computed(() => route.meta.resellerConsole === true)
+const isStandalone = computed(() => route.meta.standalone === true)
 // getActiveTemplate 读取 appStore.config（响应式），config 加载后会重新计算
 const isVault = computed(() => getActiveTemplate() === 'vault')
 </script>
