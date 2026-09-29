@@ -1,0 +1,311 @@
+[
+  {
+    "id": 1,
+    "title": "ChatGPT Plus 独享账号",
+    "category": "ChatGPT",
+    "deliveryType": "成品账号",
+    "period": "月卡",
+    "periodLabel": "使用期限",
+    "expiresOn": "",
+    "pendingValidity": false,
+    "validityNote": "",
+    "warranty": "24小时质保",
+    "price": 88,
+    "image": "/products/51b9fa3a993e4df58dc55ee3af246b.jpg",
+    "sections": [
+      {
+        "title": "服务内容",
+        "paragraphs": [
+          "日区特殊渠道独享Plus月卡账号，支持反代。月卡期限与售后质保期不同，请按所选规格确认。"
+        ]
+      },
+      {
+        "title": "售后范围",
+        "paragraphs": [
+          "购买24小时内，非禁止网络导致的账号问题可免费更换一次，每单限一次；超过24小时不提供售后。以客服收到反馈的时间为准，请及时提交错误截图。",
+          "如收到的账号遗漏激活、显示为免费版，可联系客服核实退款。"
+        ]
+      },
+      {
+        "title": "使用限制",
+        "paragraphs": [
+          "禁止使用香港、新加坡、台湾地区网络，以及 Amazon、Google、Alibaba、Tencent、Akamai、Frantech、Cloudflare、Oracle、Akari、GSL、Nearoute、it7、Xtom、Dmit、Colocrossing、Sakura 服务商网络，尤其是腾讯43开头的IP。此类禁止网络导致的问题不在质保范围。",
+          "Codex可能要求额外的手机验证，相关验证码费用另计；部分账号可能出现额度减少，请购买前确认可接受。",
+          "不要另行开通Team，Team异常可能导致Plus会员丢失。"
+        ]
+      },
+      {
+        "title": "账号安全",
+        "paragraphs": [
+          "登录成功后先修改账户密码，再修改邮箱密码或添加辅助邮箱。因未修改密码导致的账号被盗不提供售后。微软邮箱登录异常时，可尝试浏览器无痕模式并关闭代理。"
+        ]
+      }
+    ],
+    "images": []
+  },
+  {
+    "id": 2,
+    "title": "ChatGPT Plus 独享账号",
+    "category": "ChatGPT",
+    "deliveryType": "成品账号",
+    "period": "月卡",
+    "periodLabel": "使用期限",
+    "expiresOn": "",
+    "pendingValidity": false,
+    "validityNote": "",
+    "warranty": "20天质保",
+    "price": 100,
+    "image": "/products/274c9483478cf511bbd14bc65a3926.jpg",
+    "sections": [
+      {
+        "title": "服务内容",
+        "paragraphs": [
+          "日区特殊渠道独享Plus月卡账号，支持反代。月卡期限与售后质保期不同，请按所选规格确认。"
+        ]
+      },
+      {
+        "title": "售后范围",
+        "paragraphs": [
+          "购买20天内，非禁止网络导致的掉订阅、封号等有效问题，经客服核实后按剩余天数退剩余价值。以本商品售价100元计算：使用8天，剩余12天，退款为12 ÷ 20 × 100 = 60元。"
+        ]
+      },
+      {
+        "title": "使用限制",
+        "paragraphs": [
+          "禁止使用香港、新加坡、台湾地区网络，以及 Amazon、Google、Alibaba、Tencent、Akamai、Frantech、Cloudflare、Oracle、Akari、GSL、Nearoute、it7、Xtom、Dmit、Colocrossing、Sakura 服务商网络，尤其是腾讯43开头的IP。此类禁止网络导致的问题不在质保范围。",
+          "Codex可能要求额外的手机验证，相关验证码费用另计；部分账号可能出现额度减少，请购买前确认可接受。",
+          "不要另行开通Team，Team异常可能导致Plus会员丢失。"
+        ]
+      },
+      {
+        "title": "账号安全",
+        "paragraphs": [
+          "登录成功后先修改账户密码，再修改邮箱密码或添加辅助邮箱。因未修改密码导致的账号被盗不提供售后。微软邮箱登录异常时，可尝试浏览器无痕模式并关闭代理。"
+        ]
+      }
+    ],
+    "images": []
+  },
+  {
+    "id": 3,
+    "title": "ChatGPT Free 普通账号",
+    "category": "ChatGPT",
+    "deliveryType": "成品账号",
+    "period": "无付费订阅",
+    "periodLabel": "使用期限",
+    "expiresOn": "",
+    "pendingValidity": false,
+    "validityNote": "",
+    "warranty": "首登质保",
+    "price": 7.88,
+    "image": "/products/9c416262bd799c295d0beca233a53f.jpg",
+    "sections": [
+      {
+        "title": "服务内容",
+        "paragraphs": [
+          "普通Free账号，注册日期为2026年4月，不含Plus或Pro订阅。交付账号、密码与邮箱密码；附带的refreshToken可能已过期。"
+        ]
+      },
+      {
+        "title": "售后范围",
+        "paragraphs": [
+          "仅保障交付后的首次正常登录，首次登录成功后不提供账号问题的售后或补偿。",
+          "账号可能触发风控。后续充值Plus或Pro后因账号风控无法使用，不提供售后。"
+        ]
+      },
+      {
+        "title": "使用须知",
+        "paragraphs": [
+          "使用邮箱方式登录，不要选择微软登录。请修改邮箱密码；充值前务必同时修改账户和邮箱密码。",
+          "Codex可能要求额外手机验证，验证码费用另计。"
+        ]
+      }
+    ],
+    "images": []
+  },
+  {
+    "id": 4,
+    "title": "ChatGPT Plus 代充值",
+    "category": "ChatGPT",
+    "deliveryType": "自助充值",
+    "period": "月卡",
+    "periodLabel": "使用期限",
+    "expiresOn": "",
+    "pendingValidity": false,
+    "validityNote": "",
+    "warranty": "订阅质保",
+    "price": 134,
+    "image": "/products/68ab65a1551230b14e21bf165a14f1.jpg",
+    "sections": [
+      {
+        "title": "服务内容",
+        "paragraphs": [
+          "Plus月卡自助充值，使用SESSION文件方式充值，不支持其他充值方式；其他方式充值失败不负责。"
+        ]
+      },
+      {
+        "title": "售后范围",
+        "paragraphs": [
+          "仅保障订阅，掉订阅按天退差价；账号封禁不在质保范围。",
+          "卡密有效期仅保障1周，超过1周未使用导致失效，不提供售后。"
+        ]
+      },
+      {
+        "title": "使用须知",
+        "paragraphs": [
+          "可提前续费，但新订阅会覆盖原有时间，并非累加时长。",
+          "频繁切换IP、使用批量注册账号可能导致风控。"
+        ]
+      }
+    ],
+    "images": []
+  },
+  {
+    "id": 5,
+    "title": "ChatGPT Pro 5X 代充值",
+    "category": "ChatGPT",
+    "deliveryType": "自助充值",
+    "period": "月卡",
+    "periodLabel": "使用期限",
+    "expiresOn": "",
+    "pendingValidity": false,
+    "validityNote": "",
+    "warranty": "订阅质保",
+    "price": 700,
+    "image": "/products/ad164ca5e1678795061ce64705be4c.jpg",
+    "sections": [
+      {
+        "title": "服务内容",
+        "paragraphs": [
+          "卡密自助充值至您自己的账号，使用交付的充值说明操作。"
+        ]
+      },
+      {
+        "title": "售后范围",
+        "paragraphs": [
+          "仅保障订阅，掉订阅按天退差价；账号封禁不在质保范围。",
+          "卡密有效期仅保障1周，超过1周未使用导致失效，不提供售后。"
+        ]
+      },
+      {
+        "title": "使用须知",
+        "paragraphs": [
+          "可提前续费，但新订阅会覆盖原有时间，并非累加时长。",
+          "Pro会员时间从充值起计算1个月。频繁切换IP、使用批量注册账号可能导致风控。"
+        ]
+      }
+    ],
+    "images": []
+  },
+  {
+    "id": 6,
+    "title": "ChatGPT Pro 20X 代充值",
+    "category": "ChatGPT",
+    "deliveryType": "自助充值",
+    "period": "月卡",
+    "periodLabel": "使用期限",
+    "expiresOn": "",
+    "pendingValidity": false,
+    "validityNote": "",
+    "warranty": "订阅质保",
+    "price": 1250,
+    "image": "/products/b729782a65596b0cf751320e932aca.jpg",
+    "sections": [
+      {
+        "title": "服务内容",
+        "paragraphs": [
+          "卡密自助充值至您自己的账号，使用交付的充值说明操作。"
+        ]
+      },
+      {
+        "title": "售后范围",
+        "paragraphs": [
+          "仅保障订阅，掉订阅按天退差价；账号封禁不在质保范围。",
+          "卡密有效期仅保障1周，超过1周未使用导致失效，不提供售后。"
+        ]
+      },
+      {
+        "title": "使用须知",
+        "paragraphs": [
+          "可提前续费，但新订阅会覆盖原有时间，并非累加时长。",
+          "Pro会员时间从充值起计算1个月。频繁切换IP、使用批量注册账号可能导致风控。"
+        ]
+      }
+    ],
+    "images": []
+  },
+  {
+    "id": 8,
+    "title": "Codex 手机验证码",
+    "category": "验证码服务",
+    "deliveryType": "验证码服务",
+    "period": "约25天",
+    "periodLabel": "使用期限",
+    "expiresOn": "",
+    "pendingValidity": false,
+    "validityNote": "",
+    "warranty": "仅验证码服务",
+    "price": 9.99,
+    "image": "/products/097b405cdd903e0750a19c6d848b4c.jpg",
+    "sections": [
+      {
+        "title": "服务内容",
+        "paragraphs": [
+          "美区TM号码，仅用于Codex手机绑定；有效期约25天，具体到期时间以交付的接收页面为准。有效期内可重复接收验证码。"
+        ]
+      },
+      {
+        "title": "使用须知",
+        "paragraphs": [
+          "一个号码绑定一个账号，成功收到验证码后不能更换号码。成功接收前如提示无法发送短信、号码不支持或验证次数过多，可在接收页面选择换号重试。"
+        ]
+      },
+      {
+        "title": "售后范围",
+        "paragraphs": [
+          "仅提供验证码服务，不保障账号本身。有效期内异常无法收码可联系客服反馈，处理结果需进一步确认；号码到期后不能继续使用。"
+        ]
+      }
+    ],
+    "images": []
+  },
+  {
+    "id": 23,
+    "title": "Gmail 随机老账号",
+    "category": "邮箱账号",
+    "deliveryType": "成品账号",
+    "period": "200X—201X年注册",
+    "periodLabel": "注册年份",
+    "expiresOn": "",
+    "pendingValidity": false,
+    "validityNote": "",
+    "warranty": "售后范围咨询确认",
+    "price": 18.88,
+    "image": "/products/294d28a8dc515316e378f8e150fa6d.jpg",
+    "sections": [
+      {
+        "title": "服务内容",
+        "paragraphs": [
+          "随机年份的Gmail老账号，注册年份为200X—201X。具体售后范围请购买前咨询。"
+        ]
+      },
+      {
+        "title": "账号安全",
+        "paragraphs": [
+          "收到后添加2FA和辅助邮箱，移除其他设备，保留自己的设备；7天后再修改账户密码。",
+          "已绑定号码有效期约60—80天。购买7天后、号码到期前，应换绑为自己的长期号码。"
+        ]
+      },
+      {
+        "title": "使用须知",
+        "paragraphs": [
+          "账号被停用时需要提交申诉，恢复时间与结果无法保证。",
+          "如遇商品说明图所示的验证限制，需等待7天，此情况不退不换。"
+        ]
+      }
+    ],
+    "images": [
+      "/products/3302dfaa81adacbb93cfbd6b28d262.jpg"
+    ]
+  }
+]
