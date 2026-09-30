@@ -1,7 +1,11 @@
 export const copyText = async (value: string): Promise<void> => {
   if (navigator?.clipboard?.writeText) {
-    await navigator.clipboard.writeText(value)
-    return
+    try {
+      await navigator.clipboard.writeText(value)
+      return
+    } catch {
+      // Embedded browsers may block this API while still allowing a user copy action.
+    }
   }
   const textarea = document.createElement('textarea')
   textarea.value = value
@@ -11,7 +15,9 @@ export const copyText = async (value: string): Promise<void> => {
   textarea.focus()
   textarea.select()
   try {
-    document.execCommand('copy')
+    if (!document.execCommand('copy')) {
+      throw new Error('Clipboard copy failed')
+    }
   } finally {
     document.body.removeChild(textarea)
   }

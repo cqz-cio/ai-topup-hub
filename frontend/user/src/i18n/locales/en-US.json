@@ -1273,6 +1273,7 @@
     "cryptoChain": "Chain / network",
     "cryptoToken": "Payment token",
     "copyWalletAddress": "Copy wallet address",
+    "copyCryptoAmount": "Copy USDT amount",
     "qrTitle": "Scan to pay",
     "qrTip": "Open your payment app and scan to complete payment.",
     "redirectTitle": "Redirect to pay",

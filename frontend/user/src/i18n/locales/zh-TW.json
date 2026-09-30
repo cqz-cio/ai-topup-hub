@@ -1273,6 +1273,7 @@
     "cryptoChain": "鏈/網路",
     "cryptoToken": "支付幣種",
     "copyWalletAddress": "複製錢包地址",
+    "copyCryptoAmount": "複製 USDT 金額",
     "qrTitle": "請使用掃碼支付",
     "qrTip": "打開支付應用掃碼完成支付。",
     "redirectTitle": "請使用跳轉支付",

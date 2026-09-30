@@ -2,6 +2,8 @@
 
 本目录是智享A社商品目录网页，使用 React 19、Vinext、Vite 和 Tailwind CSS。
 
+自助下单商城已将确认后的首页接入 `frontend/user`。正式部署继续构建原用户端；本目录保留为展示页与商品资料参考，具体链路和部署说明见 [自助购买联调说明](../../docs/self-service-storefront.md)。下文说明仅适用于单独运行这一参考展示页。
+
 ## 本地运行
 
 需要 Node.js >= 22.13.0 和 npm。在本目录执行：

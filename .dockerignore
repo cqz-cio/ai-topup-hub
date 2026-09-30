@@ -8,6 +8,7 @@
 db/
 uploads/
 logs/
+work/
 config.yml
 *.db
 *.log

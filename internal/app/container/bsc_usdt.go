@@ -26,10 +26,14 @@ func (c *Container) initBSCUSDT() error {
 		return nil
 	}
 	endpoint := strings.TrimSpace(os.Getenv("BSC_RPC_URL"))
+	receiptEndpoint := strings.TrimSpace(os.Getenv("BSC_RECEIPT_RPC_URL"))
 	if endpoint == "" {
 		endpoint = "https://bsc-rpc.publicnode.com"
+		if receiptEndpoint == "" {
+			receiptEndpoint = "https://bsc-dataseed.bnbchain.org"
+		}
 	}
-	rpc, err := bscrpc.NewRPC(endpoint)
+	rpc, err := bscrpc.NewRPCWithReceiptEndpoint(endpoint, receiptEndpoint)
 	if err != nil {
 		return err
 	}

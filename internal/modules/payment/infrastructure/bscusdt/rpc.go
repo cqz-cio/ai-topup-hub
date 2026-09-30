@@ -25,23 +25,43 @@ var isHex = chain.IsHex
 var addressTopic = chain.AddressTopic
 
 type RPC struct {
-	endpoint string
-	client   *http.Client
+	endpoint        string
+	receiptEndpoint string
+	client          *http.Client
 }
 
 func NewRPC(endpoint string) (*RPC, error) {
-	u, err := url.Parse(endpoint)
-	if err != nil || u.Scheme != "https" || u.Hostname() == "" || u.User != nil || u.Fragment != "" {
+	return NewRPCWithReceiptEndpoint(endpoint, "")
+}
+
+// NewRPCWithReceiptEndpoint supports nodes whose public log and receipt APIs
+// have different access limits. Settlement still compares each receipt with
+// the finalized block and transfer log returned by the primary endpoint.
+func NewRPCWithReceiptEndpoint(endpoint, receiptEndpoint string) (*RPC, error) {
+	if !validEndpoint(endpoint) || (receiptEndpoint != "" && !validEndpoint(receiptEndpoint)) {
 		return nil, ErrRPC
 	}
-	return &RPC{endpoint: endpoint, client: &http.Client{Timeout: 12 * time.Second, CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}}, nil
+	return &RPC{endpoint: endpoint, receiptEndpoint: receiptEndpoint, client: &http.Client{Timeout: 12 * time.Second, CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}}, nil
+}
+
+func validEndpoint(endpoint string) bool {
+	u, err := url.Parse(endpoint)
+	return err == nil && u.Scheme == "https" && u.Hostname() != "" && u.User == nil && u.Fragment == ""
 }
 func (r *RPC) call(ctx context.Context, method string, params interface{}, out interface{}) error {
+	endpoint := r.endpoint
+	if method == "eth_getTransactionReceipt" && r.receiptEndpoint != "" {
+		endpoint = r.receiptEndpoint
+	}
+	return r.callEndpoint(ctx, endpoint, method, params, out)
+}
+
+func (r *RPC) callEndpoint(ctx context.Context, endpoint, method string, params interface{}, out interface{}) error {
 	raw, err := json.Marshal(map[string]interface{}{"jsonrpc": "2.0", "id": 1, "method": method, "params": params})
 	if err != nil {
 		return ErrRPC
 	}
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, r.endpoint, bytes.NewReader(raw))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, bytes.NewReader(raw))
 	if err != nil {
 		return ErrRPC
 	}
@@ -73,15 +93,25 @@ func (r *RPC) call(ctx context.Context, method string, params interface{}, out i
 	return nil
 }
 func (r *RPC) Check(ctx context.Context) error {
+	if err := r.checkEndpoint(ctx, r.endpoint); err != nil {
+		return err
+	}
+	if r.receiptEndpoint != "" && r.receiptEndpoint != r.endpoint {
+		return r.checkEndpoint(ctx, r.receiptEndpoint)
+	}
+	return nil
+}
+
+func (r *RPC) checkEndpoint(ctx context.Context, endpoint string) error {
 	var chain, decimals string
-	if err := r.call(ctx, "eth_chainId", []interface{}{}, &chain); err != nil {
+	if err := r.callEndpoint(ctx, endpoint, "eth_chainId", []interface{}{}, &chain); err != nil {
 		return err
 	}
 	n, err := quantity(chain)
 	if err != nil || n != ChainID {
 		return ErrRPC
 	}
-	if err = r.call(ctx, "eth_call", []interface{}{map[string]string{"to": Token, "data": "0x313ce567"}, "latest"}, &decimals); err != nil {
+	if err = r.callEndpoint(ctx, endpoint, "eth_call", []interface{}{map[string]string{"to": Token, "data": "0x313ce567"}, "latest"}, &decimals); err != nil {
 		return err
 	}
 	if !isHex(decimals, 32) || decimals != "0x"+strings.Repeat("0", 62)+"12" {

@@ -1226,6 +1226,7 @@
     "cryptoChain": "链/网络",
     "cryptoToken": "支付币种",
     "copyWalletAddress": "复制钱包地址",
+    "copyCryptoAmount": "复制 USDT 金额",
     "qrTitle": "请使用扫码支付",
     "qrTip": "打开支付应用扫码完成支付。",
     "redirectTitle": "请使用跳转支付",

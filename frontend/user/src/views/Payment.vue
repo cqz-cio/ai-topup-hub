@@ -96,25 +96,15 @@
                 <div v-if="qrUsingPayLinkFallback" class="mt-3 text-xs text-muted-foreground">
                   {{ t('payment.qrFallbackHint') }}
                 </div>
-                <div v-if="hasCryptoPaymentDetails" class="mt-4 w-full max-w-xl space-y-2 rounded-xl border bg-white/5 p-3 text-left">
-                  <div
-                    v-for="item in cryptoPaymentDetails"
-                    :key="item.key"
-                    class="flex flex-col gap-1 border-b pb-2 last:border-b-0 last:pb-0 sm:flex-row sm:items-start sm:justify-between sm:gap-4"
-                  >
-                    <span class="shrink-0 text-xs text-muted-foreground">{{ item.label }}</span>
-                    <span class="min-w-0 text-sm font-semibold text-foreground break-all sm:text-right">
-                      {{ item.value }}
-                      <span v-if="item.detail" class="ml-1 font-normal text-muted-foreground">({{ item.detail }})</span>
-                    </span>
-                  </div>
-                  <div v-if="cryptoWalletAddress" class="flex flex-wrap items-center justify-end gap-2 pt-1">
-                    <Button variant="secondary" size="sm" @click="handleCopyWalletAddress">
-                      {{ t('payment.copyWalletAddress') }}
-                    </Button>
-                    <span v-if="walletAddressCopied" class="text-xs text-success">{{ t('payment.copied') }}</span>
-                  </div>
-                </div>
+                <CryptoPaymentDetails
+                  v-if="hasCryptoPaymentDetails"
+                  class="mt-4 w-full max-w-xl"
+                  :details="cryptoPaymentDetails"
+                  :amount-copied="cryptoAmountCopied"
+                  :address-copied="walletAddressCopied"
+                  @copy-amount="handleCopyCryptoAmount"
+                  @copy-address="handleCopyWalletAddress"
+                />
               </div>
 
               <div v-else class="bg-secondary border rounded-2xl p-6">
@@ -393,25 +383,14 @@
                 <div v-if="qrUsingPayLinkFallback" class="text-xs text-muted-foreground">
                   {{ t('payment.qrFallbackHint') }}
                 </div>
-                <div v-if="hasCryptoPaymentDetails" class="space-y-2 rounded-xl border bg-white/5 p-3">
-                  <div
-                    v-for="item in cryptoPaymentDetails"
-                    :key="item.key"
-                    class="flex flex-col gap-1 border-b pb-2 last:border-b-0 last:pb-0"
-                  >
-                    <span class="text-xs text-muted-foreground">{{ item.label }}</span>
-                    <span class="min-w-0 font-semibold text-foreground break-all">
-                      {{ item.value }}
-                      <span v-if="item.detail" class="ml-1 font-normal text-muted-foreground">({{ item.detail }})</span>
-                    </span>
-                  </div>
-                  <div v-if="cryptoWalletAddress" class="flex flex-wrap items-center gap-2 pt-1">
-                    <Button variant="secondary" size="sm" class="font-bold" @click="handleCopyWalletAddress">
-                      {{ t('payment.copyWalletAddress') }}
-                    </Button>
-                    <span v-if="walletAddressCopied" class="text-xs text-success">{{ t('payment.copied') }}</span>
-                  </div>
-                </div>
+                <CryptoPaymentDetails
+                  v-if="hasCryptoPaymentDetails"
+                  :details="cryptoPaymentDetails"
+                  :amount-copied="cryptoAmountCopied"
+                  :address-copied="walletAddressCopied"
+                  @copy-amount="handleCopyCryptoAmount"
+                  @copy-address="handleCopyWalletAddress"
+                />
                 <div v-if="paymentResult.pay_url" class="pt-2 flex flex-wrap items-center gap-2">
                   <Button type="button" variant="outline" size="sm" class="font-semibold" @click="handleCopyPayLink">
                     <Copy class="h-4 w-4" aria-hidden="true" />
@@ -494,6 +473,7 @@ import { Copy, ExternalLink } from 'lucide-vue-next'
 import { pageAlertVariant, pageAlertToneClass } from '../utils/alerts'
 import PaymentAmountBreakdown from '../components/payment/PaymentAmountBreakdown.vue'
 import PaymentChannelSelector from '../components/payment/PaymentChannelSelector.vue'
+import CryptoPaymentDetails from '../components/payment/CryptoPaymentDetails.vue'
 import EmptyState from '../components/EmptyState.vue'
 import CheckoutSteps from '../components/checkout/CheckoutSteps.vue'
 import { Input } from '@/components/ui/input'
@@ -505,18 +485,18 @@ import { usePayment } from '../composables/usePayment'
 const { t } = useI18n()
 
 const {
-  loading, submitting, order, paymentResult, selectedChannelId, copied, walletAddressCopied,
+  loading, submitting, order, paymentResult, selectedChannelId, copied, walletAddressCopied, cryptoAmountCopied,
   openedPayWindow, cachedPayment, guestAuth, guestAuthError, walletLoading, useBalance,
   backLink, showGuestAuthForm, walletOnlyPayment, showBalanceOption, configReady, channels,
   selectedChannel, selectedChannelName, cachedChannelName, resultChannelName, interactionLabel,
   paymentResultTitle, paymentGuideTitle, paymentGuideTip, showPayLink, showTelegramPayHint, payLinkOpenedTip,
-  cryptoWalletAddress, cryptoPaymentDetails, hasCryptoPaymentDetails, qrUsingPayLinkFallback, showQRCode, qrImageUrl,
+  cryptoPaymentDetails, hasCryptoPaymentDetails, qrUsingPayLinkFallback, showQRCode, qrImageUrl,
   orderExpired, orderCanceled, paymentAlert, countdownExpired, countdownText, showCountdown, showResultView, pollingActive, orderItems,
   customerFeeApplied, customerFeeAmountDisplay, payableAmountDisplay, walletBalanceDisplay,
   expectedWalletPaidDisplay, expectedOnlinePayDisplay, expectedOnlinePayCents, requiresOnlineChannel,
   paymentWalletPaidDisplay, paymentOnlinePayDisplay, isChannelDisabledForAmount, channelAmountLimitHint, canSubmitPayment,
   formatDate, statusLabel, formatMoney, hasDiscountAmount, formatDiscountMoney, getLocalizedText, orderItemSkuText, fulfillmentTypeLabelText,
-  handleCopyPayLink, handleCopyWalletAddress, handleOpenPayLink, restoreCachedPayment, handleChangePaymentMethod,
+  handleCopyPayLink, handleCopyWalletAddress, handleCopyCryptoAmount, handleOpenPayLink, restoreCachedPayment, handleChangePaymentMethod,
   handlePayment, handleGuestAuthSubmit, handleRefresh,
 } = usePayment()
 </script>

@@ -1,5 +1,7 @@
 .vscode/
 /work/codex-logs/
+/work/codex-tools/
+/work/codex-runtime/
 config.yml
 .idea
 db

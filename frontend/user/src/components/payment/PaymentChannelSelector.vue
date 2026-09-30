@@ -1,27 +1,42 @@
 <template>
   <div v-if="props.channels.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <button v-for="channel in props.channels" :key="channel.id"
-      :disabled="isDisabled(channel)"
-      :title="isDisabled(channel) ? channelHint(channel) : ''"
-      @click="handleSelect(channel)"
-      class="text-left border rounded-xl p-4 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
-      :class="props.modelValue === channel.id && !isDisabled(channel) ? 'border-primary/45 bg-primary/10' : 'bg-card hover:border-foreground/25'">
-      <div class="flex items-center justify-between gap-2">
-        <div class="flex items-center gap-2">
-          <img v-if="channel.icon" :src="getImageUrl(channel.icon)" loading="lazy" class="h-5 w-5 rounded object-contain shrink-0" />
-          <div class="text-foreground font-medium">{{ channel.name }}</div>
+    <template v-for="channel in props.channels" :key="channel.id">
+      <Bep20PaymentOption
+        v-if="isBep20PaymentChannel(channel)"
+        :full-name="channel.name"
+        :selected="props.modelValue === channel.id"
+        :disabled="isDisabled(channel)"
+        :disabled-hint="channelHint(channel)"
+        @select="handleSelect(channel)"
+      >
+        <template v-if="channel.fee_policy === 'customer_surcharge'" #fees>
+          <div>{{ t('payment.feeLabel') }}：{{ customerFeeDescription(channel) }}</div>
+        </template>
+      </Bep20PaymentOption>
+      <button v-else
+        type="button"
+        :disabled="isDisabled(channel)"
+        :title="isDisabled(channel) ? channelHint(channel) : channel.name"
+        @click="handleSelect(channel)"
+        class="text-left border rounded-xl p-4 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+        :class="props.modelValue === channel.id && !isDisabled(channel) ? 'border-primary/45 bg-primary/10' : 'bg-card hover:border-foreground/25'">
+        <div class="flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <img v-if="channel.icon" :src="getImageUrl(channel.icon)" loading="lazy" class="h-5 w-5 rounded object-contain shrink-0" />
+            <div class="text-foreground font-medium">{{ channel.name }}</div>
+          </div>
+          <Badge v-if="props.modelValue === channel.id && !isDisabled(channel)" variant="accent" size="xs">
+            {{ t('payment.selected') }}
+          </Badge>
         </div>
-        <Badge v-if="props.modelValue === channel.id && !isDisabled(channel)" variant="accent" size="xs">
-          {{ t('payment.selected') }}
-        </Badge>
-      </div>
-      <div v-if="channel.fee_policy === 'customer_surcharge'" class="mt-2 text-xs font-medium text-warning">
-        {{ t('payment.feeLabel') }}：{{ customerFeeDescription(channel) }}
-      </div>
-      <div v-if="isDisabled(channel)" class="mt-2 text-xs text-warning">
-        {{ channelHint(channel) }}
-      </div>
-    </button>
+        <div v-if="channel.fee_policy === 'customer_surcharge'" class="mt-2 text-xs font-medium text-warning">
+          {{ t('payment.feeLabel') }}：{{ customerFeeDescription(channel) }}
+        </div>
+        <div v-if="isDisabled(channel)" class="mt-2 text-xs text-warning">
+          {{ channelHint(channel) }}
+        </div>
+      </button>
+    </template>
   </div>
   <div v-else-if="props.showBalanceOption" class="text-sm text-muted-foreground">
     {{ t('payment.channelEmptyUseBalance') }}
@@ -35,6 +50,8 @@
 import { useI18n } from 'vue-i18n'
 import { getImageUrl } from '../../utils/image'
 import { Badge } from '@/components/ui/badge'
+import Bep20PaymentOption from './Bep20PaymentOption.vue'
+import { isBep20PaymentChannel } from '../../utils/paymentChannelPresentation'
 
 const emit = defineEmits<{
   'update:modelValue': [value: number]

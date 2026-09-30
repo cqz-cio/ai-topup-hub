@@ -44,6 +44,7 @@ export function usePayment() {
   const selectedChannelId = ref<number | null>(null)
   const copied = ref(false)
   const walletAddressCopied = ref(false)
+  const cryptoAmountCopied = ref(false)
   const capturing = ref(false)
   const redirecting = ref(false)
   const redirected = ref(false)
@@ -60,6 +61,7 @@ export function usePayment() {
   const now = ref(appStore.getServerTime())
   const copiedTimer = ref<number | null>(null)
   const walletAddressCopiedTimer = ref<number | null>(null)
+  const cryptoAmountCopiedTimer = ref<number | null>(null)
   const redirectTimer = ref<number | null>(null)
   const walletLoading = ref(false)
   const walletBalance = ref('0')
@@ -729,6 +731,23 @@ export function usePayment() {
     }
   }
 
+  const handleCopyCryptoAmount = async () => {
+    if (!cryptoChainAmount.value) return
+    try {
+      await copyText(cryptoChainAmount.value)
+      cryptoAmountCopied.value = true
+      if (cryptoAmountCopiedTimer.value) {
+        window.clearTimeout(cryptoAmountCopiedTimer.value)
+      }
+      cryptoAmountCopiedTimer.value = window.setTimeout(() => {
+        cryptoAmountCopied.value = false
+        cryptoAmountCopiedTimer.value = null
+      }, 1500)
+    } catch (err: any) {
+      error.value = err?.message || t('payment.copyFailed')
+    }
+  }
+
   const handleCopyWalletAddress = async () => {
     if (!cryptoWalletAddress.value) return
     try {
@@ -1316,6 +1335,10 @@ export function usePayment() {
       window.clearTimeout(walletAddressCopiedTimer.value)
       walletAddressCopiedTimer.value = null
     }
+    if (cryptoAmountCopiedTimer.value) {
+      window.clearTimeout(cryptoAmountCopiedTimer.value)
+      cryptoAmountCopiedTimer.value = null
+    }
     debouncedLoadOrder.cancel()
     debouncedLoadOrderPaymentChannels.cancel()
   })
@@ -1351,6 +1374,7 @@ export function usePayment() {
     selectedChannelId,
     copied,
     walletAddressCopied,
+    cryptoAmountCopied,
     openedPayWindow,
     cachedPayment,
     guestAuth,
@@ -1421,6 +1445,7 @@ export function usePayment() {
     // actions
     handleCopyPayLink,
     handleCopyWalletAddress,
+    handleCopyCryptoAmount,
     handleOpenPayLink,
     restoreCachedPayment,
     handleChangePaymentMethod,

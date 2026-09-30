@@ -161,29 +161,42 @@
 
           <template v-if="!walletOnlyPayment">
             <div v-if="requiresOnlineChannel && paymentChannels.length > 0" class="grid gap-2.5 sm:grid-cols-2">
-              <button
-                v-for="channel in paymentChannels"
-                :key="channel.id"
-                type="button"
-                class="rounded-sm border-2 bg-card p-2.5 text-left"
-                :class="[
-                  selectedChannelId === channel.id && !isChannelDisabledForAmount(channel) ? 'border-primary bg-primary/10' : 'border-hairline-strong',
-                  isChannelDisabledForAmount(channel) ? 'cursor-not-allowed opacity-55' : '',
-                ]"
-                :disabled="isChannelDisabledForAmount(channel)"
-                :title="isChannelDisabledForAmount(channel) ? channelAmountLimitHint(channel) : ''"
-                @click="handleSelectChannel(channel)"
-              >
-                <div class="flex items-center gap-2">
-                  <img v-if="channel.icon" :src="getImageUrl(channel.icon)" loading="lazy" class="h-5 w-5 flex-none rounded-[4px] object-contain" />
-                  <span class="truncate font-semibold text-foreground">{{ channel.name }}</span>
-                </div>
-                <div v-if="channel.fee_policy === 'customer_surcharge'" class="mt-1.5 grid gap-0.5 text-[11.5px] text-warning">
-                  <div>{{ t('payment.feeLabel') }}：{{ formatChannelFeeRate(channel) }}</div>
-                  <div>{{ t('payment.fixedFeeLabel') }}：{{ formatChannelFixedFee(channel) }}</div>
-                </div>
-                <div v-if="isChannelDisabledForAmount(channel)" class="mt-1 text-[11px] text-warning">{{ channelAmountLimitHint(channel) }}</div>
-              </button>
+              <template v-for="channel in paymentChannels" :key="channel.id">
+                <Bep20PaymentOption
+                  v-if="isBep20PaymentChannel(channel)"
+                  :full-name="channel.name"
+                  :selected="selectedChannelId === channel.id"
+                  :disabled="isChannelDisabledForAmount(channel)"
+                  :disabled-hint="channelAmountLimitHint(channel)"
+                  @select="handleSelectChannel(channel)"
+                >
+                  <template v-if="channel.fee_policy === 'customer_surcharge'" #fees>
+                    <div>{{ t('payment.feeLabel') }}：{{ formatChannelFeeRate(channel) }}</div>
+                    <div>{{ t('payment.fixedFeeLabel') }}：{{ formatChannelFixedFee(channel) }}</div>
+                  </template>
+                </Bep20PaymentOption>
+                <button v-else
+                  type="button"
+                  class="rounded-sm border-2 bg-card p-2.5 text-left"
+                  :class="[
+                    selectedChannelId === channel.id && !isChannelDisabledForAmount(channel) ? 'border-primary bg-primary/10' : 'border-hairline-strong',
+                    isChannelDisabledForAmount(channel) ? 'cursor-not-allowed opacity-55' : '',
+                  ]"
+                  :disabled="isChannelDisabledForAmount(channel)"
+                  :title="isChannelDisabledForAmount(channel) ? channelAmountLimitHint(channel) : ''"
+                  @click="handleSelectChannel(channel)"
+                >
+                  <div class="flex items-center gap-2">
+                    <img v-if="channel.icon" :src="getImageUrl(channel.icon)" loading="lazy" class="h-5 w-5 flex-none rounded-[4px] object-contain" />
+                    <span class="truncate font-semibold text-foreground">{{ channel.name }}</span>
+                  </div>
+                  <div v-if="channel.fee_policy === 'customer_surcharge'" class="mt-1.5 grid gap-0.5 text-[11.5px] text-warning">
+                    <div>{{ t('payment.feeLabel') }}：{{ formatChannelFeeRate(channel) }}</div>
+                    <div>{{ t('payment.fixedFeeLabel') }}：{{ formatChannelFixedFee(channel) }}</div>
+                  </div>
+                  <div v-if="isChannelDisabledForAmount(channel)" class="mt-1 text-[11px] text-warning">{{ channelAmountLimitHint(channel) }}</div>
+                </button>
+              </template>
             </div>
             <div v-else-if="requiresOnlineChannel && paymentChannels.length === 0" class="text-[13px] text-muted-foreground">{{ t('checkout.noPaymentChannels') }}</div>
           </template>
@@ -207,6 +220,8 @@ import ImageCaptcha from '../../components/captcha/ImageCaptcha.vue'
 import TurnstileCaptcha from '../../components/captcha/TurnstileCaptcha.vue'
 import CheckoutManualForm from '../../components/checkout/CheckoutManualForm.vue'
 import VaultCheckoutSteps from './components/VaultCheckoutSteps.vue'
+import Bep20PaymentOption from '../../components/payment/Bep20PaymentOption.vue'
+import { isBep20PaymentChannel } from '../../utils/paymentChannelPresentation'
 import { useCheckout } from '../../composables/useCheckout'
 
 const { t } = useI18n()

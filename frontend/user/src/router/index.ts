@@ -121,7 +121,8 @@ const router = createRouter({
         {
             path: '/',
             name: 'home',
-            component: templateView('Home', homeViewLoader),
+            component: () => import('../views/Storefront.vue'),
+            meta: { standalone: true },
         },
         {
             path: '/products',

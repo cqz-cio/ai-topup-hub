@@ -198,6 +198,8 @@ bsc_usdt:
   cny_per_usdt: "6.66" # 1 USDT = 6.66 CNY；每笔支付单保存此汇率
   confirmations: 15 # 同时要求 RPC finalized，不只检查区块数量
 # BSC_RPC_URL 服务端环境变量可覆盖公开 RPC；无需钱包私钥/助记词
+# 默认事件查询使用 PublicNode，交易收据使用 BNB 官方主网 RPC。
+# 自定义主节点需要另一个收据节点时，通过 BSC_RECEIPT_RPC_URL 配置。
 
 auto_recharge:
   enabled: false
