@@ -338,6 +338,7 @@ import { useUserAuthStore } from '../stores/userAuth'
 import { useUserProfileStore } from '../stores/userProfile'
 import { getFirstImageUrl, getImageUrl } from '../utils/image'
 import { normalizeSkuId, buildSkuDisplayText } from '../utils/sku'
+import { resolveCartPricingSnapshot } from '../utils/cartPricingSnapshot'
 import { resolveSkuAvailableStock, resolveSkuStockDisplay, type PublicStockDisplay } from '../utils/publicStock'
 import { useLocalized, useProductLabels } from '../composables/useProduct'
 import { toast } from '../composables/useToast'
@@ -424,10 +425,11 @@ const selectedSku = computed(() => {
   return activeSkus.value.find((sku: any) => normalizeSkuId(sku?.id) === selectedSkuId.value) || null
 })
 
-const userMemberLevelId = computed(() => Number(userAuthStore.user?.member_level_id || 0))
+const userMemberLevelId = computed(() => userAuthStore.isAuthenticated ? Number(props.product?.pricing_member_level_id ?? userAuthStore.user?.member_level_id ?? 0) : 0)
 
 const currentMemberDiscountRate = computed(() => {
   if (!userMemberLevelId.value) return 0
+  if (props.product?.member_discount_rate != null) return Number(props.product.member_discount_rate)
   const level = userProfileStore.memberLevels.find((item: any) => Number(item?.id || 0) === userMemberLevelId.value)
   return Number(level?.discount_rate || 0)
 })
@@ -752,6 +754,7 @@ const handleAddToCart = () => {
     slug: props.product.slug,
     title: props.product.title,
     priceAmount: String(sku?.price_amount || props.product.price_amount || '0.00'),
+    ...resolveCartPricingSnapshot(props.product, sku, Number(userAuthStore.user?.id || 0)),
     wholesalePrices: Array.isArray(props.product.wholesale_prices) ? props.product.wholesale_prices : undefined,
     image: images[0] || '',
     minPurchaseQuantity: normalizeOptionalLimitNumber(props.product.min_purchase_quantity) ?? undefined,
@@ -806,6 +809,7 @@ const handleBuyNow = () => {
     slug: props.product.slug,
     title: props.product.title,
     priceAmount: String(sku?.price_amount || props.product.price_amount || '0.00'),
+    ...resolveCartPricingSnapshot(props.product, sku, Number(userAuthStore.user?.id || 0)),
     wholesalePrices: Array.isArray(props.product.wholesale_prices) ? props.product.wholesale_prices : undefined,
     image: images[0] || '',
     minPurchaseQuantity: normalizeOptionalLimitNumber(props.product.min_purchase_quantity) ?? undefined,

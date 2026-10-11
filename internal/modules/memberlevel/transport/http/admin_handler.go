@@ -22,6 +22,7 @@ type AdminService interface {
 	DeleteLevel(id uint) error
 	GetLevelPricesByProduct(productID uint) ([]memberleveldomain.MemberLevelPrice, error)
 	BatchUpsertLevelPrices(prices []memberleveldomain.MemberLevelPrice) error
+	ReplaceLevelPrices(productID uint, prices []memberleveldomain.MemberLevelPrice) error
 	DeleteLevelPrice(id uint) error
 	SetUserLevel(userID, levelID uint) error
 	BackfillDefaultLevel() (int64, error)
@@ -207,7 +208,8 @@ func (h *AdminHandler) GetMemberLevelPrices(c *gin.Context) {
 
 // BatchUpsertMemberLevelPricesRequest 批量设置等级价请求
 type BatchUpsertMemberLevelPricesRequest struct {
-	Prices []MemberLevelPriceInput `json:"prices" binding:"required"`
+	ProductID uint                    `json:"product_id"`
+	Prices    []MemberLevelPriceInput `json:"prices" binding:"required"`
 }
 
 // MemberLevelPriceInput 等级价输入
@@ -215,7 +217,7 @@ type MemberLevelPriceInput struct {
 	MemberLevelID uint    `json:"member_level_id" binding:"required"`
 	ProductID     uint    `json:"product_id" binding:"required"`
 	SKUID         uint    `json:"sku_id"`
-	PriceAmount   float64 `json:"price_amount" binding:"required"`
+	PriceAmount   float64 `json:"price_amount" binding:"required,gt=0"`
 }
 
 // BatchUpsertMemberLevelPrices 批量设置等级价
@@ -228,16 +230,31 @@ func (h *AdminHandler) BatchUpsertMemberLevelPrices(c *gin.Context) {
 
 	prices := make([]memberleveldomain.MemberLevelPrice, 0, len(req.Prices))
 	for _, p := range req.Prices {
+		amount := decimal.NewFromFloat(p.PriceAmount)
+		if !amount.Equal(amount.Round(2)) {
+			ginutil.RespondError(c, response.CodeBadRequest, "error.bad_request", nil)
+			return
+		}
 		prices = append(prices, memberleveldomain.MemberLevelPrice{
 			MemberLevelID: p.MemberLevelID,
 			ProductID:     p.ProductID,
 			SKUID:         p.SKUID,
-			PriceAmount:   money.FromDecimal(decimal.NewFromFloat(p.PriceAmount)),
+			PriceAmount:   money.FromDecimal(amount),
 		})
 	}
 
-	if err := h.service.BatchUpsertLevelPrices(prices); err != nil {
-		ginutil.RespondError(c, response.CodeInternal, "error.member_level_price_save_failed", err)
+	var err error
+	if req.ProductID > 0 {
+		err = h.service.ReplaceLevelPrices(req.ProductID, prices)
+	} else {
+		err = h.service.BatchUpsertLevelPrices(prices)
+	}
+	if err != nil {
+		if errors.Is(err, memberlevelcontract.ErrPriceInvalid) || errors.Is(err, memberlevelcontract.ErrNotFound) {
+			ginutil.RespondError(c, response.CodeBadRequest, "error.bad_request", err)
+		} else {
+			ginutil.RespondError(c, response.CodeInternal, "error.member_level_price_save_failed", err)
+		}
 		return
 	}
 

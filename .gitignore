@@ -2,6 +2,7 @@
 /work/codex-logs/
 /work/codex-tools/
 /work/codex-runtime/
+/work/member-pricing-qa/
 config.yml
 .idea
 db

@@ -31,6 +31,7 @@ type PriceRepository interface {
 	ListByProduct(productID uint) ([]memberleveldomain.MemberLevelPrice, error)
 	ListByLevelAndProducts(levelID uint, productIDs []uint) ([]memberleveldomain.MemberLevelPrice, error)
 	BatchUpsert(prices []memberleveldomain.MemberLevelPrice) error
+	ReplaceByProduct(productID uint, prices []memberleveldomain.MemberLevelPrice) error
 	Delete(id uint) error
 	DeleteByProduct(productID uint) error
 }

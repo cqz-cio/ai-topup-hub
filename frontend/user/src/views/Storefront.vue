@@ -312,7 +312,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { RouterLink } from 'vue-router'
 import { ChevronRight, Info, PackageOpen, Search } from 'lucide-vue-next'
 import { productAPI } from '../api/product'
@@ -423,15 +423,18 @@ const clearFilters = () => {
 let disposed = false
 let refreshTimer: ReturnType<typeof setInterval> | undefined
 let copyTimer: ReturnType<typeof setTimeout> | undefined
+let productRequest = 0
 
 const refreshProducts = async () => {
-  if (refreshing.value || disposed) return
+  if (disposed) return
+  const request = ++productRequest
+  const token = authStore.token
   refreshing.value = true
   try {
     const next = await loadStorefrontProducts(
       async (page) => (await productAPI.list({ page, page_size: 100 })).data,
     )
-    if (disposed) return
+    if (disposed || request !== productRequest || token !== authStore.token) return
     products.value = next
     loadFailed.value = false
     if (
@@ -440,16 +443,21 @@ const refreshProducts = async () => {
     )
       selectedCategory.value = ''
   } catch {
-    if (disposed) return
+    if (disposed || request !== productRequest || token !== authStore.token) return
     products.value = []
     loadFailed.value = true
   } finally {
-    if (!disposed) {
+    if (!disposed && request === productRequest) {
       initialLoading.value = false
       refreshing.value = false
     }
   }
 }
+watch(() => authStore.token, () => {
+  products.value = []
+  initialLoading.value = true
+  void refreshProducts()
+})
 const refreshOnFocus = () => {
   if (document.visibilityState === 'visible') void refreshProducts()
 }

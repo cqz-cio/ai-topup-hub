@@ -2,6 +2,7 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAppStore } from '../stores/app'
 import { amountToCents, centsToAmount } from '../utils/money'
+import { resolveMemberPriceAmount } from '../utils/memberPricing'
 
 export function useLocalized() {
   const appStore = useAppStore()
@@ -172,26 +173,6 @@ export function useProductLabels() {
     }
     if (matchedCents === null || matchedCents >= base) return null
     return centsToAmount(matchedCents)
-  }
-
-  const resolveMemberPriceAmount = (product: any, skuId: any, basePrice: any, memberLevelId: any, discountRate?: any) => {
-    const base = parsePriceAmount(basePrice)
-    const levelId = Number(memberLevelId || 0)
-    if (base === null || base <= 0 || !Number.isFinite(levelId) || levelId <= 0) return null
-
-    const prices = Array.isArray(product?.member_prices) ? product.member_prices : []
-    const normalizedSkuId = Number(skuId || 0)
-    const skuPrice = prices.find((p: any) => Number(p?.member_level_id || 0) === levelId && Number(p?.sku_id || 0) === normalizedSkuId)
-    const productPrice = prices.find((p: any) => Number(p?.member_level_id || 0) === levelId && Number(p?.sku_id || 0) === 0)
-    const overrideCents = parsePriceAmount(skuPrice?.price_amount ?? productPrice?.price_amount)
-    if (overrideCents !== null && overrideCents > 0) {
-      return overrideCents < base ? centsToAmount(overrideCents) : null
-    }
-
-    const rate = Number(discountRate || 0)
-    if (!Number.isFinite(rate) || rate <= 0 || rate >= 100) return null
-    const memberCents = Math.round((base * rate) / 100)
-    return memberCents < base ? centsToAmount(memberCents) : null
   }
 
   return {

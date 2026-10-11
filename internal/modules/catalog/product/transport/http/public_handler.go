@@ -48,6 +48,7 @@ type ProductPromotionDecorator interface {
 
 // MemberLevelPricing 是公开商品会员价装饰端口。
 type MemberLevelPricing interface {
+	GetUserLevel(userID uint) (*memberleveldomain.MemberLevel, error)
 	GetLevelPricesByProduct(productID uint) ([]memberleveldomain.MemberLevelPrice, error)
 	ResolveMemberPrice(levelID, productID, skuID uint, basePrice decimal.Decimal) (decimal.Decimal, decimal.Decimal)
 }
@@ -112,6 +113,12 @@ func isResellerTenant(tenant reseller.TenantContext) bool {
 
 // GetProducts 获取商品列表
 func (h *PublicHandler) GetProducts(c *gin.Context) {
+	c.Header("Cache-Control", "private, no-store")
+	c.Writer.Header().Add("Vary", "Authorization")
+	level, ok := h.memberLevelForRequest(c)
+	if !ok {
+		return
+	}
 	page, pageSize := ginutil.ParsePagination(c)
 	categoryID := c.Query("category_id")
 	search := strings.TrimSpace(c.Query("search"))
@@ -143,7 +150,7 @@ func (h *PublicHandler) GetProducts(c *gin.Context) {
 
 	decorated := make([]productpresenter.Product, 0, len(products))
 	for i := range products {
-		item, derr := h.decoratePublicProductForTenant(&products[i], h.promotions, tenant, resellerBatch)
+		item, derr := h.decoratePublicProductForTenant(&products[i], h.promotions, tenant, resellerBatch, level)
 		if derr != nil {
 			if errors.Is(derr, productcontract.ErrResellerProductNotListed) {
 				continue
@@ -160,6 +167,12 @@ func (h *PublicHandler) GetProducts(c *gin.Context) {
 
 // GetProductBySlug 根据 slug 获取商品详情
 func (h *PublicHandler) GetProductBySlug(c *gin.Context) {
+	c.Header("Cache-Control", "private, no-store")
+	c.Writer.Header().Add("Vary", "Authorization")
+	level, ok := h.memberLevelForRequest(c)
+	if !ok {
+		return
+	}
 	slug := c.Param("slug")
 	tenant := tenantFromRequest(c)
 
@@ -193,7 +206,7 @@ func (h *PublicHandler) GetProductBySlug(c *gin.Context) {
 		}
 	}
 
-	decorated, derr := h.decoratePublicProductForTenant(product, h.promotions, tenant, resellerBatch)
+	decorated, derr := h.decoratePublicProductForTenant(product, h.promotions, tenant, resellerBatch, level)
 	if derr != nil {
 		if errors.Is(derr, productcontract.ErrResellerProductNotListed) {
 			ginutil.RespondError(c, response.CodeNotFound, "error.product_not_found", nil)
@@ -208,6 +221,18 @@ func (h *PublicHandler) GetProductBySlug(c *gin.Context) {
 	}
 
 	response.Success(c, decorated)
+}
+
+func (h *PublicHandler) memberLevelForRequest(c *gin.Context) (*memberleveldomain.MemberLevel, bool) {
+	if h.memberLevels == nil || c.GetUint("user_id") == 0 || isResellerTenant(tenantFromRequest(c)) {
+		return nil, true
+	}
+	level, err := h.memberLevels.GetUserLevel(c.GetUint("user_id"))
+	if err != nil {
+		ginutil.RespondError(c, response.CodeInternal, "error.product_fetch_failed", err)
+		return nil, false
+	}
+	return level, true
 }
 
 func (h *PublicHandler) loadRelatedPostCards(ctx context.Context, productID uint) ([]productpresenter.RelatedPost, error) {

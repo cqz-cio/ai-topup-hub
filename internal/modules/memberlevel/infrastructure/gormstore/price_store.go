@@ -8,6 +8,7 @@ import (
 	memberleveldomain "github.com/dujiao-next/internal/modules/memberlevel/domain"
 
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type PriceStore struct {
@@ -66,23 +67,56 @@ func (r *PriceStore) BatchUpsert(prices []memberleveldomain.MemberLevelPrice) er
 	if len(prices) == 0 {
 		return nil
 	}
-	for _, p := range prices {
-		existing, err := r.GetByLevelAndProductAndSKU(p.MemberLevelID, p.ProductID, p.SKUID)
-		if err != nil {
+	return r.db.Transaction(func(tx *gorm.DB) error {
+		return upsertPrices(tx, prices)
+	})
+}
+
+func upsertPrices(tx *gorm.DB, prices []memberleveldomain.MemberLevelPrice) error {
+	if len(prices) == 0 {
+		return nil
+	}
+	rows := append([]memberleveldomain.MemberLevelPrice(nil), prices...)
+	for i := range rows {
+		rows[i].ID = 0
+		rows[i].DeletedAt = nil
+		rows[i].UpdatedAt = time.Now()
+	}
+	// Restore a previously cleared price instead of colliding with its unique key.
+	return tx.Clauses(clause.OnConflict{
+		Columns:   []clause.Column{{Name: "member_level_id"}, {Name: "product_id"}, {Name: "sku_id"}},
+		DoUpdates: clause.AssignmentColumns([]string{"price_amount", "updated_at", "deleted_at"}),
+	}).CreateInBatches(rows, 100).Error
+}
+
+func (r *PriceStore) ReplaceByProduct(productID uint, prices []memberleveldomain.MemberLevelPrice) error {
+	return r.db.Transaction(func(tx *gorm.DB) error {
+		var count int64
+		if err := tx.Table("products").Where("id = ? AND deleted_at IS NULL", productID).Count(&count).Error; err != nil {
 			return err
 		}
-		if existing != nil {
-			existing.PriceAmount = p.PriceAmount
-			if err := r.db.Save(existing).Error; err != nil {
+		if count != 1 {
+			return memberlevelcontract.ErrPriceInvalid
+		}
+		for _, price := range prices {
+			if price.ProductID != productID {
+				return memberlevelcontract.ErrPriceInvalid
+			}
+			if price.SKUID == 0 {
+				continue
+			}
+			if err := tx.Table("product_skus").Where("id = ? AND product_id = ? AND deleted_at IS NULL", price.SKUID, productID).Count(&count).Error; err != nil {
 				return err
 			}
-		} else {
-			if err := r.db.Create(&p).Error; err != nil {
-				return err
+			if count != 1 {
+				return memberlevelcontract.ErrPriceInvalid
 			}
 		}
-	}
-	return nil
+		if err := NewPriceStore(tx).DeleteByProduct(productID); err != nil {
+			return err
+		}
+		return upsertPrices(tx, prices)
+	})
 }
 
 func (r *PriceStore) Delete(id uint) error {

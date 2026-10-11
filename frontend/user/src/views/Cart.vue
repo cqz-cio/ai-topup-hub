@@ -44,7 +44,7 @@
                     >
                       {{ getLocalizedText(item.title) }}
                     </router-link>
-                    <p class="mt-1 text-sm text-muted-foreground">{{ t('cart.priceLabel') }}：{{ formatPrice(item.priceAmount, totalCurrency) }}</p>
+                    <p class="mt-1 text-sm text-muted-foreground">{{ t('cart.priceLabel') }}：{{ formatPrice(itemUnitPriceAmount(item), totalCurrency) }}</p>
                     <p v-if="itemSkuDisplay(item)" class="mt-1 text-xs text-muted-foreground truncate">{{ t('cart.skuLabel') }}：{{ itemSkuDisplay(item) }}</p>
                     <p v-if="itemStockHint(item)" class="mt-1 text-xs text-muted-foreground">{{ itemStockHint(item) }}</p>
                     <div class="mt-2 md:mt-3 flex flex-wrap gap-2">
@@ -169,7 +169,7 @@ const { t } = useI18n()
 const {
   getLocalizedText, formatPrice, totalCurrency,
   cartItems, totalItems, totalAmount,
-  cartItemKey, cartItemImage, itemSkuDisplay, itemSubtotal, itemStockHint, quantityWarning,
+  cartItemKey, cartItemImage, itemSkuDisplay, itemSubtotal, itemUnitPriceAmount, itemStockHint, quantityWarning,
   itemPurchaseMin, itemMaxQuantity,
   removeWithUndo, updateQty, handleQtyChange,
 } = useCart()

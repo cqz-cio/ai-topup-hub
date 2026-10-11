@@ -45,7 +45,7 @@ func TestRouteDomainFilesPreserveTrustBoundaries(t *testing.T) {
 			file: "routes_storefront.go",
 			required: []string{
 				`storefront.Use(middleware.ResellerTenantMiddleware(`,
-				`producthttp.RegisterPublicRoutes(public, publicCatalogHandler)`,
+				`producthttp.RegisterPublicRoutes(public.Group("", middleware.OptionalUserJWTAuthMiddleware(cfg.UserJWT.SecretKey, c.UserStore)), publicCatalogHandler)`,
 				`categoryhttp.RegisterPublicRoutes(public, publicCategoryHandler)`,
 				`contenttransport.RegisterPublicRoutes(public, publicContentHandler)`,
 				`captchatransport.RegisterPublicRoutes(public,`,

@@ -317,6 +317,19 @@ func AdminRBACMiddleware(authzService *authz.Service) gin.HandlerFunc {
 	}
 }
 
+// OptionalUserJWTAuthMiddleware keeps guest browsing available and validates any
+// supplied token with the same status and revocation checks as authenticated routes.
+func OptionalUserJWTAuthMiddleware(secretKey string, userRepo usercontract.Store) gin.HandlerFunc {
+	authenticate := UserJWTAuthMiddleware(secretKey, userRepo)
+	return func(c *gin.Context) {
+		if c.GetHeader(authHeaderKey) == "" {
+			c.Next()
+			return
+		}
+		authenticate(c)
+	}
+}
+
 // UserJWTAuthMiddleware 用户 JWT 鉴权中间件
 func UserJWTAuthMiddleware(secretKey string, userRepo usercontract.Store) gin.HandlerFunc {
 	return func(c *gin.Context) {

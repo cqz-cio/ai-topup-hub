@@ -22,6 +22,12 @@ export interface CartItem {
     slug: string
     title: any
     priceAmount: string
+    displayPriceAmount?: string
+    promotionPriceAmount?: string
+    pricingUserId?: number
+    memberLevelId?: number
+    memberDiscountRate?: string
+    memberPrices?: Array<{ member_level_id: number; sku_id: number; price_amount: string | number }>
     wholesalePrices?: Array<{ sku_id?: number; sku_code?: string; min_quantity: number; unit_price: string | number }>
     image?: string
     quantity: number
@@ -160,6 +166,12 @@ export const useCartStore = defineStore('cart', () => {
             existing.slug = normalizedItem.slug
             existing.title = normalizedItem.title
             existing.priceAmount = normalizedItem.priceAmount
+            existing.displayPriceAmount = normalizedItem.displayPriceAmount
+            existing.promotionPriceAmount = normalizedItem.promotionPriceAmount
+            existing.pricingUserId = normalizedItem.pricingUserId
+            existing.memberLevelId = normalizedItem.memberLevelId
+            existing.memberDiscountRate = normalizedItem.memberDiscountRate
+            existing.memberPrices = normalizedItem.memberPrices
             existing.wholesalePrices = normalizedItem.wholesalePrices
             existing.image = normalizedItem.image
             existing.minPurchaseQuantity = normalizedItem.minPurchaseQuantity

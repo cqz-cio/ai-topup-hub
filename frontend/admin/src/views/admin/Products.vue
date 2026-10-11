@@ -19,6 +19,8 @@ import ListPagination from '@/components/ListPagination.vue'
 import type { ListFetchOptions } from '@/composables/useListRefresh'
 import { confirmAction } from '@/utils/confirm'
 import ProductEditModal from './components/ProductEditModal.vue'
+import MemberPriceModal from './components/MemberPriceModal.vue'
+import { useAdminAuthStore } from '@/stores/auth'
 import { buildAdminCategoryPath, createAdminCategoryMap, createAdminCategoryChildCountMap, flattenAdminCategories, isAdminProductCategorySelectable } from '@/utils/category'
 import { formatWholesaleTierScopeLabel, wholesaleTierScopeValue } from '@/utils/wholesalePricing'
 
@@ -33,6 +35,12 @@ const route = useRoute()
 const router = useRouter()
 
 const showModal = ref(false)
+const auth = useAdminAuthStore()
+const showMemberPrices = ref(false)
+const pricingProductId = ref<number | null>(null)
+const canReadMemberPrices = computed(() => auth.hasPermission('GET:/admin/member-level-prices') && auth.hasPermission('GET:/admin/member-levels'))
+const openMemberPrices = (id: number) => { pricingProductId.value = id; showMemberPrices.value = true }
+const editRetailPrice = (id: number) => { showMemberPrices.value = false; openEditById(id) }
 const editingProductId = ref<number | null>(null)
 const editingSortId = ref<number | null>(null)
 const editingSortValue = ref('')
@@ -758,6 +766,7 @@ watch(
             <TableCell class="px-6 py-4 text-right">
               <div class="flex flex-wrap items-center justify-end gap-2">
                 <Button size="sm" variant="outline" @click="openEditById(product.id)">{{ t('admin.products.actions.edit') }}</Button>
+                <Button v-if="canReadMemberPrices" size="sm" variant="outline" @click="openMemberPrices(product.id)">{{ t('admin.memberPrices.title') }}</Button>
                 <Button size="sm" variant="destructive" @click="handleDelete(product)">{{ t('admin.products.actions.delete') }}</Button>
               </div>
             </TableCell>
@@ -784,5 +793,6 @@ watch(
       :supported-locales="['zh-CN', 'zh-TW', 'en-US']"
       @success="handleModalSuccess"
     />
+    <MemberPriceModal v-model="showMemberPrices" :product-id="pricingProductId" :site-currency="siteCurrency" @success="fetchProducts()" @edit-product="editRetailPrice" />
   </div>
 </template>

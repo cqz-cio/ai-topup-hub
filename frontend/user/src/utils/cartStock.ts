@@ -79,7 +79,7 @@ const shouldEnforceSkuStock = (product: any, sku: any) => {
   return true
 }
 
-export const refreshCartStockSnapshots = async (cartStore: CartStoreLike) => {
+export const refreshCartStockSnapshots = async (cartStore: CartStoreLike, pricingUserId = 0, isCurrent = () => true) => {
   const items = Array.isArray(cartStore.items) ? cartStore.items : []
   if (items.length === 0) return
 
@@ -104,6 +104,7 @@ export const refreshCartStockSnapshots = async (cartStore: CartStoreLike) => {
   })
 
   await Promise.all(requests)
+  if (!isCurrent()) return
 
   for (const item of items) {
     const slug = String(item.slug || '').trim()
@@ -127,7 +128,7 @@ export const refreshCartStockSnapshots = async (cartStore: CartStoreLike) => {
     const stockRangeMax = normalizeStockNumber(matchedSku?.stock_range_max)
 
     cartStore.patchItem(item.productId, item.skuId, {
-      ...resolveCartPricingSnapshot(product, matchedSku),
+      ...resolveCartPricingSnapshot(product, matchedSku, pricingUserId),
       skuCode: String(matchedSku?.sku_code || item.skuCode || ''),
       skuSpecValues: (matchedSku?.spec_values && typeof matchedSku.spec_values === 'object')
         ? matchedSku.spec_values

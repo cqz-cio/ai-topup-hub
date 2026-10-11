@@ -1,4 +1,4 @@
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useCartStore, type CartItem } from '../stores/cart'
 import { useAppStore } from '../stores/app'
@@ -10,7 +10,8 @@ import {
   cartItemPurchaseMin as itemPurchaseMin,
 } from '../utils/cartStock'
 import { getImageUrl } from '../utils/image'
-import { useLocalized } from './useProduct'
+import { useLocalized, useProductLabels } from './useProduct'
+import { useUserAuthStore } from '../stores/userAuth'
 import { toast } from './useToast'
 
 /**
@@ -20,6 +21,8 @@ import { toast } from './useToast'
 export function useCart() {
   const cartStore = useCartStore()
   const appStore = useAppStore()
+  const userAuthStore = useUserAuthStore()
+  const { resolveWholesalePriceAmount, resolveMemberPriceAmount } = useProductLabels()
   const { t } = useI18n()
 
   const { getLocalizedText, siteCurrency, formatPrice } = useLocalized()
@@ -28,10 +31,27 @@ export function useCart() {
   const cartItems = computed(() => cartStore.items)
   const totalItems = computed(() => cartStore.totalItems)
   const quantityWarnings = ref<Record<string, string>>({})
+  const productQuantities = computed(() => {
+    const totals = new Map<number, number>()
+    for (const item of cartItems.value) totals.set(item.productId, (totals.get(item.productId) || 0) + item.quantity)
+    return totals
+  })
+  const itemUnitPriceAmount = (item: CartItem) => {
+    const base = amountToCents(item.priceAmount)
+    if (base === null) return item.priceAmount
+    const promotion = amountToCents(item.promotionPriceAmount)
+    const wholesale = amountToCents(resolveWholesalePriceAmount(item, item.priceAmount,
+      productQuantities.value.get(item.productId) || item.quantity, item.skuId, item.skuCode, item.quantity))
+    const cents = Math.min(base, promotion !== null && promotion >= 0 ? promotion : base, wholesale ?? base)
+    const levelId = userAuthStore.isAuthenticated && item.pricingUserId === Number(userAuthStore.user?.id || 0)
+      ? item.memberLevelId : 0
+    return resolveMemberPriceAmount({ member_prices: item.memberPrices }, item.skuId, centsToAmount(cents), levelId, item.memberDiscountRate)
+      ?? centsToAmount(cents)
+  }
 
   const totalAmount = computed(() => {
     const totalCents = cartItems.value.reduce((sum, item) => {
-      const amountCents = amountToCents(item.priceAmount)
+      const amountCents = amountToCents(itemUnitPriceAmount(item))
       const qty = parseInteger(item.quantity)
       if (amountCents === null || qty === null) return sum
       return sum + amountCents * qty
@@ -54,7 +74,7 @@ export function useCart() {
   }
 
   const itemSubtotal = (item: CartItem) => {
-    const amountCents = amountToCents(item.priceAmount)
+    const amountCents = amountToCents(itemUnitPriceAmount(item))
     const qty = parseInteger(item.quantity)
     if (amountCents === null || qty === null) {
       return formatPrice('-', totalCurrency.value)
@@ -185,9 +205,26 @@ export function useCart() {
 
   const quantityWarning = (item: CartItem) => quantityWarnings.value[cartItemKey(item)] || ''
 
+  let pricingRequestId = 0
+  const refreshPricing = () => {
+    const token = userAuthStore.token
+    const requestId = ++pricingRequestId
+    return refreshCartStockSnapshots(cartStore, Number(userAuthStore.user?.id || 0),
+      () => requestId === pricingRequestId && token === userAuthStore.token)
+  }
+  let pricingTimer: ReturnType<typeof setInterval> | undefined
+  const onPricingFocus = () => { void refreshPricing() }
   onMounted(() => {
-    void refreshCartStockSnapshots(cartStore)
+    void refreshPricing()
+    window.addEventListener('focus', onPricingFocus)
+    pricingTimer = setInterval(onPricingFocus, 60_000)
   })
+  onUnmounted(() => {
+    pricingRequestId++
+    window.removeEventListener('focus', onPricingFocus)
+    if (pricingTimer) clearInterval(pricingTimer)
+  })
+  watch(() => userAuthStore.token, () => { void refreshPricing() })
 
   return {
     // helpers / formatters
@@ -203,6 +240,7 @@ export function useCart() {
     cartItemImage,
     itemSkuDisplay,
     itemSubtotal,
+    itemUnitPriceAmount,
     itemStockHint,
     quantityWarning,
     // purchase limits

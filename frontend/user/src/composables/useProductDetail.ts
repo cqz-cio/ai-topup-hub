@@ -12,6 +12,7 @@ import { useUserProfileStore } from '../stores/userProfile'
 import { debounceAsync } from '../utils/debounce'
 import { buildSkuDisplayText, normalizeSkuId } from '../utils/sku'
 import { resolveSkuAvailableStock, resolveSkuStockDisplay, type PublicStockDisplay } from '../utils/publicStock'
+import { resolveCartPricingSnapshot } from '../utils/cartPricingSnapshot'
 import { useLocalized, useProductLabels } from './useProduct'
 import { toast } from './useToast'
 
@@ -82,10 +83,13 @@ export function useProductDetail(options: { onLoaded?: () => void } = {}) {
   })
 
   // 会员价相关
-  const userMemberLevelId = computed(() => Number(userAuthStore.user?.member_level_id || 0))
+  const userMemberLevelId = computed(() => userAuthStore.isAuthenticated
+    ? Number(product.value?.pricing_member_level_id ?? userAuthStore.user?.member_level_id ?? 0)
+    : 0)
 
   const currentMemberDiscountRate = computed(() => {
     if (!userMemberLevelId.value) return 0
+    if (product.value?.member_discount_rate != null) return Number(product.value.member_discount_rate)
     const level = userProfileStore.memberLevels.find((item: any) => Number(item?.id || 0) === userMemberLevelId.value)
     return Number(level?.discount_rate || 0)
   })
@@ -400,6 +404,7 @@ export function useProductDetail(options: { onLoaded?: () => void } = {}) {
     slug: product.value.slug,
     title: product.value.title,
     priceAmount: String(sku?.price_amount || product.value.price_amount || '0.00'),
+    ...resolveCartPricingSnapshot(product.value, sku, Number(userAuthStore.user?.id || 0)),
     wholesalePrices: Array.isArray(product.value.wholesale_prices) ? product.value.wholesale_prices : undefined,
     image: images.value[0],
     minPurchaseQuantity: normalizeOptionalLimitNumber(product.value.min_purchase_quantity) ?? undefined,
@@ -524,11 +529,17 @@ export function useProductDetail(options: { onLoaded?: () => void } = {}) {
     router.push(`/auth/login?redirect=${encodeURIComponent(route.fullPath)}`)
   }
 
+  let productRequest = 0
+  let disposed = false
+  let priceRefreshTimer: ReturnType<typeof setInterval> | undefined
   const loadProduct = async () => {
+    const request = ++productRequest
+    const token = userAuthStore.token
+    const slug = route.params.slug as string
     loading.value = true
     try {
-      const slug = route.params.slug as string
       const response = await productAPI.detail(slug)
+      if (disposed || request !== productRequest || token !== userAuthStore.token || slug !== route.params.slug) return
       product.value = response.data.data || null
       if (images.value.length > 0) {
         currentImage.value = images.value[0] || ''
@@ -537,11 +548,12 @@ export function useProductDetail(options: { onLoaded?: () => void } = {}) {
       await nextTick()
       options.onLoaded?.()
     } catch (error) {
+      if (disposed || request !== productRequest || token !== userAuthStore.token || slug !== route.params.slug) return
       console.error('Failed to load product:', error)
       product.value = null
       selectedSkuId.value = 0
     } finally {
-      loading.value = false
+      if (!disposed && request === productRequest) loading.value = false
     }
   }
 
@@ -632,9 +644,20 @@ export function useProductDetail(options: { onLoaded?: () => void } = {}) {
     },
   })
 
+  const refreshPriceOnFocus = () => {
+    if (document.visibilityState === 'visible') void loadProduct()
+  }
+  watch(() => [userAuthStore.token, route.params.slug], () => {
+    product.value = null
+    selectedSkuId.value = 0
+    void loadProduct()
+  })
+
   onMounted(() => {
     loadProduct()
     ensureMemberLevels()
+    window.addEventListener('focus', refreshPriceOnFocus)
+    priceRefreshTimer = setInterval(refreshPriceOnFocus, 60000)
   })
 
   watch(userMemberLevelId, () => {
@@ -662,6 +685,9 @@ export function useProductDetail(options: { onLoaded?: () => void } = {}) {
   })
 
   onUnmounted(() => {
+    disposed = true
+    window.removeEventListener('focus', refreshPriceOnFocus)
+    if (priceRefreshTimer) clearInterval(priceRefreshTimer)
     debouncedLoadProduct.cancel()
   })
 

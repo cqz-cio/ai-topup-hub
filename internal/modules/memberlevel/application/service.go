@@ -115,7 +115,70 @@ func (s *Service) GetLevelPricesByProduct(productID uint) ([]memberleveldomain.M
 }
 
 func (s *Service) BatchUpsertLevelPrices(prices []memberleveldomain.MemberLevelPrice) error {
+	if err := s.validateLevelPrices(prices); err != nil {
+		return err
+	}
 	return s.priceRepo.BatchUpsert(prices)
+}
+
+// ReplaceLevelPrices saves the complete price matrix for one product atomically.
+func (s *Service) ReplaceLevelPrices(productID uint, prices []memberleveldomain.MemberLevelPrice) error {
+	if productID == 0 {
+		return memberlevelcontract.ErrPriceInvalid
+	}
+	for _, price := range prices {
+		if price.ProductID != productID {
+			return memberlevelcontract.ErrPriceInvalid
+		}
+	}
+	if err := s.validateLevelPrices(prices); err != nil {
+		return err
+	}
+	return s.priceRepo.ReplaceByProduct(productID, prices)
+}
+
+func (s *Service) validateLevelPrices(prices []memberleveldomain.MemberLevelPrice) error {
+	seen := make(map[[3]uint]bool)
+	levels := make(map[uint]bool)
+	for _, price := range prices {
+		key := [3]uint{price.MemberLevelID, price.ProductID, price.SKUID}
+		amount := price.PriceAmount.Decimal
+		if price.MemberLevelID == 0 || price.ProductID == 0 || seen[key] ||
+			!amount.GreaterThan(decimal.Zero) || !amount.Equal(amount.Round(2)) {
+			return memberlevelcontract.ErrPriceInvalid
+		}
+		seen[key] = true
+		if !levels[price.MemberLevelID] {
+			level, err := s.levelRepo.GetByID(price.MemberLevelID)
+			if err != nil {
+				return err
+			}
+			if level == nil {
+				return memberlevelcontract.ErrNotFound
+			}
+			levels[price.MemberLevelID] = true
+		}
+	}
+	return nil
+}
+
+// GetUserLevel reads the current assignment, including changes made after login.
+func (s *Service) GetUserLevel(userID uint) (*memberleveldomain.MemberLevel, error) {
+	if userID == 0 {
+		return nil, nil
+	}
+	user, err := s.userRepo.GetByID(userID)
+	if err != nil {
+		return nil, err
+	}
+	if user == nil || user.MemberLevelID == 0 {
+		return nil, nil
+	}
+	level, err := s.levelRepo.GetByID(user.MemberLevelID)
+	if err != nil || level == nil || !level.IsActive {
+		return nil, err
+	}
+	return level, nil
 }
 
 func (s *Service) DeleteLevelPrice(id uint) error {

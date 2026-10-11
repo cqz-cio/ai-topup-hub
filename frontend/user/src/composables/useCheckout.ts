@@ -53,7 +53,7 @@ export function useCheckout() {
   const { t } = useI18n()
 
   const { getLocalizedText, siteCurrency, formatPrice } = useLocalized()
-  const { resolveWholesalePriceAmount } = useProductLabels()
+  const { resolveWholesalePriceAmount, resolveMemberPriceAmount } = useProductLabels()
 
   const isBuyNowMode = computed(() => route.query.mode === 'buynow')
   const cartItems = computed<CartItem[]>(() => {
@@ -231,6 +231,8 @@ export function useCheckout() {
   })
 
   const totalCurrency = computed(() => siteCurrency.value || 'CNY')
+  const pricedAmount = computed(() => centsToAmount(cartItems.value.reduce((sum, item) =>
+    sum + (cartItemPricingSubtotalCents(item) ?? 0), 0)))
 
   const previewCurrency = computed(() => preview.value?.currency || totalCurrency.value)
   const previewOriginal = computed(() => preview.value?.original_amount ?? totalAmount.value)
@@ -238,7 +240,7 @@ export function useCheckout() {
   const previewPromotion = computed(() => preview.value?.promotion_discount_amount ?? '0')
   const previewWholesale = computed(() => preview.value?.wholesale_discount_amount ?? '0')
   const previewMemberDiscount = computed(() => preview.value?.member_discount_amount ?? '0')
-  const previewTotal = computed(() => preview.value?.total_amount ?? totalAmount.value)
+  const previewTotal = computed(() => preview.value?.total_amount ?? pricedAmount.value)
   const checkoutItemCurrency = computed(() => previewCurrency.value)
 
   const previewItemsByKey = computed(() => {
@@ -697,14 +699,26 @@ export function useCheckout() {
 
   const debouncedLoadOrderPaymentChannels = debounceAsync(loadOrderPaymentChannels, 250)
 
+  let pricingRefreshId = 0
   const syncCartStockSnapshots = async () => {
-    if (isBuyNowMode.value) return
-    if (syncingStock.value) return
+    const requestId = ++pricingRefreshId
+    const token = userAuthStore.token
+    ++previewRequestId.value
+    preview.value = null
+    previewLoading.value = false
     syncingStock.value = true
     try {
-      await refreshCartStockSnapshots(cartStore)
+      const item = buyNowStore.item
+      const target = isBuyNowMode.value && item ? {
+        items: [item],
+        patchItem: (_productId: number, _skuId: number | undefined, patch: Partial<CartItem>) => {
+          if (buyNowStore.item === item) buyNowStore.setItem({ ...item, ...patch })
+        },
+      } : cartStore
+      await refreshCartStockSnapshots(target, Number(userAuthStore.user?.id || 0),
+        () => token === userAuthStore.token && requestId === pricingRefreshId)
     } finally {
-      syncingStock.value = false
+      if (requestId === pricingRefreshId) syncingStock.value = false
     }
   }
 
@@ -747,6 +761,7 @@ export function useCheckout() {
     }
 
     const requestId = ++previewRequestId.value
+    const token = userAuthStore.token
     previewLoading.value = true
     previewError.value = ''
 
@@ -764,7 +779,7 @@ export function useCheckout() {
         })
       }
 
-      if (requestId !== previewRequestId.value) return
+      if (requestId !== previewRequestId.value || token !== userAuthStore.token) return
       preview.value = response.data.data
       if (userAuthStore.isAuthenticated) {
         debouncedLoadOrderPaymentChannels()
@@ -772,7 +787,7 @@ export function useCheckout() {
         orderPaymentChannels.value = []
       }
     } catch (err: any) {
-      if (requestId !== previewRequestId.value) return
+      if (requestId !== previewRequestId.value || token !== userAuthStore.token) return
       preview.value = null
       orderPaymentChannels.value = []
       previewError.value = err.message || t('checkout.previewFailed')
@@ -878,6 +893,14 @@ export function useCheckout() {
   watch(walletOnlyPayment, (v) => {
     if (v) useBalance.value = true
   }, { immediate: true })
+  watch(() => userAuthStore.token, async () => {
+    ++previewRequestId.value
+    ++orderPaymentChannelsRequestId.value
+    preview.value = null
+    orderPaymentChannels.value = []
+    await syncCartStockSnapshots()
+    debouncedLoadPreview()
+  })
 
   watch(normalizedCouponCode, (value, previous) => {
     if (value === previous) return
@@ -918,7 +941,15 @@ export function useCheckout() {
     }
   }
 
+  let pricingTimer: ReturnType<typeof setInterval> | undefined
+  const refreshPricingOnFocus = async () => {
+    if (document.visibilityState !== 'visible' || submitting.value) return
+    await syncCartStockSnapshots()
+    debouncedLoadPreview()
+  }
   onMounted(async () => {
+    window.addEventListener('focus', refreshPricingOnFocus)
+    pricingTimer = setInterval(() => { void refreshPricingOnFocus() }, 60_000)
     if (!appStore.config) {
       await appStore.loadConfig()
     }
@@ -928,6 +959,10 @@ export function useCheckout() {
   })
 
   onUnmounted(() => {
+    ++pricingRefreshId
+    ++previewRequestId.value
+    window.removeEventListener('focus', refreshPricingOnFocus)
+    if (pricingTimer) clearInterval(pricingTimer)
     debouncedLoadPreview.cancel()
     debouncedLoadOrderPaymentChannels.cancel()
   })
@@ -956,9 +991,10 @@ export function useCheckout() {
     return amountCents * qty
   }
 
-  const cartItemWholesaleSubtotalCents = (item: CartItem) => {
+  function cartItemPricingSubtotalCents(item: CartItem) {
     const qty = parseInteger(item.quantity)
-    if (qty === null || qty <= 0 || !Array.isArray(item.wholesalePrices)) {
+    const base = amountToCents(item.priceAmount)
+    if (qty === null || qty <= 0 || base === null) {
       return null
     }
     const productId = Number(item.productId || 0)
@@ -971,8 +1007,13 @@ export function useCheckout() {
       item.skuCode,
       qty,
     ))
-    if (matchedPriceCents === null) return null
-    return matchedPriceCents * qty
+    const promotion = amountToCents(item.promotionPriceAmount)
+    const discounted = Math.min(base, matchedPriceCents ?? base, promotion !== null && promotion >= 0 ? promotion : base)
+    const levelId = userAuthStore.isAuthenticated && item.pricingUserId === Number(userAuthStore.user?.id || 0)
+      ? item.memberLevelId : 0
+    const memberPrice = resolveMemberPriceAmount({ member_prices: item.memberPrices }, item.skuId,
+      centsToAmount(discounted), levelId, item.memberDiscountRate)
+    return (amountToCents(memberPrice) ?? discounted) * qty
   }
 
   const checkoutItemPreview = (item: CartItem) => previewItemsByKey.value.get(cartItemKey(item))
@@ -991,8 +1032,8 @@ export function useCheckout() {
       const couponDiscountCents = amountToCents(previewItem?.coupon_discount_amount) || 0
       return Math.max(0, previewPayableCents - couponDiscountCents)
     }
-    const wholesaleSubtotal = cartItemWholesaleSubtotalCents(item)
-    if (wholesaleSubtotal !== null) return wholesaleSubtotal
+    const pricingSubtotal = cartItemPricingSubtotalCents(item)
+    if (pricingSubtotal !== null) return pricingSubtotal
     return checkoutItemOriginalCents(item)
   }
 

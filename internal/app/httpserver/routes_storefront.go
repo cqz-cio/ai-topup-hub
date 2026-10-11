@@ -79,7 +79,7 @@ func registerStorefrontRoutes(
 	public := storefront.Group("/public")
 	{
 		publicconfigtransport.RegisterPublicRoutes(public, publicConfigHandler)
-		producthttp.RegisterPublicRoutes(public, publicCatalogHandler)
+		producthttp.RegisterPublicRoutes(public.Group("", middleware.OptionalUserJWTAuthMiddleware(cfg.UserJWT.SecretKey, c.UserStore)), publicCatalogHandler)
 		categoryhttp.RegisterPublicRoutes(public, publicCategoryHandler)
 		contenttransport.RegisterPublicRoutes(public, publicContentHandler)
 		captchatransport.RegisterPublicRoutes(public, captchatransport.NewPublicHandler(c.CaptchaService))

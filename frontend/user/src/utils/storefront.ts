@@ -6,6 +6,8 @@ export interface StorefrontProduct {
   category?: { name?: unknown }
   images?: string[] | { images?: string[] }
   price_amount: unknown
+  effective_price_amount?: unknown
+  pricing_member_level_id?: number
   promotion_price_amount?: unknown
   fulfillment_type?: string
   purchase_type?: string
@@ -40,6 +42,8 @@ const parseAmount = (value: unknown): number | null => {
 export function storefrontPrice(product: StorefrontProduct): number | null {
   const base = parseAmount(product.price_amount)
   if (base === null) return null
+  const effective = parseAmount(product.effective_price_amount)
+  if (effective !== null && effective <= base) return effective
   const promotion = parseAmount(product.promotion_price_amount)
   return promotion !== null && promotion < base ? promotion : base
 }

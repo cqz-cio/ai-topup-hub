@@ -4,6 +4,7 @@ import (
 	"errors"
 	"strings"
 
+	memberleveldomain "github.com/dujiao-next/internal/modules/memberlevel/domain"
 	promotiondomain "github.com/dujiao-next/internal/modules/promotion/domain"
 
 	productcontract "github.com/dujiao-next/internal/modules/catalog/product/contract"
@@ -16,6 +17,7 @@ import (
 	promotioncontract "github.com/dujiao-next/internal/modules/promotion/contract"
 	reseller "github.com/dujiao-next/internal/modules/reseller/contract"
 	"github.com/dujiao-next/internal/shared/money"
+	"github.com/shopspring/decimal"
 )
 
 // publicSKUView 内部 SKU 计算结构，用于装饰逻辑
@@ -23,6 +25,7 @@ type publicSKUView struct {
 	productdomain.ProductSKU
 	PromotionPriceAmount *money.Amount
 	MemberPriceAmount    *money.Amount
+	EffectivePriceAmount *money.Amount
 }
 
 // publicProductView 内部商品计算结构，装饰完成后转换为 productpresenter.Product
@@ -34,6 +37,9 @@ type publicProductView struct {
 	PromotionPriceAmount *money.Amount
 	PromotionRules       []productpresenter.PromotionRule
 	MemberPrices         []productpresenter.MemberLevelPrice
+	EffectivePriceAmount *money.Amount
+	PricingMemberLevelID uint
+	MemberDiscountRate   money.Amount
 	PublicSKUs           []publicSKUView
 	ManualStockAvailable int
 	AutoStockAvailable   int64
@@ -70,6 +76,7 @@ func (v *publicProductView) toProductResp() productpresenter.Product {
 			IsActive:             sv.IsActive,
 			PromotionPriceAmount: sv.PromotionPriceAmount,
 			MemberPriceAmount:    sv.MemberPriceAmount,
+			EffectivePriceAmount: sv.EffectivePriceAmount,
 		})
 	}
 
@@ -82,6 +89,9 @@ func (v *publicProductView) toProductResp() productpresenter.Product {
 		Description:          v.Product.DescriptionJSON,
 		Content:              v.Product.ContentJSON,
 		PriceAmount:          v.Product.PriceAmount,
+		EffectivePriceAmount: v.EffectivePriceAmount,
+		PricingMemberLevelID: v.PricingMemberLevelID,
+		MemberDiscountRate:   v.MemberDiscountRate,
 		WholesalePrices:      productpresenter.WholesalePrices(v.Product.WholesalePrices),
 		Images:               v.Product.Images,
 		Tags:                 v.Product.Tags,
@@ -136,7 +146,7 @@ func isResellerDisplayHiddenError(err error) bool {
 		errors.Is(err, reseller.ErrPricingModeInvalid)
 }
 
-func (h *PublicHandler) decoratePublicProduct(product *productdomain.Product, promotions ProductPromotionDecorator, userMemberLevelID ...uint) (productpresenter.Product, error) {
+func (h *PublicHandler) decoratePublicProduct(product *productdomain.Product, promotions ProductPromotionDecorator, userLevel ...*memberleveldomain.MemberLevel) (productpresenter.Product, error) {
 	if product == nil {
 		return productpresenter.Product{}, nil
 	}
@@ -167,14 +177,22 @@ func (h *PublicHandler) decoratePublicProduct(product *productdomain.Product, pr
 
 	// 附加会员等级价格
 	var memberLevelID uint
-	if len(userMemberLevelID) > 0 {
-		memberLevelID = userMemberLevelID[0]
+	if len(userLevel) > 0 && userLevel[0] != nil && userLevel[0].IsActive {
+		memberLevelID = userLevel[0].ID
+		item.PricingMemberLevelID = memberLevelID
+		item.MemberDiscountRate = userLevel[0].DiscountRate
 	}
-	if h.memberLevels != nil {
-		levelPrices, _ := h.memberLevels.GetLevelPricesByProduct(product.ID)
+	if h.memberLevels != nil && memberLevelID > 0 {
+		levelPrices, err := h.memberLevels.GetLevelPricesByProduct(product.ID)
+		if err != nil {
+			return productpresenter.Product{}, err
+		}
 		if len(levelPrices) > 0 {
 			views := make([]productpresenter.MemberLevelPrice, 0, len(levelPrices))
 			for _, lp := range levelPrices {
+				if lp.MemberLevelID != memberLevelID {
+					continue
+				}
 				views = append(views, productpresenter.MemberLevelPrice{
 					MemberLevelID: lp.MemberLevelID,
 					SKUID:         lp.SKUID,
@@ -193,15 +211,6 @@ func (h *PublicHandler) decoratePublicProduct(product *productdomain.Product, pr
 	for _, sku := range item.Product.SKUs {
 		sv := publicSKUView{ProductSKU: sku}
 
-		// 计算当前用户的会员价
-		if memberLevelID > 0 && h.memberLevels != nil && sku.IsActive {
-			memberPrice, _ := h.memberLevels.ResolveMemberPrice(memberLevelID, product.ID, sku.ID, sku.PriceAmount.Decimal)
-			if memberPrice.LessThan(sku.PriceAmount.Decimal) {
-				mp := money.FromDecimal(memberPrice)
-				sv.MemberPriceAmount = &mp
-			}
-		}
-
 		if promotions != nil && sku.IsActive {
 			priceCarrier := *product
 			priceCarrier.PriceAmount = sku.PriceAmount
@@ -216,6 +225,30 @@ func (h *PublicHandler) decoratePublicProduct(product *productdomain.Product, pr
 					cp := discountedPrice
 					displayPromotionPrice = &cp
 				}
+			}
+		}
+		if sku.IsActive {
+			// Match order pricing: best promotion/quantity price, then level price.
+			base := sku.PriceAmount.Decimal
+			if sv.PromotionPriceAmount != nil && sv.PromotionPriceAmount.Decimal.LessThan(base) {
+				base = sv.PromotionPriceAmount.Decimal
+			}
+			wholesale, _, _ := productdomain.ResolveWholesaleUnitPriceForSKU(product, sku.PriceAmount.Decimal, sku.ID, sku.SKUCode, 1, 1)
+			if wholesale.GreaterThan(decimal.Zero) && wholesale.LessThan(base) {
+				base = wholesale
+			}
+			if memberLevelID > 0 && h.memberLevels != nil {
+				memberPrice, _ := h.memberLevels.ResolveMemberPrice(memberLevelID, product.ID, sku.ID, base)
+				if memberPrice.LessThan(base) {
+					mp := money.FromDecimal(memberPrice)
+					sv.MemberPriceAmount = &mp
+				}
+				base = memberPrice
+			}
+			effective := money.FromDecimal(base)
+			sv.EffectivePriceAmount = &effective
+			if sku.ID == displaySKUID {
+				item.EffectivePriceAmount = &effective
 			}
 		}
 		skuViews = append(skuViews, sv)
@@ -240,10 +273,10 @@ func (h *PublicHandler) decoratePublicProductForTenant(
 	promotions ProductPromotionDecorator,
 	tenant reseller.TenantContext,
 	resellerBatch *reseller.DisplayPricingBatch,
-	userMemberLevelID ...uint,
+	userLevel ...*memberleveldomain.MemberLevel,
 ) (productpresenter.Product, error) {
 	if !isResellerTenant(tenant) {
-		return h.decoratePublicProduct(product, promotions, userMemberLevelID...)
+		return h.decoratePublicProduct(product, promotions, userLevel...)
 	}
 	if product == nil {
 		return productpresenter.Product{}, nil
@@ -280,11 +313,12 @@ func (h *PublicHandler) decoratePublicProductForTenant(
 	}
 	productCopy.SKUs = filteredSKUs
 
-	item := publicProductView{Product: productCopy}
+	item := publicProductView{Product: productCopy, EffectivePriceAmount: &productCopy.PriceAmount}
 	h.decorateProductStock(&productCopy, &item)
 	skuViews := make([]publicSKUView, 0, len(productCopy.SKUs))
 	for _, sku := range productCopy.SKUs {
-		skuViews = append(skuViews, publicSKUView{ProductSKU: sku})
+		price := sku.PriceAmount
+		skuViews = append(skuViews, publicSKUView{ProductSKU: sku, EffectivePriceAmount: &price})
 	}
 	item.PublicSKUs = skuViews
 	return item.toProductResp(), nil
