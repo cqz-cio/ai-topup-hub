@@ -88,7 +88,7 @@ const footerLinks = computed(() => {
 
 const currentYear = new Date().getFullYear()
 
-const supportWechat = computed(() => String(config.value?.contact?.wechat || '').trim() || (appStore.isResellerTenant ? '' : '15824485317'))
+const supportWechat = computed(() => String(config.value?.contact?.wechat || '').trim() || (appStore.isResellerTenant ? '' : 'Cqz0924ttxk'))
 const copyWechat = async () => {
   try { await copyText(supportWechat.value); toast.success(t('shopUi.wechatCopied')) }
   catch { toast.error(t('shopUi.wechatCopyFailed')) }

@@ -140,7 +140,7 @@ const siteName = computed(
 const supportWechat = computed(
   () =>
     String(appStore.config?.contact?.wechat || '').trim() ||
-    (appStore.isResellerTenant ? '' : '15824485317'),
+    (appStore.isResellerTenant ? '' : 'Cqz0924ttxk'),
 )
 const products = ref<StorefrontProduct[]>([])
 const categoryRows = ref<Array<{ name?: unknown }>>([])
