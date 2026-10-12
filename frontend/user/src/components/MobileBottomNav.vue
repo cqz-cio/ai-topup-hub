@@ -1,5 +1,5 @@
 <template>
-  <nav class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-card/90 backdrop-blur-xl border-t theme-safe-bottom">
+  <nav class="xl:hidden fixed bottom-0 left-0 right-0 z-40 bg-card/90 backdrop-blur-xl border-t theme-safe-bottom">
     <div class="flex items-stretch h-14">
       <router-link
         v-for="item in navItems"
@@ -22,6 +22,7 @@
         </div>
         <!-- Me -->
         <User v-else-if="item.icon === 'me'" class="w-5 h-5" />
+        <ClipboardList v-else-if="item.icon === 'orders'" class="w-5 h-5" />
         <span>{{ t(item.label) }}</span>
       </router-link>
     </div>
@@ -32,7 +33,7 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { Home, LayoutGrid, ShoppingCart, User } from 'lucide-vue-next'
+import { ClipboardList, Home, LayoutGrid, ShoppingCart, User } from 'lucide-vue-next'
 import { useCartStore } from '../stores/cart'
 import { useUserAuthStore } from '../stores/userAuth'
 import { useAppStore } from '../stores/app'
@@ -51,6 +52,7 @@ const navItems = computed(() => {
     { path: '/', icon: 'home', label: 'bottomNav.home' },
     ...(!isListMode.value ? [{ path: '/products', icon: 'products', label: 'bottomNav.products' }] : []),
     { path: '/cart', icon: 'cart', label: 'bottomNav.cart' },
+    { path: userAuthStore.isAuthenticated ? '/me/orders' : '/guest/orders', icon: 'orders', label: 'shopUi.ordersNav' },
     { path: userAuthStore.isAuthenticated ? '/me' : '/auth/login', icon: 'me', label: 'bottomNav.me' },
   ]
   return items
@@ -58,6 +60,9 @@ const navItems = computed(() => {
 
 const isActive = (path: string) => {
   if (path === '/') return route.path === '/'
+  if (path === '/me') return route.path.startsWith('/me') && !route.path.startsWith('/me/orders')
+  if (path === '/guest/orders') return route.path.startsWith('/guest/orders') || (route.path === '/pay' && route.query.guest === '1')
+  if (path === '/me/orders') return route.path.startsWith('/me/orders') || route.path.startsWith('/orders/') || (route.path === '/pay' && route.query.guest !== '1')
   return route.path.startsWith(path)
 }
 </script>

@@ -13,6 +13,10 @@ export interface StorefrontProduct {
   purchase_type?: string
   is_sold_out?: boolean
   stock_status?: string
+  stock_display_mode?: string
+  stock_quantity_hidden?: boolean
+  auto_stock_available?: unknown
+  manual_stock_available?: unknown
   skus?: Array<{
     is_active?: boolean
     is_sold_out?: boolean
@@ -60,6 +64,22 @@ export function canPurchaseStorefrontProduct(
     return product.skus.some((sku) => sku.is_active === true && stocked(sku))
   }
   return true
+}
+
+export function storefrontStockQuantity(
+  product: StorefrontProduct,
+): number | null {
+  if (
+    product.stock_display_mode !== 'exact' ||
+    product.stock_quantity_hidden !== false
+  ) return null
+  const value = product.fulfillment_type === 'auto'
+    ? product.auto_stock_available
+    : product.manual_stock_available
+  if (typeof value !== 'number' && typeof value !== 'string') return null
+  if (typeof value === 'string' && !/^\d+$/.test(value.trim())) return null
+  const quantity = Number(value)
+  return Number.isSafeInteger(quantity) && quantity >= 0 ? quantity : null
 }
 
 export interface StorefrontProductPage {

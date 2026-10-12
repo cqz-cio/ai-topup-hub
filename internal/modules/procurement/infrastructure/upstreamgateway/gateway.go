@@ -49,19 +49,45 @@ func (s *session) CallbackURL() string    { return s.connection.CallbackURL }
 func (s *session) RetryMax() int          { return s.connection.RetryMax }
 func (s *session) RetryIntervals() string { return s.connection.RetryIntervals }
 
+func (s *session) RequiresSingleSubmission() bool {
+	adapter, ok := s.adapter.(upstream.SingleSubmissionAdapter)
+	return ok && adapter.RequiresSingleSubmission()
+}
+
 func (s *session) CreateOrder(ctx context.Context, request procurementcontract.CreateOrderRequest) (*procurementcontract.CreateOrderResult, error) {
 	result, err := s.adapter.CreateOrder(ctx, upstream.CreateUpstreamOrderReq{
 		SKUID: request.SKUID, Quantity: request.Quantity, ManualFormData: request.ManualFormData,
 		DownstreamOrderNo: request.DownstreamOrderNo, TraceID: request.TraceID, CallbackURL: request.CallbackURL,
+		MaxAmount: request.MaxAmount, Currency: request.Currency,
 	})
 	if err != nil {
 		return nil, err
 	}
-	return &procurementcontract.CreateOrderResult{
+	response := &procurementcontract.CreateOrderResult{
 		OK: result.OK, OrderID: result.OrderID, OrderNo: result.OrderNo,
 		Status: result.Status, Amount: result.Amount, Currency: result.Currency,
 		ErrorCode: result.ErrorCode, ErrorMessage: result.ErrorMessage,
-	}, nil
+	}
+	if result.Fulfillment != nil {
+		response.Fulfillment = fromUpstreamFulfillment(result.Fulfillment)
+	}
+	return response, nil
+}
+
+func (s *session) GetOrderByReference(ctx context.Context, orderID uint, orderNo string) (*procurementcontract.UpstreamOrder, error) {
+	adapter, ok := s.adapter.(upstream.ReferenceOrderAdapter)
+	if !ok {
+		return s.GetOrder(ctx, orderID)
+	}
+	detail, err := adapter.GetOrderByReference(ctx, orderNo)
+	if err != nil {
+		return nil, err
+	}
+	result := &procurementcontract.UpstreamOrder{OrderID: detail.OrderID, OrderNo: detail.OrderNo, Status: detail.Status, Amount: detail.Amount, Currency: detail.Currency}
+	if detail.Fulfillment != nil {
+		result.Fulfillment = fromUpstreamFulfillment(detail.Fulfillment)
+	}
+	return result, nil
 }
 
 func (s *session) GetOrder(ctx context.Context, orderID uint) (*procurementcontract.UpstreamOrder, error) {

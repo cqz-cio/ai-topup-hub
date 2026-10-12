@@ -11,8 +11,9 @@
       @click="emit('select')"
     >
       <img :src="bepusdtIcon" alt="" aria-hidden="true" width="22" height="22" class="bep20-payment-icon" />
-      <span>U-Bep20</span>
+      <span>USDT · BEP20</span>
     </button>
+    <div class="mt-1 text-xs text-muted-foreground">BNB Smart Chain</div>
     <div v-if="$slots.fees" class="mt-1 space-y-0.5 text-xs text-warning">
       <slot name="fees" />
     </div>

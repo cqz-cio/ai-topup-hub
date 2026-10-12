@@ -1,0 +1,124 @@
+/* 智享 A 社：所有购买、付款、查询、交付页面共用同一套品牌样式。 */
+.commerce-page {
+  padding-top: 118px;
+  padding-bottom: 72px;
+  min-height: 72vh;
+}
+.commerce-page > .container, .brand-navbar > .container, .brand-footer > .container {
+  max-width: 1240px;
+  padding-left: 32px;
+  padding-right: 32px;
+}
+.commerce-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+.commerce-eyebrow {
+  color: var(--ui-success);
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: .12em;
+  margin-bottom: 12px;
+}
+.commerce-heading h1 {
+  font-size: clamp(28px, 3.2vw, 40px);
+  font-weight: 750;
+  line-height: 1.25;
+  letter-spacing: -.035em;
+}
+.commerce-heading-description {
+  color: var(--ui-text-muted);
+  font-size: 14px;
+  margin-top: 12px;
+  max-width: 620px;
+  line-height: 1.8;
+}
+.commerce-heading-actions { flex-shrink: 0; }
+.commerce-steps {
+  display: flex;
+  list-style: none;
+  padding: 18px 24px;
+  border: 1px solid var(--ui-border);
+  background: var(--ui-bg-elevated);
+  border-radius: 16px;
+  gap: 16px;
+}
+.commerce-step { flex: 1; min-width: 0; position: relative; }
+.commerce-step-content { display: flex; align-items: center; gap: 10px; position: relative; z-index: 1; }
+.commerce-step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 16px;
+  right: 0;
+  left: 130px;
+  height: 1px;
+  background: var(--ui-border);
+}
+.commerce-step-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  width: 32px;
+  border: 1px solid var(--ui-border);
+  border-radius: 50%;
+  flex-shrink: 0;
+  color: var(--ui-text-muted);
+  background: var(--ui-bg-elevated);
+  font-size: 12px;
+  font-weight: 650;
+}
+.commerce-step-label { font-size: 12px; color: var(--ui-text-muted); }
+.commerce-step.is-current .commerce-step-number { background: var(--ui-accent); color: var(--ui-text-on-accent); border-color: var(--ui-accent); }
+.commerce-step.is-current .commerce-step-label { color: var(--ui-text-primary); font-weight: 650; }
+.commerce-step.is-done .commerce-step-number { color: var(--ui-success); background: var(--ui-success-soft); border-color: transparent; }
+.commerce-step.is-done::after { background: var(--ui-success); opacity: .35; }
+.commerce-page .shadow-2xl, .commerce-page .shadow-lg { box-shadow: var(--ui-shadow-soft); }
+.commerce-page input:not([type='checkbox']):not([type='radio']) { min-height: 44px; border-radius: 10px; }
+.commerce-page .font-mono { font-variant-numeric: tabular-nums; }
+.commerce-page .commerce-form-label { font-size: 12px; font-weight: 600; color: var(--ui-text-secondary); display: grid; gap: 9px; }
+.commerce-summary { border-top: 3px solid var(--ui-accent); }
+.commerce-note { display: flex; gap: 10px; align-items: flex-start; color: var(--ui-text-muted); font-size: 12px; line-height: 1.8; }
+.commerce-note svg { width: 16px; height: 16px; flex-shrink: 0; margin-top: 3px; color: var(--ui-success); }
+.brand-navbar { min-height: 76px; box-shadow: none !important; background: var(--ui-bg-overlay-strong); }
+.brand-navbar .theme-wordmark { gap: 12px; }
+.brand-navbar .theme-wordmark-text { font-size: 24px; letter-spacing: -.07em; font-weight: 800; }
+.brand-navbar .brand-tagline { display: block; margin-top: 2px; font-size: 9px; font-weight: 500; letter-spacing: .15em; color: var(--ui-text-muted); }
+.brand-navbar .theme-wordmark > div { line-height: 1.1; }
+.brand-navbar a.router-link-exact-active { color: var(--ui-text-primary); }
+.brand-navbar button, .brand-navbar a { touch-action: manipulation; }
+.brand-footer { background: var(--ui-bg-elevated); border-top: 1px solid var(--ui-border); padding-bottom: env(safe-area-inset-bottom); }
+.brand-footer-top { padding: 38px 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 32px; }
+.brand-footer-name { font-size: 23px; font-weight: 750; letter-spacing: -.04em; color: var(--ui-text-primary); }
+.brand-footer-description { font-size: 12px; color: var(--ui-text-muted); margin-top: 10px; max-width: 400px; }
+.brand-footer-links { display: flex; gap: 48px; }
+.brand-footer-links > div { display: grid; gap: 10px; font-size: 12px; }
+.brand-footer-links h4 { font-size: 11px; color: var(--ui-text-muted); margin-bottom: 5px; font-weight: 500; }
+.brand-footer-bottom { border-top: 1px solid var(--ui-border); padding: 18px 0; display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; color: var(--ui-text-muted); font-size: 10px; }
+.brand-footer-bottom > div { display: flex; gap: 18px; flex-wrap: wrap; }
+.brand-footer a:hover { color: var(--ui-text-primary); text-decoration: underline; text-underline-offset: 4px; }
+@media (max-width: 1279px) {
+  .brand-footer { padding-bottom: calc(3.5rem + 8px + env(safe-area-inset-bottom, 0px)); }
+}
+@media (max-width: 767px) {
+  .commerce-page { padding-top: 100px; padding-bottom: 38px; }
+  .commerce-page > .container, .brand-navbar > .container, .brand-footer > .container { padding-left: 18px; padding-right: 18px; }
+  .commerce-heading { align-items: flex-start; flex-direction: column; gap: 16px; margin-bottom: 24px; }
+  .commerce-heading-description { font-size: 13px; margin-top: 9px; }
+  .commerce-eyebrow { margin-bottom: 9px; font-size: 10px; }
+  .commerce-steps { padding: 15px 10px; gap: 4px; }
+  .commerce-step-content { flex-direction: column; gap: 6px; }
+  .commerce-step-label { font-size: 10px; }
+  .commerce-step:not(:last-child)::after { left: calc(50% + 20px); right: calc(-50% + 20px); }
+  .brand-navbar { min-height: 72px; padding-top: 12px; padding-bottom: 12px; }
+  .brand-navbar .theme-wordmark-text { font-size: 22px; }
+  .brand-footer-top { padding: 28px 0; flex-direction: column; gap: 26px; }
+  .brand-footer-links { width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; overflow-wrap: anywhere; }
+  .brand-footer-bottom { padding-bottom: 24px; flex-direction: column; gap: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .commerce-page *, .storefront * { transition-duration: 0ms !important; animation-duration: 0ms !important; }
+}

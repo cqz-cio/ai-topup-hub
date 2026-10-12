@@ -20,9 +20,14 @@ func BuildRunner(cfg *config.Config, mode string) (*Runner, error) {
 	if err != nil {
 		return nil, err
 	}
+	if mode == ModeCheckout {
+		// Paid upstream orders remain awaiting fulfillment until procurement is
+		// explicitly enabled. Do not create or enqueue purchases in this mode.
+		dependencies.PaymentService.SetProcurementService(nil)
+	}
 
 	var services []Service
-	if dependencies.BSCUSDTService != nil && (mode == ModeAll || mode == ModeWorker) {
+	if dependencies.BSCUSDTService != nil && (mode == ModeAll || mode == ModeWorker || mode == ModeCheckout || mode == ModeStorefront) {
 		services = append(services, &bscUSDTWorker{service: dependencies.BSCUSDTService})
 	}
 	if dependencies.AutoRechargeService != nil && (mode == ModeAll || mode == ModeWorker) {
@@ -30,7 +35,7 @@ func BuildRunner(cfg *config.Config, mode string) (*Runner, error) {
 	}
 
 	// 初始化 HTTP 服务
-	if mode == ModeAll || mode == ModeAPI {
+	if mode == ModeAll || mode == ModeAPI || mode == ModeCheckout || mode == ModeStorefront {
 		engine := httpserver.SetupRouter(cfg, dependencies)
 		addr := cfg.Server.Host + ":" + cfg.Server.Port
 		httpService := NewHTTPService(addr, engine)
@@ -41,6 +46,21 @@ func BuildRunner(cfg *config.Config, mode string) (*Runner, error) {
 	if mode == ModeAll || mode == ModeWorker {
 		consumer := jobconsumer.New(dependencies)
 		workerService, err := jobs.NewService(&cfg.Queue, consumer)
+		if err != nil {
+			return nil, err
+		}
+		services = append(services, workerService)
+	}
+	if mode == ModeCheckout {
+		consumer := jobconsumer.New(dependencies)
+		workerService, err := jobs.NewCheckoutService(&cfg.Queue, consumer)
+		if err != nil {
+			return nil, err
+		}
+		services = append(services, workerService)
+	}
+	if mode == ModeStorefront {
+		workerService, err := jobs.NewStorefrontService(&cfg.Queue, jobconsumer.New(dependencies))
 		if err != nil {
 			return nil, err
 		}

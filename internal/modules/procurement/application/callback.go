@@ -35,6 +35,9 @@ func (s *Service) HandleUpstreamCallback(procurementOrderID uint, upstreamStatus
 
 	switch upstreamStatus {
 	case "delivered", "completed", "fulfilled":
+		if fulfillment == nil || (strings.TrimSpace(fulfillment.Payload) == "" && len(fulfillment.DeliveryData) == 0) || s.orderLifecycle == nil {
+			return fmt.Errorf("supplier delivery has no card or delivery data; keep awaiting fulfillment")
+		}
 		// 先创建交付记录（幂等），再推进采购单状态；写入失败时采购单保持非终态以便上游重试
 		if fulfillment != nil && s.orderLifecycle != nil {
 			if err := s.createUpstreamFulfillment(procOrder.LocalOrderID, fulfillment, now); err != nil {
@@ -54,17 +57,21 @@ func (s *Service) HandleUpstreamCallback(procurementOrderID uint, upstreamStatus
 		if fulfillment != nil {
 			updates["upstream_payload"] = fulfillment.Payload
 		}
-		if err := s.procRepo.UpdateStatus(procOrder.ID, "fulfilled", updates); err != nil {
-			return fmt.Errorf("update procurement status: %w", err)
+		// 更新本地订单状态
+		if err := s.orderRepo.UpdateStatus(procOrder.LocalOrderID, constants.OrderStatusDelivered, map[string]interface{}{
+			"updated_at": now,
+		}); err != nil {
+			return fmt.Errorf("update delivered local order: %w", err)
 		}
 
-		// 更新本地订单状态
-		_ = s.orderRepo.UpdateStatus(procOrder.LocalOrderID, constants.OrderStatusDelivered, map[string]interface{}{
-			"updated_at": now,
-		})
-
 		// 如果有父订单，同步父订单状态
-		localOrder, _ := s.orderRepo.GetByID(procOrder.LocalOrderID)
+		localOrder, err := s.orderRepo.GetByID(procOrder.LocalOrderID)
+		if err != nil {
+			return fmt.Errorf("load delivered order for parent synchronization: %w", err)
+		}
+		if localOrder == nil {
+			return procurementcontract.ErrOrderNotFound
+		}
 		if localOrder != nil && localOrder.ParentID != nil && s.orderLifecycle != nil {
 			if status, syncErr := s.orderLifecycle.SyncParentStatus(*localOrder.ParentID, now); syncErr != nil {
 				logger.Warnw("procurement_sync_parent_status_failed",
@@ -72,6 +79,7 @@ func (s *Service) HandleUpstreamCallback(procurementOrderID uint, upstreamStatus
 					"parent_order_id", *localOrder.ParentID,
 					"error", syncErr,
 				)
+				return syncErr
 			} else {
 				if status == "" {
 					status = constants.OrderStatusDelivered
@@ -82,6 +90,9 @@ func (s *Service) HandleUpstreamCallback(procurementOrderID uint, upstreamStatus
 			}
 		} else if localOrder != nil && s.orderLifecycle != nil {
 			_, _ = s.orderLifecycle.EnqueueStatusEmail(localOrder.ID, constants.OrderStatusDelivered)
+		}
+		if err := s.procRepo.UpdateStatus(procOrder.ID, "fulfilled", updates); err != nil {
+			return fmt.Errorf("update procurement status: %w", err)
 		}
 
 		// 触发下游回调（多级连跳：本站作为中间节点，通知下游交付完成）

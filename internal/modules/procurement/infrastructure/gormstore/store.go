@@ -19,6 +19,7 @@ type Store struct {
 }
 
 var _ procurementcontract.Repository = (*Store)(nil)
+var _ procurementcontract.RecoveryReader = (*Store)(nil)
 
 func New(db *gorm.DB) *Store { return &Store{db: db} }
 
@@ -70,6 +71,43 @@ func (s *Store) UpdateStatus(id uint, status string, updates map[string]interfac
 	return s.db.Model(&procurementdomain.Order{}).
 		Where("id = ? AND deleted_at IS NULL", id).
 		Updates(updates).Error
+}
+
+func (s *Store) UpdateStatusIfCurrent(id uint, current, status string, updates map[string]interface{}) (bool, error) {
+	if updates == nil {
+		updates = map[string]interface{}{}
+	}
+	updates["status"] = status
+	result := s.db.Model(&procurementdomain.Order{}).
+		Where("id = ? AND deleted_at IS NULL AND status = ?", id, current).
+		Updates(updates)
+	return result.RowsAffected == 1, result.Error
+}
+
+func (s *Store) ClaimSubmission(id uint) (bool, error) {
+	result := s.db.Model(&procurementdomain.Order{}).
+		Where("id = ? AND deleted_at IS NULL AND status IN ?", id, []string{"pending", "failed"}).
+		Updates(map[string]interface{}{"status": "submitting", "updated_at": time.Now(), "error_message": ""})
+	return result.RowsAffected == 1, result.Error
+}
+
+func (s *Store) FindPaidOrdersMissingProcurement(limit int) ([]uint, error) {
+	var ids []uint
+	err := s.db.Table("orders AS o").Select("o.id").
+		Where("o.deleted_at IS NULL AND o.status IN ?", []string{"paid", "fulfilling"}).
+		Where("NOT EXISTS (SELECT 1 FROM orders child WHERE child.parent_id=o.id AND child.deleted_at IS NULL)").
+		Where("EXISTS (SELECT 1 FROM order_items i WHERE i.order_id=o.id AND i.deleted_at IS NULL AND i.fulfillment_type='upstream')").
+		Where("NOT EXISTS (SELECT 1 FROM procurement_orders p WHERE p.local_order_id=o.id)").
+		Order("o.id ASC").Limit(limit).Scan(&ids).Error
+	return ids, err
+}
+
+func (s *Store) ListRecoverable(before time.Time, limit int) ([]procurementdomain.Order, error) {
+	var orders []procurementdomain.Order
+	err := s.active().Where("status IN ? AND updated_at <= ?", []string{"pending", "failed", "accepted", "submitting"}, before).
+		Where("next_retry_at IS NULL OR next_retry_at <= ?", time.Now()).
+		Order("updated_at ASC").Limit(limit).Find(&orders).Error
+	return orders, err
 }
 
 func (s *Store) List(filter procurementcontract.ListFilter) ([]procurementdomain.Order, int64, error) {

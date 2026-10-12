@@ -1,13 +1,9 @@
 <template>
-  <div class="min-h-screen bg-background text-foreground pt-24 pb-16">
+  <div class="commerce-page guest-orders-page min-h-screen bg-background text-foreground pt-24 pb-16">
     <div class="container mx-auto px-4">
-      <div class="mb-8">
-        <h1 class="text-3xl font-black text-foreground mb-2 flex items-center gap-3">
-          <ClipboardList class="w-8 h-8 opacity-70" />
-          {{ t('guestOrders.title') }}
-        </h1>
-        <p class="text-muted-foreground text-sm">{{ t('guestOrders.subtitle') }}</p>
-      </div>
+      <CommerceHeading :title="t('shopUi.lookupAction')" :description="t('shopUi.queryHint')">
+        <template #actions><Button as-child variant="outline" size="sm"><RouterLink to="/me/orders">{{ t('shopUi.memberOrders') }}</RouterLink></Button></template>
+      </CommerceHeading>
 
       <div class="rounded-2xl border bg-card p-6 shadow-sm mb-8">
         <div v-if="hasSavedAuth"
@@ -17,15 +13,15 @@
             {{ t('guestOrders.clearSaved') }}
           </Button>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Input v-model="email" type="email" class="h-11" :placeholder="t('guestOrders.emailPlaceholder')" />
-          <Input v-model="orderPassword" type="password" class="h-11" :placeholder="t('guestOrders.passwordPlaceholder')" />
-          <Input v-model="orderNo" type="text" class="h-11" :placeholder="t('guestOrders.orderNoPlaceholder')" />
-          <Button @click="handleSearch" :disabled="loading" class="h-11 px-6 font-bold">
+        <form class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end" @submit.prevent="handleSearch">
+          <label class="commerce-form-label">{{ t('shopUi.guestEmail') }}<Input v-model="email" type="email" autocomplete="email" class="h-11" :placeholder="t('guestOrders.emailPlaceholder')" /></label>
+          <label class="commerce-form-label">{{ t('shopUi.guestPassword') }}<Input v-model="orderPassword" type="password" autocomplete="off" class="h-11" :placeholder="t('guestOrders.passwordPlaceholder')" /></label>
+          <label class="commerce-form-label">{{ t('shopUi.orderNo') }}<Input v-model="orderNo" type="text" class="h-11" :placeholder="t('guestOrders.orderNoPlaceholder')" /></label>
+          <Button type="submit" :disabled="loading" class="h-11 px-6 font-bold">
             <Search class="h-4 w-4" />
             {{ loading ? t('guestOrders.searching') : t('guestOrders.search') }}
           </Button>
-        </div>
+        </form>
         <p class="text-xs text-muted-foreground mt-3">{{ t('guestOrders.tip') }}</p>
         <Alert v-if="error" variant="destructive" class="mt-4">
           <AlertDescription>{{ error }}</AlertDescription>
@@ -56,7 +52,7 @@
             </div>
             <div class="text-xs text-muted-foreground mt-1">{{ formatDate(order.created_at) }}</div>
           </div>
-          <div class="flex items-center gap-3">
+          <div class="flex flex-wrap items-center gap-3">
             <Badge :variant="statusVariant(order.status)" size="sm">
               {{ statusLabel(order.status) }}
             </Badge>
@@ -65,7 +61,7 @@
               :class="buttonVariants({ variant: 'outline', size: 'sm' })"
             >
               <Eye class="h-4 w-4 opacity-60" />
-              {{ t('guestOrders.viewDetails') }}
+              {{ t('shopUi.orderDetailsAction') }}
             </RouterLink>
             <Button v-if="order.status === 'pending_payment'" as-child size="sm">
               <router-link :to="`/pay?guest=1&order_no=${order.order_no}`">
@@ -88,7 +84,8 @@
 </template>
 
 <script setup lang="ts">
-import { ClipboardList, Search, Eye, CreditCard } from 'lucide-vue-next'
+import { Search, Eye, CreditCard } from 'lucide-vue-next'
+import CommerceHeading from '../components/commerce/CommerceHeading.vue'
 import { useI18n } from 'vue-i18n'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'

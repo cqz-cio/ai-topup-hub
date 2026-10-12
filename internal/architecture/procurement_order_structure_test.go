@@ -27,7 +27,7 @@ func TestProcurementUsesCompleteVerticalLayout(t *testing.T) {
 	if production != 0 || total != 0 {
 		t.Fatalf("procurement module root must remain structural only, got production=%d total=%d", production, total)
 	}
-	assertDirectoryGoFileBudget(t, applicationRoot, 8)
+	assertDirectoryGoFileBudget(t, applicationRoot, 9)
 	assertDirectoryGoFileBudget(t, contractRoot, 3)
 	assertDirectoryGoFileBudget(t, domainRoot, 1)
 	assertDirectoryGoFileBudget(t, storeRoot, 2)
@@ -44,9 +44,11 @@ func TestProcurementUsesCompleteVerticalLayout(t *testing.T) {
 	assertFileDeclaresTypes(t, filepath.Join(contractRoot, "ports.go"), []string{
 		"Repository", "OrderRepository", "ProductMappingReader", "SKUMappingReader", "ConnectionProvider",
 		"Enqueuer", "OrderLifecycle", "DownstreamCallbackEnqueuer", "BotFulfillmentNotifier", "FailureNotifier",
+		"SubmissionClaimer", "RecoveryReader",
 	})
 	assertFileDeclaresTypes(t, filepath.Join(contractRoot, "types.go"), []string{
 		"ListFilter", "Fulfillment", "CreateOrderRequest", "CreateOrderResult", "UpstreamOrder", "UpstreamConnection", "UseCase",
+		"ReferencedOrderConnection", "SingleSubmissionConnection",
 	})
 	assertFileDeclaresTypes(t, filepath.Join(domainRoot, "order.go"), []string{"Order", "LocalOrder", "LocalOrderItem"})
 	assertFileDeclaresTypes(t, filepath.Join(storeRoot, "store.go"), []string{"Store"})
@@ -57,15 +59,16 @@ func TestProcurementUsesCompleteVerticalLayout(t *testing.T) {
 	assertFileDeclaresFunctions(t, filepath.Join(transportRoot, "routes.go"), []string{"RegisterAdminRoutes"})
 
 	expected := map[string][]string{
-		"service.go": {"NewService"},
-		"create.go":  {"CreateForOrder", "createProcurementForSingleOrder", "hasUpstreamItems"},
+		"service.go":  {"NewService"},
+		"recovery.go": {"RecoverPaidOrders"},
+		"create.go":   {"CreateForOrder", "createProcurementForSingleOrder", "hasUpstreamItems"},
 		"submit.go": {
 			"SubmitToUpstream", "markProcurementError", "rejectProcurement",
 			"rollbackLocalOrderOnProcurementFailure", "notifyProcurementFailure", "handleSubmitFailure",
-			"isRetryableErrorCode", "parseRetryIntervals",
+			"isRetryableErrorCode", "parseRetryIntervals", "requiresSingleSubmission", "markSubmissionUnknown",
 		},
 		"callback.go": {"HandleUpstreamCallback", "createUpstreamFulfillment", "isUpstreamTransitionAllowed"},
-		"poll.go":     {"PollUpstreamStatus", "requeuePoll", "SyncAcceptedOrders", "mapProcurementUpstreamStatus"},
+		"poll.go":     {"PollUpstreamStatus", "requeuePoll", "SyncAcceptedOrders", "mapProcurementUpstreamStatus", "getReferencedUpstreamOrder"},
 		"query.go": {
 			"GetByID", "GetByLocalOrderNo", "List", "StatsByStatus", "FillParentOrderNo", "fillParentOrderNos",
 			"applyProcurementLocalRefundedAmountFallback", "shouldSyncUpstreamRefundStatus",

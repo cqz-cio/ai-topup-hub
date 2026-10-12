@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 540" width="900" height="540" role="img" aria-labelledby="title desc">
+  <title id="title">ChatGPT Pro 20x iOS 渠道商品封面</title>
+  <desc id="desc">黑色与红色波浪背景，白色大字 20x，并标注 iOS 渠道和全新 30 天</desc>
+  <defs>
+    <linearGradient id="p20-carbon" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#343a3e"/>
+      <stop offset=".42" stop-color="#101416"/>
+      <stop offset=".72" stop-color="#080a0b"/>
+      <stop offset="1" stop-color="#2a3033"/>
+    </linearGradient>
+    <linearGradient id="p20-ribbon" x1="0" y1="0" x2=".4" y2="1">
+      <stop stop-color="#ff4a59"/>
+      <stop offset=".28" stop-color="#d52239"/>
+      <stop offset=".62" stop-color="#591621"/>
+      <stop offset="1" stop-color="#120b10"/>
+    </linearGradient>
+    <linearGradient id="p20-edge" x1="0" y1="0" x2="1" y2="0">
+      <stop stop-color="#ff5363"/>
+      <stop offset=".24" stop-color="#ff344e"/>
+      <stop offset=".55" stop-color="#b52536"/>
+      <stop offset=".84" stop-color="#ff5969"/>
+      <stop offset="1" stop-color="#ff8b95"/>
+    </linearGradient>
+    <linearGradient id="p20-fold" x1="0" y1="0" x2=".9" y2="1">
+      <stop stop-color="#363a3d" stop-opacity=".75"/>
+      <stop offset=".6" stop-color="#14181a"/>
+      <stop offset="1" stop-color="#050709"/>
+    </linearGradient>
+    <linearGradient id="p20-shade" x1="0" y1="0" x2="1" y2="0">
+      <stop stop-color="#050607" stop-opacity=".95"/>
+      <stop offset=".54" stop-color="#050607" stop-opacity=".43"/>
+      <stop offset="1" stop-color="#050607" stop-opacity=".04"/>
+    </linearGradient>
+    <radialGradient id="p20-glow" cx=".86" cy=".14" r=".78">
+      <stop stop-color="#ff304b" stop-opacity=".28"/>
+      <stop offset="1" stop-color="#ff304b" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="p20-soft" x="-20%" y="-80%" width="140%" height="260%">
+      <feGaussianBlur stdDeviation="5"/>
+    </filter>
+  </defs>
+
+  <rect width="900" height="540" fill="#080a0b"/>
+  <rect width="900" height="540" fill="url(#p20-glow)"/>
+  <svg x="0" y="0" width="900" height="540" viewBox="0 0 400 220" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M-25 47C93 69 119 230 241 192S368 77 427 33L427 181C335 202 310 252 209 225S56 116-25 118Z" fill="url(#p20-carbon)"/>
+    <path d="M-25 92C88 107 104 224 230 202S341 149 428 100L428 166C301 260 166 244 91 183S22 141-25 151Z" fill="url(#p20-ribbon)"/>
+    <path d="M-25 92C88 107 104 224 230 202S341 149 428 100" fill="none" stroke="#ff304b" stroke-width="9" opacity=".36" filter="url(#p20-soft)"/>
+    <path d="M-25 92C88 107 104 224 230 202S341 149 428 100" fill="none" stroke="url(#p20-edge)" stroke-width="1.7"/>
+    <path d="M-25 170C84 91 125 243 240 214S345 115 428 37L428 249H-25Z" fill="url(#p20-fold)"/>
+    <path d="M-25 170C84 91 125 243 240 214S345 115 428 37" fill="none" stroke="#ff334b" stroke-width="7" opacity=".24" filter="url(#p20-soft)"/>
+    <path d="M-25 170C84 91 125 243 240 214S345 115 428 37" fill="none" stroke="url(#p20-edge)" stroke-width="1.1" opacity=".8"/>
+    <path d="M-25 192C88 150 105 251 232 234S371 171 428 143" fill="none" stroke="#b5bec6" stroke-width=".7" opacity=".16"/>
+  </svg>
+  <rect width="900" height="540" fill="url(#p20-shade)"/>
+
+  <g font-family="Inter, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif">
+    <text x="72" y="82" fill="#f2f4f5" font-size="28" font-weight="650" letter-spacing="1.5">ChatGPT Pro</text>
+    <text x="62" y="318" fill="#ffffff" font-size="178" font-weight="800" letter-spacing="-11">20x</text>
+    <text x="75" y="382" fill="#ffffff" font-size="42" font-weight="700" letter-spacing="2">iOS 渠道</text>
+    <rect x="74" y="427" width="206" height="52" rx="26" fill="#101416" fill-opacity=".82" stroke="#ff5363" stroke-width="1.5"/>
+    <circle cx="105" cy="453" r="6" fill="#ff4057"/>
+    <text x="126" y="462" fill="#eef1f2" font-size="24" font-weight="600" letter-spacing="1">全新 30 天</text>
+  </g>
+  <path d="M72 105H198" stroke="#ff4057" stroke-width="5" stroke-linecap="round"/>
+</svg>

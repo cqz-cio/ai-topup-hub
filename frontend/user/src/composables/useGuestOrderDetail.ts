@@ -7,6 +7,7 @@ import { clearGuestOrderAuth, loadGuestOrderAuth, saveGuestOrderAuth } from '../
 import { resolveGuestOrderDetailViewState } from '../utils/guestOrderDetailState'
 import { useOrderDisplayHelpers } from './useOrderDisplayHelpers'
 import { createOrderDetailPolling, needsOrderDetailRefresh } from '../utils/orderDetailPolling'
+import { toast } from './useToast'
 
 /**
  * 游客订单详情逻辑（classic + vault 共用）。
@@ -44,7 +45,7 @@ export function useGuestOrderDetail() {
       a.download = `fulfillment-${orderNo}.txt`
       a.click()
       URL.revokeObjectURL(url)
-    } catch {} finally {
+    } catch { toast.error(t('shopUi.downloadFailed')) } finally {
       fulfillmentDownloading.value = false
     }
   }

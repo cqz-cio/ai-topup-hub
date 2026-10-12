@@ -56,6 +56,11 @@ func (s *Service) Create(input CreateInput) (*siteconnectiondomain.Connection, e
 	if protocol == "" {
 		protocol = constants.ConnectionProtocolDujiaoNext
 	}
+	if protocol == constants.ConnectionProtocolACGFaka {
+		if _, err := upstream.NewACGFakaAdapter(&siteconnectiondomain.Connection{BaseURL: strings.TrimSpace(input.BaseURL), ApiKey: strings.TrimSpace(input.ApiKey), ApiSecret: input.ApiSecret}, s.uploadsDir); err != nil {
+			return nil, siteconnectioncontract.ErrInvalid
+		}
+	}
 
 	encryptedSecret, err := crypto.Encrypt(s.encryptKey, input.ApiSecret)
 	if err != nil {
@@ -158,6 +163,11 @@ func (s *Service) Update(id uint, input UpdateInput) (*siteconnectiondomain.Conn
 		conn.AutoSyncPrice = *input.AutoSyncPrice
 	}
 
+	if conn.Protocol == constants.ConnectionProtocolACGFaka {
+		if _, err := s.GetAdapter(conn); err != nil {
+			return nil, siteconnectioncontract.ErrInvalid
+		}
+	}
 	if err := s.connRepo.Update(conn); err != nil {
 		return nil, err
 	}

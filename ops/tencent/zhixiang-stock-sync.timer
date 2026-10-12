@@ -1,0 +1,11 @@
+[Unit]
+Description=Refresh merchant 1039 inventory every five minutes
+
+[Timer]
+OnBootSec=45s
+OnUnitInactiveSec=300s
+AccuracySec=5s
+Unit=zhixiang-stock-sync.service
+
+[Install]
+WantedBy=timers.target

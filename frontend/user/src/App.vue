@@ -15,7 +15,7 @@
     <!-- classic 模板 / 分销控制台（保持原有结构不变） -->
     <template v-else>
       <Navbar v-if="!isResellerConsole" />
-      <main class="flex-1" :class="isResellerConsole ? '' : 'pb-14 lg:pb-0'">
+      <main class="flex-1" :class="isResellerConsole ? '' : 'pb-14 xl:pb-0'">
         <ErrorBoundary>
           <RouterView v-slot="{ Component }">
             <Transition name="page-fade" mode="out-in">

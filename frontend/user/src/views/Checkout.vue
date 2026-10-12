@@ -1,15 +1,11 @@
 <template>
-  <div class="min-h-screen bg-background text-foreground pt-24 pb-16">
+  <div class="commerce-page checkout-page min-h-screen bg-background text-foreground pt-24 pb-16">
     <div class="container mx-auto px-4">
-      <div class="mb-8">
-        <h1 class="mb-2 text-3xl font-black text-foreground">{{ t('checkout.title') }}</h1>
-        <p class="text-sm text-muted-foreground">{{ t('checkout.subtitle') }}</p>
-      </div>
+      <CommerceHeading :title="t('shopUi.steps.checkout')" :description="t('shopUi.checkoutHint')" />
 
       <CheckoutSteps
         class="mb-8"
         current-step="checkout"
-        :step-keys="isBuyNowMode ? ['checkout', 'payment'] : ['cart', 'checkout', 'payment']"
       />
 
       <EmptyState
@@ -125,18 +121,20 @@
             </div>
 
             <div v-if="checkoutMode === 'guest'" class="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <Input
+              <label class="commerce-form-label">{{ t('shopUi.guestEmail') }}<Input
                 v-model="guestEmail"
                 type="email"
+                autocomplete="email"
                 class="h-11"
                 :placeholder="t('checkout.guestEmailPlaceholder')"
-              />
-              <Input
+              /></label>
+              <label class="commerce-form-label">{{ t('shopUi.guestPassword') }}<Input
                 v-model="guestPassword"
                 type="password"
+                autocomplete="new-password"
                 class="h-11"
                 :placeholder="t('checkout.guestPasswordPlaceholder')"
-              />
+              /></label>
             </div>
 
             <div v-if="checkoutMode === 'guest' && guestCaptchaEnabled" class="space-y-2">
@@ -169,7 +167,7 @@
           </div>
         </div>
 
-        <div class="h-fit rounded-2xl border bg-card text-card-foreground p-6 lg:sticky lg:top-24">
+        <div class="commerce-summary h-fit rounded-2xl border bg-card text-card-foreground p-6 lg:sticky lg:top-24">
           <h2 class="mb-4 text-lg font-bold text-foreground">{{ t('checkout.submitTitle') }}</h2>
           <div class="mb-4 rounded-lg border bg-secondary p-3 text-xs text-muted-foreground">
             {{ t('checkout.submitHint') }}
@@ -327,6 +325,7 @@
 </template>
 
 <script setup lang="ts">
+import CommerceHeading from '../components/commerce/CommerceHeading.vue'
 import { useI18n } from 'vue-i18n'
 import { pageAlertVariant, pageAlertToneClass } from '../utils/alerts'
 import ImageCaptcha from '../components/captcha/ImageCaptcha.vue'
@@ -346,7 +345,7 @@ const { t } = useI18n()
 
 const {
   userAuthStore, getLocalizedText, formatPrice, getImageUrl,
-  isBuyNowMode, cartItems, totalItems, cartItemKey, checkoutItemImage, itemSkuDisplay,
+  cartItems, totalItems, cartItemKey, checkoutItemImage, itemSkuDisplay,
   itemStockExceeded, itemStockHint,
   checkoutItemCurrency, checkoutItemPriceParts, checkoutItemOriginalPriceParts, checkoutItemHasPriceDiscount,
   manualFormProducts, manualFormData, submitAttempted, getManualFieldLabel, getManualFieldPlaceholder, manualFieldError,

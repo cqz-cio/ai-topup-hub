@@ -34,6 +34,8 @@ type CreateOrderRequest struct {
 	DownstreamOrderNo string
 	TraceID           string
 	CallbackURL       string
+	MaxAmount         string
+	Currency          string
 }
 
 type CreateOrderResult struct {
@@ -45,6 +47,16 @@ type CreateOrderResult struct {
 	Currency     string
 	ErrorCode    string
 	ErrorMessage string
+	Fulfillment  *Fulfillment
+}
+
+// ReferencedOrderConnection retains supplier order numbers without integer coercion.
+type ReferencedOrderConnection interface {
+	GetOrderByReference(ctx context.Context, orderID uint, orderNo string) (*UpstreamOrder, error)
+}
+
+type SingleSubmissionConnection interface {
+	RequiresSingleSubmission() bool
 }
 
 type UpstreamOrder struct {
@@ -73,6 +85,7 @@ type UseCase interface {
 	SubmitToUpstream(procurementOrderID uint) error
 	PollUpstreamStatus(procurementOrderID uint) error
 	SyncAcceptedOrders()
+	RecoverPaidOrders() error
 	HandleUpstreamCallback(procurementOrderID uint, upstreamStatus string, fulfillment *Fulfillment) error
 	GetByID(id uint) (*procurementdomain.Order, error)
 	GetByLocalOrderNo(localOrderNo string) (*procurementdomain.Order, error)

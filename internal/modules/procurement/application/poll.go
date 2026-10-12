@@ -47,7 +47,7 @@ func (s *Service) PollUpstreamStatus(procurementOrderID uint) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
-	detail, err := connection.GetOrder(ctx, procOrder.UpstreamOrderID)
+	detail, err := getReferencedUpstreamOrder(ctx, connection, procOrder)
 	if err != nil {
 		logger.Warnw("procurement_poll_status_error",
 			"procurement_order_id", procOrder.ID,
@@ -103,6 +103,15 @@ func (s *Service) requeuePoll(procOrder *procurementdomain.Order) error {
 // SyncAcceptedOrders 定时巡检：检查所有 accepted 状态的采购单，向上游查询最新状态
 // 由 worker 定时任务调用（每30分钟）
 func (s *Service) SyncAcceptedOrders() {
+	// A process may have stopped between the persisted intent and the response.
+	// Neither a queue retry nor a restart may resend that balance purchase.
+	if pending, _, err := s.procRepo.List(procurementcontract.ListFilter{Status: "submitting", Page: 1, PageSize: 200}); err == nil {
+		for i := range pending {
+			if time.Since(pending[i].UpdatedAt) > 5*time.Minute {
+				_ = s.markSubmissionUnknown(&pending[i], "supplier submission was interrupted; reconcile before retrying")
+			}
+		}
+	}
 	orders, _, err := s.procRepo.List(procurementcontract.ListFilter{
 		Status:   "accepted",
 		Page:     1,
@@ -120,7 +129,7 @@ func (s *Service) SyncAcceptedOrders() {
 
 	for i := range orders {
 		procOrder := &orders[i]
-		if procOrder.UpstreamOrderID == 0 {
+		if procOrder.UpstreamOrderID == 0 && procOrder.UpstreamOrderNo == "" {
 			continue
 		}
 
@@ -130,7 +139,7 @@ func (s *Service) SyncAcceptedOrders() {
 		}
 
 		ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
-		detail, err := connection.GetOrder(ctx, procOrder.UpstreamOrderID)
+		detail, err := getReferencedUpstreamOrder(ctx, connection, procOrder)
 		cancel()
 
 		if err != nil {
@@ -188,6 +197,17 @@ func (s *Service) SyncAcceptedOrders() {
 			}
 		}
 	}
+}
+
+func getReferencedUpstreamOrder(ctx context.Context, connection procurementcontract.UpstreamConnection, order *procurementdomain.Order) (*procurementcontract.UpstreamOrder, error) {
+	// Recover an immediate card response even when the original delivery write failed.
+	if order.UpstreamPayload != "" {
+		return &procurementcontract.UpstreamOrder{Status: "delivered", Fulfillment: &procurementcontract.Fulfillment{Type: "auto", Status: "delivered", Payload: order.UpstreamPayload}}, nil
+	}
+	if referenced, ok := connection.(procurementcontract.ReferencedOrderConnection); ok {
+		return referenced.GetOrderByReference(ctx, order.UpstreamOrderID, order.UpstreamOrderNo)
+	}
+	return connection.GetOrder(ctx, order.UpstreamOrderID)
 }
 
 // mapProcurementUpstreamStatus 统一映射上游状态别名，便于回调与轮询使用同一分支逻辑。

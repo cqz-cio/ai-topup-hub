@@ -1,0 +1,28 @@
+[Unit]
+Description=Zhixiang shop (embedded storefront and admin)
+After=network-online.target zhixiang-redis.service
+Wants=network-online.target
+Requires=zhixiang-redis.service
+
+[Service]
+Type=simple
+User=zhixiang
+Group=zhixiang
+WorkingDirectory=/srv/zhixiang/shared
+ExecStart=/srv/zhixiang/current/zhixiang-shop -mode storefront
+Environment=UPSTREAM_PURCHASE_ENABLED=true
+Environment=TZ=Asia/Shanghai
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+UMask=0077
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/srv/zhixiang
+
+[Install]
+WantedBy=multi-user.target

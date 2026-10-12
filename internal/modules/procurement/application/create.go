@@ -1,6 +1,7 @@
 package application
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -29,7 +30,7 @@ func (s *Service) CreateForOrder(orderID uint) error {
 			if !s.hasUpstreamItems(child) {
 				continue
 			}
-			if err := s.createProcurementForSingleOrder(child); err != nil {
+			if err := s.createProcurementForSingleOrder(child); err != nil && !errors.Is(err, procurementcontract.ErrExists) {
 				logger.Warnw("procurement_create_child_failed",
 					"parent_order_id", orderID,
 					"child_order_id", child.ID,
@@ -50,6 +51,9 @@ func (s *Service) CreateForOrder(orderID uint) error {
 
 // createProcurementForSingleOrder 为单个订单创建采购单
 func (s *Service) createProcurementForSingleOrder(order *procurementdomain.LocalOrder) error {
+	if order.Status != constants.OrderStatusPaid && order.Status != constants.OrderStatusFulfilling {
+		return procurementcontract.ErrStatusInvalid
+	}
 	// 检查是否已存在
 	existing, err := s.procRepo.GetByLocalOrderID(order.ID)
 	if err != nil {
@@ -84,6 +88,10 @@ func (s *Service) createProcurementForSingleOrder(order *procurementdomain.Local
 	}
 
 	if err := s.procRepo.Create(procOrder); err != nil {
+		// A concurrent callback/recovery may have won the unique order claim.
+		if existing, lookupErr := s.procRepo.GetByLocalOrderID(order.ID); lookupErr == nil && existing != nil {
+			return procurementcontract.ErrExists
+		}
 		return fmt.Errorf("create procurement order: %w", err)
 	}
 
@@ -95,11 +103,12 @@ func (s *Service) createProcurementForSingleOrder(order *procurementdomain.Local
 
 	// 入队提交任务
 	if s.queue != nil {
-		if err := s.queue.EnqueueSubmit(procOrder.ID); err != nil {
+		if err := s.queue.EnqueueSubmit(procOrder.ID, 0); err != nil {
 			logger.Warnw("procurement_enqueue_submit_failed",
 				"procurement_order_id", procOrder.ID,
 				"error", err,
 			)
+			return err
 		}
 	}
 

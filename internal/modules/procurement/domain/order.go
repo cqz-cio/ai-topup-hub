@@ -15,7 +15,7 @@ const PayloadPreviewMaxLines = 100
 type Order struct {
 	ID                       uint         `gorm:"primarykey" json:"id"`
 	ConnectionID             uint         `gorm:"index;not null" json:"connection_id"`
-	LocalOrderID             uint         `gorm:"index;not null" json:"local_order_id"`
+	LocalOrderID             uint         `gorm:"index;uniqueIndex:ux_procurement_local_order;not null" json:"local_order_id"`
 	LocalOrderNo             string       `gorm:"type:varchar(64);index" json:"local_order_no"`
 	UpstreamOrderID          uint         `json:"-"`
 	UpstreamOrderNo          string       `gorm:"type:varchar(64);index" json:"upstream_order_no,omitempty"`

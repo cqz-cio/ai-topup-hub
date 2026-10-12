@@ -1,5 +1,5 @@
 <template>
-  <div class="relative min-h-screen overflow-hidden bg-background text-foreground pt-24 pb-16">
+  <div class="commerce-page relative min-h-screen overflow-hidden bg-background text-foreground pt-24 pb-16">
     <div class="container relative z-10 mx-auto px-4">
       <header class="relative mb-8 overflow-hidden rounded-3xl border bg-card shadow-sm">
         <div class="relative flex flex-col gap-6 p-6 lg:flex-row lg:items-center lg:justify-between lg:p-8">

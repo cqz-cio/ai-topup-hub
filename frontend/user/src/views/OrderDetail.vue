@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-background text-foreground pt-24 pb-16">
+  <div class="commerce-page order-receipt-page min-h-screen bg-background text-foreground pt-24 pb-16">
     <div class="container mx-auto px-4">
       <BreadcrumbNav
         class="mb-6"
@@ -9,10 +9,7 @@
           { label: t('orderDetail.title') },
         ]"
       />
-      <div class="mb-8">
-        <h1 class="text-3xl font-black text-foreground mb-2">{{ t('orderDetail.title') }}</h1>
-        <p class="text-muted-foreground text-sm">{{ t('orderDetail.subtitle') }}</p>
-      </div>
+      <CommerceHeading :title="t('shopUi.deliveryTitle')" :description="t('shopUi.deliveryDescription')" />
 
       <!-- Loading Skeleton -->
       <div v-if="loading" class="space-y-6">
@@ -53,6 +50,7 @@
       />
 
       <div v-else class="space-y-6">
+        <CheckoutSteps :current-step="deliveryState === 'unpaid' ? 'payment' : 'delivery'" :complete="deliveryState === 'ready'" v-if="deliveryState !== 'closed'" />
         <div class="rounded-2xl border bg-card shadow-sm p-6">
           <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
@@ -78,6 +76,8 @@
             </div>
           </div>
         </div>
+
+        <OrderDelivery :order="order" :downloading="fulfillmentDownloading" @download="handleDownloadFulfillment" />
 
         <div v-if="order.children && order.children.length > 0"
           class="rounded-2xl border bg-card shadow-sm p-6">
@@ -156,118 +156,12 @@
                 </div>
                 <div v-else class="text-sm text-muted-foreground">{{ t('orderDetail.noItems') }}</div>
               </div>
-              <div class="mt-4">
-                <div class="flex items-center justify-between mb-3">
-                  <h3 class="text-sm font-semibold text-foreground">{{
-                    t('orderDetail.childFulfillmentTitle') }}</h3>
-                  <button v-if="child.fulfillment?.status === 'delivered'"
-                    class="inline-flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-lg transition-colors shadow-sm"
-                    :class="fulfillmentCopied ? 'bg-emerald-600 text-white' : 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800'"
-                    @click="handleCopyFulfillment(child.fulfillment)">
-                    <Copy v-if="!fulfillmentCopied" class="w-3.5 h-3.5" :stroke-width="2" />
-                    <Check v-else class="w-3.5 h-3.5" :stroke-width="2" />
-                    {{ fulfillmentCopied ? t('orderDetail.fulfillmentCopied') : t('orderDetail.fulfillmentCopy') }}
-                  </button>
-                </div>
-                <div v-if="child.fulfillment">
-                  <div class="text-sm text-muted-foreground">{{ t('orderDetail.fulfillmentType') }}：{{
-                    fulfillmentTypeLabelText(child.fulfillment.type) }}</div>
-                  <div class="text-sm text-muted-foreground">{{ t('orderDetail.fulfillmentStatus') }}：{{
-                    fulfillmentStatusLabelText(child.fulfillment.status) }}</div>
-                  <div v-if="isFulfillmentTruncated(child.fulfillment)" class="mt-3">
-                    <div class="flex items-center justify-between mb-2">
-                      <span class="text-sm text-muted-foreground">{{ t('orderDetail.fulfillmentTotalLines', { count: child.fulfillment.payload_line_count }) }}</span>
-                      <button class="inline-flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 transition-colors shadow-sm disabled:opacity-50"
-                        :disabled="fulfillmentDownloading"
-                        @click="handleDownloadFulfillment(child.order_no || order.order_no)">
-                        <Download class="w-3.5 h-3.5" :stroke-width="2" />
-                        {{ fulfillmentDownloading ? t('orderDetail.fulfillmentDownloading') : t('orderDetail.fulfillmentDownload') }}
-                      </button>
-                    </div>
-                    <div class="mb-2 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 px-3 py-2 text-xs text-amber-700 dark:text-amber-400">
-                      {{ t('orderDetail.fulfillmentTruncatedHint') }}
-                    </div>
-                    <div class="border rounded-xl p-4 text-sm text-muted-foreground whitespace-pre-wrap break-all overflow-hidden max-h-48 overflow-y-auto">{{ child.fulfillment.payload }}</div>
-                  </div>
-                  <div v-else-if="fulfillmentDeliveryLines(child.fulfillment).length"
-                    class="mt-3 border rounded-xl p-4 text-sm text-muted-foreground space-y-1 break-all overflow-hidden">
-                    <div v-for="(line, index) in fulfillmentDeliveryLines(child.fulfillment)" :key="`child-fulfillment-${child.id}-${index}`">{{ line }}</div>
-                  </div>
-                  <div v-else-if="child.fulfillment.payload"
-                    class="mt-3 border rounded-xl p-4 text-sm text-muted-foreground whitespace-pre-wrap break-all overflow-hidden">
-                    {{ child.fulfillment.payload }}
-                  </div>
-                  <div v-if="child.fulfillment.status === 'delivered' && instructionBlocks(child.items).length"
-                    class="mt-4 space-y-3">
-                    <div v-for="(block, bi) in instructionBlocks(child.items)" :key="`child-inst-${child.id}-${bi}`"
-                      class="rounded-xl border border-blue-200 bg-blue-50/50 dark:border-blue-900 dark:bg-blue-950/30 p-4">
-                      <div class="flex items-center gap-2 mb-2 text-sm font-semibold text-blue-700 dark:text-blue-300">
-                        <Info class="w-4 h-4" :stroke-width="2" />
-                        {{ t('orderDetail.instructionsTitle') }}
-                      </div>
-                      <div class="prose prose-sm max-w-none dark:prose-invert text-muted-foreground break-words" v-html="block.html"></div>
-                    </div>
-                  </div>
-                </div>
-                <div v-else class="text-sm text-muted-foreground">{{ t('orderDetail.childFulfillmentEmpty') }}</div>
-              </div>
+
             </div>
           </div>
         </div>
 
-        <div v-if="order.fulfillment"
-          class="rounded-2xl border bg-card shadow-sm p-6">
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-bold">{{ t('orderDetail.fulfillmentTitle') }}</h2>
-            <div class="flex items-center gap-2">
-              <button v-if="isFulfillmentTruncated(order.fulfillment)"
-                class="inline-flex items-center gap-1 text-sm font-medium px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 transition-colors shadow-sm disabled:opacity-50"
-                :disabled="fulfillmentDownloading"
-                @click="handleDownloadFulfillment(order.order_no)">
-                <Download class="w-4 h-4" :stroke-width="2" />
-                {{ fulfillmentDownloading ? t('orderDetail.fulfillmentDownloading') : t('orderDetail.fulfillmentDownload') }}
-              </button>
-              <button v-if="order.fulfillment.status === 'delivered' && !isFulfillmentTruncated(order.fulfillment)"
-                class="inline-flex items-center gap-1 text-sm font-medium px-4 py-2 rounded-lg transition-colors shadow-sm"
-                :class="fulfillmentCopied ? 'bg-emerald-600 text-white' : 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800'"
-                @click="handleCopyFulfillment(order.fulfillment)">
-                <Copy v-if="!fulfillmentCopied" class="w-4 h-4" :stroke-width="2" />
-                <Check v-else class="w-4 h-4" :stroke-width="2" />
-                {{ fulfillmentCopied ? t('orderDetail.fulfillmentCopied') : t('orderDetail.fulfillmentCopy') }}
-              </button>
-            </div>
-          </div>
-          <div class="text-sm text-muted-foreground">{{ t('orderDetail.fulfillmentType') }}：{{
-            fulfillmentTypeLabelText(order.fulfillment.type) }}</div>
-          <div class="text-sm text-muted-foreground">{{ t('orderDetail.fulfillmentStatus') }}：{{
-            fulfillmentStatusLabelText(order.fulfillment.status) }}</div>
-          <div v-if="isFulfillmentTruncated(order.fulfillment)" class="mt-4">
-            <div class="text-sm text-muted-foreground mb-2">{{ t('orderDetail.fulfillmentTotalLines', { count: order.fulfillment.payload_line_count }) }}</div>
-            <div class="mb-2 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 px-3 py-2 text-xs text-amber-700 dark:text-amber-400">
-              {{ t('orderDetail.fulfillmentTruncatedHint') }}
-            </div>
-            <div class="border rounded-xl p-4 text-sm text-muted-foreground whitespace-pre-wrap break-all overflow-hidden max-h-64 overflow-y-auto">{{ order.fulfillment.payload }}</div>
-          </div>
-          <div v-else-if="fulfillmentDeliveryLines(order.fulfillment).length"
-            class="mt-4 border rounded-xl p-4 text-sm text-muted-foreground space-y-1 break-all overflow-hidden">
-            <div v-for="(line, index) in fulfillmentDeliveryLines(order.fulfillment)" :key="`fulfillment-${order.order_no || 'order'}-${index}`">{{ line }}</div>
-          </div>
-          <div v-else
-            class="mt-4 border rounded-xl p-4 text-sm text-muted-foreground whitespace-pre-wrap break-all overflow-hidden">
-            {{ order.fulfillment.payload }}
-          </div>
-          <div v-if="order.fulfillment.status === 'delivered' && instructionBlocks(order.items).length"
-            class="mt-4 space-y-3">
-            <div v-for="(block, bi) in instructionBlocks(order.items)" :key="`order-inst-${bi}`"
-              class="rounded-xl border border-blue-200 bg-blue-50/50 dark:border-blue-900 dark:bg-blue-950/30 p-4">
-              <div class="flex items-center gap-2 mb-2 text-sm font-semibold text-blue-700 dark:text-blue-300">
-                <Info class="w-4 h-4" :stroke-width="2" />
-                {{ t('orderDetail.instructionsTitle') }}
-              </div>
-              <div class="prose prose-sm max-w-none dark:prose-invert text-muted-foreground break-words" v-html="block.html"></div>
-            </div>
-          </div>
-        </div>
+
 
         <div class="rounded-2xl border bg-card shadow-sm p-6">
           <h2 class="text-lg font-bold mb-4">{{ t('orderDetail.itemsTitle') }}</h2>
@@ -435,7 +329,11 @@
 </template>
 
 <script setup lang="ts">
-import { Copy, Check, Download, Info } from 'lucide-vue-next'
+import { computed } from 'vue'
+import CommerceHeading from '../components/commerce/CommerceHeading.vue'
+import OrderDelivery from '../components/commerce/OrderDelivery.vue'
+import CheckoutSteps from '../components/checkout/CheckoutSteps.vue'
+import { orderDeliveryState } from '../utils/orderDelivery'
 import { useI18n } from 'vue-i18n'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -449,12 +347,12 @@ const { t } = useI18n()
 
 const {
   loading, order, debouncedLoadOrder, cancelOrder,
-  statusLabel, statusVariant, fulfillmentTypeLabelText, fulfillmentStatusLabelText,
+  statusLabel, statusVariant, fulfillmentTypeLabelText,
   formatDate, getLocalizedText, formatMoney, formatDiscountMoney, hasDiscountAmount, hasAmount,
   refundReasonText, showRefundRecordsCard, refundRecords, showTimeCard,
   orderItemImage, orderItemSkuText, manualSubmissionRows,
   hasItemDiscount, formatItemDiscountTotal, formatItemPaidAmount, resolvedChildStatus,
-  fulfillmentDeliveryLines, instructionBlocks, isFulfillmentTruncated,
-  fulfillmentCopied, handleCopyFulfillment, fulfillmentDownloading, handleDownloadFulfillment,
+  fulfillmentDownloading, handleDownloadFulfillment,
 } = useOrderDetail()
+const deliveryState = computed(() => orderDeliveryState(order.value))
 </script>

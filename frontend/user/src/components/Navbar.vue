@@ -1,6 +1,6 @@
 <template>
   <nav
-    class="fixed top-0 left-0 right-0 z-50 bg-card/80 border-b backdrop-blur-md transition-all"
+    class="brand-navbar fixed top-0 left-0 right-0 z-50 bg-card/80 border-b backdrop-blur-md transition-all"
     :class="scrolled ? 'py-2 shadow-lg' : 'py-4'"
     :style="{ transitionDuration: 'var(--ui-duration-normal)' }">
     <div class="container mx-auto px-4 flex items-center justify-between gap-4">
@@ -10,13 +10,16 @@
           v-if="brandLogo"
           :src="brandLogo"
           :alt="brandSiteName"
-          class="h-8 max-w-[180px] shrink-0 object-contain"
+          class="h-8 max-w-[64px] sm:max-w-[120px] shrink-0 object-contain"
         />
-        <span class="theme-wordmark-text">{{ brandSiteName }}</span>
+        <div>
+          <span class="theme-wordmark-text">{{ brandSiteName }}</span>
+          <span class="brand-tagline">{{ t('shopUi.brandLine') }}</span>
+        </div>
       </router-link>
 
       <!-- Desktop Menu -->
-      <div class="hidden lg:flex items-center space-x-1 min-w-0 overflow-x-auto scrollbar-hide">
+      <div class="hidden xl:flex items-center space-x-1 min-w-0 overflow-x-auto scrollbar-hide">
         <template v-for="item in menuItems" :key="item.key">
           <Button v-if="item.type === 'route'" as-child variant="ghost" size="sm"
             class="gap-1.5 text-muted-foreground whitespace-nowrap shrink-0">
@@ -36,9 +39,9 @@
       </div>
 
       <!-- Right Side Actions -->
-      <div class="flex items-center shrink-0 space-x-2 lg:space-x-4">
+      <div class="flex items-center shrink-0 space-x-2 xl:space-x-4">
         <!-- Cart (desktop only, mobile has bottom nav) -->
-        <Button as-child variant="ghost" size="sm" class="hidden lg:flex relative gap-2 text-muted-foreground">
+        <Button as-child variant="ghost" size="sm" class="hidden xl:flex relative gap-2 text-muted-foreground">
           <router-link to="/cart">
             <ShoppingCart class="w-4 h-4 shrink-0" />
             <span class="text-xs font-medium">{{ t('navbar.cart') }}</span>
@@ -50,35 +53,35 @@
           </router-link>
         </Button>
 
-        <Button v-if="!userAuthStore.isAuthenticated" as-child variant="ghost" size="sm"
-          class="hidden lg:inline-flex gap-1.5 text-muted-foreground whitespace-nowrap">
-          <router-link to="/guest/orders">
+        <Button as-child variant="ghost" size="sm"
+          class="hidden xl:inline-flex gap-1.5 text-muted-foreground whitespace-nowrap">
+          <router-link :to="userAuthStore.isAuthenticated ? '/me/orders' : '/guest/orders'">
             <ClipboardList class="w-4 h-4 shrink-0 opacity-70" />
-            {{ t('navbar.guestOrders') }}
+            {{ t('shopUi.ordersNav') }}
           </router-link>
         </Button>
         <Button v-if="!userAuthStore.isAuthenticated" as-child variant="ghost" size="sm"
-          class="hidden lg:inline-flex gap-1.5 text-muted-foreground whitespace-nowrap">
+          class="hidden xl:inline-flex gap-1.5 text-muted-foreground whitespace-nowrap">
           <router-link to="/auth/login">
             <LogIn class="w-4 h-4 shrink-0 opacity-70" />
             {{ t('navbar.login') }}
           </router-link>
         </Button>
         <Button v-if="userAuthStore.isAuthenticated" as-child variant="ghost" size="sm"
-          class="hidden lg:inline-flex gap-1.5 text-muted-foreground whitespace-nowrap">
+          class="hidden xl:inline-flex gap-1.5 text-muted-foreground whitespace-nowrap">
           <router-link to="/me">
             <User class="w-4 h-4 shrink-0 opacity-70" />
             {{ t('navbar.personalCenter') }}
           </router-link>
         </Button>
         <Button v-if="userAuthStore.isAuthenticated" variant="ghost" size="sm"
-          class="hidden lg:inline-flex gap-1.5 whitespace-nowrap text-destructive hover:text-destructive hover:bg-destructive/10"
+          class="hidden xl:inline-flex gap-1.5 whitespace-nowrap text-destructive hover:text-destructive hover:bg-destructive/10"
           @click="userAuthStore.logout()">
           <LogOut class="w-4 h-4 shrink-0 opacity-70" />
           {{ t('navbar.logout') }}
         </Button>
         <!-- Theme Switcher -->
-        <Button variant="ghost" size="icon" class="text-muted-foreground" @click="toggleTheme">
+        <Button variant="ghost" size="icon" class="text-muted-foreground" :aria-label="t('shopUi.toggleTheme')" @click="toggleTheme">
           <Sun v-if="theme === 'dark'" class="w-4 h-4" />
           <Moon v-else class="w-4 h-4" />
         </Button>
@@ -86,7 +89,7 @@
         <!-- Language Switcher (Desktop) -->
         <Popover v-model:open="langOpen">
           <PopoverTrigger as-child>
-            <Button variant="ghost" size="sm" class="hidden lg:inline-flex gap-2 text-muted-foreground">
+            <Button variant="ghost" size="sm" class="hidden xl:inline-flex gap-2 text-muted-foreground" :aria-label="t('navbar.selectLanguage')">
               <Languages class="w-4 h-4" />
               <span class="text-xs font-medium uppercase tracking-wider">{{ currentLocale }}</span>
             </Button>
@@ -105,8 +108,8 @@
         </Popover>
 
         <!-- Mobile Menu Button (more menu, not main nav) -->
-        <Button variant="ghost" size="icon" class="lg:hidden text-muted-foreground [&_svg]:size-5"
-          @click="toggleMobileMenu">
+        <Button variant="ghost" size="icon" class="xl:hidden text-muted-foreground [&_svg]:size-5"
+          :aria-label="t('navbar.more')" :aria-expanded="showMobileMenu" @click="toggleMobileMenu">
           <EllipsisVertical />
         </Button>
       </div>
@@ -124,7 +127,7 @@
       leave-active-class="transition duration-200 ease-in"
       leave-from-class="opacity-100"
       leave-to-class="opacity-0">
-      <div v-if="showMobileMenu" class="lg:hidden fixed inset-0 z-[60] bg-black/50" @click="showMobileMenu = false" style="overscroll-behavior: none;"></div>
+      <div v-if="showMobileMenu" class="xl:hidden fixed inset-0 z-[60] bg-black/50" @click="showMobileMenu = false" style="overscroll-behavior: none;"></div>
     </Transition>
 
     <!-- Mobile Drawer (only items NOT in bottom nav) -->
@@ -136,13 +139,13 @@
       leave-from-class="translate-x-0"
       leave-to-class="translate-x-full">
       <div v-if="showMobileMenu"
-        class="lg:hidden fixed right-0 top-0 bottom-0 z-[70] w-72 max-w-[80vw] bg-card/95 backdrop-blur-xl border-l overflow-y-auto"
+        class="xl:hidden fixed right-0 top-0 bottom-0 z-[70] w-72 max-w-[80vw] bg-card/95 backdrop-blur-xl border-l overflow-y-auto"
         style="overscroll-behavior: none;">
         <div class="p-5 space-y-1">
           <!-- Header -->
           <div class="flex items-center justify-between mb-4">
             <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{{ t('navbar.more') }}</span>
-            <Button variant="secondary" size="icon" class="[&_svg]:size-5" @click="showMobileMenu = false">
+            <Button variant="secondary" size="icon" class="[&_svg]:size-5" :aria-label="t('common.close')" @click="showMobileMenu = false">
               <X />
             </Button>
           </div>
@@ -252,12 +255,12 @@ const cartCount = computed(() => cartStore.totalItems)
 
 const brandSiteName = computed(() => {
   const text = String(appStore.config?.brand?.site_name || '').trim()
-  return text !== '' ? text : 'Dujiao-Next'
+  return text !== '' ? text : '智享A社'
 })
 
 const brandLogo = computed(() => {
   const raw = String(appStore.config?.brand?.site_logo || '').trim()
-  return raw ? getImageUrl(raw) : ''
+  return raw ? getImageUrl(raw) : (appStore.isResellerTenant ? '' : '/brand-icon.png')
 })
 
 const toggleMobileMenu = () => {

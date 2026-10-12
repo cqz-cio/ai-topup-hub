@@ -41,7 +41,7 @@ interface UpstreamRefundRecordRow {
 }
 
 type ProcurementOrderWithRelations = AdminProcurementOrder & {
-  connection?: { name?: string; id?: number; exchange_rate?: number }
+  connection?: { name?: string; id?: number; exchange_rate?: number; protocol?: string }
   local_order?: LocalOrder
   currency?: string
   upstream_currency?: string
@@ -94,6 +94,8 @@ const handleDownloadUpstreamPayload = async (orderId: number) => {
 const statusOptions = [
   { value: '__all__', key: 'procurement.filters.allStatus' },
   { value: 'pending', key: 'procurement.status.pending' },
+  { value: 'submitting', key: 'procurement.status.submitting' },
+  { value: 'manual_review', key: 'procurement.status.manual_review' },
   { value: 'accepted', key: 'procurement.status.accepted' },
   { value: 'rejected', key: 'procurement.status.rejected' },
   { value: 'failed', key: 'procurement.status.failed' },
@@ -411,7 +413,10 @@ const profitClass = (order: ProcurementOrderWithRelations) => {
 }
 
 const canRetry = (status: string) => ['failed', 'rejected'].includes(status)
-const canCancel = (status: string) => ['pending', 'submitted', 'accepted', 'failed'].includes(status)
+const canCancel = (order: ProcurementOrderWithRelations) => {
+  const protocol = order.connection?.protocol || connections.value.find((connection) => connection.id === order.connection_id)?.protocol
+  return protocol !== 'acg-faka' && ['pending', 'submitted', 'accepted', 'failed'].includes(order.status)
+}
 
 onMounted(() => {
   fetchConnections()
@@ -595,7 +600,7 @@ onMounted(() => {
                 {{ t('procurement.actions.retry') }}
               </Button>
               <Button
-                v-if="canCancel(order.status)"
+                v-if="canCancel(order)"
                 size="sm"
                 variant="ghost"
                 class="h-7 text-xs text-muted-foreground hover:text-red-600"
@@ -892,7 +897,7 @@ onMounted(() => {
               {{ t('procurement.actions.retry') }}
             </Button>
             <Button
-              v-if="canCancel(detailOrder.status)"
+              v-if="canCancel(detailOrder)"
               variant="destructive"
               class="w-full sm:w-auto"
               :disabled="cancelingId === detailOrder.id"

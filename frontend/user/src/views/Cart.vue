@@ -1,10 +1,7 @@
 <template>
-  <div class="min-h-screen bg-background text-foreground pt-24 pb-16">
+  <div class="commerce-page cart-page min-h-screen bg-background text-foreground pt-24 pb-16">
     <div class="container mx-auto px-4">
-      <div class="mb-8">
-        <h1 class="mb-2 text-3xl font-black text-foreground">{{ t('cart.title') }}</h1>
-        <p class="text-sm text-muted-foreground">{{ t('cart.subtitle') }}</p>
-      </div>
+      <CommerceHeading :title="t('cart.title')" :description="t('cart.subtitle')" />
 
       <CheckoutSteps class="mb-8" current-step="cart" />
 
@@ -155,6 +152,7 @@
 </template>
 
 <script setup lang="ts">
+import CommerceHeading from '../components/commerce/CommerceHeading.vue'
 import { useI18n } from 'vue-i18n'
 import { Trash2 } from 'lucide-vue-next'
 import { Badge } from '@/components/ui/badge'

@@ -31,8 +31,12 @@ func (s *Service) RetryManual(id uint) error {
 		"error_message": "",
 		"updated_at":    now,
 	}
-	if err := s.procRepo.UpdateStatus(procOrder.ID, "pending", updates); err != nil {
+	changed, err := s.procRepo.UpdateStatusIfCurrent(procOrder.ID, procOrder.Status, "pending", updates)
+	if err != nil {
 		return fmt.Errorf("reset procurement status: %w", err)
+	}
+	if !changed {
+		return procurementcontract.ErrStatusInvalid
 	}
 
 	logger.Infow("procurement_manual_retry",
@@ -40,7 +44,7 @@ func (s *Service) RetryManual(id uint) error {
 	)
 
 	if s.queue != nil {
-		return s.queue.EnqueueSubmit(procOrder.ID)
+		return s.queue.EnqueueSubmit(procOrder.ID, 0)
 	}
 	return nil
 }
@@ -54,6 +58,21 @@ func (s *Service) CancelManual(id uint) error {
 	if procOrder == nil {
 		return procurementcontract.ErrNotFound
 	}
+	if procOrder.Status == "submitting" || procOrder.Status == "manual_review" || (procOrder.Status == "accepted" && procOrder.UpstreamOrderID == 0 && procOrder.UpstreamOrderNo != "") {
+		return procurementcontract.ErrStatusInvalid // Supplier funds may already have been consumed.
+	}
+	// This supplier has no cancellation API. A pending balance purchase may be
+	// claimed by a worker immediately after this read, so do not cancel it locally.
+	connection, err := s.connections.Open(procOrder.ConnectionID)
+	if err != nil {
+		return fmt.Errorf("load connection before canceling: %w", err)
+	}
+	if connection == nil {
+		return procurementcontract.ErrConnectionNotFound
+	}
+	if requiresSingleSubmission(connection) {
+		return procurementcontract.ErrStatusInvalid
+	}
 
 	// 已交付/已退款的不能取消
 	if procOrder.Status == constants.ProcurementStatusFulfilled ||
@@ -66,17 +85,14 @@ func (s *Service) CancelManual(id uint) error {
 
 	// 已被上游接受：尝试取消上游订单
 	if procOrder.Status == "accepted" && procOrder.UpstreamOrderID > 0 {
-		connection, err := s.connections.Open(procOrder.ConnectionID)
-		if err == nil && connection != nil {
-			ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
-			defer cancel()
-			if cancelErr := connection.CancelOrder(ctx, procOrder.UpstreamOrderID); cancelErr != nil {
-				logger.Warnw("procurement_cancel_upstream_failed",
-					"procurement_order_id", procOrder.ID,
-					"upstream_order_id", procOrder.UpstreamOrderID,
-					"error", cancelErr,
-				)
-			}
+		ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+		defer cancel()
+		if cancelErr := connection.CancelOrder(ctx, procOrder.UpstreamOrderID); cancelErr != nil {
+			logger.Warnw("procurement_cancel_upstream_failed",
+				"procurement_order_id", procOrder.ID,
+				"upstream_order_id", procOrder.UpstreamOrderID,
+				"error", cancelErr,
+			)
 		}
 	}
 
@@ -85,8 +101,12 @@ func (s *Service) CancelManual(id uint) error {
 		"error_message": "manually canceled",
 		"updated_at":    now,
 	}
-	if err := s.procRepo.UpdateStatus(procOrder.ID, "canceled", updates); err != nil {
+	changed, err := s.procRepo.UpdateStatusIfCurrent(procOrder.ID, procOrder.Status, "canceled", updates)
+	if err != nil {
 		return fmt.Errorf("update procurement status: %w", err)
+	}
+	if !changed {
+		return procurementcontract.ErrStatusInvalid
 	}
 
 	logger.Infow("procurement_manual_cancel",

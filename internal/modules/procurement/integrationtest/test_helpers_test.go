@@ -1,7 +1,12 @@
 package procurement_test
 
 import (
+	"context"
+	"sync/atomic"
+
 	"fmt"
+	"github.com/dujiao-next/internal/constants"
+	"github.com/dujiao-next/internal/upstream"
 	"testing"
 	"time"
 
@@ -120,13 +125,74 @@ func createTestProcurementOrder(t *testing.T, db *gorm.DB, connID, localOrderID 
 }
 
 func newTestProcurementService(db *gorm.DB, connections *siteconnectionapp.Service) *procurementapp.Service {
+	options := procurementOptionsForTest(db)
+	options.Connections = procurementupstream.New(connections)
+	return procurementapp.NewService(options)
+}
+
+func procurementOptionsForTest(db *gorm.DB) procurementapp.Options {
 	orders := ordergormstore.New(db, "test-guest-credential-secret-with-32-bytes")
-	return procurementapp.NewService(procurementapp.Options{
+	return procurementapp.Options{
 		Repository:      procurementgormstore.New(db),
 		Orders:          procurementorder.New(orders),
 		ProductMappings: procurementmapping.NewProducts(mappinggormstore.NewMappingStore(db)),
 		SKUMappings:     procurementmapping.NewSKUs(mappinggormstore.NewSKUMappingStore(db)),
-		Connections:     procurementupstream.New(connections),
 		OrderLifecycle:  procurementgormstore.NewLifecycle(db, nil, nil, config.EmailConfig{}),
-	})
+	}
+}
+
+// The wire protocol is covered in internal/upstream/acg_faka_test.go. This
+// fixture exercises the real DB claim, gateway, order lifecycle and card record.
+type acgProcurementAdapter struct {
+	upstream.Adapter
+	calls     atomic.Int32
+	result    *upstream.CreateUpstreamOrderResp
+	err       error
+	reference string
+	request   upstream.CreateUpstreamOrderReq
+}
+
+func (*acgProcurementAdapter) RequiresSingleSubmission() bool { return true }
+func (a *acgProcurementAdapter) CreateOrder(_ context.Context, request upstream.CreateUpstreamOrderReq) (*upstream.CreateUpstreamOrderResp, error) {
+	a.calls.Add(1)
+	a.request = request
+	return a.result, a.err
+}
+func (a *acgProcurementAdapter) GetOrderByReference(_ context.Context, no string) (*upstream.UpstreamOrderDetail, error) {
+	a.reference = no
+	return &upstream.UpstreamOrderDetail{OrderNo: no, Status: "delivered", Fulfillment: &upstream.UpstreamFulfillment{Type: "auto", Status: "delivered", Payload: "DELAYED-CARD"}}, nil
+}
+
+type acgProcurementProvider struct{ adapter *acgProcurementAdapter }
+
+func (p *acgProcurementProvider) GetByID(id uint) (*siteconnectiondomain.Connection, error) {
+	return &siteconnectiondomain.Connection{ID: id, Protocol: constants.ConnectionProtocolACGFaka, RetryMax: 2, RetryIntervals: "[30,60]"}, nil
+}
+func (p *acgProcurementProvider) GetAdapter(*siteconnectiondomain.Connection) (upstream.Adapter, error) {
+	return p.adapter, nil
+}
+
+func acgProcurementFixture(t *testing.T, status string, adapter *acgProcurementAdapter) (*gorm.DB, *procurementapp.Service, *ProcurementOrder, *orderdomain.Order) {
+	t.Helper()
+	db := setupProcurementTestDB(t)
+	sqlDB, _ := db.DB()
+	sqlDB.SetMaxOpenConns(1)
+	order := createProcTestOrder(t, db, "ACG-ORDER-1", status, constants.FulfillmentTypeUpstream)
+	if err := db.Model(&orderdomain.OrderItem{}).Where("order_id = ?", order.ID).Update("cost_price", "33.00").Error; err != nil {
+		t.Fatal(err)
+	}
+	pm := &mappingdomain.Mapping{ConnectionID: 1, LocalProductID: 1, UpstreamProductID: 4, IsActive: true}
+	if err := db.Create(pm).Error; err != nil {
+		t.Fatal(err)
+	}
+	sm := &mappingdomain.SKUMapping{ProductMappingID: pm.ID, LocalSKUID: 1, UpstreamSKUID: 4, UpstreamIsActive: true}
+	if err := db.Create(sm).Error; err != nil {
+		t.Fatal(err)
+	}
+	// Construct the same production service, replacing only the supplier wire.
+	options := procurementOptionsForTest(db)
+	options.Connections = procurementupstream.New(&acgProcurementProvider{adapter: adapter})
+	svc := procurementapp.NewService(options)
+	proc := createTestProcurementOrder(t, db, 1, order.ID, order.OrderNo, "pending")
+	return db, svc, proc, order
 }

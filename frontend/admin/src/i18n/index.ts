@@ -35,6 +35,8 @@ const messages = {
       status: {
         pending: '待处理',
         submitted: '已提交',
+        submitting: '正在采购',
+        manual_review: '待核实扣款',
         accepted: '已接受',
         rejected: '已拒绝',
         failed: '失败',
@@ -270,6 +272,9 @@ const messages = {
       form: {
         name: '名称',
         namePlaceholder: '连接名称',
+        merchantId: '商户 ID',
+        merchantSecret: '商户密钥',
+        acgFakaHint: '填写上游网站根地址、商户 ID 和商户密钥；在上游白名单登记采购服务器的出口 IP。买家付款确认后才使用商户余额采购。支持无额外规格和表单的自动发卡商品；结果不明的采购进入待核实，不会自动再次扣款。',
         baseUrl: 'Base URL',
         baseUrlPlaceholder: 'https://example.com',
         apiKey: 'API Key',
@@ -4492,6 +4497,8 @@ const messages = {
       status: {
         pending: '待處理',
         submitted: '已提交',
+        submitting: '正在採購',
+        manual_review: '待核實扣款',
         accepted: '已接受',
         rejected: '已拒絕',
         failed: '失敗',
@@ -4727,6 +4734,9 @@ const messages = {
       form: {
         name: '名稱',
         namePlaceholder: '連接名稱',
+        merchantId: '商戶 ID',
+        merchantSecret: '商戶密鑰',
+        acgFakaHint: '填寫上游網站根地址、商戶 ID 和商戶密鑰；在上游白名單登記採購伺服器的出口 IP。買家付款確認後才使用商戶餘額採購。支援無額外規格和表單的自動發卡商品；結果不明的採購進入待核實，不會自動再次扣款。',
         baseUrl: 'Base URL',
         baseUrlPlaceholder: 'https://example.com',
         apiKey: 'API Key',
@@ -8949,6 +8959,8 @@ const messages = {
       status: {
         pending: 'Pending',
         submitted: 'Submitted',
+        submitting: 'Purchasing',
+        manual_review: 'Reconcile purchase',
         accepted: 'Accepted',
         rejected: 'Rejected',
         failed: 'Failed',
@@ -9184,6 +9196,9 @@ const messages = {
       form: {
         name: 'Name',
         namePlaceholder: 'Connection name',
+        merchantId: 'Merchant ID',
+        merchantSecret: 'Merchant secret',
+        acgFakaHint: 'Use the supplier site root URL, merchant ID and merchant secret. Allowlist the procurement server egress IP at the supplier. Purchases use the merchant balance only after the buyer payment is confirmed. Automatic card products without variants or extra forms are supported. Uncertain purchases require reconciliation and are never automatically charged again.',
         baseUrl: 'Base URL',
         baseUrlPlaceholder: 'https://example.com',
         apiKey: 'API Key',

@@ -82,6 +82,13 @@ func (c *Consumer) handleProcurementSyncAccepted(_ context.Context, _ *asynq.Tas
 	return nil
 }
 
+func (c *Consumer) handleProcurementRecover(_ context.Context, _ *asynq.Task) error {
+	if c == nil || c.ProcurementOrderService == nil {
+		return nil
+	}
+	return c.ProcurementOrderService.RecoverPaidOrders()
+}
+
 // handleDownstreamCallback 处理下游回调发送任务。
 func (c *Consumer) handleDownstreamCallback(ctx context.Context, task *asynq.Task) error {
 	if c == nil || task == nil || c.DownstreamCallbackService == nil {

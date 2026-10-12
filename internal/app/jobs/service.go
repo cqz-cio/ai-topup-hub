@@ -3,6 +3,7 @@ package jobs
 import (
 	"context"
 	"errors"
+	"time"
 
 	jobconsumer "github.com/dujiao-next/internal/app/jobs/consumer"
 	"github.com/dujiao-next/internal/config"
@@ -24,6 +25,22 @@ type Service struct {
 
 // NewService 创建异步队列服务
 func NewService(cfg *config.QueueConfig, consumer *jobconsumer.Consumer) (*Service, error) {
+	return newService(cfg, consumer, "worker")
+}
+
+// NewCheckoutService only processes payment and local order maintenance jobs.
+// It never registers procurement, upstream polling or recurring jobs.
+func NewCheckoutService(cfg *config.QueueConfig, consumer *jobconsumer.Consumer) (*Service, error) {
+	return newService(cfg, consumer, "checkout")
+}
+
+// NewStorefrontService keeps inventory synchronization independent while
+// processing customer payments, procurement, delivery and recovery.
+func NewStorefrontService(cfg *config.QueueConfig, consumer *jobconsumer.Consumer) (*Service, error) {
+	return newService(cfg, consumer, "storefront")
+}
+
+func newService(cfg *config.QueueConfig, consumer *jobconsumer.Consumer, profile string) (*Service, error) {
 	if cfg == nil || !cfg.Enabled {
 		return nil, errors.New("queue disabled")
 	}
@@ -33,10 +50,21 @@ func NewService(cfg *config.QueueConfig, consumer *jobconsumer.Consumer) (*Servi
 	opt, serverCfg := queue.BuildServerConfig(cfg)
 	server := asynq.NewServer(opt, serverCfg)
 	mux := asynq.NewServeMux()
+	if profile == "checkout" {
+		consumer.RegisterCheckout(mux)
+		return &Service{name: "checkout-worker", server: server, mux: mux, consumer: consumer}, nil
+	}
+	if profile == "storefront" {
+		consumer.RegisterStorefront(mux)
+		scheduler := asynq.NewScheduler(opt, nil)
+		registerProcurementRecovery(scheduler, consumer)
+		return &Service{name: "storefront-worker", server: server, mux: mux, scheduler: scheduler, consumer: consumer}, nil
+	}
 	consumer.Register(mux)
 
 	scheduler := asynq.NewScheduler(opt, nil)
 	registerPeriodicTasks(scheduler, consumer, cfg)
+	registerProcurementRecovery(scheduler, consumer)
 
 	return &Service{
 		name:      "worker",
@@ -45,6 +73,15 @@ func NewService(cfg *config.QueueConfig, consumer *jobconsumer.Consumer) (*Servi
 		scheduler: scheduler,
 		consumer:  consumer,
 	}, nil
+}
+
+func registerProcurementRecovery(scheduler *asynq.Scheduler, consumer *jobconsumer.Consumer) {
+	if consumer.ProcurementOrderService == nil {
+		return
+	}
+	if _, err := scheduler.Register("@every 1m", asynq.NewTask(queue.TaskProcurementRecover, nil), asynq.Queue(queue.DefaultQueue), asynq.Unique(50*time.Second)); err != nil {
+		logger.Warnw("scheduler_register_procurement_recovery_failed", "error", err)
+	}
 }
 
 // registerPeriodicTasks 注册所有周期性任务

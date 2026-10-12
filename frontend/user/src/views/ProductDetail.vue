@@ -1,6 +1,6 @@
 <template>
   <div
-    class="product-detail-page min-h-screen bg-background text-foreground pt-24 pb-16">
+    class="commerce-page product-detail-page min-h-screen bg-background text-foreground pt-24 pb-16">
     <div class="container mx-auto px-4">
       <!-- Loading Skeleton -->
       <div v-if="loading" class="space-y-8">
@@ -41,6 +41,8 @@
             { label: getLocalizedText(product.title) },
           ]"
         />
+
+        <CheckoutSteps class="mb-8" current-step="cart" />
 
         <!-- Main Info Card -->
         <div
@@ -411,6 +413,7 @@
 </template>
 
 <script setup lang="ts">
+import CheckoutSteps from '../components/checkout/CheckoutSteps.vue'
 import { ref, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ArrowLeft, Lock, Minus, Pencil, Plus, RotateCw, Tag, UserPlus, Zap } from 'lucide-vue-next'

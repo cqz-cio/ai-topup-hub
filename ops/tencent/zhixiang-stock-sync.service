@@ -1,0 +1,20 @@
+[Unit]
+Description=Merchant 1039 inventory synchronization without purchases
+After=network-online.target zhixiang-shop.service
+Wants=network-online.target
+Requires=zhixiang-shop.service
+
+[Service]
+Type=oneshot
+User=zhixiang
+Group=zhixiang
+WorkingDirectory=/srv/zhixiang/shared
+ExecStart=/usr/bin/python3 /srv/zhixiang/current/scripts/sync-ellaixshop-stock.py --base-url http://127.0.0.1 --credentials-file /srv/zhixiang/shared/stock-sync.credentials.json --report-file /srv/zhixiang/shared/reports/merchant1039-stock-sync.json
+Environment=TZ=Asia/Shanghai
+TimeoutStartSec=180
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/srv/zhixiang/shared/reports

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { adminAPI } from '@/api/admin'
 import type { AdminSiteConnection } from '@/api/types'
@@ -44,6 +44,7 @@ const form = reactive({
   auto_sync_price: 'false',
 })
 const reapplyingId = ref<number | null>(null)
+const isACGFaka = computed(() => form.protocol === 'acg-faka')
 
 const siteConnectionSchema = {
   name: [rules.required()],
@@ -381,16 +382,16 @@ onMounted(() => {
             </div>
             <div class="md:col-span-2">
               <label class="mb-1.5 block text-xs font-medium text-muted-foreground">{{ t('siteConnections.form.baseUrl') }}</label>
-              <Input v-model="form.base_url" required :placeholder="t('siteConnections.form.baseUrlPlaceholder')" />
+              <Input v-model="form.base_url" required :placeholder="isACGFaka ? 'https://ellaixshop.com' : t('siteConnections.form.baseUrlPlaceholder')" />
               <p v-if="errors.base_url" class="text-xs text-destructive mt-1">{{ errors.base_url }}</p>
             </div>
             <div>
-              <label class="mb-1.5 block text-xs font-medium text-muted-foreground">{{ t('siteConnections.form.apiKey') }}</label>
-              <Input v-model="form.api_key" :placeholder="t('siteConnections.form.apiKeyPlaceholder')" />
+              <label class="mb-1.5 block text-xs font-medium text-muted-foreground">{{ t(isACGFaka ? 'siteConnections.form.merchantId' : 'siteConnections.form.apiKey') }}</label>
+              <Input v-model="form.api_key" :placeholder="isACGFaka ? '1039' : t('siteConnections.form.apiKeyPlaceholder')" />
               <p v-if="errors.api_key" class="text-xs text-destructive mt-1">{{ errors.api_key }}</p>
             </div>
             <div>
-              <label class="mb-1.5 block text-xs font-medium text-muted-foreground">{{ t('siteConnections.form.apiSecret') }}</label>
+              <label class="mb-1.5 block text-xs font-medium text-muted-foreground">{{ t(isACGFaka ? 'siteConnections.form.merchantSecret' : 'siteConnections.form.apiSecret') }}</label>
               <Input v-model="form.api_secret" type="password" :placeholder="t('siteConnections.form.apiSecretPlaceholder')" />
             </div>
             <div>
@@ -401,22 +402,25 @@ onMounted(() => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="dujiao-next">dujiao-next</SelectItem>
+                  <SelectItem value="acg-faka">Acg-Faka / ELLAIXSHOP</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-            <div>
+            <div v-if="!isACGFaka">
               <label class="mb-1.5 block text-xs font-medium text-muted-foreground">{{ t('siteConnections.form.callbackUrl') }}</label>
               <Input v-model="form.callback_url" :placeholder="t('siteConnections.form.callbackUrlPlaceholder')" />
             </div>
-            <div>
+            <div v-if="!isACGFaka">
               <label class="mb-1.5 block text-xs font-medium text-muted-foreground">{{ t('siteConnections.form.retryMax') }}</label>
               <Input v-model.number="form.retry_max" type="number" min="0" placeholder="3" />
             </div>
-            <div>
+            <div v-if="!isACGFaka">
               <label class="mb-1.5 block text-xs font-medium text-muted-foreground">{{ t('siteConnections.form.retryIntervals') }}</label>
               <Input v-model="form.retry_intervals" placeholder="30,60,120" />
             </div>
           </div>
+
+          <p v-if="isACGFaka" class="text-sm leading-6 text-muted-foreground">{{ t('siteConnections.form.acgFakaHint') }}</p>
 
           <div class="border-t border-border pt-4">
             <h3 class="mb-3 text-sm font-medium text-foreground">{{ t('siteConnections.form.markupSection') }}</h3>

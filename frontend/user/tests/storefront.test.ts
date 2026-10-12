@@ -4,6 +4,7 @@ import {
   canPurchaseStorefrontProduct,
   loadStorefrontProducts,
   storefrontPrice,
+  storefrontStockQuantity,
   type StorefrontProduct,
 } from '../src/utils/storefront.ts'
 
@@ -138,4 +139,20 @@ test('a failed later page fails the whole catalog refresh so stale products cann
     })),
     /Invalid public product response/,
   )
+})
+
+test('exact stock shows the current aggregate quantity for automatic and manual delivery', () => {
+  const exact = { stock_display_mode: 'exact', stock_quantity_hidden: false }
+  assert.equal(storefrontStockQuantity(product({ ...exact, fulfillment_type: 'auto', auto_stock_available: 9979 })), 9979)
+  assert.equal(storefrontStockQuantity(product({ ...exact, fulfillment_type: 'manual', manual_stock_available: '4' })), 4)
+  assert.equal(storefrontStockQuantity(product({ ...exact, fulfillment_type: 'auto', auto_stock_available: 0 })), 0)
+})
+
+test('hidden, unlimited, missing or malformed quantities do not become invented stock counts', () => {
+  const exact = { stock_display_mode: 'exact', stock_quantity_hidden: false, fulfillment_type: 'auto' }
+  for (const value of [undefined, null, '', 'unknown', -1, 1.5, Infinity]) {
+    assert.equal(storefrontStockQuantity(product({ ...exact, auto_stock_available: value })), null)
+  }
+  assert.equal(storefrontStockQuantity(product({ ...exact, stock_display_mode: 'status', auto_stock_available: 9999 })), null)
+  assert.equal(storefrontStockQuantity(product({ ...exact, stock_quantity_hidden: true, auto_stock_available: 9999 })), null)
 })

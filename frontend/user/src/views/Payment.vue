@@ -1,17 +1,11 @@
 <template>
-  <div class="min-h-screen bg-background text-foreground pt-24 pb-16">
+  <div class="commerce-page payment-page min-h-screen bg-background text-foreground pt-24 pb-16">
     <div class="container mx-auto px-4">
-      <div class="mb-6 flex items-center justify-between">
-        <div>
-          <h1 class="text-3xl font-black text-foreground mb-2">{{ t('payment.title') }}</h1>
-          <p class="text-muted-foreground text-sm">{{ t('payment.subtitle') }}</p>
-        </div>
-        <router-link :to="backLink"
-          class="text-muted-foreground hover:text-foreground transition-colors text-sm">{{
-            t('payment.backToOrders') }}</router-link>
-      </div>
+      <CommerceHeading :title="t('payment.title')" :description="t('shopUi.paymentHint')">
+        <template #actions><Button as-child variant="outline" size="sm"><router-link :to="backLink">{{ t('payment.backToOrders') }}</router-link></Button></template>
+      </CommerceHeading>
 
-      <CheckoutSteps class="mb-8" current-step="payment" />
+      <CheckoutSteps class="mb-8" :current-step="['waiting', 'partial', 'ready'].includes(deliveryState) ? 'delivery' : 'payment'" :complete="deliveryState === 'ready'" />
 
       <!-- Loading Skeleton -->
       <div v-if="loading" class="space-y-6">
@@ -468,6 +462,9 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+import { orderDeliveryState } from '../utils/orderDelivery'
+import CommerceHeading from '../components/commerce/CommerceHeading.vue'
 import { useI18n } from 'vue-i18n'
 import { Copy, ExternalLink } from 'lucide-vue-next'
 import { pageAlertVariant, pageAlertToneClass } from '../utils/alerts'
@@ -499,4 +496,5 @@ const {
   handleCopyPayLink, handleCopyWalletAddress, handleCopyCryptoAmount, handleOpenPayLink, restoreCachedPayment, handleChangePaymentMethod,
   handlePayment, handleGuestAuthSubmit, handleRefresh,
 } = usePayment()
+const deliveryState = computed(() => orderDeliveryState(order.value))
 </script>

@@ -122,7 +122,7 @@
                 {{ statusLabel(order.status) }}
               </Badge>
               <Button as-child variant="outline" size="sm">
-                <router-link :to="`/orders/${order.order_no}`">{{ t('orders.viewDetails') }}</router-link>
+                <router-link :to="`/orders/${order.order_no}`">{{ t('shopUi.orderDetailsAction') }}</router-link>
               </Button>
               <Button v-if="order.status === 'pending_payment'" as-child size="sm">
                 <router-link :to="`/pay?order_no=${order.order_no}`">{{ t('orders.payNow') }}</router-link>

@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "./styles/commerce.css";
 @plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:where(.dark, .dark *));
@@ -78,34 +79,34 @@
 }
 
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: Inter, 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
-  --ui-bg-page: #f5f5f7;
+  --ui-bg-page: #f7f8f4;
   --ui-bg-elevated: #ffffff;
-  --ui-bg-soft: #f2f2f4;
-  --ui-bg-muted: #ececf0;
+  --ui-bg-soft: #f2f4ef;
+  --ui-bg-muted: #e9ede5;
   --ui-bg-overlay: rgba(255, 255, 255, 0.8);
   --ui-bg-overlay-strong: rgba(255, 255, 255, 0.92);
-  --ui-text-primary: #1d1d1f;
-  --ui-text-secondary: #424245;
-  --ui-text-muted: #6e6e73;
+  --ui-text-primary: #202720;
+  --ui-text-secondary: #4d574d;
+  --ui-text-muted: #6a756b;
   --ui-text-on-accent: #ffffff;
   --ui-border: rgba(0, 0, 0, 0.12);
   --ui-border-strong: rgba(0, 0, 0, 0.2);
-  --ui-accent: #0071e3;
-  --ui-accent-hover: #0067d2;
-  --ui-accent-soft: rgba(0, 113, 227, 0.14);
-  --ui-success: #2f8f6f;
-  --ui-success-soft: rgba(47, 143, 111, 0.14);
+  --ui-accent: #243b2c;
+  --ui-accent-hover: #345440;
+  --ui-accent-soft: rgba(36, 59, 44, 0.08);
+  --ui-success: #39764e;
+  --ui-success-soft: rgba(57, 118, 78, 0.09);
   --ui-warning: #b06b00;
   --ui-warning-soft: rgba(176, 107, 0, 0.15);
   --ui-danger: #c9342f;
   --ui-danger-soft: rgba(201, 52, 47, 0.15);
-  --ui-info: #0a84ff;
-  --ui-info-soft: rgba(10, 132, 255, 0.14);
-  --ui-focus-ring: rgba(0, 113, 227, 0.22);
+  --ui-info: #46765a;
+  --ui-info-soft: rgba(70, 118, 90, 0.1);
+  --ui-focus-ring: rgba(36, 59, 44, 0.22);
   --ui-radius-sm: 0.5rem;
   --ui-radius-md: 0.75rem;
   --ui-radius-lg: 1rem;
@@ -163,30 +164,30 @@
 }
 
 .dark {
-  --ui-bg-page: #000000;
-  --ui-bg-elevated: #1c1c1e;
-  --ui-bg-soft: #2c2c2e;
-  --ui-bg-muted: #242426;
+  --ui-bg-page: #151b17;
+  --ui-bg-elevated: #1d2620;
+  --ui-bg-soft: #28332b;
+  --ui-bg-muted: #243027;
   --ui-bg-overlay: rgba(28, 28, 30, 0.78);
   --ui-bg-overlay-strong: rgba(28, 28, 30, 0.9);
   --ui-text-primary: #f5f5f7;
   --ui-text-secondary: #d2d2d7;
   --ui-text-muted: #8e8e93;
-  --ui-text-on-accent: #f5f5f7;
+  --ui-text-on-accent: #17231a;
   --ui-border: rgba(255, 255, 255, 0.14);
   --ui-border-strong: rgba(255, 255, 255, 0.24);
-  --ui-accent: #0a84ff;
-  --ui-accent-hover: #409cff;
-  --ui-accent-soft: rgba(10, 132, 255, 0.24);
-  --ui-success: #30d158;
-  --ui-success-soft: rgba(48, 209, 88, 0.22);
+  --ui-accent: #c4dbc5;
+  --ui-accent-hover: #d7e7d6;
+  --ui-accent-soft: rgba(196, 219, 197, 0.12);
+  --ui-success: #8ec89d;
+  --ui-success-soft: rgba(142, 200, 157, 0.13);
   --ui-warning: #ffd60a;
   --ui-warning-soft: rgba(255, 214, 10, 0.24);
   --ui-danger: #ff453a;
   --ui-danger-soft: rgba(255, 69, 58, 0.24);
-  --ui-info: #64d2ff;
-  --ui-info-soft: rgba(100, 210, 255, 0.24);
-  --ui-focus-ring: rgba(10, 132, 255, 0.32);
+  --ui-info: #a1cdb1;
+  --ui-info-soft: rgba(161, 205, 177, 0.12);
+  --ui-focus-ring: rgba(196, 219, 197, 0.32);
   --ui-shadow-1: 0 14px 30px -22px rgba(0, 0, 0, 0.72);
   --ui-shadow-2: 0 24px 48px -28px rgba(0, 0, 0, 0.78);
   --ui-shadow-3: 0 36px 76px -34px rgba(0, 0, 0, 0.84);

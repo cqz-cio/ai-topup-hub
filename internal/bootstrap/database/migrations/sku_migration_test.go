@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -25,13 +26,15 @@ import (
 	"gorm.io/gorm"
 )
 
+var migrationTestDBSequence atomic.Uint64
+
 func setupSKUMigrationTestDB(t *testing.T) *gorm.DB {
 	t.Helper()
 	previousDB := gormdb.DB
 	t.Cleanup(func() {
 		gormdb.DB = previousDB
 	})
-	dsn := fmt.Sprintf("file:sku_migration_test_%d?mode=memory&cache=shared", time.Now().UnixNano())
+	dsn := fmt.Sprintf("file:sku_migration_test_%d?mode=memory&cache=shared", migrationTestDBSequence.Add(1))
 	db, err := gorm.Open(sqlite.Open(dsn), &gorm.Config{
 		DisableForeignKeyConstraintWhenMigrating: true,
 	})
@@ -48,7 +51,7 @@ func setupRegistryMigrationTestDB(t *testing.T) *gorm.DB {
 	t.Cleanup(func() {
 		gormdb.DB = previousDB
 	})
-	dsn := fmt.Sprintf("file:registry_migration_test_%d?mode=memory&cache=shared&_pragma=foreign_keys(1)", time.Now().UnixNano())
+	dsn := fmt.Sprintf("file:registry_migration_test_%d?mode=memory&cache=shared&_pragma=foreign_keys(1)", migrationTestDBSequence.Add(1))
 	db, err := gorm.Open(sqlite.Open(dsn), &gorm.Config{})
 	if err != nil {
 		t.Fatalf("open sqlite failed: %v", err)
@@ -608,7 +611,9 @@ func TestAutoMigrateReplacesSupersededProcurementConstraintName(t *testing.T) {
 	if err := db.AutoMigrate(&procurementOrderIndexSchema{}); err != nil {
 		t.Fatalf("create indexed superseded procurement schema failed: %v", err)
 	}
-	assertModelIndexesExist(t, db, &procurementdomain.Order{})
+	// The legacy schema predates the per-order unique index. Verify its own
+	// indexes here, then require all current indexes after the upgrade below.
+	assertModelIndexesExist(t, db, &procurementOrderIndexSchema{})
 	if !db.Migrator().HasConstraint(&supersededProcurementOrderSchema{}, supersededProcurementOrderForeignKeyConstraint) {
 		t.Fatalf("test setup did not create superseded procurement constraint")
 	}

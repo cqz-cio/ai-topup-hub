@@ -179,7 +179,7 @@ func TestHandleUpstreamCallback_Delivered_SynchronizesParentStatus(t *testing.T)
 	proc := createTestProcurementOrder(t, db, 1, child.ID, child.OrderNo, constants.ProcurementStatusAccepted)
 
 	svc := newTestProcurementService(db, newTestSiteConnectionService(db, "test-key", t.TempDir()))
-	if err := svc.HandleUpstreamCallback(proc.ID, "delivered", nil); err != nil {
+	if err := svc.HandleUpstreamCallback(proc.ID, "delivered", &procurementcontract.Fulfillment{Payload: "SIMULATED-PARENT-CARD"}); err != nil {
 		t.Fatalf("HandleUpstreamCallback: %v", err)
 	}
 
@@ -189,6 +189,25 @@ func TestHandleUpstreamCallback_Delivered_SynchronizesParentStatus(t *testing.T)
 	}
 	if updatedParent.Status != constants.OrderStatusDelivered {
 		t.Fatalf("parent status = %q, want %q", updatedParent.Status, constants.OrderStatusDelivered)
+	}
+}
+
+func TestSupplierEmptyDeliveryKeepsOrderAwaitingCard(t *testing.T) {
+	db := setupProcurementTestDB(t)
+	order := createProcTestOrder(t, db, "EMPTY-DELIVERY", constants.OrderStatusFulfilling, constants.FulfillmentTypeUpstream)
+	proc := createTestProcurementOrder(t, db, 1, order.ID, order.OrderNo, "accepted")
+	svc := newTestProcurementService(db, newTestSiteConnectionService(db, "fixture-key", t.TempDir()))
+	if err := svc.HandleUpstreamCallback(proc.ID, "delivered", nil); err == nil {
+		t.Fatal("empty card was marked delivered")
+	}
+	if err := db.First(proc, proc.ID).Error; err != nil {
+		t.Fatal(err)
+	}
+	if err := db.First(order, order.ID).Error; err != nil {
+		t.Fatal(err)
+	}
+	if proc.Status != "accepted" || order.Status != constants.OrderStatusFulfilling {
+		t.Fatal("empty card completed order")
 	}
 }
 

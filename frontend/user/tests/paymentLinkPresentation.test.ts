@@ -3,6 +3,7 @@ import assert from 'node:assert/strict'
 import { readdirSync, readFileSync } from 'node:fs'
 import { basename, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { parse } from 'vue/compiler-sfc'
 
 const userSourceRoot = fileURLToPath(new URL('../src', import.meta.url))
 const paymentViewNames = new Set(['Payment.vue', 'RechargeOrderDetail.vue'])
@@ -31,7 +32,7 @@ test('payment views keep pay URLs behind actions instead of rendering the raw li
 
   for (const path of paymentViews) {
     const source = readFileSync(path, 'utf8')
-    const template = source.match(/<template>([\s\S]*?)<\/template>/)?.[1]
+    const template = parse(source).descriptor.template?.content
     const viewName = relative(userSourceRoot, path) || basename(path)
 
     assert.ok(template, `${viewName} should contain a template`)
@@ -47,7 +48,7 @@ test('payment views keep pay URLs behind actions instead of rendering the raw li
 test('default payment views present open-link actions as primary buttons', () => {
   for (const path of defaultPaymentViews) {
     const source = readFileSync(path, 'utf8')
-    const template = source.match(/<template>([\s\S]*?)<\/template>/)?.[1]
+    const template = parse(source).descriptor.template?.content
     const viewName = relative(userSourceRoot, path) || basename(path)
 
     assert.ok(template, `${viewName} should contain a template`)
@@ -69,7 +70,7 @@ test('default payment views present open-link actions as primary buttons', () =>
 
 test('default payment view presents copy-link actions as outlined secondary buttons', () => {
   const source = readFileSync(defaultPaymentView, 'utf8')
-  const template = source.match(/<template>([\s\S]*?)<\/template>/)?.[1]
+  const template = parse(source).descriptor.template?.content
 
   assert.ok(template, 'views/Payment.vue should contain a template')
 

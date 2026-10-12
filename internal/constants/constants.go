@@ -390,6 +390,7 @@ const (
 	TaskProcurementSubmit           = "procurement:submit"
 	TaskProcurementPollStatus       = "procurement:poll_status"
 	TaskProcurementSyncAccepted     = "procurement:sync_accepted"
+	TaskProcurementRecover          = "procurement:recover_paid"
 	TaskUpstreamSyncProducts        = "upstream:sync_products"
 	TaskUpstreamSyncStock           = "upstream:sync_stock"
 	TaskReconciliationRun           = "reconciliation:run"
@@ -432,6 +433,7 @@ const (
 // 对接协议类型常量
 const (
 	ConnectionProtocolDujiaoNext = "dujiao-next"
+	ConnectionProtocolACGFaka    = "acg-faka"
 )
 
 // API 凭证状态常量

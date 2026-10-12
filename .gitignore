@@ -1,4 +1,5 @@
 .vscode/
+/work/
 /work/codex-logs/
 /work/codex-tools/
 /work/codex-runtime/
@@ -8,8 +9,12 @@ config.yml
 db
 uploads
 *.db
+*.db-shm
+*.db-wal
+*.credentials.json
+*.tsbuildinfo
 *.log
-.env
+.env*
 .DS_Store
 node_modules/
 # Added by goreleaser init:

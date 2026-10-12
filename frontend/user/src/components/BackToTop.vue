@@ -46,7 +46,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
 .back-to-top {
   bottom: calc(3.5rem + env(safe-area-inset-bottom, 0px) + 1rem);
 }
-@media (min-width: 1024px) {
+@media (min-width: 1280px) {
   .back-to-top {
     bottom: 1.5rem;
   }

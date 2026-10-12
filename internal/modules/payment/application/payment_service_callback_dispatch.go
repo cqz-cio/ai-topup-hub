@@ -29,6 +29,9 @@ func (s *PaymentService) enqueueOrderPaidAsync(order *orderdomain.Order, payment
 			log.Warnw("auto_recharge_schedule_failed", "order_id", order.ID)
 		}
 	}
+	// Persist procurement intent even when Redis is temporarily unavailable.
+	// The recovery job can later enqueue this confirmed paid order.
+	s.enqueueProcurementAsync(order, log)
 	if s.affiliateSvc != nil {
 		if err := s.affiliateSvc.HandleOrderPaid(order.ID); err != nil {
 			log.Warnw("affiliate_handle_order_paid_failed",
@@ -83,8 +86,6 @@ func (s *PaymentService) enqueueOrderPaidAsync(order *orderdomain.Order, payment
 				}
 			}
 		}
-		// 上游采购：为包含上游交付类型的订单创建采购单
-		s.enqueueProcurementAsync(order, log)
 		// B 侧：订单支付成功后检查是否需要回调下游
 		s.enqueueDownstreamCallbackAsync(order, log)
 		return
@@ -101,8 +102,6 @@ func (s *PaymentService) enqueueOrderPaidAsync(order *orderdomain.Order, payment
 			)
 		}
 	}
-	// 上游采购：为包含上游交付类型的订单创建采购单
-	s.enqueueProcurementAsync(order, log)
 	// B 侧：订单支付成功后检查是否需要回调下游
 	s.enqueueDownstreamCallbackAsync(order, log)
 }

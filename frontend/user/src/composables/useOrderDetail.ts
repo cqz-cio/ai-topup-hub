@@ -37,7 +37,7 @@ export function useOrderDetail() {
       a.download = `fulfillment-${orderNo}.txt`
       a.click()
       URL.revokeObjectURL(url)
-    } catch {} finally {
+    } catch { toast.error(t('shopUi.downloadFailed')) } finally {
       fulfillmentDownloading.value = false
     }
   }

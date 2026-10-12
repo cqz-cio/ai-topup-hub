@@ -110,18 +110,31 @@ type CreateUpstreamOrderReq struct {
 	DownstreamOrderNo string       `json:"downstream_order_no"`
 	TraceID           string       `json:"trace_id"`
 	CallbackURL       string       `json:"callback_url"`
+	MaxAmount         string       `json:"-"` // Local purchase guard; not part of the native upstream wire format.
+	Currency          string       `json:"-"`
 }
 
 // CreateUpstreamOrderResp 创建上游采购单响应
 type CreateUpstreamOrderResp struct {
-	OK           bool   `json:"ok"`
-	OrderID      uint   `json:"order_id,omitempty"`
-	OrderNo      string `json:"order_no,omitempty"`
-	Status       string `json:"status,omitempty"`
-	Amount       string `json:"amount,omitempty"`
-	Currency     string `json:"currency,omitempty"`
-	ErrorCode    string `json:"error_code,omitempty"`
-	ErrorMessage string `json:"error_message,omitempty"`
+	OK           bool                 `json:"ok"`
+	OrderID      uint                 `json:"order_id,omitempty"`
+	OrderNo      string               `json:"order_no,omitempty"`
+	Status       string               `json:"status,omitempty"`
+	Amount       string               `json:"amount,omitempty"`
+	Currency     string               `json:"currency,omitempty"`
+	ErrorCode    string               `json:"error_code,omitempty"`
+	ErrorMessage string               `json:"error_message,omitempty"`
+	Fulfillment  *UpstreamFulfillment `json:"fulfillment,omitempty"`
+}
+
+// ReferenceOrderAdapter supports suppliers whose order identifier is a string.
+type ReferenceOrderAdapter interface {
+	GetOrderByReference(context.Context, string) (*UpstreamOrderDetail, error)
+}
+
+// SingleSubmissionAdapter requires a durable claim before any balance purchase.
+type SingleSubmissionAdapter interface {
+	RequiresSingleSubmission() bool
 }
 
 // UpstreamFulfillment 上游交付信息
@@ -178,6 +191,8 @@ func NewAdapter(conn *siteconnectiondomain.Connection, uploadsDir string) (Adapt
 	switch conn.Protocol {
 	case constants.ConnectionProtocolDujiaoNext:
 		return NewDujiaoNextAdapter(conn, uploadsDir), nil
+	case constants.ConnectionProtocolACGFaka:
+		return NewACGFakaAdapter(conn, uploadsDir)
 	default:
 		return nil, fmt.Errorf("unsupported protocol: %s", conn.Protocol)
 	}

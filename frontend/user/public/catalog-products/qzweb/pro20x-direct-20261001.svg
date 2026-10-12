@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 540" role="img" aria-labelledby="title desc">
+  <title id="title">ChatGPT Pro 20x 直接开通</title><desc id="desc">银白弧线背景上的 Pro 20x 直开套餐标识</desc>
+  <defs><linearGradient id="silver" x2=".9" y2="1"><stop stop-color="#dfe4eb"/><stop offset=".48" stop-color="#f5f7fa"/><stop offset="1" stop-color="#e8edf3"/></linearGradient><linearGradient id="fold" x2=".15" y2="1"><stop stop-color="#ffffff"/><stop offset=".55" stop-color="#eef2f7"/><stop offset="1" stop-color="#d2dae5"/></linearGradient></defs>
+  <rect width="900" height="540" fill="url(#silver)"/>
+  <path d="M-70 50C200 150 565 88 965-98L960 160C540 399 138 267-70 95Z" fill="#fff" opacity=".53"/>
+  <path d="M-70 280C170 478 551 463 970 118L960 320C563 580 95 557-70 350Z" fill="url(#fold)"/>
+  <path d="M-70 280C170 478 551 463 970 118" fill="none" stroke="#fff" stroke-width="3" opacity=".82"/>
+  <path d="M-70 398C257 541 491 544 957 352L970 590H-70Z" fill="#f7f9fc" opacity=".83"/>
+  <g font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Arial,sans-serif" fill="#242d3b"><text x="44" y="344" font-size="247" font-weight="750" letter-spacing="-17">20x</text><text x="655" y="225" font-size="27" font-weight="560">ChatGPT</text><text x="655" y="267" font-size="29" font-weight="720" letter-spacing="1">PRO 20x</text><text x="655" y="312" font-size="25" font-weight="600">直接开通</text></g>
+  <rect x="655" y="348" width="65" height="7" rx="3.5" fill="#6386d9"/>
+</svg>

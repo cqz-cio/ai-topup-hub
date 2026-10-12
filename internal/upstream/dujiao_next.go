@@ -139,6 +139,9 @@ func (a *DujiaoNextAdapter) GetProduct(ctx context.Context, productID uint) (*Up
 
 // CreateOrder 发起采购单
 func (a *DujiaoNextAdapter) CreateOrder(ctx context.Context, req CreateUpstreamOrderReq) (*CreateUpstreamOrderResp, error) {
+	if !purchasesEnabled() {
+		return purchaseDisabledResponse(), nil
+	}
 	var result CreateUpstreamOrderResp
 	if err := a.doRequest(ctx, http.MethodPost, "/api/v1/upstream/orders", req, &result); err != nil {
 		return nil, err

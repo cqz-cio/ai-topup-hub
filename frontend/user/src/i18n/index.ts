@@ -16,18 +16,7 @@ export function detectLocale(): string {
     const saved = localStorage.getItem('locale')
     if (saved && supportedLocales.includes(saved)) return saved
 
-    const browserLang = navigator.language || ''
-    if (supportedLocales.includes(browserLang)) return browserLang
-
-    const langPrefix = browserLang.split('-')[0]
-    if (langPrefix === 'zh') {
-        if (browserLang.includes('TW') || browserLang.includes('HK') || browserLang.includes('Hant')) {
-            return 'zh-TW'
-        }
-        return 'zh-CN'
-    }
-    if (langPrefix === 'en') return 'en-US'
-
+    // 首次访问默认简体中文；仅手动选择的语言覆盖站点默认值。
     return 'zh-CN'
 }
 

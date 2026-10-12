@@ -14,6 +14,10 @@ const (
 	ModeAll    = "all"
 	ModeAPI    = "api"
 	ModeWorker = "worker"
+	// ModeCheckout runs storefront payments and local order jobs without procurement.
+	ModeCheckout = "checkout"
+	// ModeStorefront adds paid-order procurement and delivery to checkout.
+	ModeStorefront = "storefront"
 )
 
 // Options 应用启动选项

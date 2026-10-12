@@ -31,6 +31,7 @@ const (
 	TaskProcurementPollStatus = constants.TaskProcurementPollStatus
 	// TaskProcurementSyncAccepted 采购单定时巡检任务
 	TaskProcurementSyncAccepted = constants.TaskProcurementSyncAccepted
+	TaskProcurementRecover      = constants.TaskProcurementRecover
 	// TaskDownstreamCallback 下游回调通知任务
 	TaskDownstreamCallback = constants.TaskDownstreamCallback
 	// TaskReconciliationRun 对账执行任务

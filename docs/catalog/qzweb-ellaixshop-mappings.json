@@ -1,0 +1,106 @@
+{
+  "merchant_id": "1039",
+  "base_url": "https://ellaixshop.com",
+  "protocol": "acg-faka",
+  "auto_sync_price": false,
+  "mapped": [
+    {
+      "slug": "qzweb-4",
+      "source_id": 4,
+      "upstream_product_id": 4,
+      "shared_code": "ellaix_zovocard_go_v1"
+    },
+    {
+      "slug": "qzweb-5",
+      "source_id": 5,
+      "upstream_product_id": 5,
+      "shared_code": "ellaix_zovocard_plus_v1"
+    },
+    {
+      "slug": "qzweb-55",
+      "source_id": 55,
+      "upstream_product_id": 55,
+      "shared_code": "ellaix_zovocard_pro_20x_direct_v1"
+    },
+    {
+      "slug": "qzweb-7",
+      "source_id": 7,
+      "upstream_product_id": 7,
+      "shared_code": "ellaix_zovocard_pro_20x_renew_v1"
+    },
+    {
+      "slug": "qzweb-56",
+      "source_id": 56,
+      "upstream_product_id": 56,
+      "shared_code": "ellaix_zovocard_pro_50x_ph_v1"
+    },
+    {
+      "slug": "qzweb-63",
+      "source_id": 63,
+      "upstream_product_id": 63,
+      "shared_code": "ellaix_zovocard_go_cl_v1"
+    },
+    {
+      "slug": "qzweb-58",
+      "source_id": 58,
+      "upstream_product_id": 58,
+      "shared_code": "ellaix_zovocard_pro_50x_cl_v1"
+    },
+    {
+      "slug": "qzweb-64",
+      "source_id": 64,
+      "upstream_product_id": 64,
+      "shared_code": "ellaix_zovocard_plus_cl_v1"
+    },
+    {
+      "slug": "qzweb-57",
+      "source_id": 57,
+      "upstream_product_id": 57,
+      "shared_code": "ellaix_zovocard_pro_5x_cl_v1"
+    },
+    {
+      "slug": "qzweb-50",
+      "source_id": 50,
+      "upstream_product_id": 50,
+      "shared_code": "24516218C8255CF0"
+    },
+    {
+      "slug": "qzweb-51",
+      "source_id": 51,
+      "upstream_product_id": 51,
+      "shared_code": "B6B7BAC03EB3907D"
+    },
+    {
+      "slug": "qzweb-59",
+      "source_id": 59,
+      "upstream_product_id": 59,
+      "shared_code": "F15D72A753EBA070"
+    }
+  ],
+  "unmatched": [
+    {
+      "slug": "qzweb-52",
+      "source_id": 52,
+      "name": "预售【质保一个月】Gemini Pro18个月",
+      "reason": "商户1039接口未提供该商品"
+    },
+    {
+      "slug": "qzweb-53",
+      "source_id": 53,
+      "name": "预售【无质保】Gemini Pro18个月",
+      "reason": "商户1039接口未提供该商品"
+    },
+    {
+      "slug": "qzweb-62",
+      "source_id": 62,
+      "name": "ChatGPT Pro 20x｜iOS 渠道｜覆盖充值·质保一个月",
+      "reason": "商户1039接口未提供该商品"
+    },
+    {
+      "slug": "qzweb-1",
+      "source_id": 1,
+      "name": "DEMO",
+      "reason": "商户1039接口未提供该商品"
+    }
+  ]
+}
