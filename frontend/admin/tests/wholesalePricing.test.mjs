@@ -1,38 +1,8 @@
 import assert from 'node:assert/strict'
-import { execFileSync } from 'node:child_process'
-import { rmSync } from 'node:fs'
-import { dirname, join } from 'node:path'
-import { fileURLToPath, pathToFileURL } from 'node:url'
 import test from 'node:test'
+import { buildWholesaleSkuPriceReferences, hasMultipleActiveWholesaleSkus } from '../src/utils/wholesalePricing.ts'
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
-const root = join(__dirname, '..')
-const outDir = join(root, '.codex-test-output', 'wholesalePricing')
-
-async function loadModule() {
-  rmSync(outDir, { recursive: true, force: true })
-  execFileSync(
-    join(root, 'node_modules', '.bin', 'tsc'),
-    [
-      'src/utils/wholesalePricing.ts',
-      '--target',
-      'ES2022',
-      '--module',
-      'ES2022',
-      '--moduleResolution',
-      'bundler',
-      '--strict',
-      '--skipLibCheck',
-      '--outDir',
-      outDir,
-    ],
-    { cwd: root, stdio: 'pipe' },
-  )
-  return import(`${pathToFileURL(join(outDir, 'wholesalePricing.js')).href}?t=${Date.now()}`)
-}
-
-test('buildWholesaleSkuPriceReferences explains which SKUs are affected by current wholesale tiers', async () => {
-  const { buildWholesaleSkuPriceReferences, hasMultipleActiveWholesaleSkus } = await loadModule()
+test('buildWholesaleSkuPriceReferences explains which SKUs are affected by current wholesale tiers', () => {
   const product = {
     skus: [
       {

@@ -9,7 +9,7 @@
     "build": "vue-tsc -b && vite build",
     "build:fullstack": "vue-tsc -b && VITE_FULLSTACK=1 vite build",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run && node --experimental-strip-types --test tests/*.test.ts tests/*.test.mjs"
   },
   "dependencies": {
     "@tanstack/vue-table": "^8.21.3",

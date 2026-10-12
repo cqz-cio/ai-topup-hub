@@ -71,7 +71,7 @@ func (s *Store) Update(ref *downstreamdomain.OrderRef) error {
 func (s *Store) ListPendingCallbacks(limit int) ([]downstreamdomain.OrderRef, error) {
 	var refs []downstreamdomain.OrderRef
 	query := s.db.Where("callback_status = ? AND callback_url != ''", downstreamdomain.StatusPending).
-		Order("created_at ASC").
+		Order("created_at ASC, id ASC").
 		Limit(limit)
 	if err := query.Find(&refs).Error; err != nil {
 		return nil, err
@@ -91,7 +91,7 @@ func (s *Store) ListByCredentialID(credentialID uint, filter downstreamcontract.
 		return nil, 0, err
 	}
 
-	query = query.Order("created_at DESC")
+	query = query.Order("created_at DESC, id DESC")
 	if filter.Page > 0 && filter.PageSize > 0 {
 		query = query.Offset((filter.Page - 1) * filter.PageSize).Limit(filter.PageSize)
 	}

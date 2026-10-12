@@ -50,6 +50,7 @@ func TestStorePersistsAndFindsOrderReference(t *testing.T) {
 
 func TestStoreFiltersPendingAndCredentialLists(t *testing.T) {
 	store := openTestStore(t)
+	createdAt := time.Date(2026, time.October, 12, 0, 0, 0, 0, time.UTC)
 	refs := []*downstreamdomain.OrderRef{
 		{OrderID: 1, ApiCredentialID: 5, CallbackURL: "https://one.example", CallbackStatus: downstreamdomain.StatusPending},
 		{OrderID: 2, ApiCredentialID: 5, CallbackURL: "", CallbackStatus: downstreamdomain.StatusPending},
@@ -57,6 +58,7 @@ func TestStoreFiltersPendingAndCredentialLists(t *testing.T) {
 		{OrderID: 4, ApiCredentialID: 6, CallbackURL: "https://four.example", CallbackStatus: downstreamdomain.StatusPending},
 	}
 	for _, ref := range refs {
+		ref.CreatedAt = createdAt
 		if err := store.Create(ref); err != nil {
 			t.Fatalf("create ref for order %d: %v", ref.OrderID, err)
 		}
@@ -80,5 +82,16 @@ func TestStoreFiltersPendingAndCredentialLists(t *testing.T) {
 	}
 	if total != 2 || len(listed) != 1 || listed[0].OrderID != 2 {
 		t.Fatalf("credential list mismatch: total=%d refs=%#v", total, listed)
+	}
+	secondPage, total, err := store.ListByCredentialID(5, downstreamcontract.RefListFilter{
+		CallbackStatus: downstreamdomain.StatusPending,
+		Page:           2,
+		PageSize:       1,
+	})
+	if err != nil {
+		t.Fatalf("list second credential page: %v", err)
+	}
+	if total != 2 || len(secondPage) != 1 || secondPage[0].OrderID != 1 {
+		t.Fatalf("second credential page mismatch: total=%d refs=%#v", total, secondPage)
 	}
 }

@@ -28,6 +28,7 @@ import (
 	"github.com/dujiao-next/internal/shared/jsonmap"
 	"github.com/dujiao-next/internal/shared/money"
 	"github.com/glebarez/sqlite"
+	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
 )
@@ -51,7 +52,7 @@ func newResellerAccountingTestHarness(store *resellergormstore.Store, confirmDay
 
 func openResellerAccountingServiceTestDB(t *testing.T) *gorm.DB {
 	t.Helper()
-	dsn := fmt.Sprintf("file:reseller_accounting_service_%d?mode=memory&cache=shared", time.Now().UnixNano())
+	dsn := fmt.Sprintf("file:reseller_accounting_service_%s?mode=memory&cache=shared", uuid.NewString())
 	db, err := gorm.Open(sqlite.Open(dsn), &gorm.Config{})
 	if err != nil {
 		t.Fatalf("open sqlite failed: %v", err)
@@ -77,7 +78,7 @@ func openResellerAccountingServiceTestDB(t *testing.T) *gorm.DB {
 
 func seedResellerAccountingProfile(t *testing.T, db *gorm.DB) resellerdomain.Profile {
 	t.Helper()
-	user := userdomain.User{Email: fmt.Sprintf("reseller-%d@example.test", time.Now().UnixNano()), PasswordHash: "x"}
+	user := userdomain.User{Email: fmt.Sprintf("reseller-%s@example.test", uuid.NewString()), PasswordHash: "x"}
 	if err := db.Create(&user).Error; err != nil {
 		t.Fatalf("create reseller user failed: %v", err)
 	}
