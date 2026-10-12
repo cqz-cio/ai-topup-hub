@@ -25,9 +25,11 @@
 
 ## 可配置首页公告弹窗（2026-10-12）
 
-- 用户要求首次进入商城时显示可自行设置的弹窗公告，已将既有 `home_announcement` 配置接入当前 `Storefront.vue` 首页并发布上海前端 `20261012-231734`，商城源码 `a2cda8e818712a3a23d6b7534f8f795dbca26604`。后台路径为 **系统设置 → 站点设置 → 首页公告**，支持标题、富文本、图片、链接、开关及起止时间。正式公告尚未填写，线上配置未修改；管理员保存并开启后生效。
+- 用户要求首次进入商城时显示可自行设置的弹窗公告，已将既有 `home_announcement` 配置接入当前 `Storefront.vue` 首页并发布上海前端 `20261012-231734`，商城源码 `a2cda8e818712a3a23d6b7534f8f795dbca26604`。后台路径为 **系统设置 → 站点设置 → 首页公告**，支持标题、富文本、图片、链接、开关及起止时间。2026-10-12 23:35 已按用户参考图片整理并启用正式公告“购买须知与代理合作”：购买与发货说明、ChatGPT 卡密兑换须知、诚招代理及代理价咨询、客服微信 15824485317；兑换入口 https://cdkai.kdns.fr/。文案快照 `remote-latest/docs/catalog/home-announcement.json`，配置来源提交 `6c088c7a20725b5ebcfec10286e6346b2c8870d2`，公开版本 `c13a6e2c`。后续可在后台修改。
 - 关闭后本次会话不重复弹出，支持今日不再提示和不再提示；标题或内容变化后再次提醒。日常本机入口通过实际公告保存、公开接口与 12 项浏览器检查，临时内容已恢复；公网通过 12 项只读检查，弹窗仅在测试浏览器内注入验证，覆盖六种宽度，无页面错误。94 项前台测试、类型检查和生产构建通过。
 - 仅部署商城静态资源，后台、新加坡后端及支付采购配置保持原状态；售价和两条 USDT 渠道核对正常，没有上传本机库或进行付款采购测试。上海备份 `/srv/zhixiang-front/backups/before-announcement-20261012-231734`，新加坡备份 `/srv/zhixiang/backups/before-frontend-announcement-20261012-231734`。私有报告为 `deployment/local/announcement-deployment.json`、`announcement-live-verification.json`；截图与浏览器记录为 `remote-latest/work/codex-runtime/announcement-qa/`，均由 Git 忽略。
+
+- 本次正式内容仅更新后台 `home_announcement`，前后端程序版本保持不变。本机与正式站各通过桌面 1920px、手机 390px 和 320px 的实际公开配置检查，未使用测试注入；联系人、兑换链接、代理价咨询和关闭后刷新均正确，窄屏标题完整。线上备份 `/srv/zhixiang/backups/before-announcement-content-20261012-233551`，私有报告 `deployment/local/announcement-content-deployment.json`、`announcement-content-live-verification.json`；截图与报告在 `remote-latest/work/codex-runtime/announcement-content-qa/`。没有重启服务、上传本机库、修改售价及支付渠道或执行付款采购测试。
 
 ## 商品详情封面完整显示（2026-10-12）
 
