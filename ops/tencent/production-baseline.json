@@ -434,15 +434,15 @@
     "verification_directory": "work/codex-runtime/announcement-qa/"
   },
   "home_announcement_content": {
-    "checked_at": "2026-10-12T15:56:57.413599+00:00",
-    "configured_at": "20261012-235139",
-    "configuration_source_commit": "02c1a082c3b989adee398f16073e7ef8d89a4806",
+    "checked_at": "2026-10-12T16:30:31.913806+00:00",
+    "configured_at": "20261013-002738",
+    "configuration_source_commit": "0448e64db4058e52f6b16fe5ac1a23c70975578a",
     "source_file": "docs/catalog/home-announcement.json",
     "enabled": true,
-    "version": "e97dfd7a",
+    "version": "bf3a1445",
     "title": "购买须知与代理合作",
     "customer_wechat": "Cqz0924ttxk",
-    "redemption_url": "https://cdkai.kdns.fr/",
+    "redemption_url": "https://cdk.bar/",
     "agent_price_contact_required": true,
     "actual_public_configuration_verified": true,
     "local_browser_cases_passed": 3,
@@ -456,8 +456,8 @@
     "backend_release_preserved": "20261012-153531",
     "frontend_release_preserved": "20261012-235241",
     "programs_replaced": false,
-    "backup": "/srv/zhixiang/backups/before-wechat-contact-20261012-235139",
-    "verification_directory": "work/codex-runtime/wechat-unified-qa/",
+    "backup": "/srv/zhixiang/backups/before-redemption-announcement-20261013-002738",
+    "verification_directory": "work/codex-runtime/redemption-url-qa/",
     "real_payment_or_purchase_submitted": false,
     "previous_configured_at": "20261012-233551"
   },
@@ -492,5 +492,35 @@
     "local_database_uploaded": false,
     "backend_restarted": false,
     "real_payment_or_purchase_submitted": false
+  },
+  "chatgpt_redemption_url_update": {
+    "checked_at": "2026-10-12T16:30:31.913806+00:00",
+    "redemption_url": "https://cdk.bar/",
+    "source_commit": "0448e64db4058e52f6b16fe5ac1a23c70975578a",
+    "product_slugs": [
+      "qzweb-4",
+      "qzweb-5",
+      "qzweb-55",
+      "qzweb-7",
+      "qzweb-56",
+      "qzweb-63",
+      "qzweb-58",
+      "qzweb-64",
+      "qzweb-57",
+      "qzweb-59",
+      "qzweb-62"
+    ],
+    "changed_count": 11,
+    "historical_orders_and_delivery_records_unchanged": true,
+    "non_chatgpt_products_unchanged": true,
+    "prices_unchanged": true,
+    "backend_release_preserved": "20261012-153531",
+    "frontend_release_preserved": "20261012-235241",
+    "database_tests_passed": 9,
+    "actual_local_and_live_browser_cases_passed": 6,
+    "backend_restarted": false,
+    "local_database_uploaded": false,
+    "real_payment_or_purchase_submitted": false,
+    "backup": "/srv/zhixiang/backups/before-redemption-url-20261013-002736"
   }
 }
