@@ -1,6 +1,7 @@
 # π星卡社开发约束
 
 - 客服微信统一使用 `Cqz0924ttxk`，不能用电话号码作为微信号展示或回退值。
+- 2026-10-13 已补齐并上线中文隐私政策和服务条款，文案快照为 `docs/catalog/site-legal.json`，配置来源 `9b260f889420d8c386c6c2c20d76c27e1630a94d`。后台 **系统设置 → 站点设置 → 法律条款** 可继续编辑；公开入口 `/privacy`、`/terms`，注册页实际链接已核验。仅修改 `site_config.legal.privacy.zh-CN` 和 `site_config.legal.terms.zh-CN`，保留其他配置及语言内容。条款中的兑换入口遵循各笔订单交付说明，质保和退款按具体商品约定及适用法律处理；不写统一永久质保或“概不退款”。本机、正式站各通过 1920、390、320px 共 9 项只读页面检查，记录在忽略目录 `work/codex-runtime/site-legal-qa/`。线上备份 `/srv/zhixiang/backups/before-site-legal-20261013-003435`，未更换程序、重启后端、上传本机库或执行付款采购测试。
 
 - `main` 是唯一正式源码主线，维护当前绿色 Go + Vue 商城，包含已确认的 π星卡社名称、派大星 Logo 和水母背景。用户端为 `frontend/user`，后台为 `frontend/admin`；这些品牌改动属于同一项目主版本。
 - 支付、订单、数据库和采购后端部署在腾讯云新加坡 `43.134.141.10`，账号 `ubuntu`，目录 `/srv/zhixiang`。两套前端部署在上海 `124.220.2.69` 的 `/srv/zhixiang-front`：商城 `https://www.qzweb.cloud/`，管理端 `https://124.220.2.69:18888/login`。上海通过受限 SSH 通道连接新加坡回环 API；维护说明见 `ops/tencent/README.md`。
