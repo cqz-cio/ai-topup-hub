@@ -174,6 +174,7 @@ func registerAdminRoutes(
 
 	// 会员等级
 	memberleveltransport.RegisterAdminRoutes(authorized, adminMemberLevelHandler)
+	memberleveltransport.RegisterUserPriceAdminRoutes(authorized, memberleveltransport.NewUserPriceAdminHandler(c.MemberLevelService))
 
 	// 支付渠道与支付记录
 	paymenttransport.RegisterAdminChannelRoutes(paymentProtected, adminPaymentChannelHandler)

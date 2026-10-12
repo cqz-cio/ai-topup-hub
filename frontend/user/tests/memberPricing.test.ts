@@ -53,3 +53,19 @@ test('invalid server prices cannot raise or corrupt the public catalog price', (
   assert.equal(storefrontPrice({ ...product, effective_price_amount: '-1' }), 100)
   assert.equal(resolveCatalogSkuPrice({}, { price_amount: '100', effective_price_amount: 'bad', promotion_price_amount: '80' }), '80.00')
 })
+
+test('personal prices bypass level discounts and keep the retail snapshot for account switching', () => {
+  const sku = { id: 11, price_amount: '140.01', effective_price_amount: '140.01', user_price_amount: '140.01', retail_price_amount: '100.00' }
+  const personalized = { ...product, price_amount: '140.01', user_price_amount: '140.01', effective_price_amount: '140.01', skus: [sku] }
+  assert.equal(resolveMemberPriceAmount(personalized, 11, '140.01', 2, 80), null)
+  assert.equal(storefrontPrice(personalized), 140.01)
+  assert.equal(resolveCatalogSkuPrice(personalized, sku), '140.01')
+  const snapshot = resolveCartPricingSnapshot(personalized, sku, 9)
+  assert.equal(snapshot.priceAmount, '100.00')
+  assert.equal(snapshot.userPriceAmount, '140.01')
+  assert.equal(snapshot.displayPriceAmount, '140.01')
+  assert.equal(snapshot.pricingUserId, 9)
+  const cleared = resolveCartPricingSnapshot(product, { id: 11, price_amount: '100.00', effective_price_amount: '70.00' }, 9)
+  assert.equal(cleared.userPriceAmount, undefined)
+  assert.equal(cleared.displayPriceAmount, '70.00')
+})

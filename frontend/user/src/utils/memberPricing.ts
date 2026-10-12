@@ -1,10 +1,18 @@
 import { amountToCents, centsToAmount, rateToBasisPoints } from './money.ts'
 
+export function hasUserPriceForSku(product: any, skuId: unknown): boolean {
+  const id = Number(skuId || 0)
+  const sku = Array.isArray(product?.skus) ? product.skus.find((row: any) => Number(row?.id) === id) : null
+  const price = amountToCents(id > 0 ? sku?.user_price_amount : product?.user_price_amount)
+  return price !== null && price > 0
+}
+
 // Same precedence and rounding as the order service: SKU, product, level rate.
 export function resolveMemberPriceAmount(
   product: any, skuId: unknown, basePrice: unknown,
   memberLevelId: unknown, discountRate?: unknown,
 ): string | null {
+  if (hasUserPriceForSku(product, skuId)) return null
   const base = amountToCents(basePrice)
   const levelId = Number(memberLevelId || 0)
   if (base === null || base <= 0 || !Number.isSafeInteger(levelId) || levelId <= 0) return null

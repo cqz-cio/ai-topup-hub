@@ -51,6 +51,7 @@ type MemberLevelPricing interface {
 	GetUserLevel(userID uint) (*memberleveldomain.MemberLevel, error)
 	GetLevelPricesByProduct(productID uint) ([]memberleveldomain.MemberLevelPrice, error)
 	ResolveMemberPrice(levelID, productID, skuID uint, basePrice decimal.Decimal) (decimal.Decimal, decimal.Decimal)
+	GetUserPrices(userID uint) ([]memberleveldomain.UserPrice, error)
 }
 
 // LocalProductMappingReader 按本地商品 ID 读取上游映射。
@@ -149,6 +150,10 @@ func (h *PublicHandler) GetProducts(c *gin.Context) {
 	}
 
 	decorated := make([]productpresenter.Product, 0, len(products))
+	userPrices, ok := h.userPricesForRequest(c)
+	if !ok {
+		return
+	}
 	for i := range products {
 		item, derr := h.decoratePublicProductForTenant(&products[i], h.promotions, tenant, resellerBatch, level)
 		if derr != nil {
@@ -158,6 +163,7 @@ func (h *PublicHandler) GetProducts(c *gin.Context) {
 			ginutil.RespondError(c, response.CodeInternal, "error.product_fetch_failed", derr)
 			return
 		}
+		applyUserProductPrices(&item, userPrices, resolvePublicDisplaySKUID(&products[i]))
 		decorated = append(decorated, item)
 	}
 
@@ -216,6 +222,11 @@ func (h *PublicHandler) GetProductBySlug(c *gin.Context) {
 		return
 	}
 
+	userPrices, ok := h.userPricesForRequest(c)
+	if !ok {
+		return
+	}
+	applyUserProductPrices(&decorated, userPrices, resolvePublicDisplaySKUID(product))
 	if posts, relatedErr := h.loadRelatedPostCards(c.Request.Context(), product.ID); relatedErr == nil {
 		decorated.RelatedPosts = posts
 	}

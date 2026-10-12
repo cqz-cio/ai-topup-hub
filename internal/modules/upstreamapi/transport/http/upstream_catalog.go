@@ -135,7 +135,12 @@ func (h *Handler) ListProducts(c *gin.Context) {
 
 	items := make([]upstreamProduct, 0, len(products))
 	for _, p := range products {
-		items = append(items, h.toUpstreamProductWithMemberPrice(p, memberLevelID, fulfillmentTypeMap))
+		item, err := h.toUpstreamProductWithUserPrice(p, memberLevelID, fulfillmentTypeMap, userID)
+		if err != nil {
+			errorResponse(c, http.StatusInternalServerError, "internal_error", "failed to resolve product price")
+			return
+		}
+		items = append(items, item)
 	}
 
 	successResponse(c, gin.H{
@@ -193,10 +198,12 @@ func (h *Handler) GetProduct(c *gin.Context) {
 	// 解析映射商品的真实交付类型
 	fulfillmentTypeMap := h.resolveEffectiveFulfillmentTypes(products)
 
-	successResponse(c, gin.H{
-		"ok":      true,
-		"product": h.toUpstreamProductWithMemberPrice(products[0], memberLevelID, fulfillmentTypeMap),
-	})
+	item, err := h.toUpstreamProductWithUserPrice(products[0], memberLevelID, fulfillmentTypeMap, userID)
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, "internal_error", "failed to resolve product price")
+		return
+	}
+	successResponse(c, gin.H{"ok": true, "product": item})
 }
 
 // applyUpstreamStockToProducts 为 upstream 类型商品的 SKU 填充上游库存数据
@@ -245,6 +252,32 @@ func (h *Handler) resolveEffectiveFulfillmentTypes(products []productdomain.Prod
 		result[m.LocalProductID] = ft
 	}
 	return result
+}
+
+func (h *Handler) toUpstreamProductWithUserPrice(p productdomain.Product, memberLevelID uint, fulfillmentTypeMap map[uint]string, userID uint) (upstreamProduct, error) {
+	result := h.toUpstreamProductWithMemberPrice(p, memberLevelID, fulfillmentTypeMap)
+	if userID == 0 || h.MemberLevels == nil {
+		return result, nil
+	}
+	for i := range result.SKUs {
+		price, err := h.MemberLevels.ResolveUserPrice(userID, p.ID, result.SKUs[i].ID)
+		if err != nil {
+			return upstreamProduct{}, err
+		}
+		if price == nil {
+			continue
+		}
+		result.SKUs[i].PriceAmount = price.StringFixed(2)
+		result.SKUs[i].MemberPrice = ""
+		result.SKUs[i].OriginalPrice = ""
+		result.WholesalePrices = nil
+		if i == 0 {
+			result.PriceAmount = price.StringFixed(2)
+			result.MemberPrice = ""
+			result.OriginalPrice = ""
+		}
+	}
+	return result, nil
 }
 
 func (h *Handler) toUpstreamProductWithMemberPrice(p productdomain.Product, memberLevelID uint, fulfillmentTypeMap map[uint]string) upstreamProduct {

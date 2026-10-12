@@ -10,9 +10,10 @@ import (
 
 // Service 会员等级服务
 type Service struct {
-	levelRepo memberlevelcontract.LevelRepository
-	priceRepo memberlevelcontract.PriceRepository
-	userRepo  memberlevelcontract.UserRepository
+	levelRepo     memberlevelcontract.LevelRepository
+	priceRepo     memberlevelcontract.PriceRepository
+	userRepo      memberlevelcontract.UserRepository
+	userPriceRepo memberlevelcontract.UserPriceRepository
 }
 
 // NewService 创建会员等级服务
@@ -20,12 +21,17 @@ func NewService(
 	levelRepo memberlevelcontract.LevelRepository,
 	priceRepo memberlevelcontract.PriceRepository,
 	userRepo memberlevelcontract.UserRepository,
+	userPrices ...memberlevelcontract.UserPriceRepository,
 ) *Service {
-	return &Service{
+	service := &Service{
 		levelRepo: levelRepo,
 		priceRepo: priceRepo,
 		userRepo:  userRepo,
 	}
+	if len(userPrices) > 0 {
+		service.userPriceRepo = userPrices[0]
+	}
+	return service
 }
 
 // --- 等级 CRUD ---

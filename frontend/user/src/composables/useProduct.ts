@@ -2,7 +2,7 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAppStore } from '../stores/app'
 import { amountToCents, centsToAmount } from '../utils/money'
-import { resolveMemberPriceAmount } from '../utils/memberPricing'
+import { hasUserPriceForSku, resolveMemberPriceAmount } from '../utils/memberPricing'
 
 export function useLocalized() {
   const appStore = useAppStore()
@@ -116,7 +116,7 @@ export function useProductLabels() {
     return centsToAmount(original - promotion)
   }
 
-  const hasPromotionRules = (product: any) => product?.promotion_rules?.length > 0
+  const hasPromotionRules = (product: any) => !hasUserPriceForSku(product, 0) && product?.promotion_rules?.length > 0
   const getPromotionRules = (product: any): any[] => product?.promotion_rules ?? []
 
   const normalizeText = (value: unknown) => String(value ?? '').trim()
@@ -143,6 +143,7 @@ export function useProductLabels() {
     return tiers.some((tier) => !isUniversalWholesaleTier(tier) && wholesaleTierMatchesSku(tier, skuId, skuCode))
   }
   const getWholesalePrices = (product: any, skuId?: any, skuCode?: any): any[] => {
+    if (hasUserPriceForSku(product, skuId)) return []
     const tiers = allWholesalePrices(product)
     const hasSku = normalizeSkuId(skuId) > 0 || normalizeText(skuCode) !== ''
     if (!hasSku) return tiers
@@ -156,6 +157,7 @@ export function useProductLabels() {
   const hasWholesalePrices = (product: any) => getWholesalePrices(product).length > 0
 
   const resolveWholesalePriceAmount = (product: any, basePrice: any, matchQuantity: number, skuId?: any, skuCode?: any, lineQuantity?: number) => {
+    if (hasUserPriceForSku(product, skuId)) return null
     const base = parsePriceAmount(basePrice)
     if (base === null || !Number.isFinite(matchQuantity) || matchQuantity <= 0) return null
     const hasSku = normalizeSkuId(skuId) > 0 || normalizeText(skuCode) !== ''

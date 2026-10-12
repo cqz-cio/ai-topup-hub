@@ -2,6 +2,7 @@ package upstreamhttp
 
 import (
 	"errors"
+	"github.com/dujiao-next/internal/shared/money"
 	"net/http"
 	"time"
 
@@ -104,6 +105,7 @@ type SKUMappingRepository interface {
 
 type MemberLevelService interface {
 	ResolveMemberPrice(levelID, productID, skuID uint, basePrice decimal.Decimal) (decimal.Decimal, decimal.Decimal)
+	ResolveUserPrice(userID, productID, skuID uint) (*money.Amount, error)
 	GetByID(id uint) (*memberleveldomain.MemberLevel, error)
 }
 

@@ -117,13 +117,23 @@ func (s *OrderService) buildOrderResult(input orderCreateParams) (*orderBuildRes
 
 		productCurrency := currency
 		basePrice := sku.PriceAmount.Decimal.Round(2)
+		var userPrice *money.Amount
+		if !resellerOrder && !input.IsGuest && input.UserID > 0 && s.memberLevelService != nil {
+			userPrice, err = s.memberLevelService.ResolveUserPrice(input.UserID, product.ID, sku.ID)
+			if err != nil {
+				return nil, err
+			}
+			if userPrice != nil {
+				basePrice = userPrice.Decimal.Round(2)
+			}
+		}
 
 		// 1. 计算活动价
 		priceCarrier := *product
 		priceCarrier.PriceAmount = sku.PriceAmount
 		var promotion *promotiondomain.Promotion
 		promoUnitPriceAmount := basePrice
-		if promotionService != nil {
+		if promotionService != nil && userPrice == nil {
 			var promoUnitPrice money.Amount
 			promotion, promoUnitPrice, err = promotionService.ApplyPromotion(&priceCarrier, item.Quantity)
 			if err != nil {
@@ -148,7 +158,7 @@ func (s *OrderService) buildOrderResult(input orderCreateParams) (*orderBuildRes
 		var wholesaleUnitPrice decimal.Decimal
 		wholesaleDiscount := decimal.Zero
 		wholesaleMatched := false
-		if !resellerOrder {
+		if !resellerOrder && userPrice == nil {
 			wholesaleUnitPrice, wholesaleDiscount, wholesaleMatched = productdomain.ResolveWholesaleUnitPriceForSKU(product, basePrice, sku.ID, sku.SKUCode, wholesaleMatchQuantity, item.Quantity)
 		}
 		if wholesaleMatched && wholesaleUnitPrice.LessThan(unitPriceAmount) {
@@ -165,7 +175,7 @@ func (s *OrderService) buildOrderResult(input orderCreateParams) (*orderBuildRes
 
 		// 3. 在已命中的商品级优惠单价基础上应用会员价。
 		itemMemberDiscount := decimal.Zero
-		if !resellerOrder && userMemberLevelID > 0 && s.memberLevelService != nil {
+		if !resellerOrder && userPrice == nil && userMemberLevelID > 0 && s.memberLevelService != nil {
 			memberUnitPrice, _ := s.memberLevelService.ResolveMemberPrice(userMemberLevelID, product.ID, sku.ID, unitPriceAmount)
 			if memberUnitPrice.LessThan(unitPriceAmount) {
 				itemMemberDiscount = unitPriceAmount.Sub(memberUnitPrice).

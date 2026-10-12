@@ -158,11 +158,13 @@ func (h *Handler) GetProducts(c *gin.Context) {
 
 	// 可选：通过 channel_user_id 获取用户会员等级
 	var memberLevelID uint
+	var userID uint
 	if cuid := channelUserIDFromQuery(c); cuid != "" {
 		user, _, err := h.UserAuthService.ResolveTelegramChannelIdentity(TelegramIdentityInput{
 			ChannelUserID: cuid,
 		})
 		if err == nil && user != nil {
+			userID = user.ID
 			memberLevelID = user.MemberLevelID
 		}
 	}
@@ -232,6 +234,25 @@ func (h *Handler) GetProducts(c *gin.Context) {
 			}
 		}
 
+		if userID > 0 && h.MemberLevelService != nil {
+			var displaySKUID uint
+			for _, sku := range p.SKUs {
+				if sku.IsActive {
+					displaySKUID = sku.ID
+					break
+				}
+			}
+			price, err := h.MemberLevelService.ResolveUserPrice(userID, p.ID, displaySKUID)
+			if err != nil {
+				respondChannelError(c, 500, 500, "internal_error", "error.internal_error", err)
+				return
+			}
+			if price != nil {
+				item.PriceFrom = price.StringFixed(2)
+				item.MemberPriceFrom = ""
+				item.WholesalePrices = nil
+			}
+		}
 		items = append(items, item)
 	}
 
@@ -292,11 +313,13 @@ func (h *Handler) GetProductDetail(c *gin.Context) {
 
 	// 可选：通过 channel_user_id 获取用户会员等级
 	var memberLevelID uint
+	var userID uint
 	if cuid := channelUserIDFromQuery(c); cuid != "" {
 		user, _, err := h.UserAuthService.ResolveTelegramChannelIdentity(TelegramIdentityInput{
 			ChannelUserID: cuid,
 		})
 		if err == nil && user != nil {
+			userID = user.ID
 			memberLevelID = user.MemberLevelID
 		}
 	}
@@ -344,6 +367,17 @@ func (h *Handler) GetProductDetail(c *gin.Context) {
 				si.MemberPrice = money.FromDecimal(memberPrice).String()
 			}
 		}
+		if userID > 0 && h.MemberLevelService != nil {
+			price, err := h.MemberLevelService.ResolveUserPrice(userID, product.ID, sku.ID)
+			if err != nil {
+				respondChannelError(c, 500, 500, "internal_error", "error.internal_error", err)
+				return
+			}
+			if price != nil {
+				si.Price = price.StringFixed(2)
+				si.MemberPrice = ""
+			}
+		}
 		skus = append(skus, si)
 	}
 
@@ -356,6 +390,27 @@ func (h *Handler) GetProductDetail(c *gin.Context) {
 		}
 	}
 
+	priceFrom := product.PriceAmount.String()
+	wholesalePrices := normalizeChannelWholesalePrices(product.WholesalePrices)
+	if userID > 0 && h.MemberLevelService != nil {
+		var displaySKUID uint
+		for _, sku := range product.SKUs {
+			if sku.IsActive {
+				displaySKUID = sku.ID
+				break
+			}
+		}
+		price, err := h.MemberLevelService.ResolveUserPrice(userID, product.ID, displaySKUID)
+		if err != nil {
+			respondChannelError(c, 500, 500, "internal_error", "error.internal_error", err)
+			return
+		}
+		if price != nil {
+			priceFrom = price.StringFixed(2)
+			memberPriceFrom = ""
+			wholesalePrices = nil
+		}
+	}
 	stockCount := domaincatalog.StockQuantity(effectiveFT, product.AutoStockAvailable, product.ManualStockTotal)
 	stockStatus := domaincatalog.StorefrontStockPolicy().Status(stockCount)
 	stockDisplay := domaincatalog.StorefrontStockPolicy().Display(product.StockDisplayMode, stockStatus, stockCount)
@@ -364,9 +419,9 @@ func (h *Handler) GetProductDetail(c *gin.Context) {
 		"title":                 title,
 		"description":           description,
 		"image_url":             imageURL,
-		"price_from":            product.PriceAmount.String(),
+		"price_from":            priceFrom,
 		"member_price_from":     memberPriceFrom,
-		"wholesale_prices":      normalizeChannelWholesalePrices(product.WholesalePrices),
+		"wholesale_prices":      wholesalePrices,
 		"currency":              currency,
 		"stock_status":          stockStatus,
 		"stock_count":           stockCount,

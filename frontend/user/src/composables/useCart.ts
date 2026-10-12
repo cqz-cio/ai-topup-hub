@@ -37,6 +37,9 @@ export function useCart() {
     return totals
   })
   const itemUnitPriceAmount = (item: CartItem) => {
+    const personal = userAuthStore.isAuthenticated && item.pricingUserId === Number(userAuthStore.user?.id || 0)
+      ? amountToCents(item.userPriceAmount) : null
+    if (personal !== null && personal > 0) return centsToAmount(personal)
     const base = amountToCents(item.priceAmount)
     if (base === null) return item.priceAmount
     const promotion = amountToCents(item.promotionPriceAmount)

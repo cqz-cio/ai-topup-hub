@@ -23,6 +23,7 @@ export interface CartItem {
     title: any
     priceAmount: string
     displayPriceAmount?: string
+    userPriceAmount?: string
     promotionPriceAmount?: string
     pricingUserId?: number
     memberLevelId?: number
@@ -167,6 +168,7 @@ export const useCartStore = defineStore('cart', () => {
             existing.title = normalizedItem.title
             existing.priceAmount = normalizedItem.priceAmount
             existing.displayPriceAmount = normalizedItem.displayPriceAmount
+            existing.userPriceAmount = normalizedItem.userPriceAmount
             existing.promotionPriceAmount = normalizedItem.promotionPriceAmount
             existing.pricingUserId = normalizedItem.pricingUserId
             existing.memberLevelId = normalizedItem.memberLevelId

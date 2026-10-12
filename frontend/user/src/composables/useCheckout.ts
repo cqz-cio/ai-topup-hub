@@ -993,6 +993,9 @@ export function useCheckout() {
 
   function cartItemPricingSubtotalCents(item: CartItem) {
     const qty = parseInteger(item.quantity)
+    const personal = userAuthStore.isAuthenticated && item.pricingUserId === Number(userAuthStore.user?.id || 0)
+      ? amountToCents(item.userPriceAmount) : null
+    if (qty !== null && qty > 0 && personal !== null && personal > 0) return personal * qty
     const base = amountToCents(item.priceAmount)
     if (qty === null || qty <= 0 || base === null) {
       return null

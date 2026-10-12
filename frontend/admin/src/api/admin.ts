@@ -425,6 +425,8 @@ export const adminAPI = {
   getUsers: (params?: Record<string, unknown>) => api.get('/admin/users', { params }),
   getUserLoginLogs: (params?: Record<string, unknown>) => api.get('/admin/user-login-logs', { params }),
   getUser: (id: number) => api.get(`/admin/users/${id}`),
+  getUserPrices: (id: number) => api.get(`/admin/users/${id}/prices`),
+  setUserPrices: (id: number, data: { prices: Array<{ product_id: number; sku_id: number; price_amount: string }> }) => api.put(`/admin/users/${id}/prices`, data),
   getUserWallet: (id: number) => api.get(`/admin/users/${id}/wallet`),
   getUserWalletTransactions: (id: number, params?: Record<string, unknown>) =>
     api.get(`/admin/users/${id}/wallet/transactions`, { params }),

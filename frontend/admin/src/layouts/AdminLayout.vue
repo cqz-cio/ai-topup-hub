@@ -745,7 +745,7 @@ onBeforeUnmount(() => {
     <div class="flex min-h-screen">
       <!-- Desktop sidebar -->
       <aside
-        class="hidden md:flex border-r border-border bg-card flex-col sticky top-0 h-screen overflow-y-auto transition-all duration-300"
+        class="hidden shrink-0 md:flex border-r border-border bg-card flex-col sticky top-0 h-screen overflow-y-auto transition-all duration-300"
         :class="sidebarCollapsed ? 'w-16' : 'w-64'"
       >
         <div class="py-6" :class="sidebarCollapsed ? 'px-2' : 'px-6'">
@@ -950,7 +950,7 @@ onBeforeUnmount(() => {
             </Button>
             <div class="text-sm text-muted-foreground hidden sm:block">{{ t('admin.layout.workspace') }}</div>
           </div>
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-1 sm:gap-2">
             <Select
               :model-value="locale"
               @update:modelValue="(value) => { if (value) applyLocale(String(value)) }"

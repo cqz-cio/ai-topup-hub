@@ -98,6 +98,7 @@ func AutoMigrate() error {
 		&broadcastdomain.Broadcast{},
 		&memberleveldomain.MemberLevel{},
 		&memberleveldomain.MemberLevelPrice{},
+		&memberleveldomain.UserPrice{},
 		&contentdomain.Media{},
 	); err != nil {
 		return err

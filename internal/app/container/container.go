@@ -132,6 +132,7 @@ type Container struct {
 	TelegramBroadcastRepo  broadcastcontract.Store
 	MemberLevelRepo        memberlevelcontract.LevelRepository
 	MemberLevelPriceRepo   *memberlevelgormstore.PriceStore
+	UserPriceRepo          *memberlevelgormstore.UserPriceStore
 	MemberLevelUserRepo    memberlevelcontract.UserRepository
 
 	// Services

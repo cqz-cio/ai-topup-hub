@@ -179,6 +179,7 @@ type IdentityService interface {
 
 type MemberLevelService interface {
 	ResolveMemberPrice(levelID, productID, skuID uint, basePrice decimal.Decimal) (decimal.Decimal, decimal.Decimal)
+	ResolveUserPrice(userID, productID, skuID uint) (*money.Amount, error)
 }
 
 type Settings interface {

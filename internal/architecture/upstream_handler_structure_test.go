@@ -22,6 +22,7 @@ func TestUpstreamHandlerImplementationIsSplitByResource(t *testing.T) {
 		"upstream_catalog.go": {
 			"ListCategories", "ListProducts", "GetProduct", "applyUpstreamStockToProducts",
 			"resolveEffectiveFulfillmentTypes", "toUpstreamProductWithMemberPrice", "computeSKUStock",
+			"toUpstreamProductWithUserPrice",
 		},
 		"upstream_order.go":    {"CreateOrder", "GetOrder", "CancelOrder", "mapOrderErrorToResponse"},
 		"upstream_callback.go": {"HandleCallback", "Read", "mapCallbackStatus", "validateCallbackURL"},

@@ -36,6 +36,13 @@ type PriceRepository interface {
 	DeleteByProduct(productID uint) error
 }
 
+type UserPriceRepository interface {
+	ListByUser(userID uint) ([]memberleveldomain.UserPrice, error)
+	// Read SKU override and product fallback in the same database snapshot.
+	GetByUserProductSKU(userID, productID, skuID uint) (*memberleveldomain.UserPrice, error)
+	ReplaceByUser(userID uint, prices []memberleveldomain.UserPrice) error
+}
+
 // UserRepository is the member-level consumer's minimal user persistence port.
 type UserRepository interface {
 	GetByID(id uint) (*userdomain.User, error)

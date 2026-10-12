@@ -23,6 +23,8 @@ type Product struct {
 	Content              jsonmap.JSON      `json:"content"`
 	PriceAmount          money.Amount      `json:"price_amount"`
 	EffectivePriceAmount *money.Amount     `json:"effective_price_amount,omitempty"`
+	UserPriceAmount      *money.Amount     `json:"user_price_amount,omitempty"`
+	RetailPriceAmount    *money.Amount     `json:"retail_price_amount,omitempty"`
 	PricingMemberLevelID uint              `json:"pricing_member_level_id"`
 	MemberDiscountRate   money.Amount      `json:"member_discount_rate"`
 	WholesalePrices      []WholesalePrice  `json:"wholesale_prices,omitempty"`
@@ -119,6 +121,8 @@ type SKU struct {
 	PromotionPriceAmount *money.Amount `json:"promotion_price_amount,omitempty"`
 	MemberPriceAmount    *money.Amount `json:"member_price_amount,omitempty"`
 	EffectivePriceAmount *money.Amount `json:"effective_price_amount,omitempty"`
+	UserPriceAmount      *money.Amount `json:"user_price_amount,omitempty"`
+	RetailPriceAmount    *money.Amount `json:"retail_price_amount,omitempty"`
 }
 
 // PromotionRule 是公开促销规则响应。

@@ -7,6 +7,7 @@ import { resolveCatalogSkuPrice } from './memberPricing.ts'
 export const resolveCartPricingSnapshot = (product: any, sku: any, userId = 0): Partial<CartItem> => {
   const patch: Partial<CartItem> = {
     displayPriceAmount: resolveCatalogSkuPrice(product, sku) ?? undefined,
+    userPriceAmount: userId > 0 && sku?.user_price_amount != null ? String(sku.user_price_amount) : undefined,
     promotionPriceAmount: sku?.promotion_price_amount == null ? undefined : String(sku.promotion_price_amount),
     pricingUserId: userId,
     memberLevelId: Number(product?.pricing_member_level_id || 0),
@@ -17,7 +18,7 @@ export const resolveCartPricingSnapshot = (product: any, sku: any, userId = 0): 
       : undefined,
   }
 
-  const priceCents = amountToCents(sku?.price_amount)
+  const priceCents = amountToCents(sku?.retail_price_amount ?? sku?.price_amount)
   if (priceCents !== null && priceCents > 0) {
     patch.priceAmount = centsToAmount(priceCents)
   }

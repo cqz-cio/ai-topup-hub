@@ -18,6 +18,7 @@ func TestMemberLevelImplementationLivesInBoundedContextDirectories(t *testing.T)
 
 	assertFileDeclaresTypes(t, filepath.Join(domainRoot, "level.go"), []string{"MemberLevel"})
 	assertFileDeclaresTypes(t, filepath.Join(domainRoot, "price.go"), []string{"MemberLevelPrice"})
+	assertFileDeclaresTypes(t, filepath.Join(domainRoot, "user_price.go"), []string{"UserPrice"})
 	assertFileDeclaresTypes(t, filepath.Join(contractRoot, "repository.go"), []string{
 		"ListFilter", "LevelRepository", "PriceRepository", "UserRepository",
 	})
@@ -29,6 +30,7 @@ func TestMemberLevelImplementationLivesInBoundedContextDirectories(t *testing.T)
 	assertFileDeclaresTypes(t, filepath.Join(storeRoot, "level_store.go"), []string{"LevelStore"})
 	assertFileDeclaresTypes(t, filepath.Join(storeRoot, "price_store.go"), []string{"PriceStore"})
 	assertFileDeclaresTypes(t, filepath.Join(storeRoot, "user_store.go"), []string{"UserStore"})
+	assertFileDeclaresTypes(t, filepath.Join(storeRoot, "user_price_store.go"), []string{"UserPriceStore"})
 	assertFileDeclaresFunctions(t, filepath.Join(transportRoot, "routes.go"), []string{
 		"RegisterAdminRoutes", "RegisterPublicRoutes", "RegisterChannelRoutes",
 	})
@@ -43,10 +45,10 @@ func TestMemberLevelImplementationLivesInBoundedContextDirectories(t *testing.T)
 	assertDirectoryGoFileBudget(t, domainRoot, 3)
 	assertDirectoryGoFileBudget(t, contractRoot, 3)
 	assertDirectoryGoFileBudget(t, applicationRoot, 2)
-	assertDirectoryGoFileBudget(t, storeRoot, 5)
+	assertDirectoryGoFileBudget(t, storeRoot, 6)
 	assertDirectoryGoFileBudget(t, transportRoot, 5)
 	assertDirectoryGoFileBudget(t, presenterRoot, 2)
-	assertDirectoryGoFileBudget(t, integrationTestRoot, 2)
+	assertDirectoryGoFileBudget(t, integrationTestRoot, 3)
 }
 
 func TestMemberLevelLegacyFlatFilesStayRemoved(t *testing.T) {

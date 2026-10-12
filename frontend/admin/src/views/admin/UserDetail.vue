@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n'
 import { adminAPI, type AdminWalletAccount, type AdminWalletTransaction } from '@/api/admin'
 import type { AdminUser, AdminOrder, AdminPayment, AdminMemberLevel, AdminUserOAuthIdentity } from '@/api/types'
 import IdCell from '@/components/IdCell.vue'
+import UserPricePanel from './components/UserPricePanel.vue'
 import { BadgeCheck, Copy, BadgeAlert } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
@@ -49,8 +50,9 @@ interface UserDetailCouponUsage {
 const user = ref<(AdminUser & Record<string, unknown>) | null>(null)
 const userError = ref('')
 
-const activeTab = ref<'orders' | 'payments' | 'coupons' | 'wallet'>('orders')
-const tabs = computed<Array<{ key: 'orders' | 'payments' | 'coupons' | 'wallet'; label: string }>>(() => [
+const activeTab = ref<'prices' | 'orders' | 'payments' | 'coupons' | 'wallet'>('orders')
+const tabs = computed<Array<{ key: 'prices' | 'orders' | 'payments' | 'coupons' | 'wallet'; label: string }>>(() => [
+  { key: 'prices', label: t('admin.userPrices.title') },
   { key: 'orders', label: t('admin.userDetail.tabs.orders') },
   { key: 'payments', label: t('admin.userDetail.tabs.payments') },
   { key: 'coupons', label: t('admin.userDetail.tabs.coupons') },
@@ -274,7 +276,7 @@ const changeWalletPageSize = (size: number) => {
   fetchWalletTransactions(1)
 }
 
-const changeTab = (tab: 'orders' | 'payments' | 'coupons' | 'wallet') => {
+const changeTab = (tab: 'prices' | 'orders' | 'payments' | 'coupons' | 'wallet') => {
   activeTab.value = tab
   if (tab === 'orders') {
     fetchOrders(ordersPagination.value.page)
@@ -282,7 +284,7 @@ const changeTab = (tab: 'orders' | 'payments' | 'coupons' | 'wallet') => {
     fetchPayments(paymentsPagination.value.page)
   } else if (tab === 'coupons') {
     fetchCoupons(couponsPagination.value.page)
-  } else {
+  } else if (tab === 'wallet') {
     walletError.value = ''
     walletSuccess.value = ''
     void loadWalletData(walletPagination.value.page)
@@ -491,6 +493,7 @@ watch(
         <h1 class="text-2xl font-semibold">{{ t('admin.userDetail.title') }}</h1>
       </div>
       <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <Button size="sm" class="w-full sm:w-auto" @click="changeTab('prices')">{{ t('admin.userPrices.action') }}</Button>
         <Button as-child size="sm" variant="outline" class="w-full sm:w-auto">
           <router-link :to="orderListLink">{{ t('admin.userDetail.actions.orders') }}</router-link>
         </Button>
@@ -714,6 +717,8 @@ watch(
         {{ tab.label }}
       </button>
     </div>
+
+    <UserPricePanel v-if="activeTab === 'prices'" :key="userId" :user-id="userId" :site-currency="siteCurrency" />
 
     <div v-if="activeTab === 'orders'" class="rounded-xl border border-border bg-card overflow-x-auto">
       <Table class="min-w-[720px]">
