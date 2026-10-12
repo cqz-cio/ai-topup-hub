@@ -25,7 +25,7 @@ class RedemptionGuideTest(unittest.TestCase):
             db.execute("CREATE TABLE orders (id INTEGER PRIMARY KEY, status TEXT, payload TEXT)")
             db.execute("INSERT INTO orders VALUES (1, 'pending_payment', 'SIMULATED-ONLY')")
             for product in self.products:
-                body = json.dumps({"zh-CN": product["content_html"], "en-US": "Existing product-specific terms"}, ensure_ascii=False)
+                body = json.dumps({"zh-CN": product["content_html"], "en-US": "Existing product-specific terms"}, ensure_ascii=False).encode("utf-8")
                 price = "1160.00" if product["id"] == 55 else str(product["price"])
                 db.execute("INSERT INTO products VALUES (?, ?, ?, ?, ?, 17, NULL)", (product["id"], f"qzweb-{product['id']}", body, body, price))
 
@@ -51,6 +51,10 @@ class RedemptionGuideTest(unittest.TestCase):
         self.assertEqual(self.snapshot(report["backup"]), before)
         after = self.snapshot()
         self.assertEqual(after["orders"], before["orders"])
+        with closing(sqlite3.connect(self.database)) as db:
+            storage = db.execute("SELECT slug, typeof(content_json), typeof(instructions_json) FROM products").fetchall()
+        for slug, content_type, instruction_type in storage:
+            self.assertEqual((content_type, instruction_type), ("blob", "blob"), slug)
         for old, new in zip(before["products"], after["products"]):
             self.assertEqual(new[:2], old[:2])
             self.assertEqual(new[4:], old[4:])
@@ -78,6 +82,17 @@ class RedemptionGuideTest(unittest.TestCase):
         self.assertEqual(report["changed_count"], 0)
         self.assertIsNone(report["backup"])
         self.assertEqual(self.snapshot(), before)
+
+    def test_repairs_text_json_so_go_scanner_can_read_it(self):
+        apply_to_database(self.database, self.guide, apply=True, backup_dir=self.backups)
+        with closing(sqlite3.connect(self.database)) as db, db:
+            db.execute("UPDATE products SET content_json = CAST(content_json AS TEXT), instructions_json = CAST(instructions_json AS TEXT) WHERE slug = 'qzweb-62'")
+        report = apply_to_database(self.database, self.guide, apply=True, backup_dir=self.backups)
+        self.assertEqual(report["product_slugs"], ["qzweb-62"])
+        with closing(sqlite3.connect(self.database)) as db:
+            row = db.execute("SELECT typeof(content_json), typeof(instructions_json), instructions_json FROM products WHERE slug = 'qzweb-62'").fetchone()
+        self.assertEqual(row[:2], ("blob", "blob"))
+        self.assertIn("https://cdkai.kdns.fr/", json.loads(row[2])["zh-CN"])
 
     def test_missing_product_stops_before_any_write(self):
         with closing(sqlite3.connect(self.database)) as db, db:

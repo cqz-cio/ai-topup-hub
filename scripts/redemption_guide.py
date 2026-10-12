@@ -84,8 +84,15 @@ def plan_updates(connection, guide):
         content = json.loads(raw_content or "{}")
         instructions = json.loads(raw_instructions or "{}")
         next_content, next_instructions = catalog_fields(slug, content, instructions, guide)
-        if content != next_content or instructions != next_instructions:
-            updates.append((product_id, slug, json.dumps(next_content, ensure_ascii=False), json.dumps(next_instructions, ensure_ascii=False)))
+        # jsonmap.JSON.Value() writes []byte and the current Go scanner only
+        # accepts []byte. SQLite TEXT would silently hide the JSON in the app.
+        if (content != next_content or instructions != next_instructions
+                or not isinstance(raw_content, bytes) or not isinstance(raw_instructions, bytes)):
+            updates.append((
+                product_id, slug,
+                json.dumps(next_content, ensure_ascii=False).encode("utf-8"),
+                json.dumps(next_instructions, ensure_ascii=False).encode("utf-8"),
+            ))
     return updates
 
 
