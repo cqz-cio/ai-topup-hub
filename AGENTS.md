@@ -12,15 +12,23 @@
 - 公网 IPv4：`43.134.141.10`。
 - 登录账号：`ubuntu`。
 - 配置：2 核 CPU、4 GB 内存、60 GB 系统盘。
-- 信息来源：用户确认、腾讯云控制台截图及 SSH 实测。当前公网入口 `http://43.134.141.10/`，端口 80；后台入口 `/zxa-management/`。尚未绑定商城域名或配置 HTTPS。
-- 部署目录 `/srv/zhixiang`，`current` 指向 `releases/20261012-013649`，持久化目录 `shared`。服务 `zhixiang-shop.service` 使用系统账号 `zhixiang`，以 `-mode storefront` 运行，开机自启。
+- 信息来源：用户确认、腾讯云控制台截图及 SSH 实测。当前正式商城 `https://www.qzweb.cloud/` 和后台 `https://124.220.2.69:18888/login` 为上海前端；新加坡保留订单、支付与采购后端，旧 `http://43.134.141.10/` 入口用于兼容。后续使用正式 HTTPS 商城入口验证页面，具体维护说明见 `remote-latest/ops/tencent/README.md`。
+- 新加坡部署目录 `/srv/zhixiang`，当前后端 `current` 指向 `releases/20261012-153531`，持久化目录 `shared`。服务 `zhixiang-shop.service` 使用系统账号 `zhixiang`，以 `-mode storefront` 运行，开机自启。上海前端 `/srv/zhixiang-front/current` 指向 `releases/20261012-205131`；商城源码 `6d8c1e94105d483e8a55b2318808c6c24a12877a`，后台仍沿用 `948c37f`。
 - 当前运行商城 HTTP、BSC 收款监听、订单维护及自动采购发卡队列，服务环境 `UPSTREAM_PURCHASE_ENABLED=true`。只在确认客户付款后创建采购单；不启动自动充值、不注册库存轮询或采购对账任务。库存仍由独立的 `zhixiang-stock-sync.timer` 每 300 秒只查询/同步，不能为库存同步启动额外完整 worker。实际扣款测试仍未获授权，当前商户 1039 余额 0.00 元，正常自动采购需先补足商户余额。
 
 ## 后续会话与登录凭据
 
 - 新会话在本项目中工作时，应沿用上述部署背景。用户更新服务器资料时，同步修改本文件。
 - 登录密码已按用户要求保存在本地文件 `deployment/local/tencent-cloud-server.credentials.json`，该文件由 `deployment/local/.gitignore` 排除，不提交到 Git。
-- 需要登录服务器时读取该凭据文件；不要将密码写入项目说明、源码、构建产物或 Git 提交，也不要在对话、命令输出和日志中回显密码。
+- 2026-10-12 用户进一步确认上海服务器 `124.220.2.69` 同样使用此前提供的 `ubuntu` 登录信息，明确要求保存并在后续直接复用。上海已验证的私有凭据为 `deployment/local/shanghai-front-server.credentials.json`，主机指纹为 `deployment/local/shanghai-front-known-hosts`；密码文件仅当前用户和 SYSTEM 可访问，全部由 Git 忽略。新加坡继续使用上述文件及 `deployment/local/tencent-cloud-known-hosts`。连接前核对目标，并使用对应保存的主机指纹拒绝未知或变化的主机密钥；不要重复询问已有且有效的登录信息。
+- 需要登录服务器时读取对应凭据文件；不要将密码写入项目说明、源码、构建产物或 Git 提交，也不要在对话、命令输出和日志中回显密码。
+
+## 商品详情封面完整显示（2026-10-12）
+
+- 用户截图中的详情主图仍使用 4:3 的 `object-cover`，导致 5:3 原图左右被裁切；`remote-latest/frontend/user/src/components/product/ProductImageGallery.vue` 已改为 5:3 的 `object-contain`，缩略图也改为完整显示。
+- 修复源码 `6d8c1e94105d483e8a55b2318808c6c24a12877a` 已合入并推送 `main`，先通过日常本地入口验证，再发布上海前端 `20261012-205131`。94 项前台测试、类型检查和生产构建通过，本机和公网各 30 项只读页面检查通过；覆盖 15 款实际商品封面和 1920、1280、1024、768、390、320px 六种宽度，无横向溢出或页面脚本错误。DEMO 既有图标不计入商品封面检查。
+- 此次仅更新商城静态资源，后台及旧哈希资源保留；新加坡后端、Redis、storefront 模式、支付与采购配置、库存定时器保持原状态。全部 16 款商品及 SKU 售价核对一致，`qzweb-55` 仍为 1160.00 元，两条 USDT 渠道正常；未上传本机数据库、重启后端或执行真实付款及采购测试。
+- 上海备份 `/srv/zhixiang-front/backups/before-detail-image-20261012-205131`；新加坡一致性备份 `/srv/zhixiang/backups/before-frontend-detail-20261012-205131`。私有发布包及报告位于 `deployment/local/detail-image-releases/20261012-205131/`、`detail-image-deployment.json`、`detail-image-live-verification.json`；截图与浏览器报告在 `remote-latest/work/codex-runtime/product-detail-image-qa/`，均由 Git 忽略。
 
 ## 访问检查（2026-10-11）
 
