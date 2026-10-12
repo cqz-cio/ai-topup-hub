@@ -40,5 +40,8 @@ No actionable P0/P1/P2 findings remain. No purchases or payments were submitted.
 - Existing admin frontend tests: 16 passed.
 - User frontend TypeScript check passed after preserving the still-used vault-specific component.
 - Desktop, mobile, light/dark, mouse/keyboard, fee display and disabled-state checks completed.
+- User/admin TypeScript checks, both Vite builds and the Linux fullstack compilation completed. The Windows PowerShell wrapper could not write its final hash manifest; the existing binary was independently checked for its ELF format, source commit, clean VCS state and embedded new component, then hashed and packaged without rebuilding.
+- Deployed release `20261012-134141`, source `b478c600dc6cda365289d4bbb76501987d16a377`. The production checkout was opened in the browser, both networks were selected in turn, and no console errors were reported. Final screenshot: `work/codex-runtime/payment-ui-qa/production-checkout.jpg`.
+- Deployment backup and database consistency check passed. Production configuration, role policies, prices and Redis were preserved; public storefront, admin entry and health endpoints returned 200. No production order, payment or purchase was submitted by this task.
 
 Final result: passed

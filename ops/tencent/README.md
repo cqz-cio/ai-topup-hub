@@ -4,22 +4,24 @@
 
 ## 已核验的运行基准
 
-2026-10-12 已备份并发布 **`20261012-114319`**，补齐财务角色的 Plasma 状态及转账查询权限，保留两条链收款与自动采购发卡流程。发布后已通过 SSH 与公网 GET 核验。
+2026-10-12 已备份并发布 **`20261012-134141`**，按已确认的设计统一 BEP20 与 Plasma 的付款选项：等宽纵向卡片、USDT 图标、网络说明及绿色选中态；结算页和付款页共用组件。发布后已通过 SSH 与公网 GET 核验。
 
 | 项目 | 核验结果 |
 | --- | --- |
-| 当前发布目录 | `/srv/zhixiang/current` → `/srv/zhixiang/releases/20261012-114319` |
-| 正在运行的程序 | 上述目录的 `zhixiang-shop`，90349730 字节 |
-| 程序 SHA-256 | `c27055bbba6ad4a4b93d7a7967d7c897a37603a2b6bf93da9dba2798ce1fcedc` |
+| 当前发布目录 | `/srv/zhixiang/current` → `/srv/zhixiang/releases/20261012-134141` |
+| 正在运行的程序 | 上述目录的 `zhixiang-shop`，90353826 字节 |
+| 程序 SHA-256 | `97c23731e1365caff84fdffec997aa5a1f21df35bf2acd87049b61586298d376` |
 | 发布清单 | `manifest.json` 的程序哈希与运行中程序一致 |
 | 编译信息 | Go 1.26.5，Linux amd64，CGO=0，`release,fullstack` |
 | 运行模式 | `storefront`，`UPSTREAM_PURCHASE_ENABLED=true` |
 | 服务状态 | 商城、专用 Redis、库存定时器均 active |
-| 构建源码 | `main` 的 `c84d444fe7efd6de3a33b30ef62d6a236f5e80fb`，`vcs.modified=false` |
-| 上一个发布 | `20261012-111003`，保留于服务器及升级前备份 |
+| 构建源码 | `main` 的 `b478c600dc6cda365289d4bbb76501987d16a377`，`vcs.modified=false` |
+| 上一个发布 | `20261012-114319`，保留于服务器及升级前备份 |
 | 收款渠道 | BEP20 与 Plasma 均启用，公网支付配置已显示两项 |
 
 完整证据见 [production-baseline.json](production-baseline.json)。本次发布清单与 Go 编译信息均记录完整 Git SHA，运行中程序哈希与本地发布包一致，前后台入口资源及品牌图片哈希核验通过。公网首页、后台、健康接口均为 200；6 个公开分类、原有售价和支付渠道保持不变。后续仅更新文档的提交不表示再次部署程序。库存为动态数据，本地快照不是实时生产库存。
+
+本次样式发布通过前台 94 项、后台 16 项现有测试、两套前端 TypeScript 检查及完整发布构建。已检查桌面、手机、深色模式、键盘切换、手续费和限额禁用状态，并在正式结算页核对两种网络。部署保留配置、角色权限、商品售价及持久化 Redis；未进行真实付款或采购。视觉记录见 [design-qa.md](../../design-qa.md)。
 
 ## 持久化数据与服务
 
@@ -31,8 +33,8 @@
 | 持久化 Redis | `shared/redis/`，回环地址端口 16379 |
 | 库存助手私有凭据 | `shared/stock-sync.credentials.json` |
 | 库存报告 | `shared/reports/merchant1039-stock-sync.json` |
-| 当前版本升级前备份 | `/srv/zhixiang/backups/before-20261012-114319`，数据库一致性检查通过，包含原配置与旧程序 |
-| 本次发布核验报告 | `shared/reports/finance-release-20261012-114319.json` |
+| 当前版本升级前备份 | `/srv/zhixiang/backups/before-20261012-134141`，数据库一致性检查通过，包含原配置与旧程序 |
+| 本次发布核验报告 | `shared/reports/payment-ui-release-20261012-134141.json` |
 
 `zhixiang-shop.service` 以 `zhixiang` 用户运行；`40-storefront.conf` 指定当前模式。支付监听、采购/交付 worker 与恢复任务由应用管理。`zhixiang-redis.service` 保存订单队列。`zhixiang-stock-sync.timer` 在每次任务完成后等待 300 秒，仅查询和刷新库存；不要另起重复助手或完整 worker 来同步库存。服务单元模板保存在本目录。
 

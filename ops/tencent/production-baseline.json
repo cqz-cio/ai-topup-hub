@@ -1,20 +1,20 @@
 {
-  "checked_at": "2026-10-12T03:49:23.404412+00:00",
+  "checked_at": "2026-10-12T05:45:38.041686+00:00",
   "production_url": "http://43.134.141.10",
-  "documented_release_id": "20261012-114319",
-  "verified_release_id": "20261012-114319",
-  "previous_release_id": "20261012-111003",
-  "source_commit": "c84d444fe7efd6de3a33b30ef62d6a236f5e80fb",
+  "documented_release_id": "20261012-134141",
+  "verified_release_id": "20261012-134141",
+  "previous_release_id": "20261012-114319",
+  "source_commit": "b478c600dc6cda365289d4bbb76501987d16a377",
   "source_branch": "main",
   "server_git_commit_verified": true,
-  "source_tag": "production/tencent-20261012-114319",
+  "source_tag": "production/tencent-20261012-134141",
   "production": {
-    "release_path": "/srv/zhixiang/releases/20261012-114319",
-    "running_executable": "/srv/zhixiang/releases/20261012-114319/zhixiang-shop",
-    "binary_bytes": 90349730,
-    "binary_sha256": "c27055bbba6ad4a4b93d7a7967d7c897a37603a2b6bf93da9dba2798ce1fcedc",
-    "running_binary_sha256": "c27055bbba6ad4a4b93d7a7967d7c897a37603a2b6bf93da9dba2798ce1fcedc",
-    "manifest_binary_sha256": "c27055bbba6ad4a4b93d7a7967d7c897a37603a2b6bf93da9dba2798ce1fcedc",
+    "release_path": "/srv/zhixiang/releases/20261012-134141",
+    "running_executable": "/srv/zhixiang/releases/20261012-134141/zhixiang-shop",
+    "binary_bytes": 90353826,
+    "binary_sha256": "97c23731e1365caff84fdffec997aa5a1f21df35bf2acd87049b61586298d376",
+    "running_binary_sha256": "97c23731e1365caff84fdffec997aa5a1f21df35bf2acd87049b61586298d376",
+    "manifest_binary_sha256": "97c23731e1365caff84fdffec997aa5a1f21df35bf2acd87049b61586298d376",
     "build_info": {
       "go_version": "go1.26.5",
       "build_settings": [
@@ -27,11 +27,11 @@
         "GOOS=linux",
         "GOAMD64=v1",
         "vcs=git",
-        "vcs.revision=c84d444fe7efd6de3a33b30ef62d6a236f5e80fb",
-        "vcs.time=2026-10-12T03:42:18Z",
+        "vcs.revision=b478c600dc6cda365289d4bbb76501987d16a377",
+        "vcs.time=2026-10-12T05:37:10Z",
         "vcs.modified=false"
       ],
-      "command": "GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -buildvcs=true -mod=readonly -trimpath -tags release,fullstack -ldflags '-s -w -X github.com/dujiao-next/internal/version.Version=pi-star-c84d444' ./cmd/server"
+      "command": "GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -buildvcs=true -mod=readonly -trimpath -tags release,fullstack -ldflags '-s -w -X github.com/dujiao-next/internal/version.Version=pi-star-b478c60' ./cmd/server"
     },
     "runtime_mode": "storefront",
     "upstream_purchase_enabled": true,
@@ -42,7 +42,7 @@
       "stock_sync_timer": "active"
     },
     "redis_preserved_without_restart": true,
-    "backup": "/srv/zhixiang/backups/before-20261012-114319",
+    "backup": "/srv/zhixiang/backups/before-20261012-134141",
     "database_backup_quick_check": "ok"
   },
   "payment": {
@@ -109,7 +109,7 @@
   "pages": {
     "/": {
       "status": 200,
-      "html_sha256": "fb1ab6839f213c72d31d04ad9b67fd2d34116457939a2d9a9e116b6e54765f42"
+      "html_sha256": "ed8db8ba15695dc4455f20b09cd04c405ee2e11e99007be009ddabe4b3a86148"
     },
     "/zxa-management/": {
       "status": 200,
@@ -117,18 +117,25 @@
     }
   },
   "verified_asset_sha256": {
-    "/assets/index-BRSWRh8i.js": "5e51a4854c638e18470258a183534a6993d719d46ad8360e2f2df3b17e633060",
+    "/assets/index-3IGjsF5T.js": "e35e5ff46bc13a01bc9307b19c804cd960b165f1a68a8a3361e45a5886b0ac7a",
     "/assets/vendor-vue-i18n-BpCdZEcV.js": "581fdd5e9dbd5fb8bc51f990df526e83c32a202f1f4f61abf33fc920f7fd39e8",
-    "/assets/index-CVDMMS7N.css": "b09a4652d33f457fd8b1ad15e9cda2357ea147df8906b51aafad362e52f4a0f1",
+    "/assets/index-Cck-z8a-.css": "d91d1a0ed32a5296f34e2ebef5d8ca7f6f11bcab8983a4d3c21ede73d8994e29",
     "/zxa-management/assets/index-BcRUa47L.js": "8abb7e177c4666f629c3fb48e4960445222f4a48ae1478531927af835cdd895d",
     "/zxa-management/assets/vendor-vue-CwOXpqUY.js": "6e20a69c716c11657253ec352492c4b6264d740bf9369ce9be18f5ad73c73e44",
     "/zxa-management/assets/vendor-ui-CRd8gcxV.js": "fd921e593db5ac79dd446b751415b6384d18e34c1569bc87473217280cf14ad3",
     "/zxa-management/assets/index-eeHfOVlc.css": "7d7708f9ea722a9be1506ba5f1f5e324c0777a46f480b2cdcd7abde7b98727f9",
     "/brand/patrick-logo.png": "21e992a7dc7dd3783a2d1169c53a73d8643360121d5585d7f1692bf4fc0beb19",
-    "/brand/jellyfishing-background.png": "c2efe94275b906bf3d8a8e7dee8a06f9394de7ee2d9540557bba0c2a5a569d70"
+    "/brand/jellyfishing-background.png": "c2efe94275b906bf3d8a8e7dee8a06f9394de7ee2d9540557bba0c2a5a569d70",
+    "/assets/PaymentChannelOption-4vzbjcll.css": "b7dd5103de74dce5476b3b7b1ce624562ef87d24a5536cc8480bcc6e852806e8",
+    "/assets/PaymentChannelOption-zefYgXow.js": "d1b05bc06bdca18d2fff6b0289948f5b4f4e05a8f3f08b4cc607fc54bca62ddd",
+    "/assets/Payment-DOPWzBuy.js": "4f80c46832958b7b139ff4762080518e8ce660a7e16e07a48f60d46441ae78a0",
+    "/assets/Payment-sV1Frwrc.js": "0578ed938fb7cdf0cd57f730790df359a977e964792d54bdf6b74548c1d9b0ed",
+    "/assets/Checkout-COmdYdWz.js": "110ee1484711ed5c8f40c2c27eb14b9e4e06126e12e3fd9df1bf117360efee26",
+    "/assets/Checkout-Db3bJSKw.css": "1c0617133b2ec4c8009d4692e76c9c4a62e8f14ef1eed1d9b9a0cffaf831408e",
+    "/assets/Checkout-DP6eipT-.js": "86338633c398087432bbf72d253214cba5ebb318f9625200f57530478a094b80"
   },
   "public_verification": {
-    "checked_at": "2026-10-12T03:47:37.876533+00:00",
+    "checked_at": "2026-10-12T05:45:38.041686+00:00",
     "url": "http://43.134.141.10",
     "http_status": {
       "/": 200,
@@ -136,7 +143,7 @@
       "/health": 200,
       "/api/v1/public/config": 200
     },
-    "app_version": "pi-star-c84d444",
+    "app_version": "pi-star-b478c60",
     "payment_channels": [
       {
         "name": "USDT · BNB Smart Chain (BEP-20)",
@@ -177,5 +184,15 @@
     "worker_heartbeat_count": 1,
     "paid_upstream_orders_missing_procurement": 0,
     "real_money_acceptance_performed": false
+  },
+  "payment_option_ui": {
+    "change": "Approved unified green USDT radio cards in checkout and payment selector",
+    "user_tests_passed": 94,
+    "admin_tests_passed": 16,
+    "source_and_typechecked_build": true,
+    "desktop_mobile_dark_keyboard_verified": true,
+    "existing_configuration_and_role_policies_preserved": true,
+    "production_checkout_screenshot": "work/codex-runtime/payment-ui-qa/production-checkout.jpg",
+    "real_payment_or_purchase_submitted": false
   }
 }
