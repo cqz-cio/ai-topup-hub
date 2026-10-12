@@ -4,7 +4,7 @@
 
 本机日常开发固定使用 `D:\卡网` 的 `main`。新会话从 [AGENTS.md](AGENTS.md) 和本页开始；独立开发草稿在各自工作区维护，历史资料只用于明确请求的追溯或恢复。
 
-当前线上程序包含已确认的品牌、Logo 清晰度修正以及 BEP20、Plasma 两种 USDT 支付渠道。推送源码不等于部署，实际构建来源以 [生产发布记录](ops/tencent/README.md) 为准。
+当前线上程序包含已确认的品牌、Logo 清晰度和导航留白修正，以及 BEP20、Plasma 两种 USDT 支付渠道。推送源码不等于部署，实际构建来源以 [生产发布记录](ops/tencent/README.md) 为准。
 
 | 入口 | 地址 / 位置 |
 | --- | --- |
@@ -13,9 +13,9 @@
 | 本地商城 | http://127.0.0.1:5173/ |
 | 本地后台 | http://127.0.0.1:5174/ |
 | 绿色源码基线 | `baseline/green-20261012`，提交 `419141e` |
-| 生产发布记录 | `20261012-134141`，构建源码 `b478c600dc6cda365289d4bbb76501987d16a377`，见 [生产维护说明](ops/tencent/README.md) |
+| 生产发布记录 | `20261012-153531`，构建源码 `948c37f2d33420631eb77a75d3c1debe40d967b6`，见 [生产维护说明](ops/tencent/README.md) |
 
-源码标签、服务器发布号和数据库是三个独立对象。线上比对证据与核验范围在 [production-baseline.json](ops/tencent/production-baseline.json)。推送 GitHub 不会自动部署服务器，也不会同步数据库。
+源码标签、服务器发布号和数据库是三个独立对象。线上比对证据与核验范围在 [production-baseline.json](ops/tencent/production-baseline.json)。推送 GitHub 不会自动部署服务器，也不会同步数据库。服务器已保留 `www.qzweb.cloud` 的 HTTPS 配置，但本次公网核验该域名仍返回旧站；新版商城继续以表中的 IP 入口为准。
 
 ## 目录
 

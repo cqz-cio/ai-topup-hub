@@ -1,33 +1,35 @@
 # 新加坡正式环境
 
-现有服务器 `43.134.141.10` 是智享A社卡网的正式环境。[商城](http://43.134.141.10/)与[后台](http://43.134.141.10/zxa-management/)由同一 Go 程序提供。当前入口为 HTTP/IP，未配置域名与 HTTPS。
+服务器 `43.134.141.10` 是 π星卡社的正式环境。[商城](http://43.134.141.10/)与[后台](http://43.134.141.10/zxa-management/)由同一 Go 程序提供。
+
+服务器已有 `www.qzweb.cloud` 的 HTTPS 反向代理，本次保留其配置并验证源站 TLS、页面和资源。2026-10-12 16:12（北京时间）公网 Cloudflare 入口仍返回旧版“智享A社”页面，且健康、配置接口与源站不同；这不是新版域名上线成功，当前正式新版入口以上述 IP 地址为准。后续切换域名需核对 DNS、Cloudflare 回源和缓存，不能仅凭源站证书或本地 SNI 核验宣告公网域名已切换。
 
 ## 已核验的运行基准
 
-2026-10-12 已备份并发布 **`20261012-134141`**，按已确认的设计统一 BEP20 与 Plasma 的付款选项：等宽纵向卡片、USDT 图标、网络说明及绿色选中态；结算页和付款页共用组件。发布后已通过 SSH 与公网 GET 核验。
+2026-10-12 16:11（北京时间）已完成发布 **`20261012-153531`**，应用已确认的第 2 版导航 Logo：派大星图标使用浅绿圆角方块，名称与副标题放在图标外，增加间距和上下留白。品牌图片、商品内容和购买行为保持一致。
 
 | 项目 | 核验结果 |
 | --- | --- |
-| 当前发布目录 | `/srv/zhixiang/current` → `/srv/zhixiang/releases/20261012-134141` |
-| 正在运行的程序 | 上述目录的 `zhixiang-shop`，90353826 字节 |
-| 程序 SHA-256 | `97c23731e1365caff84fdffec997aa5a1f21df35bf2acd87049b61586298d376` |
+| 当前发布目录 | `/srv/zhixiang/current` → `/srv/zhixiang/releases/20261012-153531` |
+| 正在运行的程序 | 上述目录的 `zhixiang-shop`，90366114 字节 |
+| 程序 SHA-256 | `5c3707bff99f2e16a66b4f9924150d2778ca7bcdc19b89e35dd7e2e737e6452f` |
 | 发布清单 | `manifest.json` 的程序哈希与运行中程序一致 |
 | 编译信息 | Go 1.26.5，Linux amd64，CGO=0，`release,fullstack` |
 | 运行模式 | `storefront`，`UPSTREAM_PURCHASE_ENABLED=true` |
-| 服务状态 | 商城、专用 Redis、库存定时器均 active |
-| 构建源码 | `main` 的 `b478c600dc6cda365289d4bbb76501987d16a377`，`vcs.modified=false` |
-| 上一个发布 | `20261012-114319`，保留于服务器及升级前备份 |
-| 收款渠道 | BEP20 与 Plasma 均启用，公网支付配置已显示两项 |
+| 服务状态 | 商城、专用 Redis、库存定时器、Nginx 均 active |
+| 构建源码 | `main` 的 `948c37f2d33420631eb77a75d3c1debe40d967b6`，`vcs.modified=false` |
+| 上一个实际发布 | `20261012-141843`，源码 `06620f0e61a32fa17760b6f8b94312a29c03fb4e`，旧程序和升级前备份均保留 |
+| 收款渠道 | BEP20 与 Plasma 均启用，公网 IP 支付配置已显示两项 |
 
-完整证据见 [production-baseline.json](production-baseline.json)。本次发布清单与 Go 编译信息均记录完整 Git SHA，运行中程序哈希与本地发布包一致，前后台入口资源及品牌图片哈希核验通过。公网首页、后台、健康接口均为 200；6 个公开分类、原有售价和支付渠道保持不变。后续仅更新文档的提交不表示再次部署程序。库存为动态数据，本地快照不是实时生产库存。
+完整证据见 [production-baseline.json](production-baseline.json)。发布清单、Go 编译信息及实际运行程序哈希相互匹配。公网 IP 的首页、后台、健康、配置和 20 项资源共 24 项核验通过；桌面 1920px、手机 390px 与 320px 的实际页面符合本地确认方案，Logo 与按钮没有重叠或横向溢出，浏览器无错误。后续文档提交不改变线上程序构建来源，库存仍为动态业务数据。
 
-本次样式发布通过前台 94 项、后台 16 项现有测试、两套前端 TypeScript 检查及完整发布构建。已检查桌面、手机、深色模式、键盘切换、手续费和限额禁用状态，并在正式结算页核对两种网络。部署保留配置、角色权限、商品售价及持久化 Redis；未进行真实付款或采购。视觉记录见 [design-qa.md](../../design-qa.md)。
+本次验证包括前台 94 项、后台 28 项现有测试、两套前端 TypeScript 检查及完整发布构建。部署前备份线上数据库、配置、私有凭据、旧发布、Nginx 配置和 Redis 快照；部署保留现场配置、商品说明、价格、付款渠道、权限与声明，Redis 没有重启。自动采购保持既有授权设置，自动充值仍关闭，未提交真实付款、验收订单或采购。截图和核验记录保存在本机忽略目录 `work/codex-runtime/logo-spacing-preview-20261012/`。
 
 ## ChatGPT 发货兑换指引
 
 2026-10-12 13:57（北京时间）已应用商品说明配置，14:01 完成应用接口复核。11 款 ChatGPT 卡密（含两款 iOS 渠道）发货使用 **https://cdkai.kdns.fr/**，交付使用说明附完整链接和自助充值步骤；新订单保存该说明，交付页及已启用的发货邮件读取订单快照。历史订单不回写。
 
-配置来源为 `main` 的 `2ef4790a64f351a85e91d59bebe593beb0f31dce`，映射和文案见 [qzweb-redemption-guide.json](../../docs/catalog/qzweb-redemption-guide.json)。本次更新商品数据库，不替换发布程序：现有运行发布仍为 `20261012-134141`，二进制构建源码仍为 `b478c600dc6cda365289d4bbb76501987d16a377`。
+配置来源为 `main` 的 `2ef4790a64f351a85e91d59bebe593beb0f31dce`，映射和文案见 [qzweb-redemption-guide.json](../../docs/catalog/qzweb-redemption-guide.json)。该次更新仅修改商品数据库，没有替换程序；当时运行发布为 `20261012-134141`，构建源码为 `b478c600dc6cda365289d4bbb76501987d16a377`。当前程序发布见上表，本次 Logo 发布已对照核验商品交付说明内容保持一致。
 
 数据库、私有配置和当前发布已在服务器备份。原始更新前备份为 `/srv/zhixiang/backups/before-redemption-guide-20261012T055249Z`，最终配置更新前补充备份为 `/srv/zhixiang/backups/before-redemption-guide-20261012T055749Z`；一致性检查均通过。报告为 `/srv/zhixiang/shared/reports/redemption-guide-20261012T055749Z.json`。
 
@@ -43,8 +45,8 @@
 | 持久化 Redis | `shared/redis/`，回环地址端口 16379 |
 | 库存助手私有凭据 | `shared/stock-sync.credentials.json` |
 | 库存报告 | `shared/reports/merchant1039-stock-sync.json` |
-| 当前版本升级前备份 | `/srv/zhixiang/backups/before-20261012-134141`，数据库一致性检查通过，包含原配置与旧程序 |
-| 本次发布核验报告 | `shared/reports/payment-ui-release-20261012-134141.json` |
+| 当前版本升级前备份 | `/srv/zhixiang/backups/before-20261012-153531`，数据库一致性检查通过，包含配置、凭据、旧程序、Nginx 与 Redis 快照 |
+| 本次发布核验报告 | `shared/reports/logo-release-20261012-153531.json` |
 
 `zhixiang-shop.service` 以 `zhixiang` 用户运行；`40-storefront.conf` 指定当前模式。支付监听、采购/交付 worker 与恢复任务由应用管理。`zhixiang-redis.service` 保存订单队列。`zhixiang-stock-sync.timer` 在每次任务完成后等待 300 秒，仅查询和刷新库存；不要另起重复助手或完整 worker 来同步库存。服务单元模板保存在本目录。
 
