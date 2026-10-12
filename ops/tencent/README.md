@@ -4,20 +4,22 @@
 
 ## 已核验的运行基准
 
-2026-10-12 通过 SSH 只读核验，当前发布为 **`20261012-013649`**。本次仓库整理没有部署程序、切换服务或写入生产数据库。
+2026-10-12 已备份并发布 **`20261012-111003`**，新增独立 Plasma USDT 收款，保留 BEP20 和此前的 Logo 清晰度修正。发布后已通过 SSH 与公网 GET 核验。
 
 | 项目 | 核验结果 |
 | --- | --- |
-| 当前发布目录 | `/srv/zhixiang/current` → `/srv/zhixiang/releases/20261012-013649` |
-| 正在运行的程序 | 上述目录的 `zhixiang-shop`，108794100 字节 |
-| 程序 SHA-256 | `a2d0549bdaf0b9ffff4b25e1f4868063c2cd1cf6ce80692f668b3990dea3884b` |
+| 当前发布目录 | `/srv/zhixiang/current` → `/srv/zhixiang/releases/20261012-111003` |
+| 正在运行的程序 | 上述目录的 `zhixiang-shop`，90349730 字节 |
+| 程序 SHA-256 | `a3d18cf153fda70210c3c54a4be8890088209565d7b8222e9d41b2dfe38a1e5a` |
 | 发布清单 | `manifest.json` 的程序哈希与运行中程序一致 |
 | 编译信息 | Go 1.26.5，Linux amd64，CGO=0，`release,fullstack` |
 | 运行模式 | `storefront`，`UPSTREAM_PURCHASE_ENABLED=true` |
 | 服务状态 | 商城、专用 Redis、库存定时器均 active |
-| 源码基线 | Git 标签 `baseline/green-20261012`，提交 `419141e`；不是已证实的生产构建提交号 |
+| 构建源码 | `main` 的 `800bf983e6eaaf10855eb9b79e707f2132176f9a`，`vcs.modified=false` |
+| 上一个发布 | `20261012-105801`，保留于服务器及升级前备份 |
+| 收款渠道 | BEP20 与 Plasma 均启用，公网支付配置已显示两项 |
 
-完整证据见 [production-baseline.json](production-baseline.json)。线上程序没有内嵌 `vcs.revision`，发布清单也没有源码提交号，因此不能从现有记录确定精确 Git 版本。前后台部分编译入口资源与本地构建不同；16 款商品公开资料、6 个分类、18 张商品/分类图片一致。库存为动态数据，本地快照不是实时生产库存。
+完整证据见 [production-baseline.json](production-baseline.json)。本次发布清单与 Go 编译信息均记录完整 Git SHA，运行中程序哈希与本地发布包一致，前后台入口资源及品牌图片哈希核验通过。公网首页、后台、健康接口均为 200；6 个公开分类、原有售价和支付渠道保持不变。后续仅更新文档的提交不表示再次部署程序。库存为动态数据，本地快照不是实时生产库存。
 
 ## 持久化数据与服务
 
@@ -29,7 +31,8 @@
 | 持久化 Redis | `shared/redis/`，回环地址端口 16379 |
 | 库存助手私有凭据 | `shared/stock-sync.credentials.json` |
 | 库存报告 | `shared/reports/merchant1039-stock-sync.json` |
-| 当前版本升级前备份 | `/srv/zhixiang/backups/before-20261012-013649` |
+| 当前版本升级前备份 | `/srv/zhixiang/backups/before-20261012-111003`，数据库一致性检查通过，包含原配置与旧程序 |
+| 本次发布核验报告 | `shared/reports/plasma-release-20261012-111003.json` |
 
 `zhixiang-shop.service` 以 `zhixiang` 用户运行；`40-storefront.conf` 指定当前模式。支付监听、采购/交付 worker 与恢复任务由应用管理。`zhixiang-redis.service` 保存订单队列。`zhixiang-stock-sync.timer` 在每次任务完成后等待 300 秒，仅查询和刷新库存；不要另起重复助手或完整 worker 来同步库存。服务单元模板保存在本目录。
 
@@ -60,21 +63,21 @@ sudo sha256sum /srv/zhixiang/current/zhixiang-shop
 
 ### Plasma 收款配置
 
-源码支持独立的 `plasma_usdt` 渠道；已有 BEP-20 继续使用 `bsc_usdt`。两张收款截图提供的地址相同：`0x66a8bab15067eab1efc948ac03684f0397c8416f`，但两条链的监听、金额标识和交易去重分别保存。配置示例默认关闭 Plasma，源码支持不表示线上已经启用。
+线上已启用独立的 `plasma_usdt` 渠道；已有 BEP-20 继续使用 `bsc_usdt`。两张截图与线上配置的收款地址相同：`0x66a8bab15067eab1efc948ac03684f0397c8416f`，两条链的监听、金额标识和交易去重分别保存。新环境的 `config.yml.example` 默认关闭 Plasma，不能据此判断现有生产状态。
 
 Plasma 主网编号为 `9745`，USDT0 合约为 `0xb8ce59fc3717ada4c02eadf9682a9e934f625ebb`，精度为 6；BSC USDT 精度仍为 18。合约依据：[USDT0 官方部署表](https://docs.usdt0.to/technical-documentation/deployments)。2026-10-12 已对默认 Plasma RPC 只读核验链编号、代币精度、`finalized` 和日志接口；模拟链付款及交付测试不等于真实资金验收。
 
-发布程序前先按下方发布规则备份。私有配置添加：
+当前生产配置如下，汇率沿用 BEP20 的 6.66。生产 `config.yml` 实际使用 JSON 格式（兼容 YAML），后续修改需保持文件格式并核对其余配置，不能直接在 JSON 文档末尾追加 YAML 段。以下仅以 YAML 展示相同字段：
 
 ```yaml
 plasma_usdt:
-  enabled: false
+  enabled: true
   recipient: "0x66a8bab15067eab1efc948ac03684f0397c8416f"
   cny_per_usdt: "6.66"
   confirmations: 15
 ```
 
-从生产服务器核验 RPC 可达、chain ID 为 9745、合约 `decimals()` 为 6、最终确认区块及交易收据接口可用后，再开启 `enabled` 并重启商城。默认节点是 `https://rpc.plasma.to`；自定义节点只写服务端 `PLASMA_RPC_URL`，需要分开查询收据时用 `PLASMA_RECEIPT_RPC_URL`。无需钱包私钥或助记词。
+已从生产服务器核验 RPC 可达、chain ID 为 9745、合约 `decimals()` 为 6、最终确认区块、日志及交易收据接口可用。默认节点是 `https://rpc.plasma.to`；自定义节点只写服务端 `PLASMA_RPC_URL`，需要分开查询收据时用 `PLASMA_RECEIPT_RPC_URL`。无需钱包私钥或助记词。
 
 首次启用自动创建 `USDT · Plasma` 订单支付渠道；重启不会重新启用已禁用渠道或覆盖商户名称。沿用 storefront 模式即可启动独立 Plasma 监听。后台只读查询入口为 `/api/v1/admin/chain-payments/plasma-usdt/status` 和 `/transfers`，使用已有后台鉴权。核验支付页显示 Plasma、USDT0、正确地址及完整 6 位小数金额；两条链都要求完整金额和最终确认，异常金额或过期付款进入人工核查。
 

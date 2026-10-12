@@ -6,7 +6,7 @@
 
 `baseline/green-20261012` 固定整理前的绿色源码 `419141e`，包含旧 React 展示页，可追溯恢复。它是源码基线，不等同于服务器二进制的精确 Git SHA。
 
-2026-10-12 的整理不变更商城业务代码、不替换线上程序、不迁移生产库。当前生产基准及核验事实见 [生产说明](../ops/tencent/README.md) 与 [基准清单](../ops/tencent/production-baseline.json)。
+2026-10-12 早前的仓库整理没有替换线上程序。后续已发布品牌修正及 Plasma 支付，当前生产基准与构建来源见 [生产说明](../ops/tencent/README.md) 和 [基准清单](../ops/tencent/production-baseline.json)。
 
 ## 三类版本分别记录
 
