@@ -29,6 +29,10 @@
     "build/**",
     "dist/**",
     "coverage/**",
+    "deployment/**",
+    "remote-latest/**",
+    "tmp/**",
+    "output/**",
     "next-env.d.ts"
   ],
   "rules": {

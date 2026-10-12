@@ -35,7 +35,20 @@ next-env.d.ts
 /dist/
 /.wrangler/
 /outputs/
+/output/
 /work/
+/remote-latest/
+/tmp/
+/deployment/local/
+/deployment/tools/
+/deployment/*.json
+/deployment/*.png
+/deployment/*.svg
+*.tsbuildinfo
+*.db
+*.db-shm
+*.db-wal
+*.credentials.json
 
 source-assets/
 scripts/capture.cjs

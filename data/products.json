@@ -2,7 +2,7 @@
   {
     "image": "/products/51b9fa3a993e4df58dc55ee3af246b.jpg",
     "name": "PLUS稳定特殊渠道独享月卡成品号6（日区，支持反代，购买24小时内非禁止网络账号问题可免费更换一次）",
-    "price": 59.88,
+    "price": 88,
     "stock": "库存充足",
     "detail": {
       "images": [],
@@ -43,12 +43,17 @@
         }
       ]
     },
-    "originalImage": "https://qn.ldxp.cn/d1/51b9fa3a993e4df58dc55ee3af246b.png"
+    "originalImage": "https://qn.ldxp.cn/d1/51b9fa3a993e4df58dc55ee3af246b.png",
+    "basePrice": 59.88,
+    "visible": true,
+    "serviceGroup": "Plus 月卡成品账号 · 24小时质保",
+    "displayNumber": 1,
+    "priceOverride": 88
   },
   {
     "image": "/products/5b27a95a0a4bd01035ddc2b2c9d657.jpg",
     "name": "PLUS 特殊渠道独享月卡成品号3（东南亚区，支持反代，购买24小时内非禁止网络账号问题可免费更换一次）",
-    "price": 59.88,
+    "price": 65.87,
     "stock": "缺货",
     "detail": {
       "images": [],
@@ -77,12 +82,17 @@
         }
       ]
     },
-    "originalImage": "https://qn.ldxp.cn/71/5b27a95a0a4bd01035ddc2b2c9d657.png"
+    "originalImage": "https://qn.ldxp.cn/71/5b27a95a0a4bd01035ddc2b2c9d657.png",
+    "basePrice": 59.88,
+    "visible": false,
+    "serviceGroup": "Plus 月卡成品账号 · 24小时质保",
+    "hiddenReason": "同一质保期限内保留最高售价；同价按库存及原顺序选择。",
+    "selectedAlternative": "https://wzyp.cn/item/x74yu9"
   },
   {
     "image": "/products/274c9483478cf511bbd14bc65a3926.jpg",
     "name": "PLUS稳定特殊渠道独享月卡成品号1（日区，支持反代，购买20天内非禁止网络账号问题可退剩余）",
-    "price": 88.88,
+    "price": 100,
     "stock": "库存少量",
     "detail": {
       "images": [],
@@ -112,12 +122,17 @@
         }
       ]
     },
-    "originalImage": "https://qn.ldxp.cn/77/274c9483478cf511bbd14bc65a3926.png"
+    "originalImage": "https://qn.ldxp.cn/77/274c9483478cf511bbd14bc65a3926.png",
+    "basePrice": 88.88,
+    "visible": true,
+    "serviceGroup": "Plus 月卡成品账号 · 20天质保",
+    "displayNumber": 2,
+    "priceOverride": 100
   },
   {
     "image": "/products/61bbbf59ee6f7ffd2f4a3c31a010ba.jpg",
     "name": "PLUS稳定特殊渠道独享月卡成品号5（泰区，支持反代，购买20天内非禁止网络账号问题可退剩余）",
-    "price": 88.88,
+    "price": 97.77,
     "stock": "库存少量",
     "detail": {
       "images": [],
@@ -147,12 +162,17 @@
         }
       ]
     },
-    "originalImage": "https://qn.ldxp.cn/0d/61bbbf59ee6f7ffd2f4a3c31a010ba.png"
+    "originalImage": "https://qn.ldxp.cn/0d/61bbbf59ee6f7ffd2f4a3c31a010ba.png",
+    "basePrice": 88.88,
+    "visible": false,
+    "serviceGroup": "Plus 月卡成品账号 · 20天质保",
+    "hiddenReason": "同一质保期限内保留最高售价；同价按库存及原顺序选择。",
+    "selectedAlternative": "https://wzyp.cn/item/hn4q2p"
   },
   {
     "image": "/products/9c416262bd799c295d0beca233a53f.jpg",
     "name": "Free普通号（质保首登，注册日期2026年4月份）",
-    "price": 6.88,
+    "price": 7.88,
     "stock": "库存充足",
     "detail": {
       "images": [],
@@ -182,12 +202,17 @@
         }
       ]
     },
-    "originalImage": "https://qn.ldxp.cn/b4/9c416262bd799c295d0beca233a53f.png"
+    "originalImage": "https://qn.ldxp.cn/b4/9c416262bd799c295d0beca233a53f.png",
+    "basePrice": 6.88,
+    "visible": true,
+    "serviceGroup": "Free普通号",
+    "displayNumber": 3,
+    "priceBeforeRounding": 7.57
   },
   {
     "image": "/products/d88ef20d8a2993de76d027df34a84e.jpg",
     "name": "Plus 稳定正规渠道直充1（质保订阅，封号不质保，不支持提前续费）",
-    "price": 128.88,
+    "price": 141.77,
     "stock": "库存充足",
     "detail": {
       "images": [],
@@ -196,12 +221,17 @@
       "url": "https://wzyp.cn/item/oxid90",
       "links": []
     },
-    "originalImage": "https://qn.ldxp.cn/68/d88ef20d8a2993de76d027df34a84e.png"
+    "originalImage": "https://qn.ldxp.cn/68/d88ef20d8a2993de76d027df34a84e.png",
+    "basePrice": 128.88,
+    "visible": false,
+    "serviceGroup": "Plus 代充值",
+    "hiddenReason": "同类服务只展示售价最高的一款；同价优先有货且库存更充足，其次保留原顺序。",
+    "selectedAlternative": "https://wzyp.cn/item/4xtc99"
   },
   {
     "image": "/products/68ab65a1551230b14e21bf165a14f1.jpg",
     "name": "Plus 稳定正规渠道直充 3（质保订阅，封号不质保，支持提前续费）",
-    "price": 138.88,
+    "price": 134,
     "stock": "库存一般",
     "detail": {
       "images": [],
@@ -215,12 +245,17 @@
         }
       ]
     },
-    "originalImage": "https://qn.ldxp.cn/c7/68ab65a1551230b14e21bf165a14f1.png"
+    "originalImage": "https://qn.ldxp.cn/c7/68ab65a1551230b14e21bf165a14f1.png",
+    "basePrice": 138.88,
+    "visible": true,
+    "serviceGroup": "Plus 代充值",
+    "displayNumber": 4,
+    "priceOverride": 134
   },
   {
     "image": "/products/ad164ca5e1678795061ce64705be4c.jpg",
     "name": "Pro 5X 稳定正规渠道直充2（质保订阅，封号不质保，支持覆盖升级，卡密自助充值服务）",
-    "price": 628.88,
+    "price": 700,
     "stock": "库存一般",
     "detail": {
       "images": [],
@@ -229,12 +264,17 @@
       "url": "https://wzyp.cn/item/hk57yf",
       "links": []
     },
-    "originalImage": "https://qn.ldxp.cn/5c/ad164ca5e1678795061ce64705be4c.png"
+    "originalImage": "https://qn.ldxp.cn/5c/ad164ca5e1678795061ce64705be4c.png",
+    "basePrice": 628.88,
+    "visible": true,
+    "serviceGroup": "Pro 5X 代充值",
+    "displayNumber": 5,
+    "priceOverride": 700
   },
   {
     "image": "/products/221055ad7e6f864518dd13222fed5f.jpg",
     "name": "Pro 5X 稳定正规渠道直充1（质保订阅，封号不质保，支持覆盖升级，卡密自助充值服务）",
-    "price": 628.88,
+    "price": 691.77,
     "stock": "库存少量",
     "detail": {
       "images": [],
@@ -243,12 +283,17 @@
       "url": "https://wzyp.cn/item/ep6emq",
       "links": []
     },
-    "originalImage": "https://qn.ldxp.cn/33/221055ad7e6f864518dd13222fed5f.png"
+    "originalImage": "https://qn.ldxp.cn/33/221055ad7e6f864518dd13222fed5f.png",
+    "basePrice": 628.88,
+    "visible": false,
+    "serviceGroup": "Pro 5X 代充值",
+    "hiddenReason": "同类服务只展示售价最高的一款；同价优先有货且库存更充足，其次保留原顺序。",
+    "selectedAlternative": "https://wzyp.cn/item/hk57yf"
   },
   {
     "image": "/products/b729782a65596b0cf751320e932aca.jpg",
     "name": "Pro 20X 稳定正规渠道直充1（质保订阅，封号不质保，支持覆盖升级，卡密自助充值服务）",
-    "price": 1228.88,
+    "price": 1250,
     "stock": "库存少量",
     "detail": {
       "images": [],
@@ -262,12 +307,17 @@
         }
       ]
     },
-    "originalImage": "https://qn.ldxp.cn/84/b729782a65596b0cf751320e932aca.png"
+    "originalImage": "https://qn.ldxp.cn/84/b729782a65596b0cf751320e932aca.png",
+    "basePrice": 1228.88,
+    "visible": true,
+    "serviceGroup": "Pro 20X 代充值",
+    "displayNumber": 6,
+    "priceOverride": 1300
   },
   {
     "image": "/products/22c2140d7e93d9bbb00eb72104e672.jpg",
     "name": "Pro 20X 稳定正规渠道直充2（质保订阅，封号不质保，不支持提前续费）",
-    "price": 1128.88,
+    "price": 1241.77,
     "stock": "库存充足",
     "detail": {
       "images": [],
@@ -276,12 +326,17 @@
       "url": "https://wzyp.cn/item/yh4oof",
       "links": []
     },
-    "originalImage": "https://qn.ldxp.cn/44/22c2140d7e93d9bbb00eb72104e672.png"
+    "originalImage": "https://qn.ldxp.cn/44/22c2140d7e93d9bbb00eb72104e672.png",
+    "basePrice": 1128.88,
+    "visible": false,
+    "serviceGroup": "Pro 20X 代充值",
+    "hiddenReason": "同类服务只展示售价最高的一款；同价优先有货且库存更充足，其次保留原顺序。",
+    "selectedAlternative": "https://wzyp.cn/item/egjog0"
   },
   {
     "image": "/products/fec0935a8aab54ff9553d721ee3b6d.jpg",
     "name": "Codex 美区TM自助接验证码服务3（美区TM卡，一号一绑，有效期内可无限接收码，有效期至20261004）",
-    "price": 5.88,
+    "price": 6.47,
     "stock": "库存充足",
     "detail": {
       "images": [],
@@ -290,12 +345,17 @@
       "url": "https://wzyp.cn/item/ga7uvr",
       "links": []
     },
-    "originalImage": "https://qn.ldxp.cn/e0/fec0935a8aab54ff9553d721ee3b6d.png"
+    "originalImage": "https://qn.ldxp.cn/e0/fec0935a8aab54ff9553d721ee3b6d.png",
+    "basePrice": 5.88,
+    "visible": false,
+    "serviceGroup": "Codex 美区TM自助接验证码服务3",
+    "displayNumber": 7,
+    "hiddenReason": "用户按页面编号手动删除"
   },
   {
     "image": "/products/097b405cdd903e0750a19c6d848b4c.jpg",
     "name": "Codex 美区卡自助接收验证码服务10（美区卡，一号一绑，有效期内可无限接收验证码，有效期25天左右）",
-    "price": 4.88,
+    "price": 9.99,
     "stock": "库存充足",
     "detail": {
       "images": [],
@@ -304,12 +364,17 @@
       "url": "https://wzyp.cn/item/augfm5",
       "links": []
     },
-    "originalImage": "https://qn.ldxp.cn/eb/097b405cdd903e0750a19c6d848b4c.png"
+    "originalImage": "https://qn.ldxp.cn/eb/097b405cdd903e0750a19c6d848b4c.png",
+    "basePrice": 4.88,
+    "visible": true,
+    "serviceGroup": "Codex 美区卡自助接收验证码服务10",
+    "displayNumber": 8,
+    "priceOverride": 9.99
   },
   {
     "image": "/products/5b92cbef8745dbbcdb9a38245d3bce.jpg",
     "name": "Super G r o k稳定特殊渠道周卡独享成品号 2（稳定新渠道，质保首登，有效期到20260912）",
-    "price": 28.88,
+    "price": 31.88,
     "stock": "缺货",
     "detail": {
       "images": [],
@@ -318,12 +383,17 @@
       "url": "https://wzyp.cn/item/ew9kxy",
       "links": []
     },
-    "originalImage": "https://qn.ldxp.cn/8c/5b92cbef8745dbbcdb9a38245d3bce.png"
+    "originalImage": "https://qn.ldxp.cn/8c/5b92cbef8745dbbcdb9a38245d3bce.png",
+    "basePrice": 28.88,
+    "visible": false,
+    "serviceGroup": "Super G r o k稳定特殊渠道周卡独享成品号 2",
+    "displayNumber": 9,
+    "priceBeforeRounding": 31.77
   },
   {
     "image": "/products/804b8625bf9f00e453b62a07bd77da.jpg",
     "name": "Super G r o k 稳定正规渠道季卡独享成品号 1（质保订阅，封号不管，有效期到2026年12月3日）",
-    "price": 298.88,
+    "price": 328.88,
     "stock": "库存一般",
     "detail": {
       "images": [],
@@ -341,12 +411,17 @@
         }
       ]
     },
-    "originalImage": "https://qn.ldxp.cn/bb/804b8625bf9f00e453b62a07bd77da.png"
+    "originalImage": "https://qn.ldxp.cn/bb/804b8625bf9f00e453b62a07bd77da.png",
+    "basePrice": 298.88,
+    "visible": false,
+    "serviceGroup": "Super G r o k 稳定正规渠道季卡独享成品号 1",
+    "displayNumber": 10,
+    "priceBeforeRounding": 328.77
   },
   {
     "image": "/products/88f65c9be6574ee687432c3f589c30.jpg",
     "name": "Super G r o k 稳定正规渠道月卡直充服务（质保订阅，封号不质保，卡密自助充值服务）",
-    "price": 168.88,
+    "price": 185.88,
     "stock": "库存少量",
     "detail": {
       "images": [],
@@ -355,12 +430,17 @@
       "url": "https://wzyp.cn/item/h54u1b",
       "links": []
     },
-    "originalImage": "https://qn.ldxp.cn/b8/88f65c9be6574ee687432c3f589c30.png"
+    "originalImage": "https://qn.ldxp.cn/b8/88f65c9be6574ee687432c3f589c30.png",
+    "basePrice": 168.88,
+    "visible": false,
+    "serviceGroup": "Super G r o k 稳定正规渠道月卡直充服务",
+    "displayNumber": 11,
+    "priceBeforeRounding": 185.77
   },
   {
     "image": "/products/491aa91ff81cb776d4c7888875d001.jpg",
     "name": "Super gro 稳定正规渠道 季卡直充服务（质保订阅，封号不质保，卡密自助充值服务）",
-    "price": 388.88,
+    "price": 427.88,
     "stock": "库存少量",
     "detail": {
       "images": [],
@@ -369,12 +449,17 @@
       "url": "https://wzyp.cn/item/16jx4q",
       "links": []
     },
-    "originalImage": "https://qn.ldxp.cn/ef/491aa91ff81cb776d4c7888875d001.png"
+    "originalImage": "https://qn.ldxp.cn/ef/491aa91ff81cb776d4c7888875d001.png",
+    "basePrice": 388.88,
+    "visible": false,
+    "serviceGroup": "Super gro 稳定正规渠道 季卡直充服务",
+    "displayNumber": 12,
+    "priceBeforeRounding": 427.77
   },
   {
     "image": "/products/c8ef387adb68ccf7126cb0a94d8a35.jpg",
     "name": "Super gro Heavy 特殊渠道 月卡直充服务（质保激活，激活成功后账号问题没有任何售后和补偿，人工代发）",
-    "price": 288.88,
+    "price": 317.88,
     "stock": "库存一般",
     "detail": {
       "images": [],
@@ -383,12 +468,17 @@
       "url": "https://wzyp.cn/item/zcibr5",
       "links": []
     },
-    "originalImage": "https://qn.ldxp.cn/6f/c8ef387adb68ccf7126cb0a94d8a35.png"
+    "originalImage": "https://qn.ldxp.cn/6f/c8ef387adb68ccf7126cb0a94d8a35.png",
+    "basePrice": 288.88,
+    "visible": false,
+    "serviceGroup": "Super gro Heavy 特殊渠道 月卡直充服务",
+    "displayNumber": 13,
+    "priceBeforeRounding": 317.77
   },
   {
     "image": "/products/d61f1303bf6c9c1bfbb8cbda98613e.jpg",
     "name": "Super G r o k Heavy 特殊渠道月卡成品号2（质保首登，首登成功后账号问题不会有任何售后和补偿，人工）",
-    "price": 188.88,
+    "price": 207.88,
     "stock": "库存一般",
     "detail": {
       "images": [],
@@ -402,12 +492,17 @@
         }
       ]
     },
-    "originalImage": "https://qn.ldxp.cn/4f/d61f1303bf6c9c1bfbb8cbda98613e.png"
+    "originalImage": "https://qn.ldxp.cn/4f/d61f1303bf6c9c1bfbb8cbda98613e.png",
+    "basePrice": 188.88,
+    "visible": false,
+    "serviceGroup": "Super G r o k Heavy 特殊渠道月卡成品号2",
+    "displayNumber": 14,
+    "priceBeforeRounding": 207.77
   },
   {
     "image": "/products/48e7757018eda0f3fc80c2554e2c13.jpg",
     "name": "Super G r o k Heavy 特殊渠道季卡成品号1（质保首登，首登成功后账号问题不会有任何售后和补偿，人工）",
-    "price": 368.88,
+    "price": 405.88,
     "stock": "库存一般",
     "detail": {
       "images": [],
@@ -421,12 +516,17 @@
         }
       ]
     },
-    "originalImage": "https://qn.ldxp.cn/c6/48e7757018eda0f3fc80c2554e2c13.png"
+    "originalImage": "https://qn.ldxp.cn/c6/48e7757018eda0f3fc80c2554e2c13.png",
+    "basePrice": 368.88,
+    "visible": false,
+    "serviceGroup": "Super G r o k Heavy 特殊渠道季卡成品号1",
+    "displayNumber": 15,
+    "priceBeforeRounding": 405.77
   },
   {
     "image": "/products/11ef8ab4679b1d2582ff01fae8f53c.jpg",
     "name": "Super G r o k Heavy特殊渠道年卡成品号2（质保首登，首登成功后账号问题不会有任何售后和补偿，人工代发）",
-    "price": 688.88,
+    "price": 757.88,
     "stock": "库存一般",
     "detail": {
       "images": [],
@@ -440,12 +540,17 @@
         }
       ]
     },
-    "originalImage": "https://qn.ldxp.cn/cf/11ef8ab4679b1d2582ff01fae8f53c.png"
+    "originalImage": "https://qn.ldxp.cn/cf/11ef8ab4679b1d2582ff01fae8f53c.png",
+    "basePrice": 688.88,
+    "visible": false,
+    "serviceGroup": "Super G r o k Heavy特殊渠道年卡成品号2",
+    "displayNumber": 16,
+    "priceBeforeRounding": 757.77
   },
   {
     "image": "/products/afbdbc23a34fe12809921d5e4e4136.jpg",
     "name": "Claude Pro 稳定正规渠道直充 5（质保订阅，封号无售后，请您同意再购买）",
-    "price": 146.88,
+    "price": 161.57,
     "stock": "缺货",
     "detail": {
       "images": [],
@@ -454,12 +559,17 @@
       "url": "https://wzyp.cn/item/qd4cl3",
       "links": []
     },
-    "originalImage": "https://qn.ldxp.cn/8a/afbdbc23a34fe12809921d5e4e4136.png"
+    "originalImage": "https://qn.ldxp.cn/8a/afbdbc23a34fe12809921d5e4e4136.png",
+    "basePrice": 146.88,
+    "visible": false,
+    "serviceGroup": "Claude Pro 代充值",
+    "hiddenReason": "同类服务只展示售价最高的一款；同价优先有货且库存更充足，其次保留原顺序。",
+    "selectedAlternative": "https://wzyp.cn/item/bf0ain"
   },
   {
     "image": "/products/afbdbc23a34fe12809921d5e4e4136.jpg",
     "name": "Claude Pro 稳定正规渠道直充 4（质保订阅，封号无售后，请您同意再购买）",
-    "price": 146.88,
+    "price": 161.88,
     "stock": "库存少量",
     "detail": {
       "images": [],
@@ -468,12 +578,17 @@
       "url": "https://wzyp.cn/item/bf0ain",
       "links": []
     },
-    "originalImage": "https://qn.ldxp.cn/8a/afbdbc23a34fe12809921d5e4e4136.png"
+    "originalImage": "https://qn.ldxp.cn/8a/afbdbc23a34fe12809921d5e4e4136.png",
+    "basePrice": 146.88,
+    "visible": false,
+    "serviceGroup": "Claude Pro 代充值",
+    "displayNumber": 17,
+    "priceBeforeRounding": 161.57
   },
   {
     "image": "/products/b1db89e735aaed3b517c9766a6edbe.jpg",
     "name": "Claude-Kiro API KEY 100M Token （3天有效期，支持opus4.7/4.8/5）",
-    "price": 62.88,
+    "price": 69.88,
     "stock": "缺货",
     "detail": {
       "images": [],
@@ -491,12 +606,17 @@
         }
       ]
     },
-    "originalImage": "https://qn.ldxp.cn/44/b1db89e735aaed3b517c9766a6edbe.png"
+    "originalImage": "https://qn.ldxp.cn/44/b1db89e735aaed3b517c9766a6edbe.png",
+    "basePrice": 62.88,
+    "visible": false,
+    "serviceGroup": "Claude-Kiro API KEY 100M Token",
+    "displayNumber": 18,
+    "priceBeforeRounding": 69.17
   },
   {
     "image": "/products/27b62d0e78b4f6b556ce24ba613dba.jpg",
     "name": "Claude-Kiro API KEY 100M Token （1天有效期，支持opus4.7/4.8/5）",
-    "price": 42.88,
+    "price": 47.88,
     "stock": "库存少量",
     "detail": {
       "images": [],
@@ -514,12 +634,17 @@
         }
       ]
     },
-    "originalImage": "https://qn.ldxp.cn/e7/27b62d0e78b4f6b556ce24ba613dba.png"
+    "originalImage": "https://qn.ldxp.cn/e7/27b62d0e78b4f6b556ce24ba613dba.png",
+    "basePrice": 42.88,
+    "visible": false,
+    "serviceGroup": "Claude-Kiro API KEY 100M Token",
+    "displayNumber": 19,
+    "priceBeforeRounding": 47.17
   },
   {
     "image": "/products/6ceb74b9acc1b6668eabe8755bd5ab.jpg",
     "name": "Claude-Kiro API KEY 10M Token （1天有效期，支持opus4.7/4.8/5）",
-    "price": 16.88,
+    "price": 18.88,
     "stock": "缺货",
     "detail": {
       "images": [],
@@ -537,12 +662,17 @@
         }
       ]
     },
-    "originalImage": "https://qn.ldxp.cn/97/6ceb74b9acc1b6668eabe8755bd5ab.png"
+    "originalImage": "https://qn.ldxp.cn/97/6ceb74b9acc1b6668eabe8755bd5ab.png",
+    "basePrice": 16.88,
+    "visible": false,
+    "serviceGroup": "Claude-Kiro API KEY 10M Token",
+    "displayNumber": 20,
+    "priceBeforeRounding": 18.57
   },
   {
     "image": "/products/fbdfe8cca1d3eb9aee42810486408f.jpg",
     "name": "Jio Gemini Pro 稳定特殊渠道18个月直充服务（800+订单激活成功4售后，质保激活成功，禁止反代）",
-    "price": 11.88,
+    "price": 13.88,
     "stock": "库存一般",
     "detail": {
       "images": [
@@ -554,12 +684,17 @@
       "url": "https://wzyp.cn/item/vj4iwg",
       "links": []
     },
-    "originalImage": "https://qn.ldxp.cn/41/fbdfe8cca1d3eb9aee42810486408f.png"
+    "originalImage": "https://qn.ldxp.cn/41/fbdfe8cca1d3eb9aee42810486408f.png",
+    "basePrice": 11.88,
+    "visible": false,
+    "serviceGroup": "Jio Gemini Pro 稳定特殊渠道18个月直充服务",
+    "displayNumber": 21,
+    "priceBeforeRounding": 13.07
   },
   {
     "image": "/products/ff64063be557beb8c6810a6e3fb616.jpg",
     "name": "Gemini Pro 稳定特殊渠道18个月老号成品号1（支持反重力，随机地区老帐号2022-2025，质保首登）",
-    "price": 28.88,
+    "price": 31.88,
     "stock": "库存充足",
     "detail": {
       "images": [
@@ -595,12 +730,17 @@
         }
       ]
     },
-    "originalImage": "https://qn.ldxp.cn/1b/ff64063be557beb8c6810a6e3fb616.png"
+    "originalImage": "https://qn.ldxp.cn/1b/ff64063be557beb8c6810a6e3fb616.png",
+    "basePrice": 28.88,
+    "visible": false,
+    "serviceGroup": "Gemini Pro 18个月成品账号",
+    "displayNumber": 22,
+    "priceBeforeRounding": 31.77
   },
   {
     "image": "/products/d397dc541abcd331867d63ad6fcd24.jpg",
     "name": "Gemini Pro 稳定特殊渠道18个月老号成品号（随机地区老帐号2009-2017，质保首登）",
-    "price": 22.88,
+    "price": 25.17,
     "stock": "库存一般",
     "detail": {
       "images": [],
@@ -646,12 +786,17 @@
         }
       ]
     },
-    "originalImage": "https://qn.ldxp.cn/67/d397dc541abcd331867d63ad6fcd24.png"
+    "originalImage": "https://qn.ldxp.cn/67/d397dc541abcd331867d63ad6fcd24.png",
+    "basePrice": 22.88,
+    "visible": false,
+    "serviceGroup": "Gemini Pro 18个月成品账号",
+    "hiddenReason": "同类服务只展示售价最高的一款；同价优先有货且库存更充足，其次保留原顺序。",
+    "selectedAlternative": "https://wzyp.cn/item/cdao0i"
   },
   {
     "image": "/products/294d28a8dc515316e378f8e150fa6d.jpg",
     "name": "Gmail 谷歌随机老号（随机老号200X-201X）",
-    "price": 16.88,
+    "price": 18.88,
     "stock": "库存充足",
     "detail": {
       "images": [
@@ -675,12 +820,17 @@
         }
       ]
     },
-    "originalImage": "https://qn.ldxp.cn/30/294d28a8dc515316e378f8e150fa6d.png"
+    "originalImage": "https://qn.ldxp.cn/30/294d28a8dc515316e378f8e150fa6d.png",
+    "basePrice": 16.88,
+    "visible": true,
+    "serviceGroup": "Gmail 谷歌随机老号",
+    "displayNumber": 23,
+    "priceBeforeRounding": 18.57
   },
   {
     "image": "/products/ae5a600121f20e8b58dd92616342d6.jpg",
     "name": "Gmail 美区TM卡自助接马服务1（美区TM卡，一号一绑，有效期内可无限接马，有效期至20260921）",
-    "price": 5.88,
+    "price": 6.88,
     "stock": "缺货",
     "detail": {
       "images": [],
@@ -689,12 +839,18 @@
       "url": "https://wzyp.cn/item/xjdw3k",
       "links": []
     },
-    "originalImage": "https://qn.ldxp.cn/66/ae5a600121f20e8b58dd92616342d6.png"
+    "originalImage": "https://qn.ldxp.cn/66/ae5a600121f20e8b58dd92616342d6.png",
+    "basePrice": 5.88,
+    "visible": false,
+    "serviceGroup": "Gmail 美区TM卡自助接马服务1",
+    "displayNumber": 24,
+    "priceBeforeRounding": 6.47,
+    "hiddenReason": "用户要求删除24号Gmail验证码服务"
   },
   {
     "image": "/products/5a40902c8b9cf615bbbe6cfe1bf6d8.jpg",
     "name": "Capcut Pro稳定特殊渠道月卡独享成品号（支持seedance2.5，质保首登）",
-    "price": 28.88,
+    "price": 31.88,
     "stock": "库存少量",
     "detail": {
       "images": [],
@@ -708,12 +864,17 @@
         }
       ]
     },
-    "originalImage": "https://qn.ldxp.cn/87/5a40902c8b9cf615bbbe6cfe1bf6d8.png"
+    "originalImage": "https://qn.ldxp.cn/87/5a40902c8b9cf615bbbe6cfe1bf6d8.png",
+    "basePrice": 28.88,
+    "visible": false,
+    "serviceGroup": "Capcut Pro稳定特殊渠道月卡独享成品号",
+    "displayNumber": 25,
+    "priceBeforeRounding": 31.77
   },
   {
     "image": "/products/d23aa015e183fa1eb4226c38a636d6.jpg",
     "name": "Canva Busines With Leonardo 特殊渠道月卡独享成品号 （质保首登）",
-    "price": 29.88,
+    "price": 32.88,
     "stock": "缺货",
     "detail": {
       "images": [],
@@ -735,12 +896,17 @@
         }
       ]
     },
-    "originalImage": "https://qn.ldxp.cn/69/d23aa015e183fa1eb4226c38a636d6.png"
+    "originalImage": "https://qn.ldxp.cn/69/d23aa015e183fa1eb4226c38a636d6.png",
+    "basePrice": 29.88,
+    "visible": false,
+    "serviceGroup": "Canva Busines With Leonardo 特殊渠道月卡独享成品号",
+    "displayNumber": 26,
+    "priceBeforeRounding": 32.87
   },
   {
     "image": "/products/e65a56f4be56b24b4847fc120543e4.jpg",
     "name": "Runway Max 稳定特殊渠道月卡独享成品号（9500积分，Seedance2.5等，质保24小时）",
-    "price": 188.88,
+    "price": 207.88,
     "stock": "库存一般",
     "detail": {
       "images": [],
@@ -758,12 +924,17 @@
         }
       ]
     },
-    "originalImage": "https://qn.ldxp.cn/00/e65a56f4be56b24b4847fc120543e4.png"
+    "originalImage": "https://qn.ldxp.cn/00/e65a56f4be56b24b4847fc120543e4.png",
+    "basePrice": 188.88,
+    "visible": false,
+    "serviceGroup": "Runway Max 稳定特殊渠道月卡独享成品号",
+    "displayNumber": 27,
+    "priceBeforeRounding": 207.77
   },
   {
     "image": "/products/20bfa550fa0abc04e9b99aef2f6bef.jpg",
     "name": "Leonardo Ai 稳定特殊渠道月卡独享成品号（8500积分，支持seedance2.0 等，质保首登）",
-    "price": 9.88,
+    "price": 10.88,
     "stock": "库存充足",
     "detail": {
       "images": [],
@@ -789,12 +960,17 @@
         }
       ]
     },
-    "originalImage": "https://qn.ldxp.cn/b2/20bfa550fa0abc04e9b99aef2f6bef.png"
+    "originalImage": "https://qn.ldxp.cn/b2/20bfa550fa0abc04e9b99aef2f6bef.png",
+    "basePrice": 9.88,
+    "visible": false,
+    "serviceGroup": "Leonardo Ai 稳定特殊渠道月卡独享成品号",
+    "displayNumber": 28,
+    "priceBeforeRounding": 10.87
   },
   {
     "image": "/products/b2d880fdf437165c1d8a20cae77ab0.jpg",
     "name": "Kling Ai Standard 稳定特殊渠道月卡独享成品号（1000积分，快手视频图像Ai，质保首登）",
-    "price": 88.88,
+    "price": 97.88,
     "stock": "库存一般",
     "detail": {
       "images": [],
@@ -812,12 +988,17 @@
         }
       ]
     },
-    "originalImage": "https://qn.ldxp.cn/c5/b2d880fdf437165c1d8a20cae77ab0.png"
+    "originalImage": "https://qn.ldxp.cn/c5/b2d880fdf437165c1d8a20cae77ab0.png",
+    "basePrice": 88.88,
+    "visible": false,
+    "serviceGroup": "Kling Ai Standard 稳定特殊渠道月卡独享成品号",
+    "displayNumber": 29,
+    "priceBeforeRounding": 97.77
   },
   {
     "image": "/products/4a9652bf31107f8e8f319f8a1c159d.jpg",
     "name": "Perplexity Pro 特殊渠道稳定年卡直充（质保激活，Ai搜索引擎，客服在线时间人工发送）",
-    "price": 198.88,
+    "price": 218.88,
     "stock": "库存一般",
     "detail": {
       "images": [],
@@ -831,12 +1012,17 @@
         }
       ]
     },
-    "originalImage": "https://qn.ldxp.cn/e6/4a9652bf31107f8e8f319f8a1c159d.png"
+    "originalImage": "https://qn.ldxp.cn/e6/4a9652bf31107f8e8f319f8a1c159d.png",
+    "basePrice": 198.88,
+    "visible": false,
+    "serviceGroup": "Perplexity Pro 特殊渠道稳定年卡直充",
+    "displayNumber": 30,
+    "priceBeforeRounding": 218.77
   },
   {
     "image": "/products/aa7e319fc2bfe23e7ae0461caca9ef.jpg",
     "name": "补价链接2",
-    "price": 29.88,
+    "price": 32.87,
     "stock": "库存少量",
     "detail": {
       "images": [],
@@ -845,12 +1031,17 @@
       "url": "https://wzyp.cn/item/9n5dhr",
       "links": []
     },
-    "originalImage": "https://qn.ldxp.cn/0a/aa7e319fc2bfe23e7ae0461caca9ef.png"
+    "originalImage": "https://qn.ldxp.cn/0a/aa7e319fc2bfe23e7ae0461caca9ef.png",
+    "basePrice": 29.88,
+    "visible": false,
+    "serviceGroup": "补价",
+    "displayNumber": 31,
+    "hiddenReason": "用户按页面编号手动删除"
   },
   {
     "image": "/products/aa7e319fc2bfe23e7ae0461caca9ef.jpg",
     "name": "补价链接",
-    "price": 25.88,
+    "price": 28.47,
     "stock": "库存一般",
     "detail": {
       "images": [],
@@ -859,6 +1050,11 @@
       "url": "https://wzyp.cn/item/x7bx3x",
       "links": []
     },
-    "originalImage": "https://qn.ldxp.cn/0a/aa7e319fc2bfe23e7ae0461caca9ef.png"
+    "originalImage": "https://qn.ldxp.cn/0a/aa7e319fc2bfe23e7ae0461caca9ef.png",
+    "basePrice": 25.88,
+    "visible": false,
+    "serviceGroup": "补价",
+    "hiddenReason": "同类服务只展示售价最高的一款；同价优先有货且库存更充足，其次保留原顺序。",
+    "selectedAlternative": "https://wzyp.cn/item/9n5dhr"
   }
 ]

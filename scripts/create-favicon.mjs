@@ -1,0 +1,11 @@
+import fs from 'node:fs';
+import sharp from 'sharp';
+fs.mkdirSync('deployment', { recursive: true });
+const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect x="1" y="1" width="62" height="62" rx="15" fill="#171717" stroke="#fff" stroke-opacity=".3"/><path fill="#fff" fill-rule="evenodd" d="M13 49 26 16h10l14 33H40l-3-8H26l-3 8Zm16-16h5l-2.5-8Z"/><path fill="#fff" d="m49 8 2.2 5.8L57 16l-5.8 2.2L49 24l-2.2-5.8L41 16l5.8-2.2Z"/></svg>`;
+fs.writeFileSync('public/favicon.svg', svg);
+fs.writeFileSync('public/brand-icon-v2.svg', svg);
+for (const [size,name] of [[32,'favicon-32-v2.png'],[180,'apple-touch-icon-v2.png']]) await sharp(Buffer.from(svg)).resize(size,size).png().toFile('public/'+name);
+await sharp(Buffer.from(svg)).resize(256,256).png().toFile('deployment/favicon-preview.png');
+const png = await sharp(Buffer.from(svg)).resize(32,32).png().toBuffer();
+const header=Buffer.alloc(22); header.writeUInt16LE(1,2);header.writeUInt16LE(1,4);header[6]=32;header[7]=32;header.writeUInt16LE(1,10);header.writeUInt16LE(32,12);header.writeUInt32LE(png.length,14);header.writeUInt32LE(22,18);
+fs.writeFileSync('public/favicon.ico',Buffer.concat([header,png]));

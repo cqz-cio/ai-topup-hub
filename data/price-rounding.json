@@ -1,0 +1,144 @@
+{
+  "date": "2026-09-06",
+  "rule": "手动指定的六个售价保持不变；其余可见商品统一以.88结尾，相对本轮尾价优化前价格的变化不超过1元。",
+  "changes": [
+    {
+      "number": 3,
+      "from": 8,
+      "baseline": 7.57,
+      "to": 7.88
+    },
+    {
+      "number": 9,
+      "from": 32,
+      "baseline": 31.77,
+      "to": 31.88
+    },
+    {
+      "number": 10,
+      "from": 328,
+      "baseline": 328.77,
+      "to": 328.88
+    },
+    {
+      "number": 11,
+      "from": 186,
+      "baseline": 185.77,
+      "to": 185.88
+    },
+    {
+      "number": 12,
+      "from": 428,
+      "baseline": 427.77,
+      "to": 427.88
+    },
+    {
+      "number": 13,
+      "from": 318,
+      "baseline": 317.77,
+      "to": 317.88
+    },
+    {
+      "number": 14,
+      "from": 208,
+      "baseline": 207.77,
+      "to": 207.88
+    },
+    {
+      "number": 15,
+      "from": 406,
+      "baseline": 405.77,
+      "to": 405.88
+    },
+    {
+      "number": 16,
+      "from": 758,
+      "baseline": 757.77,
+      "to": 757.88
+    },
+    {
+      "number": 17,
+      "from": 162,
+      "baseline": 161.57,
+      "to": 161.88
+    },
+    {
+      "number": 18,
+      "from": 69,
+      "baseline": 69.17,
+      "to": 69.88
+    },
+    {
+      "number": 19,
+      "from": 48,
+      "baseline": 47.17,
+      "to": 47.88
+    },
+    {
+      "number": 20,
+      "from": 18,
+      "baseline": 18.57,
+      "to": 18.88
+    },
+    {
+      "number": 21,
+      "from": 13,
+      "baseline": 13.07,
+      "to": 13.88
+    },
+    {
+      "number": 22,
+      "from": 32,
+      "baseline": 31.77,
+      "to": 31.88
+    },
+    {
+      "number": 23,
+      "from": 18,
+      "baseline": 18.57,
+      "to": 18.88
+    },
+    {
+      "number": 24,
+      "from": 6.8,
+      "baseline": 6.47,
+      "to": 6.88
+    },
+    {
+      "number": 25,
+      "from": 32,
+      "baseline": 31.77,
+      "to": 31.88
+    },
+    {
+      "number": 26,
+      "from": 33,
+      "baseline": 32.87,
+      "to": 32.88
+    },
+    {
+      "number": 27,
+      "from": 208,
+      "baseline": 207.77,
+      "to": 207.88
+    },
+    {
+      "number": 28,
+      "from": 11,
+      "baseline": 10.87,
+      "to": 10.88
+    },
+    {
+      "number": 29,
+      "from": 98,
+      "baseline": 97.77,
+      "to": 97.88
+    },
+    {
+      "number": 30,
+      "from": 218,
+      "baseline": 218.77,
+      "to": 218.88
+    }
+  ]
+}

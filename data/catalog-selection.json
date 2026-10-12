@@ -1,0 +1,125 @@
+{
+  "rule": "同一服务档位、交付形式、时长保留最高售价；同价按库存优先、原顺序优先。不同额度、订阅时长、验证码有效期分开保留。 Plus成品账号按24小时和20天质保分别归类，不能跨质保期限合并。",
+  "decisions": [
+    {
+      "group": "Plus 月卡成品账号 · 24小时质保",
+      "retained": {
+        "name": "PLUS稳定特殊渠道独享月卡成品号6（日区，支持反代，购买24小时内非禁止网络账号问题可免费更换一次）",
+        "price": 65.87,
+        "url": "https://wzyp.cn/item/x74yu9"
+      },
+      "hidden": [
+        {
+          "name": "PLUS 特殊渠道独享月卡成品号3（东南亚区，支持反代，购买24小时内非禁止网络账号问题可免费更换一次）",
+          "price": 65.87,
+          "url": "https://wzyp.cn/item/5wdrjz"
+        }
+      ]
+    },
+    {
+      "group": "Plus 月卡成品账号 · 20天质保",
+      "retained": {
+        "name": "PLUS稳定特殊渠道独享月卡成品号1（日区，支持反代，购买20天内非禁止网络账号问题可退剩余）",
+        "price": 97.77,
+        "url": "https://wzyp.cn/item/hn4q2p"
+      },
+      "hidden": [
+        {
+          "name": "PLUS稳定特殊渠道独享月卡成品号5（泰区，支持反代，购买20天内非禁止网络账号问题可退剩余）",
+          "price": 97.77,
+          "url": "https://wzyp.cn/item/tc7p4m"
+        }
+      ]
+    },
+    {
+      "group": "Plus 代充值",
+      "retained": {
+        "name": "Plus 稳定正规渠道直充 3（质保订阅，封号不质保，支持提前续费）",
+        "price": 152.77,
+        "url": "https://wzyp.cn/item/4xtc99"
+      },
+      "hidden": [
+        {
+          "name": "Plus 稳定正规渠道直充1（质保订阅，封号不质保，不支持提前续费）",
+          "price": 141.77,
+          "url": "https://wzyp.cn/item/oxid90"
+        }
+      ]
+    },
+    {
+      "group": "Pro 5X 代充值",
+      "retained": {
+        "name": "Pro 5X 稳定正规渠道直充2（质保订阅，封号不质保，支持覆盖升级，卡密自助充值服务）",
+        "price": 691.77,
+        "url": "https://wzyp.cn/item/hk57yf"
+      },
+      "hidden": [
+        {
+          "name": "Pro 5X 稳定正规渠道直充1（质保订阅，封号不质保，支持覆盖升级，卡密自助充值服务）",
+          "price": 691.77,
+          "url": "https://wzyp.cn/item/ep6emq"
+        }
+      ]
+    },
+    {
+      "group": "Pro 20X 代充值",
+      "retained": {
+        "name": "Pro 20X 稳定正规渠道直充1（质保订阅，封号不质保，支持覆盖升级，卡密自助充值服务）",
+        "price": 1351.77,
+        "url": "https://wzyp.cn/item/egjog0"
+      },
+      "hidden": [
+        {
+          "name": "Pro 20X 稳定正规渠道直充2（质保订阅，封号不质保，不支持提前续费）",
+          "price": 1241.77,
+          "url": "https://wzyp.cn/item/yh4oof"
+        }
+      ]
+    },
+    {
+      "group": "Claude Pro 代充值",
+      "retained": {
+        "name": "Claude Pro 稳定正规渠道直充 4（质保订阅，封号无售后，请您同意再购买）",
+        "price": 161.57,
+        "url": "https://wzyp.cn/item/bf0ain"
+      },
+      "hidden": [
+        {
+          "name": "Claude Pro 稳定正规渠道直充 5（质保订阅，封号无售后，请您同意再购买）",
+          "price": 161.57,
+          "url": "https://wzyp.cn/item/qd4cl3"
+        }
+      ]
+    },
+    {
+      "group": "Gemini Pro 18个月成品账号",
+      "retained": {
+        "name": "Gemini Pro 稳定特殊渠道18个月老号成品号1（支持反重力，随机地区老帐号2022-2025，质保首登）",
+        "price": 31.77,
+        "url": "https://wzyp.cn/item/cdao0i"
+      },
+      "hidden": [
+        {
+          "name": "Gemini Pro 稳定特殊渠道18个月老号成品号（随机地区老帐号2009-2017，质保首登）",
+          "price": 25.17,
+          "url": "https://wzyp.cn/item/dtl195"
+        }
+      ]
+    },
+    {
+      "group": "补价",
+      "retained": {
+        "name": "补价链接2",
+        "price": 32.87,
+        "url": "https://wzyp.cn/item/9n5dhr"
+      },
+      "hidden": [
+        {
+          "name": "补价链接",
+          "price": 28.47,
+          "url": "https://wzyp.cn/item/x7bx3x"
+        }
+      ]
+    }
+  ]
+}
