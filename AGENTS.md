@@ -9,7 +9,8 @@
 - 未完成真实资金验收，不得把模拟测试通过描述成真实收款或采购验收。
 - 库存由独立的 `zhixiang-stock-sync.timer` 每 300 秒只查询和同步。不要重复启动助手或为同步启动完整 worker。自动充值保持关闭。
 - 后续升级保留 storefront 模式、支付及采购队列、持久化 Redis。先备份线上数据，不用本机数据库覆盖线上订单，也不套用旧 api 或 checkout 初始化脚本。
-- 用户已于 2026-10-12 授权跨会话读取、保存并复用此前提供的服务器信息。本机固定凭据入口为 `D:\卡网\work\codex-runtime\tencent-cloud-server.credentials.json`，SSH 主机指纹文件为同目录 `tencent-known-hosts`。新会话先检查并读取这一私有文件，验证目标为 `43.134.141.10`、账号为 `ubuntu`，不要重复向用户索要已保存的信息；仅在文件缺失、凭据失效或目标不一致时询问。旧电脑路径不作为当前入口。
+- 用户已授权跨会话读取、保存并复用服务器信息，2026-10-12 再次确认上海和新加坡使用此前提供的同一 `ubuntu` 登录信息。当前 C 盘工作区 `C:\Codex program\智享A社\deployment\local\` 中，新加坡凭据和指纹为 `tencent-cloud-server.credentials.json`、`tencent-cloud-known-hosts`，上海凭据和指纹为 `shanghai-front-server.credentials.json`、`shanghai-front-known-hosts`；登录均已验证，文件被 Git 忽略，上海密码文件仅当前用户和 SYSTEM 可访问。D 盘工作区原 `work/codex-runtime/tencent-cloud-server.credentials.json` 与 `tencent-known-hosts` 若存在仍可用于新加坡。新会话先检查对应目标的已保存文件，不因旧路径缺失而重复索要信息；仅在所有已保存入口缺失、凭据失效或目标不一致时询问。禁止输出密码。
+- 当前上海前端发布为 `20261012-205131`，商城源码 `6d8c1e94105d483e8a55b2318808c6c24a12877a`，详情封面及缩略图完整显示；后台仍沿用 `948c37f`，新加坡后端仍为 `20261012-153531`。此前各端源码一致的记录仅适用于旧发布。此次仅更新商城静态资源，保留旧哈希资源和后台，未重启后端或进行付款采购测试，见 `ops/tencent/production-baseline.json`。
 - 凭据只保存在忽略的 `work/` 或 `deployment/local/`，限制本机文件访问权限。不得在源码、提交、对话、日志或构建产物中写入或回显密码、商户密钥、JWT、私钥或助记词；项目文档只记录私有文件路径和连接方式。使用已保存的 SSH 主机指纹核验服务器，指纹变化时停止连接并核查。
 - 商户 1039 使用 `acg-faka`；密钥仅用于本地签名，不随请求发送。余额采购须持久化原子提交状态，未知结果进入人工核查，不能自动重新采购。
 - 商品目录为 6 个分类、16 款商品，供货映射 12 款。`qzweb-55` 售价固定为 1160.00 元；库存及商户进价同步不能覆盖本站售价。

@@ -6,7 +6,9 @@
 
 ## 上海入口维护
 
-前端发布 `/srv/zhixiang-front/releases/20261012-164700`，`current` 指向该目录。436 个静态文件逐一核验，前后端构建源码均为 `948c37f2d33420631eb77a75d3c1debe40d967b6`；发布包 SHA-256 为 `59ee85aa81790421a1ebd2f735f630b9e0c0f36a2d852975d194f315ca1af57e`。前一套静态发布保留于 `releases/20261012-151927`，切换前记录为 `backups/before-front-20261012-164700/previous-release.txt`。本次没有上传数据库、替换新加坡程序或执行真实收款采购。
+当前前端发布 `/srv/zhixiang-front/releases/20261012-205131`，`current` 指向该目录。商城源码为 `6d8c1e94105d483e8a55b2318808c6c24a12877a`，后台资源沿用 `948c37f2d33420631eb77a75d3c1debe40d967b6`；新加坡后端仍运行 `20261012-153531`。发布包 SHA-256 为 `944b99b2d02b736ff8c882d687029622008cb1e328ec00dff3aed131f1da3e18`，637 个静态文件已核对，包含为已打开页面保留的旧哈希资源。前一套前端 `releases/20261012-164700` 和备份 `backups/before-detail-image-20261012-205131` 均保留。本次仅更新商城前端，没有上传数据库或重启后端。
+
+2026-10-12 20:51 发布商品详情封面修复：主图采用 5:3 比例及 `object-contain`，缩略图也完整显示，避免 `object-cover` 裁掉 Go、Plus、Pro 图中文字。94 项现有前台测试、类型检查和生产构建通过；本机和公网各 30 项页面检查覆盖 15 款商品封面，以及 1920、1280、1024、768、390、320px 六种宽度，无横向溢出或页面脚本错误。DEMO 的既有图标不计入商品封面检查。后台文件、Nginx 配置、16 款售价和两条 USDT 渠道核对正常；后端配置、storefront 模式和库存定时器保持原状态。发布报告为 `shared/work/detail-image-release-20261012-205131.json`，浏览器截图及记录在本机忽略目录 `work/codex-runtime/product-detail-image-qa/`。新加坡一致性备份位于 `/srv/zhixiang/backups/before-frontend-detail-20261012-205131`；没有执行真实付款或采购测试。
 
 `zhixiang-api-tunnel.service` 使用上海本机私钥，将 `127.0.0.1:18880` 转发到新加坡 `127.0.0.1:8080`。新加坡账号 `zhixiang-api-proxy` 只接受上海来源和这一转发目标，禁止终端、其他转发、代理转发与数据库访问；上海私钥不复制至开发机或提交 Git。Nginx 配置和服务模板见本目录 `frontend-gateway/`。后端反代禁止自动重试付款请求；管理 API 未登录返回业务状态码 401。
 
@@ -72,7 +74,7 @@
 
 ### 本机固定登录入口
 
-用户已授权后续会话复用已提供的服务器信息。当前 Windows 主目录的凭据文件为 `D:\卡网\work\codex-runtime\tencent-cloud-server.credentials.json`，字段为 `host`、`port`、`username`、`password`；文件已存在且由 Git 忽略。SSH 主机指纹保存在 `work/codex-runtime/tencent-known-hosts`。连接时从文件读取并核对 `43.134.141.10` / `ubuntu`，加载已保存指纹并拒绝未知或变化的主机密钥。不要输出整个凭据文件。
+用户已授权后续会话复用已提供的服务器信息，并于 2026-10-12 确认上海与新加坡均使用已提供的 `ubuntu` 登录信息。当前 C 盘工作区私有目录 `C:\Codex program\智享A社\deployment\local\` 已保存新加坡 `tencent-cloud-server.credentials.json`、`tencent-cloud-known-hosts`，以及上海 `shanghai-front-server.credentials.json`、`shanghai-front-known-hosts`。上海登录已验证，密码文件仅当前用户和 SYSTEM 可访问，全部由 Git 忽略。字段为 `host`、`port`、`username`、`password`；连接时核对目标 IP，加载对应已保存指纹并拒绝未知或变化的主机密钥，不输出凭据。D 盘工作区若存在其原 `work/codex-runtime/tencent-cloud-server.credentials.json` 与 `tencent-known-hosts`，仍可用于同一新加坡目标；不要因旧路径缺失而忽略当前已保存的私有文件或重复询问。
 
 新会话先复用这一入口，不再要求用户重复提供服务器信息。只有文件缺失、认证失败或目标不匹配时才询问。凭据值不写入本文、Git、日志或发布包；备份仍按生产发布流程保存在私有位置。
 

@@ -324,13 +324,13 @@
   "previous_build_verification_at": "2026-10-12T08:19:31.766441+00:00",
   "management_url": "https://124.220.2.69:18888/login",
   "frontend_gateway": {
-    "checked_at": "2026-10-12T08:53:32.669735+00:00",
+    "checked_at": "2026-10-12T12:59:38.229446+00:00",
     "frontend_host": "124.220.2.69",
     "backend_host": "43.134.141.10",
-    "frontend_release": "20261012-164700",
-    "source_commit": "948c37f2d33420631eb77a75d3c1debe40d967b6",
-    "archive_sha256": "59ee85aa81790421a1ebd2f735f630b9e0c0f36a2d852975d194f315ca1af57e",
-    "static_files_verified": 436,
+    "frontend_release": "20261012-205131",
+    "source_commit": "6d8c1e94105d483e8a55b2318808c6c24a12877a",
+    "archive_sha256": "944b99b2d02b736ff8c882d687029622008cb1e328ec00dff3aed131f1da3e18",
+    "static_files_verified": 637,
     "storefront_url": "https://www.qzweb.cloud/",
     "management_url": "https://124.220.2.69:18888/login",
     "www_dns_record": "www A 124.220.2.69",
@@ -346,7 +346,7 @@
     "certificate_renewal_verified": true,
     "certificate_timer": "qzweb-certificates.timer",
     "certificate_renewal_report": "/srv/zhixiang-front/shared/work/renew-final-20261012-1644/status.json",
-    "report_path": "/srv/zhixiang-front/shared/work/frontend-final-report.json",
+    "report_path": "/srv/zhixiang-front/shared/work/detail-image-release-20261012-205131.json",
     "backend_report_path": "/srv/zhixiang/shared/reports/shanghai-backend-final-read.json",
     "formal_alipay_enabled": false,
     "database_uploaded": false,
@@ -359,7 +359,13 @@
       "conditional_request_http_status": 200,
       "browser_current_frontend_confirmed": true,
       "report_path": "/srv/zhixiang-front/shared/work/entry-cache-report.json"
-    }
+    },
+    "previous_frontend_release": "20261012-164700",
+    "storefront_source_commit": "6d8c1e94105d483e8a55b2318808c6c24a12877a",
+    "admin_source_commit": "948c37f2d33420631eb77a75d3c1debe40d967b6",
+    "backup": "/srv/zhixiang-front/backups/before-detail-image-20261012-205131",
+    "frontend_only_update": true,
+    "previous_hashed_assets_retained": true
   },
   "alipay": {
     "code_and_official_sandbox_query_verified": true,
@@ -367,5 +373,33 @@
     "public_async_notification_tested": false,
     "merchant_business_approval_verified": false,
     "individual_long_term_quota_application_submitted": false
+  },
+  "storefront_product_detail_ui": {
+    "release": "20261012-205131",
+    "source_commit": "6d8c1e94105d483e8a55b2318808c6c24a12877a",
+    "change": "Display the complete main cover at 5:3 with object-contain; contain thumbnails as well.",
+    "user_tests_passed": 94,
+    "typechecked_production_build": true,
+    "local_browser_cases_passed": 30,
+    "production_browser_cases_passed": 30,
+    "checked_cover_product_count": 15,
+    "viewports": [
+      1920,
+      1280,
+      1024,
+      768,
+      390,
+      320
+    ],
+    "horizontal_overflow": false,
+    "browser_errors": 0,
+    "public_verification_read_only": true,
+    "backend_release_preserved": "20261012-153531",
+    "backend_configuration_and_prices_unchanged": true,
+    "admin_unchanged": true,
+    "local_database_uploaded": false,
+    "real_payment_or_purchase_submitted": false,
+    "backend_backup": "/srv/zhixiang/backups/before-frontend-detail-20261012-205131",
+    "production_screenshot_directory": "work/codex-runtime/product-detail-image-qa/"
   }
 }
