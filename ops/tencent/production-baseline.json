@@ -432,5 +432,32 @@
     "real_payment_or_purchase_submitted": false,
     "backend_backup": "/srv/zhixiang/backups/before-frontend-announcement-20261012-231734",
     "verification_directory": "work/codex-runtime/announcement-qa/"
+  },
+  "home_announcement_content": {
+    "checked_at": "2026-10-12T15:38:51.960589+00:00",
+    "configured_at": "20261012-233551",
+    "configuration_source_commit": "6c088c7a20725b5ebcfec10286e6346b2c8870d2",
+    "source_file": "docs/catalog/home-announcement.json",
+    "enabled": true,
+    "version": "c13a6e2c",
+    "title": "购买须知与代理合作",
+    "customer_wechat": "15824485317",
+    "redemption_url": "https://cdkai.kdns.fr/",
+    "agent_price_contact_required": true,
+    "actual_public_configuration_verified": true,
+    "local_browser_cases_passed": 3,
+    "production_browser_cases_passed": 3,
+    "viewports": [
+      1920,
+      390,
+      320
+    ],
+    "browser_fixture_used": false,
+    "backend_release_preserved": "20261012-153531",
+    "frontend_release_preserved": "20261012-231734",
+    "programs_replaced": false,
+    "backup": "/srv/zhixiang/backups/before-announcement-content-20261012-233551",
+    "verification_directory": "work/codex-runtime/announcement-content-qa/",
+    "real_payment_or_purchase_submitted": false
   }
 }
