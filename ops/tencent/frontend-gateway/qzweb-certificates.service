@@ -1,0 +1,10 @@
+[Unit]
+Description=Renew Shanghai storefront and IP management certificates
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/srv/zhixiang-front/shared/certbot-venv/bin/certbot renew --non-interactive --config-dir /srv/zhixiang-front/shared/letsencrypt --work-dir /srv/zhixiang-front/shared/work/certbot --logs-dir /srv/zhixiang-front/shared/work/codex-logs/certbot --no-random-sleep-on-renew --deploy-hook /srv/zhixiang-front/shared/work/reload-qzweb-nginx.sh
+TimeoutStartSec=300
+UMask=0077

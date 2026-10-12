@@ -8,14 +8,15 @@
 
 | 入口 | 地址 / 位置 |
 | --- | --- |
-| 正式商城 | http://43.134.141.10/ |
-| 正式后台 | http://43.134.141.10/zxa-management/ |
+| 正式商城 | https://www.qzweb.cloud/ （上海前端） |
+| 正式后台 | https://124.220.2.69:18888/login （上海独立 HTTPS 端口） |
+| 订单、支付与采购后端 | 新加坡 `43.134.141.10`，API 仅监听回环地址 |
 | 本地商城 | http://127.0.0.1:5173/ |
 | 本地后台 | http://127.0.0.1:5174/ |
 | 绿色源码基线 | `baseline/green-20261012`，提交 `419141e` |
 | 生产发布记录 | `20261012-153531`，构建源码 `948c37f2d33420631eb77a75d3c1debe40d967b6`，见 [生产维护说明](ops/tencent/README.md) |
 
-源码标签、服务器发布号和数据库是三个独立对象。线上比对证据与核验范围在 [production-baseline.json](ops/tencent/production-baseline.json)。推送 GitHub 不会自动部署服务器，也不会同步数据库。服务器已保留 `www.qzweb.cloud` 的 HTTPS 配置，但本次公网核验该域名仍返回旧站；新版商城继续以表中的 IP 入口为准。
+源码标签、服务器发布号和数据库是三个独立对象。线上比对证据与核验范围在 [production-baseline.json](ops/tencent/production-baseline.json)。推送 GitHub 不会自动部署服务器，也不会同步数据库。2026-10-12 已将 `www` 解析切到上海；两套前端发布 `20261012-164700` 与新加坡后端的构建源码 `948c37f` 对齐，域名 HTTPS、管理端登录鉴权和证书自动续期已核验。旧新加坡 HTTP 入口保留兼容，日常使用上表 HTTPS 地址。正式支付宝仍未启用，代码和沙箱结果见 [支付宝接入记录](docs/alipay-web-payment.md)。
 
 ## 目录
 

@@ -1,8 +1,18 @@
-# 新加坡正式环境
+# 上海前端与新加坡后端
 
-服务器 `43.134.141.10` 是 π星卡社的正式环境。[商城](http://43.134.141.10/)与[后台](http://43.134.141.10/zxa-management/)由同一 Go 程序提供。
+π星卡社的[商城](https://www.qzweb.cloud/)和[后台](https://124.220.2.69:18888/login)前端运行于上海 `124.220.2.69`，目录 `/srv/zhixiang-front`。新加坡 `43.134.141.10` 的 `/srv/zhixiang` 保留 Go 后端、生产数据库、持久化 Redis、支付监听、采购交付和库存定时任务。
 
-服务器已有 `www.qzweb.cloud` 的 HTTPS 反向代理，本次保留其配置并验证源站 TLS、页面和资源。2026-10-12 16:12（北京时间）公网 Cloudflare 入口仍返回旧版“智享A社”页面，且健康、配置接口与源站不同；这不是新版域名上线成功，当前正式新版入口以上述 IP 地址为准。后续切换域名需核对 DNS、Cloudflare 回源和缓存，不能仅凭源站证书或本地 SNI 核验宣告公网域名已切换。
+2026-10-12 16:30 完成 `www A 124.220.2.69` 的腾讯云身份验证及解析保存，根域 `@` 解析未修改。16:53 核验正常域名访问为新版 π星卡社，HTTPS 链与域名验证通过；管理端使用独立 IP 端口，`www` 下的 `/zxa-management/` 返回 404。旧新加坡 HTTP 入口仍可用于兼容，但日常登录和访问使用上海 HTTPS 入口。
+
+## 上海入口维护
+
+前端发布 `/srv/zhixiang-front/releases/20261012-164700`，`current` 指向该目录。436 个静态文件逐一核验，前后端构建源码均为 `948c37f2d33420631eb77a75d3c1debe40d967b6`；发布包 SHA-256 为 `59ee85aa81790421a1ebd2f735f630b9e0c0f36a2d852975d194f315ca1af57e`。前一套静态发布保留于 `releases/20261012-151927`，切换前记录为 `backups/before-front-20261012-164700/previous-release.txt`。本次没有上传数据库、替换新加坡程序或执行真实收款采购。
+
+`zhixiang-api-tunnel.service` 使用上海本机私钥，将 `127.0.0.1:18880` 转发到新加坡 `127.0.0.1:8080`。新加坡账号 `zhixiang-api-proxy` 只接受上海来源和这一转发目标，禁止终端、其他转发、代理转发与数据库访问；上海私钥不复制至开发机或提交 Git。Nginx 配置和服务模板见本目录 `frontend-gateway/`。后端反代禁止自动重试付款请求；管理 API 未登录返回业务状态码 401。
+
+两张证书由独立 Certbot 5.8.0 环境管理，配置目录为 `/srv/zhixiang-front/shared/letsencrypt`。`qzweb-certificates.timer` 每日 00、06、12、18 时 15 分触发，续期成功后校验并重载 Nginx；管理端使用短期 IP 证书，必须保持该定时器运行。两张证书的实际续期、Webroot 配置、定时服务和 HTTPS 访问均已核验。WWW Webroot 为 `/var/lib/letsencrypt`，管理 IP Webroot 为 `/var/lib/enterprise-exam-acme`，不能互相覆盖；未改动服务器其他站点的证书环境。
+
+上海证据保存在 `shared/work/frontend-final-report.json` 与 `shared/work/renew-final-20261012-1644/status.json`；新加坡最终只读核验报告为 `/srv/zhixiang/shared/reports/shanghai-backend-final-read.json`。本机截图与记录在忽略的 `work/codex-runtime/alipay-domain-qa/`、`work/codex-logs/`。腾讯云上海实例为 `lhins-kb6tfs2w`；尚未另行提供上海 SSH 凭据，维护可使用账号本人已登录的腾讯云自动化助手，不能借用其他账号或项目凭据。
 
 ## 已核验的运行基准
 

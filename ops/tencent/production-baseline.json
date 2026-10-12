@@ -1,6 +1,6 @@
 {
-  "checked_at": "2026-10-12T08:19:31.766441+00:00",
-  "production_url": "http://43.134.141.10",
+  "checked_at": "2026-10-12T09:00:36.156711+00:00",
+  "production_url": "https://www.qzweb.cloud/",
   "documented_release_id": "20261012-153531",
   "verified_release_id": "20261012-153531",
   "previous_release_id": "20261012-141843",
@@ -202,7 +202,7 @@
     "Source commit identifies the deployed binary; later documentation-only commits do not change the running binary.",
     "Payment channels and assets were verified through public GET requests; no production test order was created.",
     "Finance GET permissions were verified in the live policy API; existing payment compliance acknowledgement remains required for monitoring access.",
-    "The public www.qzweb.cloud Cloudflare endpoint still serves the legacy shop. Origin TLS success does not verify public domain cutover; the deployed shop was verified through 43.134.141.10."
+    "Shanghai HTTPS domain and IP management frontends were verified without placing a production order; official Alipay contracting and payment notification acceptance remain incomplete."
   ],
   "procurement_verification": {
     "mock_end_to_end_scenarios_passed": 12,
@@ -285,15 +285,13 @@
       "url": "https://www.qzweb.cloud/",
       "status": 200,
       "final_url": "https://www.qzweb.cloud/",
-      "sha256": "b06ede3ea2886ebd9e3417267939e0d0e3e96d2e888b57331a854cea9f1beeb7",
-      "server": "cloudflare",
-      "content_type": "text/html; charset=utf-8",
-      "checked_at": "2026-10-12T08:12:28.308820+00:00",
-      "serves_deployed_frontend": false,
-      "browser_confirmed_legacy_shop": true,
-      "cache_bypass_probe_status": 403
+      "sha256": "33da431f05f1721822c2a62a509bba1582206ff478a58a8381a598e02299179b",
+      "checked_at": "2026-10-12T08:53:32.669735+00:00",
+      "serves_deployed_frontend": true,
+      "browser_confirmed_legacy_shop": false
     },
-    "public_domain_cutover_verified": false
+    "public_domain_cutover_verified": true,
+    "frontend_origin_host": "124.220.2.69"
   },
   "navbar_logo_ui": {
     "source_commit": "948c37f2d33420631eb77a75d3c1debe40d967b6",
@@ -322,5 +320,44 @@
     "production_screenshot_directory": "work/codex-runtime/logo-spacing-preview-20261012/",
     "local_database_uploaded": false,
     "real_payment_or_purchase_submitted": false
+  },
+  "previous_build_verification_at": "2026-10-12T08:19:31.766441+00:00",
+  "management_url": "https://124.220.2.69:18888/login",
+  "frontend_gateway": {
+    "checked_at": "2026-10-12T08:53:32.669735+00:00",
+    "frontend_host": "124.220.2.69",
+    "backend_host": "43.134.141.10",
+    "frontend_release": "20261012-164700",
+    "source_commit": "948c37f2d33420631eb77a75d3c1debe40d967b6",
+    "archive_sha256": "59ee85aa81790421a1ebd2f735f630b9e0c0f36a2d852975d194f315ca1af57e",
+    "static_files_verified": 436,
+    "storefront_url": "https://www.qzweb.cloud/",
+    "management_url": "https://124.220.2.69:18888/login",
+    "www_dns_record": "www A 124.220.2.69",
+    "root_dns_unchanged": true,
+    "dns_changed_at": "2026-10-12T08:30:35+00:00",
+    "api_transport": "Shanghai loopback 127.0.0.1:18880 to Singapore loopback 127.0.0.1:8080 via restricted SSH account",
+    "backend_account": "zhixiang-api-proxy",
+    "backend_shell_access": false,
+    "private_key_stays_on_shanghai": true,
+    "admin_authentication_required": true,
+    "admin_unauthenticated_business_status": 401,
+    "admin_under_www_status": 404,
+    "certificate_renewal_verified": true,
+    "certificate_timer": "qzweb-certificates.timer",
+    "certificate_renewal_report": "/srv/zhixiang-front/shared/work/renew-final-20261012-1644/status.json",
+    "report_path": "/srv/zhixiang-front/shared/work/frontend-final-report.json",
+    "backend_report_path": "/srv/zhixiang/shared/reports/shanghai-backend-final-read.json",
+    "formal_alipay_enabled": false,
+    "database_uploaded": false,
+    "legacy_singapore_http_entries_retained": true,
+    "real_payment_or_purchase_performed": false
+  },
+  "alipay": {
+    "code_and_official_sandbox_query_verified": true,
+    "production_channel_enabled": false,
+    "public_async_notification_tested": false,
+    "merchant_business_approval_verified": false,
+    "individual_long_term_quota_application_submitted": false
   }
 }

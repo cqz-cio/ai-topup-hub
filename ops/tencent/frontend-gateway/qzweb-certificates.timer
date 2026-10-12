@@ -1,0 +1,11 @@
+[Unit]
+Description=Check Shanghai website certificates every six hours
+
+[Timer]
+OnCalendar=*-*-* 00,06,12,18:15:00
+RandomizedDelaySec=300
+Persistent=true
+Unit=qzweb-certificates.service
+
+[Install]
+WantedBy=timers.target

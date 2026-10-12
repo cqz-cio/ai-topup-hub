@@ -1,0 +1,21 @@
+[Unit]
+Description=Encrypted API relay for the Shanghai storefront and admin frontend
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=zhixiang-front
+Group=zhixiang-front
+ExecStart=/usr/bin/ssh -NT -i /srv/zhixiang-front/shared/ssh/id_ed25519 -o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=/srv/zhixiang-front/shared/ssh/known_hosts -o ExitOnForwardFailure=yes -o ServerAliveInterval=15 -o ServerAliveCountMax=3 -o ConnectTimeout=10 -L 127.0.0.1:18880:127.0.0.1:8080 zhixiang-api-proxy@43.134.141.10
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+CapabilityBoundingSet=
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+
+[Install]
+WantedBy=multi-user.target
