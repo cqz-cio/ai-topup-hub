@@ -105,7 +105,7 @@ func (s *Service) RunOnce(ctx context.Context) error {
 }
 
 func (s *Service) verify(ctx context.Context, l chain.Log, from, to uint64) (*domain.ChainTransfer, error) {
-	if l.Removed || !strings.EqualFold(l.Address, Token) || len(l.Topics) != 3 || !strings.EqualFold(l.Topics[0], TransferTopic) || !strings.EqualFold(l.Topics[2], addressTopic(s.config.Recipient)) || !isHex(l.Topics[1], 32) || !strings.HasPrefix(strings.ToLower(l.Topics[1]), "0x"+strings.Repeat("0", 24)) || !isHex(l.Data, 32) || !isHex(l.TransactionHash, 32) || !isHex(l.BlockHash, 32) {
+	if l.Removed || !strings.EqualFold(l.Address, s.network.Token) || len(l.Topics) != 3 || !strings.EqualFold(l.Topics[0], TransferTopic) || !strings.EqualFold(l.Topics[2], addressTopic(s.config.Recipient)) || !isHex(l.Topics[1], 32) || !strings.HasPrefix(strings.ToLower(l.Topics[1]), "0x"+strings.Repeat("0", 24)) || !isHex(l.Data, 32) || !isHex(l.TransactionHash, 32) || !isHex(l.BlockHash, 32) {
 		return nil, ErrRPC
 	}
 	n, e := quantity(l.BlockNumber)
@@ -148,7 +148,7 @@ func (s *Service) verify(ctx context.Context, l chain.Log, from, to uint64) (*do
 	if !found {
 		return nil, ErrRPC
 	}
-	return &domain.ChainTransfer{Key: fmt.Sprintf("%d/%s/%d", ChainID, strings.ToLower(l.TransactionHash), idx), Stream: s.stream, TxHash: strings.ToLower(l.TransactionHash), LogIndex: idx, Block: n, BlockHash: strings.ToLower(l.BlockHash), Sender: "0x" + strings.ToLower(l.Topics[1][26:]), Units: units.String(), PaidAt: time.Unix(int64(stamp), 0).UTC(), State: "manual_review", Reason: "unmatched_amount"}, nil
+	return &domain.ChainTransfer{Key: fmt.Sprintf("%d/%s/%d", s.network.ChainID, strings.ToLower(l.TransactionHash), idx), Stream: s.stream, TxHash: strings.ToLower(l.TransactionHash), LogIndex: idx, Block: n, BlockHash: strings.ToLower(l.BlockHash), Sender: "0x" + strings.ToLower(l.Topics[1][26:]), Units: units.String(), PaidAt: time.Unix(int64(stamp), 0).UTC(), State: "manual_review", Reason: "unmatched_amount"}, nil
 }
 
 func (s *Service) deliver(ctx context.Context) error {

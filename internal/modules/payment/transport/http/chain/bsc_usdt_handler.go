@@ -14,7 +14,15 @@ type ChainPaymentQueries interface {
 }
 
 func RegisterBSCUSDTRoutes(admin *gin.RouterGroup, service ChainPaymentQueries) {
-	admin.GET("/chain-payments/bsc-usdt/status", func(c *gin.Context) {
+	registerChainUSDTRoutes(admin, "bsc-usdt", service)
+}
+
+func RegisterPlasmaUSDTRoutes(admin *gin.RouterGroup, service ChainPaymentQueries) {
+	registerChainUSDTRoutes(admin, "plasma-usdt", service)
+}
+
+func registerChainUSDTRoutes(admin *gin.RouterGroup, network string, service ChainPaymentQueries) {
+	admin.GET("/chain-payments/"+network+"/status", func(c *gin.Context) {
 		c.Header("Cache-Control", "no-store")
 		ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)
 		defer cancel()
@@ -25,7 +33,7 @@ func RegisterBSCUSDTRoutes(admin *gin.RouterGroup, service ChainPaymentQueries) 
 		}
 		c.JSON(200, gin.H{"data": result})
 	})
-	admin.GET("/chain-payments/bsc-usdt/transfers", func(c *gin.Context) {
+	admin.GET("/chain-payments/"+network+"/transfers", func(c *gin.Context) {
 		c.Header("Cache-Control", "no-store")
 		state := c.Query("state")
 		if state != "" && state != "manual_review" && state != "ready" && state != "delivered" {

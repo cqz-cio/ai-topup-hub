@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/dujiao-next/internal/modules/payment/contract/chain"
 	"io"
 	"net/http"
@@ -28,6 +29,7 @@ type RPC struct {
 	endpoint        string
 	receiptEndpoint string
 	client          *http.Client
+	network         chain.Network
 }
 
 func NewRPC(endpoint string) (*RPC, error) {
@@ -38,10 +40,18 @@ func NewRPC(endpoint string) (*RPC, error) {
 // have different access limits. Settlement still compares each receipt with
 // the finalized block and transfer log returned by the primary endpoint.
 func NewRPCWithReceiptEndpoint(endpoint, receiptEndpoint string) (*RPC, error) {
+	return NewRPCForNetwork(endpoint, receiptEndpoint, "bsc")
+}
+
+func NewRPCForNetwork(endpoint, receiptEndpoint, networkName string) (*RPC, error) {
+	network, err := chain.ResolveNetwork(networkName)
+	if err != nil {
+		return nil, err
+	}
 	if !validEndpoint(endpoint) || (receiptEndpoint != "" && !validEndpoint(receiptEndpoint)) {
 		return nil, ErrRPC
 	}
-	return &RPC{endpoint: endpoint, receiptEndpoint: receiptEndpoint, client: &http.Client{Timeout: 12 * time.Second, CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}}, nil
+	return &RPC{endpoint: endpoint, receiptEndpoint: receiptEndpoint, network: network, client: &http.Client{Timeout: 12 * time.Second, CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}}, nil
 }
 
 func validEndpoint(endpoint string) bool {
@@ -108,13 +118,13 @@ func (r *RPC) checkEndpoint(ctx context.Context, endpoint string) error {
 		return err
 	}
 	n, err := quantity(chain)
-	if err != nil || n != ChainID {
+	if err != nil || n != r.network.ChainID {
 		return ErrRPC
 	}
-	if err = r.callEndpoint(ctx, endpoint, "eth_call", []interface{}{map[string]string{"to": Token, "data": "0x313ce567"}, "latest"}, &decimals); err != nil {
+	if err = r.callEndpoint(ctx, endpoint, "eth_call", []interface{}{map[string]string{"to": r.network.Token, "data": "0x313ce567"}, "latest"}, &decimals); err != nil {
 		return err
 	}
-	if !isHex(decimals, 32) || decimals != "0x"+strings.Repeat("0", 62)+"12" {
+	if !isHex(decimals, 32) || decimals != fmt.Sprintf("0x%064x", r.network.Decimals) {
 		return ErrRPC
 	}
 	return nil
@@ -141,7 +151,7 @@ func (r *RPC) Header(ctx context.Context, tag string) (*chain.Header, error) {
 }
 func (r *RPC) Logs(ctx context.Context, from, to uint64, recipient string) ([]chain.Log, error) {
 	var logs []chain.Log
-	err := r.call(ctx, "eth_getLogs", []interface{}{map[string]interface{}{"fromBlock": hexBlock(from), "toBlock": hexBlock(to), "address": Token, "topics": []interface{}{TransferTopic, nil, addressTopic(recipient)}}}, &logs)
+	err := r.call(ctx, "eth_getLogs", []interface{}{map[string]interface{}{"fromBlock": hexBlock(from), "toBlock": hexBlock(to), "address": r.network.Token, "topics": []interface{}{TransferTopic, nil, addressTopic(recipient)}}}, &logs)
 	return logs, err
 }
 func (r *RPC) Receipt(ctx context.Context, hash string) (*chain.Receipt, error) {

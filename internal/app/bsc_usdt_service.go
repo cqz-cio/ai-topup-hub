@@ -7,15 +7,18 @@ import (
 	"time"
 )
 
-type bscUSDTWorker struct{ service *bscusdt.Service }
+type bscUSDTWorker struct {
+	service *bscusdt.Service
+	network string
+}
 
-func (w *bscUSDTWorker) Name() string { return "bsc-usdt-listener" }
+func (w *bscUSDTWorker) Name() string { return w.network + "-usdt-listener" }
 func (w *bscUSDTWorker) Start(ctx context.Context) error {
 	ticker := time.NewTicker(10 * time.Second)
 	defer ticker.Stop()
 	for {
 		if err := w.service.RunOnce(ctx); err != nil && ctx.Err() == nil {
-			logger.Warnw("bsc_usdt_listener_pass_failed", "error", err)
+			logger.Warnw("chain_usdt_listener_pass_failed", "network", w.network, "error", err)
 		}
 		select {
 		case <-ctx.Done():

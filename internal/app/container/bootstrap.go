@@ -52,6 +52,9 @@ func NewContainer(cfg *config.Config) (*Container, error) {
 	if err := c.initBSCUSDT(); err != nil {
 		return nil, err
 	}
+	if err := c.initPlasmaUSDT(); err != nil {
+		return nil, err
+	}
 	if err := c.initAutoRecharge(); err != nil {
 		return nil, err
 	}

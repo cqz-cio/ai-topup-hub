@@ -88,6 +88,7 @@ import (
 type Container struct {
 	AutoRechargeService *autorechargeapp.Service
 	BSCUSDTService      *bscusdt.Service
+	PlasmaUSDTService   *bscusdt.Service
 	Config              *config.Config
 	QueueClient         *queue.Client
 

@@ -55,6 +55,19 @@ func (c *bscTestChain) Receipt(context.Context, string) (*chaincontract.Receipt,
 }
 
 func TestBSCConfirmedTransferPaysGuestOrderAndDeliversOneBoundCode(t *testing.T) {
+	testConfirmedTransferPaysGuestOrderAndDeliversOneBoundCode(t, "bsc")
+}
+
+func TestPlasmaConfirmedTransferPaysGuestOrderAndDeliversOneBoundCode(t *testing.T) {
+	testConfirmedTransferPaysGuestOrderAndDeliversOneBoundCode(t, "plasma")
+}
+
+func testConfirmedTransferPaysGuestOrderAndDeliversOneBoundCode(t *testing.T, networkName string) {
+	t.Helper()
+	network, err := chaincontract.ResolveNetwork(networkName)
+	if err != nil {
+		t.Fatal(err)
+	}
 	svc, db, registry := setupPaymentService(t)
 	sql, _ := db.DB()
 	sql.SetMaxOpenConns(1)
@@ -70,7 +83,7 @@ func TestBSCConfirmedTransferPaysGuestOrderAndDeliversOneBoundCode(t *testing.T)
 	svc.SetAutoRechargeService(recharge)
 	chain := &bscTestChain{head: 100, timestamp: time.Now().UTC().Truncate(time.Second)}
 	settlements := 0
-	gateway, err := bscusdt.New(chainstore.New(db), chain, bscusdt.Config{Recipient: "0x66a8bab15067eab1efc948ac03684f0397c8416f", CNYPerUSDT: "6.66"}, func(_ context.Context, i paymentdomain.ChainInvoice, transfer paymentdomain.ChainTransfer) error {
+	gateway, err := bscusdt.New(chainstore.New(db), chain, bscusdt.Config{Network: networkName, Recipient: "0x66a8bab15067eab1efc948ac03684f0397c8416f", CNYPerUSDT: "6.66"}, func(_ context.Context, i paymentdomain.ChainInvoice, transfer paymentdomain.ChainTransfer) error {
 		settlements++
 		_, e := svc.HandleCallback(paymentapp.PaymentCallbackInput{PaymentID: i.PaymentID, Status: constants.PaymentStatusSuccess, Amount: money.FromDecimal(decimal.RequireFromString(i.FiatAmount)), Currency: i.Currency, PaidAt: &transfer.PaidAt, ProviderRef: transfer.TxHash})
 		return e
@@ -78,8 +91,8 @@ func TestBSCConfirmedTransferPaysGuestOrderAndDeliversOneBoundCode(t *testing.T)
 	if err != nil {
 		t.Fatal(err)
 	}
-	registry.Register(bscusdt.Provider, "", gateway)
-	channel := paymentdomain.PaymentChannel{Name: "BSC USDT", ProviderType: bscusdt.Provider, ChannelType: "usdt-bep20", InteractionMode: constants.PaymentInteractionQR, IsActive: true, ConfigJSON: jsonmap.JSON{}}
+	registry.Register(network.Provider, "", gateway)
+	channel := paymentdomain.PaymentChannel{Name: network.ChannelName, ProviderType: network.Provider, ChannelType: network.ChannelType, InteractionMode: constants.PaymentInteractionQR, IsActive: true, ConfigJSON: jsonmap.JSON{}}
 	if err = db.Create(&channel).Error; err != nil {
 		t.Fatal(err)
 	}
@@ -93,7 +106,7 @@ func TestBSCConfirmedTransferPaysGuestOrderAndDeliversOneBoundCode(t *testing.T)
 		t.Fatal(err)
 	}
 	response := presenter.NewCreatePaymentResp(&presenter.CreatePaymentResultView{Payment: result.Payment, Channel: result.Channel})
-	if response.Chain != "bsc" || response.WalletAddress == "" || response.ChainAmount == "" || response.ExpiresAt == nil || response.Currency != "CNY" {
+	if response.Chain != networkName || response.WalletAddress == "" || response.ChainAmount == "" || response.ExpiresAt == nil || response.Currency != "CNY" {
 		t.Fatalf("incomplete cashier response: %+v", response)
 	}
 	var invoice paymentdomain.ChainInvoice
@@ -105,7 +118,7 @@ func TestBSCConfirmedTransferPaysGuestOrderAndDeliversOneBoundCode(t *testing.T)
 	if tasks != 0 {
 		t.Fatal("unpaid order issued a code")
 	}
-	chain.event = &chaincontract.Log{Address: bscusdt.Token, Topics: []string{bscusdt.TransferTopic, "0x" + strings.Repeat("0", 24) + strings.Repeat("1", 40), "0x" + strings.Repeat("0", 24) + invoice.Recipient[2:]}, Data: fmt.Sprintf("0x%064x", decimal.RequireFromString(invoice.Units).BigInt()), BlockNumber: "0x65", BlockHash: fmt.Sprintf("0x%064x", 101), TransactionHash: "0x" + strings.Repeat("a", 64), LogIndex: "0x0"}
+	chain.event = &chaincontract.Log{Address: network.Token, Topics: []string{bscusdt.TransferTopic, "0x" + strings.Repeat("0", 24) + strings.Repeat("1", 40), "0x" + strings.Repeat("0", 24) + invoice.Recipient[2:]}, Data: fmt.Sprintf("0x%064x", decimal.RequireFromString(invoice.Units).BigInt()), BlockNumber: "0x65", BlockHash: fmt.Sprintf("0x%064x", 101), TransactionHash: "0x" + strings.Repeat("a", 64), LogIndex: "0x0"}
 	chain.head = 120
 	for i := 0; i < 2; i++ {
 		if err = gateway.RunOnce(context.Background()); err != nil {

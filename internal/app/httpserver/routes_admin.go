@@ -100,6 +100,9 @@ func registerAdminRoutes(
 	if c.BSCUSDTService != nil {
 		chainhttp.RegisterBSCUSDTRoutes(paymentProtected, c.BSCUSDTService)
 	}
+	if c.PlasmaUSDTService != nil {
+		chainhttp.RegisterPlasmaUSDTRoutes(paymentProtected, c.PlasmaUSDTService)
+	}
 	if c.AutoRechargeService != nil {
 		rechargehttp.RegisterAdminRoutes(paymentProtected, rechargehttp.New(c.AutoRechargeService))
 	}

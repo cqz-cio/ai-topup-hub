@@ -20,7 +20,7 @@ func (s *Service) Status(ctx context.Context) (map[string]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	return map[string]interface{}{"chain_id": ChainID, "token_contract": Token, "recipient": s.config.Recipient, "cny_per_usdt": s.rate.String(), "confirmations": s.config.Confirmations, "next_block": cursor.NextBlock, "last_scan_at": cursor.UpdatedAt, "pending_settlements": ready, "manual_review_count": review}, nil
+	return map[string]interface{}{"chain": s.network.Name, "chain_id": s.network.ChainID, "token_contract": s.network.Token, "token_decimals": s.network.Decimals, "recipient": s.config.Recipient, "cny_per_usdt": s.rate.String(), "confirmations": s.config.Confirmations, "next_block": cursor.NextBlock, "last_scan_at": cursor.UpdatedAt, "pending_settlements": ready, "manual_review_count": review}, nil
 }
 func (s *Service) Transfers(ctx context.Context, state string, before uint64) ([]domain.ChainTransfer, error) {
 	return s.store.Transfers(ctx, s.stream, state, before)

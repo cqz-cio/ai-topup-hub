@@ -9,6 +9,7 @@ import { fulfillmentTypeLabel } from '../utils/fulfillment'
 import { debounceAsync } from '../utils/debounce'
 import { copyText } from '../utils/clipboard'
 import { amountToCents, centsToAmount } from '../utils/money'
+import { directUSDTPaymentInfo } from '../utils/paymentChannelPresentation'
 import { buildSkuDisplayTextFromSnapshot } from '../utils/sku'
 import {
   getCachedPaymentRestorePolicy,
@@ -200,10 +201,9 @@ export function usePayment() {
   })
 
   const paymentResultTitle = computed(() => t(resolvePaymentResultTitleKey(interactionMode.value)))
-  const paymentGuideTitle = computed(() => paymentProviderType.value === 'bscusdt' ? '使用 USDT · BEP-20 转账' : paymentPresentationMode.value === 'redirect' ? t('payment.redirectTitle') : t('payment.qrTitle'))
-  const paymentGuideTip = computed(() => paymentProviderType.value === 'bscusdt'
-    ? '请选择 BNB Smart Chain（BEP-20），在订单到期前按下方完整 USDT 金额转账，不要省略小数尾数；尾数用于识别订单。请确保扣除平台手续费后的到账金额一致。链上确认后订单会自动更新为已付款，请在订单详情查看发货进度，请勿重复转账。'
-    : paymentPresentationMode.value === 'redirect' ? t('payment.redirectTip') : t('payment.qrTip'))
+  const directUSDTPayment = computed(() => directUSDTPaymentInfo(paymentProviderType.value))
+  const paymentGuideTitle = computed(() => directUSDTPayment.value?.title ?? (paymentPresentationMode.value === 'redirect' ? t('payment.redirectTitle') : t('payment.qrTitle')))
+  const paymentGuideTip = computed(() => directUSDTPayment.value?.tip ?? (paymentPresentationMode.value === 'redirect' ? t('payment.redirectTip') : t('payment.qrTip')))
 
   const showPayLink = computed(() => {
     return paymentPresentationMode.value === 'redirect' || Boolean(payLink.value)
@@ -239,6 +239,7 @@ export function usePayment() {
       ethereum: 'Ethereum',
       eth: 'Ethereum',
       bsc: 'BNB Smart Chain (BEP-20)',
+      plasma: 'Plasma',
       polygon: 'Polygon',
     }
     return labels[normalized] || value
@@ -264,7 +265,7 @@ export function usePayment() {
       details.push({
         key: 'amount',
         label: t('payment.cryptoAmount'),
-        value: paymentProviderType.value === 'bscusdt' ? `${cryptoChainAmount.value} USDT` : cryptoChainAmount.value,
+        value: directUSDTPayment.value ? `${cryptoChainAmount.value} ${directUSDTPayment.value.token}` : cryptoChainAmount.value,
       })
     }
     if (cryptoWalletAddress.value) {

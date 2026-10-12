@@ -17,6 +17,7 @@ import (
 )
 
 type Config struct {
+	Network       string
 	Recipient     string
 	CNYPerUSDT    string
 	Confirmations uint64
@@ -25,15 +26,21 @@ type Config struct {
 // Settle accepts only persisted, independently verified finalized transfers.
 type Settle func(context.Context, domain.ChainInvoice, domain.ChainTransfer) error
 type Service struct {
-	store  chaincontract.Store
-	chain  chaincontract.Reader
-	config Config
-	rate   decimal.Decimal
-	stream string
-	settle Settle
+	store   chaincontract.Store
+	chain   chaincontract.Reader
+	config  Config
+	rate    decimal.Decimal
+	stream  string
+	settle  Settle
+	network chaincontract.Network
 }
 
 func New(store chaincontract.Store, chain chaincontract.Reader, cfg Config, settle Settle) (*Service, error) {
+	network, err := chaincontract.ResolveNetwork(cfg.Network)
+	if err != nil {
+		return nil, contract.ErrGatewayConfigInvalid
+	}
+	cfg.Network = network.Name
 	cfg.Recipient = strings.ToLower(strings.TrimSpace(cfg.Recipient))
 	rate, err := decimal.NewFromString(cfg.CNYPerUSDT)
 	if store == nil || chain == nil || err != nil || !rate.IsPositive() || rate.GreaterThan(decimal.NewFromInt(1000000)) || !isHex(cfg.Recipient, 20) || cfg.Recipient == "0x"+strings.Repeat("0", 40) {
@@ -45,11 +52,11 @@ func New(store chaincontract.Store, chain chaincontract.Reader, cfg Config, sett
 	if cfg.Confirmations > 1000 {
 		return nil, contract.ErrGatewayConfigInvalid
 	}
-	return &Service{store: store, chain: chain, config: cfg, rate: rate, stream: fmt.Sprintf("%d/%s/%s", ChainID, Token, cfg.Recipient), settle: settle}, nil
+	return &Service{store: store, chain: chain, config: cfg, rate: rate, stream: fmt.Sprintf("%d/%s/%s", network.ChainID, network.Token, cfg.Recipient), settle: settle, network: network}, nil
 }
-func (s *Service) Type() string { return Provider + ":" }
+func (s *Service) Type() string { return s.network.Provider + ":" }
 func (s *Service) ValidateConfig(_ jsonmap.JSON, channel string) error {
-	if channel != "usdt-bep20" {
+	if channel != s.network.ChannelType {
 		return contract.ErrGatewayConfigInvalid
 	}
 	return nil
@@ -59,10 +66,7 @@ func (s *Service) CreatePayment(ctx context.Context, _ jsonmap.JSON, in contract
 		return nil, contract.ErrGatewayConfigInvalid
 	}
 	if existing, err := s.store.Invoice(ctx, in.PaymentID); err == nil {
-		if existing.State != "pending" || !time.Now().Before(existing.ExpiresAt) {
-			return nil, contract.ErrGatewayConfigInvalid
-		}
-		return invoiceResult(existing), nil
+		return s.resumeInvoice(existing, in)
 	} else if !errors.Is(err, chaincontract.ErrNotFound) {
 		return nil, err
 	}
@@ -98,24 +102,32 @@ func (s *Service) CreatePayment(ctx context.Context, _ jsonmap.JSON, in contract
 	var invoice domain.ChainInvoice
 	for attempt := int64(0); attempt < 9999; attempt++ {
 		amount := base.Add(decimal.NewFromInt(1 + (seed.Int64()+attempt)%9999).Shift(-6))
-		units := amount.Shift(18).BigInt().String()
+		units := amount.Shift(s.network.Decimals).BigInt().String()
 		invoice = domain.ChainInvoice{PaymentID: in.PaymentID, Stream: s.stream, AmountKey: s.stream + "/" + units, Units: units, Amount: amount.StringFixed(6), FiatAmount: in.Amount.String(), Currency: "CNY", CNYPerUSDT: s.rate.String(), Recipient: s.config.Recipient, StartBlock: head + 1, ExpiresAt: *expires, State: "pending"}
 		created, err := s.store.CreateInvoice(ctx, &invoice, &domain.ChainCursor{Stream: s.stream, NextBlock: head + 1})
 		if err != nil {
 			return nil, err
 		}
 		if created {
-			return invoiceResult(&invoice), nil
+			return s.invoiceResult(&invoice), nil
 		}
 		if existing, e := s.store.Invoice(ctx, in.PaymentID); e == nil {
-			return invoiceResult(existing), nil
+			return s.resumeInvoice(existing, in)
 		} else if !errors.Is(e, chaincontract.ErrNotFound) {
 			return nil, e
 		}
 	}
-	return nil, errors.New("bsc_unique_amount_capacity_exhausted")
+	return nil, errors.New("chain_unique_amount_capacity_exhausted")
 }
 
-func invoiceResult(v *domain.ChainInvoice) *contract.GatewayCreateResult {
-	return &contract.GatewayCreateResult{ExpiresAt: &v.ExpiresAt, ProviderRef: fmt.Sprintf("bsc-invoice-%d", v.PaymentID), QRCodeURL: v.Recipient, DisplayChannelType: "usdt-bep20", Payload: jsonmap.JSON{"wallet_address": v.Recipient, "chain_amount": v.Amount, "chain": "bsc", "token_id": "USDT", "token_contract": Token, "chain_id": ChainID, "cny_per_usdt": v.CNYPerUSDT, "invoice_expires_at": v.ExpiresAt.UTC().Format(time.RFC3339)}}
+func (s *Service) resumeInvoice(v *domain.ChainInvoice, in contract.GatewayCreateInput) (*contract.GatewayCreateResult, error) {
+	fiat, err := decimal.NewFromString(v.FiatAmount)
+	if err != nil || !fiat.Equal(in.Amount.Decimal) || v.Currency != strings.ToUpper(in.Currency) || v.Stream != s.stream || v.Recipient != s.config.Recipient || v.State != "pending" || !time.Now().Before(v.ExpiresAt) {
+		return nil, contract.ErrGatewayConfigInvalid
+	}
+	return s.invoiceResult(v), nil
+}
+
+func (s *Service) invoiceResult(v *domain.ChainInvoice) *contract.GatewayCreateResult {
+	return &contract.GatewayCreateResult{ExpiresAt: &v.ExpiresAt, ProviderRef: fmt.Sprintf("%s-invoice-%d", s.network.Name, v.PaymentID), QRCodeURL: v.Recipient, DisplayChannelType: s.network.ChannelType, Payload: jsonmap.JSON{"wallet_address": v.Recipient, "chain_amount": v.Amount, "chain": s.network.Name, "token_id": s.network.TokenID, "token_contract": s.network.Token, "chain_id": s.network.ChainID, "cny_per_usdt": v.CNYPerUSDT, "invoice_expires_at": v.ExpiresAt.UTC().Format(time.RFC3339)}}
 }

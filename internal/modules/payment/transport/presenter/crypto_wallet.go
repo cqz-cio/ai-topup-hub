@@ -36,7 +36,7 @@ func ExtractCryptoWalletInfo(providerType, interactionMode string, payload jsonm
 	}
 	pt := strings.ToLower(strings.TrimSpace(providerType))
 	switch pt {
-	case "bscusdt":
+	case "bscusdt", "plasmausdt":
 		return CryptoWalletInfo{Address: readPayloadString(payload, "wallet_address"), ChainAmount: readPayloadString(payload, "chain_amount"), Chain: readPayloadString(payload, "chain"), TokenID: readPayloadString(payload, "token_id")}
 	case constants.PaymentProviderBepusdt:
 		return CryptoWalletInfo{

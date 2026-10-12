@@ -71,6 +71,7 @@ export function useRechargeOrderDetail() {
       ethereum: 'Ethereum',
       eth: 'Ethereum',
       bsc: 'BNB Smart Chain',
+      plasma: 'Plasma',
       polygon: 'Polygon',
     }
     return labels[normalized] || value

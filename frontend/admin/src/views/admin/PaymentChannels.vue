@@ -114,6 +114,8 @@ const changePageSize = (size: number) => {
 const providerTypeLabel = (value?: string) => {
   const map: Record<string, string> = {
     official: t('admin.paymentChannels.providerTypes.official'),
+    bscusdt: 'USDT · BNB Smart Chain (BEP-20)',
+    plasmausdt: 'USDT · Plasma',
     epay: t('admin.paymentChannels.providerTypes.epay'),
     bepusdt: t('admin.paymentChannels.providerTypes.bepusdt'),
     epusdt: t('admin.paymentChannels.providerTypes.epusdt'),
@@ -133,6 +135,8 @@ const channelTypeLabel = (value?: string) => {
     stripe: t('admin.paymentChannels.channelTypes.stripe'),
     usdt: t('admin.paymentChannels.channelTypes.usdt'),
     'usdt-trc20': t('admin.paymentChannels.channelTypes.usdtTrc20'),
+    'usdt-bep20': 'USDT · BEP-20',
+    'usdt-plasma': 'USDT · Plasma',
     'usdc-trc20': t('admin.paymentChannels.channelTypes.usdcTrc20'),
     trx: t('admin.paymentChannels.channelTypes.trx'),
     bepusdt: t('admin.paymentChannels.channelTypes.bepusdtCashier'),

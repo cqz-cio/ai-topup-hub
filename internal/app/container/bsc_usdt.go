@@ -7,9 +7,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/dujiao-next/internal/config"
 	"github.com/dujiao-next/internal/constants"
 	paymentapp "github.com/dujiao-next/internal/modules/payment/application"
 	"github.com/dujiao-next/internal/modules/payment/application/bscusdt"
+	chaincontract "github.com/dujiao-next/internal/modules/payment/contract/chain"
 	"github.com/dujiao-next/internal/modules/payment/domain"
 	bscrpc "github.com/dujiao-next/internal/modules/payment/infrastructure/bscusdt"
 	chainstore "github.com/dujiao-next/internal/modules/payment/infrastructure/gormstore/chain"
@@ -22,33 +24,53 @@ import (
 )
 
 func (c *Container) initBSCUSDT() error {
-	if !c.Config.BSCUSDT.Enabled {
-		return nil
+	svc, err := c.initChainUSDT(c.Config.BSCUSDT, "bsc")
+	c.BSCUSDTService = svc
+	return err
+}
+
+func (c *Container) initPlasmaUSDT() error {
+	svc, err := c.initChainUSDT(c.Config.PlasmaUSDT, "plasma")
+	c.PlasmaUSDTService = svc
+	return err
+}
+
+func (c *Container) initChainUSDT(cfg config.BSCUSDTConfig, networkName string) (*bscusdt.Service, error) {
+	if !cfg.Enabled {
+		return nil, nil
 	}
-	endpoint := strings.TrimSpace(os.Getenv("BSC_RPC_URL"))
-	receiptEndpoint := strings.TrimSpace(os.Getenv("BSC_RECEIPT_RPC_URL"))
+	network, err := chaincontract.ResolveNetwork(networkName)
+	if err != nil {
+		return nil, err
+	}
+	prefix := strings.ToUpper(network.Name)
+	endpoint := strings.TrimSpace(os.Getenv(prefix + "_RPC_URL"))
+	receiptEndpoint := strings.TrimSpace(os.Getenv(prefix + "_RECEIPT_RPC_URL"))
 	if endpoint == "" {
-		endpoint = "https://bsc-rpc.publicnode.com"
-		if receiptEndpoint == "" {
-			receiptEndpoint = "https://bsc-dataseed.bnbchain.org"
+		if network.Name == "bsc" {
+			endpoint = "https://bsc-rpc.publicnode.com"
+			if receiptEndpoint == "" {
+				receiptEndpoint = "https://bsc-dataseed.bnbchain.org"
+			}
+		} else {
+			endpoint = "https://rpc.plasma.to"
 		}
 	}
-	rpc, err := bscrpc.NewRPCWithReceiptEndpoint(endpoint, receiptEndpoint)
+	rpc, err := bscrpc.NewRPCForNetwork(endpoint, receiptEndpoint, network.Name)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	cfg := c.Config.BSCUSDT
-	svc, err := bscusdt.New(chainstore.New(gormdb.DB), rpc, bscusdt.Config{Recipient: cfg.Recipient, CNYPerUSDT: cfg.CNYPerUSDT, Confirmations: cfg.Confirmations}, func(ctx context.Context, invoice domain.ChainInvoice, transfer domain.ChainTransfer) error {
+	svc, err := bscusdt.New(chainstore.New(gormdb.DB), rpc, bscusdt.Config{Network: network.Name, Recipient: cfg.Recipient, CNYPerUSDT: cfg.CNYPerUSDT, Confirmations: cfg.Confirmations}, func(ctx context.Context, invoice domain.ChainInvoice, transfer domain.ChainTransfer) error {
 		var payment domain.Payment
 		if e := gormdb.DB.WithContext(ctx).First(&payment, invoice.PaymentID).Error; e != nil {
 			return e
 		}
 		fiat, e := decimal.NewFromString(invoice.FiatAmount)
-		if e != nil || payment.ProviderType != bscusdt.Provider || payment.Currency != invoice.Currency || !payment.Amount.Decimal.Equal(fiat) {
-			return errors.New("bsc_payment_snapshot_mismatch")
+		if e != nil || payment.ProviderType != network.Provider || payment.ChannelType != network.ChannelType || payment.Currency != invoice.Currency || !payment.Amount.Decimal.Equal(fiat) || invoice.Stream != transfer.Stream {
+			return errors.New("chain_payment_snapshot_mismatch")
 		}
 		if payment.Status == constants.PaymentStatusInitiated {
-			return errors.New("bsc_payment_initialization_pending")
+			return errors.New("chain_payment_initialization_pending")
 		}
 		payload := jsonmap.JSON{}
 		for k, v := range payment.ProviderPayload {
@@ -62,22 +84,21 @@ func (c *Container) initBSCUSDT() error {
 		return e
 	})
 	if err != nil {
-		return err
+		return nil, err
 	}
-	c.PaymentProviderRegistry.Register(bscusdt.Provider, "", svc)
-	c.BSCUSDTService = svc
+	c.PaymentProviderRegistry.Register(network.Provider, "", svc)
 	// Explicit enablement creates one ordinary, editable payment channel. It
 	// never overwrites merchant channel settings or re-enables a disabled channel.
 	var count int64
-	if err = gormdb.DB.Model(&domain.PaymentChannel{}).Where("provider_type = ?", bscusdt.Provider).Count(&count).Error; err != nil {
-		return err
+	if err = gormdb.DB.Model(&domain.PaymentChannel{}).Where("provider_type = ?", network.Provider).Count(&count).Error; err != nil {
+		return nil, err
 	}
 	if count == 0 {
-		managedKey := "bsc-usdt-default"
-		channel := domain.PaymentChannel{ManagedKey: &managedKey, Name: "USDT · BNB Smart Chain (BEP-20)", ProviderType: bscusdt.Provider, ChannelType: "usdt-bep20", InteractionMode: constants.PaymentInteractionQR, IsActive: true, ConfigJSON: jsonmap.JSON{}, PaymentTypes: jsonslice.Strings{"order"}, CreatedAt: time.Now()}
+		managedKey := network.Name + "-usdt-default"
+		channel := domain.PaymentChannel{ManagedKey: &managedKey, Name: network.ChannelName, ProviderType: network.Provider, ChannelType: network.ChannelType, InteractionMode: constants.PaymentInteractionQR, IsActive: true, ConfigJSON: jsonmap.JSON{}, PaymentTypes: jsonslice.Strings{"order"}, CreatedAt: time.Now()}
 		if err = gormdb.DB.Clauses(clause.OnConflict{DoNothing: true}).Create(&channel).Error; err != nil {
-			return err
+			return nil, err
 		}
 	}
-	return nil
+	return svc, nil
 }

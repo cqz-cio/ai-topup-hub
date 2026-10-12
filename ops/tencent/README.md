@@ -37,6 +37,14 @@
 
 ## 状态检查
 
+### 本机固定登录入口
+
+用户已授权后续会话复用已提供的服务器信息。当前 Windows 主目录的凭据文件为 `D:\卡网\work\codex-runtime\tencent-cloud-server.credentials.json`，字段为 `host`、`port`、`username`、`password`；文件已存在且由 Git 忽略。SSH 主机指纹保存在 `work/codex-runtime/tencent-known-hosts`。连接时从文件读取并核对 `43.134.141.10` / `ubuntu`，加载已保存指纹并拒绝未知或变化的主机密钥。不要输出整个凭据文件。
+
+新会话先复用这一入口，不再要求用户重复提供服务器信息。只有文件缺失、认证失败或目标不匹配时才询问。凭据值不写入本文、Git、日志或发布包；备份仍按生产发布流程保存在私有位置。
+
+### 只读命令
+
 以下命令只查询状态，不重启或部署：
 
 ```sh
@@ -49,6 +57,28 @@ sudo sha256sum /srv/zhixiang/current/zhixiang-shop
 日志读取使用有界参数，例如 `journalctl -n 100 --no-pager`，先在服务器本地检查是否含客户或凭据数据。不要输出整个配置、环境变量、商户密钥、JWT、密码或卡密。
 
 ## 后续发布
+
+### Plasma 收款配置
+
+源码支持独立的 `plasma_usdt` 渠道；已有 BEP-20 继续使用 `bsc_usdt`。两张收款截图提供的地址相同：`0x66a8bab15067eab1efc948ac03684f0397c8416f`，但两条链的监听、金额标识和交易去重分别保存。配置示例默认关闭 Plasma，源码支持不表示线上已经启用。
+
+Plasma 主网编号为 `9745`，USDT0 合约为 `0xb8ce59fc3717ada4c02eadf9682a9e934f625ebb`，精度为 6；BSC USDT 精度仍为 18。合约依据：[USDT0 官方部署表](https://docs.usdt0.to/technical-documentation/deployments)。2026-10-12 已对默认 Plasma RPC 只读核验链编号、代币精度、`finalized` 和日志接口；模拟链付款及交付测试不等于真实资金验收。
+
+发布程序前先按下方发布规则备份。私有配置添加：
+
+```yaml
+plasma_usdt:
+  enabled: false
+  recipient: "0x66a8bab15067eab1efc948ac03684f0397c8416f"
+  cny_per_usdt: "6.66"
+  confirmations: 15
+```
+
+从生产服务器核验 RPC 可达、chain ID 为 9745、合约 `decimals()` 为 6、最终确认区块及交易收据接口可用后，再开启 `enabled` 并重启商城。默认节点是 `https://rpc.plasma.to`；自定义节点只写服务端 `PLASMA_RPC_URL`，需要分开查询收据时用 `PLASMA_RECEIPT_RPC_URL`。无需钱包私钥或助记词。
+
+首次启用自动创建 `USDT · Plasma` 订单支付渠道；重启不会重新启用已禁用渠道或覆盖商户名称。沿用 storefront 模式即可启动独立 Plasma 监听。后台只读查询入口为 `/api/v1/admin/chain-payments/plasma-usdt/status` 和 `/transfers`，使用已有后台鉴权。核验支付页显示 Plasma、USDT0、正确地址及完整 6 位小数金额；两条链都要求完整金额和最终确认，异常金额或过期付款进入人工核查。
+
+### 正式升级规则
 
 GitHub `main` 为当前绿色商城源码主线，推送不会自动更新此服务器。升级遵循 [发布规则](../../docs/release-process.md)：先记录源码提交及构建哈希，备份线上库、配置和当前发布，再执行已授权的程序升级；保留 `shared/`、storefront 模式、支付采购队列和持久化 Redis。不得上传本地预览库覆盖生产订单。
 

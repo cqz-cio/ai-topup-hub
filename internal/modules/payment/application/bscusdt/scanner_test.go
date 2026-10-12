@@ -98,6 +98,10 @@ type testFixture struct {
 }
 
 func setup(t *testing.T) *testFixture {
+	return setupNetwork(t, "bsc")
+}
+
+func setupNetwork(t *testing.T, network string) *testFixture {
 	t.Helper()
 	db, err := gorm.Open(sqlite.Open(filepath.Join(t.TempDir(), "chain.db")), &gorm.Config{Logger: logger.Default.LogMode(logger.Silent)})
 	if err != nil {
@@ -110,7 +114,7 @@ func setup(t *testing.T) *testFixture {
 		t.Fatal(err)
 	}
 	f := &testFixture{db: db, chain: &testChain{head: 100, final: 100, timestamp: time.Now().UTC().Truncate(time.Second)}}
-	f.s, err = New(chainstore.New(db), f.chain, Config{Recipient: testRecipient, CNYPerUSDT: "6.66", Confirmations: 15}, func(_ context.Context, i domain.ChainInvoice, v domain.ChainTransfer) error {
+	f.s, err = New(chainstore.New(db), f.chain, Config{Network: network, Recipient: testRecipient, CNYPerUSDT: "6.66", Confirmations: 15}, func(_ context.Context, i domain.ChainInvoice, v domain.ChainTransfer) error {
 		f.calls++
 		return f.settleErr
 	})
@@ -135,7 +139,7 @@ func setup(t *testing.T) *testFixture {
 }
 func (f *testFixture) event(units string, block uint64, index uint64) Log {
 	amount := decimal.RequireFromString(units).BigInt()
-	return Log{Address: Token, Topics: []string{TransferTopic, addressTopic("0x" + strings.Repeat("1", 40)), addressTopic(testRecipient)}, Data: fmt.Sprintf("0x%064x", amount), BlockNumber: hexBlock(block), BlockHash: fmt.Sprintf("0x%064x", block), TransactionHash: fmt.Sprintf("0x%064x", index+1000), LogIndex: hexBlock(index)}
+	return Log{Address: f.s.network.Token, Topics: []string{TransferTopic, addressTopic("0x" + strings.Repeat("1", 40)), addressTopic(testRecipient)}, Data: fmt.Sprintf("0x%064x", amount), BlockNumber: hexBlock(block), BlockHash: fmt.Sprintf("0x%064x", block), TransactionHash: fmt.Sprintf("0x%064x", index+1000), LogIndex: hexBlock(index)}
 }
 func (f *testFixture) run(t *testing.T) {
 	t.Helper()
