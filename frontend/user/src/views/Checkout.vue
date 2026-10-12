@@ -262,44 +262,24 @@
               </div>
             </div>
 
-            <!-- Channel Grid (hidden in wallet-only mode) -->
+            <!-- Payment options (hidden in wallet-only mode) -->
             <template v-if="!walletOnlyPayment">
-              <div v-if="requiresOnlineChannel && paymentChannels.length > 0" class="grid grid-cols-2 gap-2">
-                <template v-for="channel in paymentChannels" :key="channel.id">
-                  <Bep20PaymentOption
-                    v-if="isBep20PaymentChannel(channel)"
-                    class="col-span-2 sm:col-span-1"
-                    :full-name="channel.name"
-                    :selected="selectedChannelId === channel.id"
-                    :disabled="isChannelDisabledForAmount(channel)"
-                    :disabled-hint="channelAmountLimitHint(channel)"
-                    @select="handleSelectChannel(channel)"
-                  >
-                    <template v-if="channel.fee_policy === 'customer_surcharge'" #fees>
-                      <div>{{ t('payment.feeLabel') }}：{{ formatChannelFeeRate(channel) }}</div>
-                      <div>{{ t('payment.fixedFeeLabel') }}：{{ formatChannelFixedFee(channel) }}</div>
-                    </template>
-                  </Bep20PaymentOption>
-                  <button v-else
-                    type="button"
-                    :disabled="isChannelDisabledForAmount(channel)"
-                    :title="isChannelDisabledForAmount(channel) ? channelAmountLimitHint(channel) : channel.name"
-                    @click="handleSelectChannel(channel)"
-                    class="text-left border rounded-lg p-2.5 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
-                    :class="selectedChannelId === channel.id && !isChannelDisabledForAmount(channel) ? 'border-primary/45 bg-primary/10' : 'bg-card hover:border-foreground/25'">
-                    <div class="flex items-center gap-2">
-                      <img v-if="channel.icon" :src="getImageUrl(channel.icon)" loading="lazy" class="h-5 w-5 rounded object-contain shrink-0" />
-                      <div class="min-w-0 whitespace-normal break-words text-sm text-foreground font-medium">{{ channel.name }}</div>
-                    </div>
-                    <div v-if="channel.fee_policy === 'customer_surcharge'" class="mt-1 space-y-0.5 text-xs text-warning">
-                      <div>{{ t('payment.feeLabel') }}：{{ formatChannelFeeRate(channel) }}</div>
-                      <div>{{ t('payment.fixedFeeLabel') }}：{{ formatChannelFixedFee(channel) }}</div>
-                    </div>
-                    <div v-if="isChannelDisabledForAmount(channel)" class="mt-1 text-xs text-warning">
-                      {{ channelAmountLimitHint(channel) }}
-                    </div>
-                  </button>
-                </template>
+              <div v-if="requiresOnlineChannel && paymentChannels.length > 0" class="grid grid-cols-1 gap-2.5" role="group" :aria-label="t('checkout.paymentMethod')">
+                <PaymentChannelOption
+                  v-for="channel in paymentChannels"
+                  :key="channel.id"
+                  :channel="channel"
+                  name="checkout-payment-channel"
+                  :selected="selectedChannelId === channel.id"
+                  :disabled="isChannelDisabledForAmount(channel)"
+                  :disabled-hint="channelAmountLimitHint(channel)"
+                  @select="handleSelectChannel(channel)"
+                >
+                  <template v-if="channel.fee_policy === 'customer_surcharge'" #fees>
+                    <span class="block">{{ t('payment.feeLabel') }}：{{ formatChannelFeeRate(channel) }}</span>
+                    <span class="block">{{ t('payment.fixedFeeLabel') }}：{{ formatChannelFixedFee(channel) }}</span>
+                  </template>
+                </PaymentChannelOption>
               </div>
               <div v-else-if="requiresOnlineChannel && paymentChannels.length === 0" class="text-xs text-muted-foreground">
                 {{ t('checkout.noPaymentChannels') }}
@@ -334,8 +314,7 @@ import CheckoutManualForm from '../components/checkout/CheckoutManualForm.vue'
 import EmptyState from '../components/EmptyState.vue'
 import SmartImage from '../components/SmartImage.vue'
 import CheckoutSteps from '../components/checkout/CheckoutSteps.vue'
-import Bep20PaymentOption from '../components/payment/Bep20PaymentOption.vue'
-import { isBep20PaymentChannel } from '../utils/paymentChannelPresentation'
+import PaymentChannelOption from '../components/payment/PaymentChannelOption.vue'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -344,7 +323,7 @@ import { useCheckout } from '../composables/useCheckout'
 const { t } = useI18n()
 
 const {
-  userAuthStore, getLocalizedText, formatPrice, getImageUrl,
+  userAuthStore, getLocalizedText, formatPrice,
   cartItems, totalItems, cartItemKey, checkoutItemImage, itemSkuDisplay,
   itemStockExceeded, itemStockHint,
   checkoutItemCurrency, checkoutItemPriceParts, checkoutItemOriginalPriceParts, checkoutItemHasPriceDiscount,

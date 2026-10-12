@@ -1259,6 +1259,7 @@
     }
   },
   "payment": {
+    "plasmaNetwork": "Plasma 网络",
     "title": "发起支付",
     "subtitle": "选择支付方式并完成支付",
     "backToOrders": "返回订单",
