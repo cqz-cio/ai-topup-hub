@@ -194,5 +194,41 @@
     "existing_configuration_and_role_policies_preserved": true,
     "production_checkout_screenshot": "work/codex-runtime/payment-ui-qa/production-checkout.jpg",
     "real_payment_or_purchase_submitted": false
+  },
+  "redemption_guide": {
+    "applied_at": "2026-10-12T05:57:49.593238+00:00",
+    "source_commit": "2ef4790a64f351a85e91d59bebe593beb0f31dce",
+    "redemption_url": "https://cdkai.kdns.fr/",
+    "verified_product_slugs": [
+      "qzweb-4",
+      "qzweb-5",
+      "qzweb-55",
+      "qzweb-7",
+      "qzweb-56",
+      "qzweb-63",
+      "qzweb-58",
+      "qzweb-64",
+      "qzweb-57",
+      "qzweb-59",
+      "qzweb-62"
+    ],
+    "verified_product_count": 11,
+    "backup_directory": "/srv/zhixiang/backups/before-redemption-guide-20261012T055749Z",
+    "original_backup_directory": "/srv/zhixiang/backups/before-redemption-guide-20261012T055249Z",
+    "report_path": "/srv/zhixiang/shared/reports/redemption-guide-20261012T055749Z.json",
+    "script_sha256": "49a0204f117effb643cee3348263ecc6d34c055099a795b7d0f8c2630126593a",
+    "binary_release": "20261012-134141",
+    "binary_replaced": false,
+    "services_restarted": false,
+    "prices_unchanged": true,
+    "payment_channels_unchanged": true,
+    "configuration_unchanged": true,
+    "historical_orders_modified": false,
+    "guide_idempotent": true,
+    "application_api_verified": true,
+    "ios_public_details_verified": true,
+    "json_storage_type": "blob",
+    "temporary_database_tests_passed": 8,
+    "real_payment_or_supplier_purchase_performed": false
   }
 }

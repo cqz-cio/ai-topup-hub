@@ -23,6 +23,16 @@
 
 本次样式发布通过前台 94 项、后台 16 项现有测试、两套前端 TypeScript 检查及完整发布构建。已检查桌面、手机、深色模式、键盘切换、手续费和限额禁用状态，并在正式结算页核对两种网络。部署保留配置、角色权限、商品售价及持久化 Redis；未进行真实付款或采购。视觉记录见 [design-qa.md](../../design-qa.md)。
 
+## ChatGPT 发货兑换指引
+
+2026-10-12 13:57（北京时间）已应用商品说明配置，14:01 完成应用接口复核。11 款 ChatGPT 卡密（含两款 iOS 渠道）发货使用 **https://cdkai.kdns.fr/**，交付使用说明附完整链接和自助充值步骤；新订单保存该说明，交付页及已启用的发货邮件读取订单快照。历史订单不回写。
+
+配置来源为 `main` 的 `2ef4790a64f351a85e91d59bebe593beb0f31dce`，映射和文案见 [qzweb-redemption-guide.json](../../docs/catalog/qzweb-redemption-guide.json)。本次更新商品数据库，不替换发布程序：现有运行发布仍为 `20261012-134141`，二进制构建源码仍为 `b478c600dc6cda365289d4bbb76501987d16a377`。
+
+数据库、私有配置和当前发布已在服务器备份。原始更新前备份为 `/srv/zhixiang/backups/before-redemption-guide-20261012T055249Z`，最终配置更新前补充备份为 `/srv/zhixiang/backups/before-redemption-guide-20261012T055749Z`；一致性检查均通过。报告为 `/srv/zhixiang/shared/reports/redemption-guide-20261012T055749Z.json`。
+
+已核验 11 款后台商品详情实际返回兑换链接和步骤，两款 iOS 公开详情显示统一兑换入口并保留 30 天权益、剩余时长不叠加的规则。SQLite JSON 按现有 Go 存储契约写为 BLOB。8 项临时数据库测试覆盖备份、回滚、重复应用和存储兼容性；售价、支付渠道及配置核对通过，商城、Redis 和库存定时器保持 active。未创建真实验收订单或主动采购。
+
 ## 持久化数据与服务
 
 | 用途 | 服务器位置 |

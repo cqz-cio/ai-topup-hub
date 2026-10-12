@@ -55,6 +55,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/local/stop.ps1
 - 数据库保存实际商品、上架状态、库存、订单和用户；配置与凭据私有保存。
 - `git pull` 只更新源码，目录文件需要显式导入，真实库存来自供货渠道。
 - 本地预览使用库存快照，不表示拥有真实卡密，不连接生产采购。
+- 11 款 ChatGPT 卡密（含 iOS）发货附 `https://cdkai.kdns.fr/` 兑换链接和自助充值指引，线上已应用；文案配置见 `docs/catalog/qzweb-redemption-guide.json`。
 
 详见 [商品与购买流程](docs/self-service-storefront.md)、[供货接入](docs/ellaixshop-distribution.md) 和 [发布规则](docs/release-process.md)。生产库不得被本地预览库覆盖。
 
