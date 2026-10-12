@@ -10,7 +10,9 @@
 
 先在日常本地入口保存正文、核对实际页面，再推送文案并更新正式配置；本机与正式站各通过 1920、390、320px 共 9 项只读页面检查，两页各 9 节完整显示，注册页两个链接实际点击、刷新保留、未自动勾选协议、无横向溢出和脚本错误均通过。没有注入测试配置。线上备份 `/srv/zhixiang/backups/before-site-legal-20261013-003435`，报告 `/srv/zhixiang/shared/reports/site-legal-20261013-003435.json`；本机报告与截图位于忽略目录 `work/codex-runtime/site-legal-qa/`，配置更新报告为工作区私有文件 `deployment/local/site-legal-deployment.json`。前后端发布、其他站点设置、商品/SKU 售价、两条支付渠道和 storefront 服务状态保持一致；未替换程序、重启服务、上传本机库或提交付款及采购测试。
 
-当前前端发布 `/srv/zhixiang-front/releases/20261012-235241`，`current` 指向该目录。商城源码为 `02c1a082c3b989adee398f16073e7ef8d89a4806`，后台资源沿用 `948c37f2d33420631eb77a75d3c1debe40d967b6`；新加坡后端仍运行 `20261012-153531`。发布包 SHA-256 为 `57f5706e306243b28591cf5a714c819162ad9537b13b956c167ddae233c1e13e`，1015 个静态文件已核对，保留旧哈希资源。前一套前端 `releases/20261012-231734` 和备份 `/srv/zhixiang-front/backups/before-wechat-contact-20261012-235241` 均保留。本次更新公告配置与商城静态资源，没有上传数据库或重启后端。
+当前两套前端发布 `/srv/zhixiang-front/releases/20261013-012037`，新加坡程序发布 `/srv/zhixiang/releases/20261013-012037`，两处 `current` 均指向该版本；程序、商城与后台源码均为 `a9e853fb9b84ddde1d212787560d0883d1f5d450`。本次新增按用户设置商品单价，保留上海旧哈希资源、线上数据库、配置、Redis 及 storefront 支付采购模式。
+
+2026-10-13 已上线 **用户管理 → 用户列表 → 用户详情 → 设置商品单价**。填写实际金额，清空恢复现有定价；只对对应登录用户生效，商品展示、购物车与下单预览一致。使用方法见 [用户商品单价](../../docs/user-product-prices.md)。本地 13 项、正式站 9 项浏览器检查及 437 项静态文件核验通过，后台 48 项、商城 95 项测试与相关 Go 回归通过。两地发布前备份为 `backups/before-user-prices-20261013-012037`；历史记录、公开售价、采购成本、支付渠道与私有配置摘要一致，未上传本机库或进行真实付款采购测试。
 
 2026-10-13 00:27 已将公告、11 款 ChatGPT 商品购买说明及新订单发货指引的兑换入口更新为 **https://cdk.bar/**，配置来源 `0448e64db4058e52f6b16fe5ac1a23c70975578a`，公告版本 `bf3a1445`。商品同步工具同时迁移已有指引、iOS 原有链接及其他语言中的旧地址；原站资料快照保留，导入后应用当前兑换配置。9 项临时数据库测试和本机、正式站各三项实际桌面手机检查通过。历史订单、交付记录、售价及其他商品说明摘要一致；前后端程序版本、微信号 `Cqz0924ttxk` 和支付配置保持原状态。线上商品更新前备份 `/srv/zhixiang/backups/before-redemption-url-20261013-002736`，公告更新前备份 `/srv/zhixiang/backups/before-redemption-announcement-20261013-002738`，报告 `/srv/zhixiang/shared/reports/redemption-url-20261013-002736.json`。本机核验记录在忽略目录 `work/codex-runtime/redemption-url-qa/`。
 

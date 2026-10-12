@@ -1,20 +1,20 @@
 {
-  "checked_at": "2026-10-12T09:00:36.156711+00:00",
+  "checked_at": "2026-10-13T01:44:10.762739+08:00",
   "production_url": "https://www.qzweb.cloud/",
-  "documented_release_id": "20261012-153531",
-  "verified_release_id": "20261012-153531",
-  "previous_release_id": "20261012-141843",
-  "source_commit": "948c37f2d33420631eb77a75d3c1debe40d967b6",
+  "documented_release_id": "20261013-012037",
+  "verified_release_id": "20261013-012037",
+  "previous_release_id": "20261012-153531",
+  "source_commit": "a9e853fb9b84ddde1d212787560d0883d1f5d450",
   "source_branch": "main",
   "server_git_commit_verified": true,
-  "source_tag": "production/tencent-20261012-153531",
+  "source_tag": "production/tencent-20261013-012037",
   "production": {
-    "release_path": "/srv/zhixiang/releases/20261012-153531",
-    "running_executable": "/srv/zhixiang/releases/20261012-153531/zhixiang-shop",
-    "binary_bytes": 90366114,
-    "binary_sha256": "5c3707bff99f2e16a66b4f9924150d2778ca7bcdc19b89e35dd7e2e737e6452f",
-    "running_binary_sha256": "5c3707bff99f2e16a66b4f9924150d2778ca7bcdc19b89e35dd7e2e737e6452f",
-    "manifest_binary_sha256": "5c3707bff99f2e16a66b4f9924150d2778ca7bcdc19b89e35dd7e2e737e6452f",
+    "release_path": "/srv/zhixiang/releases/20261013-012037",
+    "running_executable": "/srv/zhixiang/releases/20261013-012037/zhixiang-shop",
+    "binary_bytes": 94548130,
+    "binary_sha256": "2e4ddf2f050143b6f02c6503b7b40f227450a8e2a6a592a1af14d653e63994fe",
+    "running_binary_sha256": "2e4ddf2f050143b6f02c6503b7b40f227450a8e2a6a592a1af14d653e63994fe",
+    "manifest_binary_sha256": "2e4ddf2f050143b6f02c6503b7b40f227450a8e2a6a592a1af14d653e63994fe",
     "build_info": {
       "go_version": "go1.26.5",
       "build_settings": [
@@ -27,11 +27,11 @@
         "GOOS=linux",
         "GOAMD64=v1",
         "vcs=git",
-        "vcs.revision=948c37f2d33420631eb77a75d3c1debe40d967b6",
-        "vcs.time=2026-10-12T07:19:51Z",
+        "vcs.revision=a9e853fb9b84ddde1d212787560d0883d1f5d450",
+        "vcs.time=2026-10-12T17:19:04Z",
         "vcs.modified=false"
       ],
-      "command": "GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -buildvcs=true -mod=readonly -trimpath -tags release,fullstack -ldflags '-s -w -X github.com/dujiao-next/internal/version.Version=pi-star-948c37f' ./cmd/server"
+      "git_metadata_pinned": true
     },
     "runtime_mode": "storefront",
     "upstream_purchase_enabled": true,
@@ -39,14 +39,12 @@
     "services": {
       "shop": "active",
       "redis": "active",
-      "stock_sync_timer": "active",
-      "nginx": "active"
+      "stock_sync_timer": "active"
     },
     "redis_preserved_without_restart": true,
-    "backup": "/srv/zhixiang/backups/before-20261012-153531",
+    "backup": "/srv/zhixiang/backups/before-user-prices-20261013-012037",
     "database_backup_quick_check": "ok",
-    "redis_backup": "/srv/zhixiang/backups/before-20261012-153531/redis-snapshot.rdb",
-    "report_path": "/srv/zhixiang/shared/reports/logo-release-20261012-153531.json",
+    "report_path": "/srv/zhixiang/shared/reports/user-prices-release-20261013-012037.json",
     "configuration_unchanged": true,
     "nginx_configuration_preserved": true,
     "source_dirty": false
@@ -114,80 +112,44 @@
     "previous_detailed_verification_recorded_at": "2026-10-12T05:45:38.041686+00:00",
     "current_release_verification_scope": "Public channels and database channel rows verified; configuration, role policies and compliance rows preserved. Prior RPC and finance API evidence was not repeated for this CSS-only release."
   },
-  "pages": {
-    "/": {
-      "status": 200,
-      "html_sha256": "33da431f05f1721822c2a62a509bba1582206ff478a58a8381a598e02299179b"
-    },
-    "/zxa-management/": {
-      "status": 200,
-      "html_sha256": "2e4b4b43aab6cb0c5631b4820e19820b5adf9024a4a15a7bd6b47652e000f599"
-    }
-  },
+  "pages": [
+    "https://www.qzweb.cloud/",
+    "https://www.qzweb.cloud/products/qzweb-4",
+    "https://124.220.2.69:18888/users"
+  ],
   "verified_asset_sha256": {
-    "/assets/index-9Hhlws33.js": "902804baf6f1107ce37f098c2d51ad09e40e78b2c978c3f45570c45f8e33467f",
-    "/assets/paymentResumePolicy-ClAh5BJh.js": "ee1136ad2abebb800817fdf8a397ff76e47df0e548d9538ae33ee527cda228d4",
-    "/assets/PaymentChannelOption-4vzbjcll.css": "b7dd5103de74dce5476b3b7b1ce624562ef87d24a5536cc8480bcc6e852806e8",
-    "/assets/CheckoutSteps.vue_vue_type_script_setup_true_lang-DCNeg_fp.js": "1f5698db0df14d0e2c5def451e85380fc85ecdc2c7a1cb59ae7454c47dd182ca",
-    "/assets/index-CAJAbNIM.css": "de9ad92c4da1ec5c8196c4046b221316d69bf37235969cb033ba74cf10724328",
-    "/assets/paymentChannelPresentation-CBREC2ca.js": "4d1b3b08ca6fcce434343176d7cdb0795bf31c3837a280832c494a6f3410f2db",
-    "/assets/Checkout-BB58c8lr.js": "c9de9ba690bfbf20e9d39df41beb43b0f017428517af9dd4223fad6f7ba6b99e",
-    "/assets/Payment-Dv7os8-k.js": "509e8faae3ec692da2cf39ea03ecf816e11c53db23e0bbe298b8ed72ae485716",
-    "/assets/Checkout-tOEv7-aA.js": "882ab3e49f76ab60094518ca14d13ed865a46a47aac5249b622d2dcc1e78896a",
-    "/assets/vendor-vue-i18n-BpCdZEcV.js": "581fdd5e9dbd5fb8bc51f990df526e83c32a202f1f4f61abf33fc920f7fd39e8",
-    "/brand/patrick-logo.png": "21e992a7dc7dd3783a2d1169c53a73d8643360121d5585d7f1692bf4fc0beb19",
-    "/brand/jellyfishing-background.png": "c2efe94275b906bf3d8a8e7dee8a06f9394de7ee2d9540557bba0c2a5a569d70",
-    "/assets/Checkout-Db3bJSKw.css": "1c0617133b2ec4c8009d4692e76c9c4a62e8f14ef1eed1d9b9a0cffaf831408e",
-    "/assets/PaymentChannelOption-CgZYHbjD.js": "5285da85043c9bd32949006eb8f2b96f0fa7bd60bbb713a13b417ce6e30acafe",
-    "/assets/Payment-BosBvEuo.js": "22fad7dc185afc021cd4b1cb577db230221c7e7d461deb970879aca90dca7057",
-    "/zxa-management/assets/index-BnQtjfuO.js": "be89edf48dcf829b6a73072fd25418d2a31771d1ca07b95ff90cf1ce60ed2464",
-    "/zxa-management/dj.svg": "20a516705644c081d1b4ac187cf04a2ba01461223ff5b2744cad8598ad03fca9",
-    "/zxa-management/assets/vendor-ui-CRd8gcxV.js": "fd921e593db5ac79dd446b751415b6384d18e34c1569bc87473217280cf14ad3",
-    "/zxa-management/assets/vendor-vue-CwOXpqUY.js": "6e20a69c716c11657253ec352492c4b6264d740bf9369ce9be18f5ad73c73e44",
-    "/zxa-management/assets/index-eeHfOVlc.css": "7d7708f9ea722a9be1506ba5f1f5e324c0777a46f480b2cdcd7abde7b98727f9"
+    "admin/assets/AdminLayout--gBStOb-.js": "ef6d3daae955ecd78b366dedb6ebcc4384bd77898b269b8d2a1738667ece08b7",
+    "admin/assets/AdminLayout-hQuMUW9A.css": "586d41aa7856f850f5ea88a434b89a111597c16cd51df017d666ffbe58cfb334",
+    "admin/assets/index-BovJh1VF.js": "a885c661351fd0aa5118b17c12983c41137ee22afcfea3a7340c4c09fd3778dd",
+    "admin/assets/index-DbM9Ft6U.js": "58eba0b0266d969a64ead9070eb98824a39d37b787974a476b96b0161a2b602c",
+    "admin/assets/index-FKeDju8L.css": "eb3d018fc9d71a41c78d0e72edc542f286f83d4fc91c110cfa561083a5675a3d",
+    "admin/assets/UserDetail-DxERPFcs.js": "db068b3cb269a64e29174576671facea4393125d56677d0a2f85ff62241d70fa",
+    "admin/index.html": "8975ad1cc139f5019c32bc62ecd7561f5d3213b94b14f5c152e6b4a556056cc5",
+    "user/assets/Cart-BGTz1GRt.js": "4dede589162acd79c9be3b53b0b025028ecc847c4ea7a17008177fb2e5d99194",
+    "user/assets/Cart-BuvG_Fk4.js": "76ef4507ee59fc380af522a2d44f1791916260627e567db4787685c321e7f7ff",
+    "user/assets/Cart-Cj9pM7PQ.css": "2f0a82b34df269829f9cf539560ad7d929b1bbdcb638ad06bbe11d65eb5274da",
+    "user/assets/index-BD-AVwxy.js": "5900aba45d6799c9487f8513503be499b5b5c63dca8da79db372c09a97459d5f",
+    "user/assets/index-Cc_6as7e.css": "70832b98e94cd24099268c21a7dc5c2736ff1a1069586d2f64dd6c9e9dcb93bf",
+    "user/assets/index-DRgQeIze.js": "fbcda5b92cf65cb671326df72abcce711399d6d68647ec8e261b797aa8f8bdf8",
+    "user/assets/index-mEN1y8s4.js": "97cd88cc2ab8a44103aee272c257af3d977b9e2164491aa6f75983b37b9a3c5e",
+    "user/assets/useCheckout-BaiH7Y67.js": "b3e3fba26a428a6c38e70c5aba55a766e39c2d1cf865666fac2dee3bc5830d4c",
+    "user/assets/useProductDetail-D96-XI11.js": "39848d8330f8552b75223405d4b84afc1a946de7c8ca28d7a806fdcb18da9912",
+    "user/index.html": "5ef55885f87dfeb2487b89735d282f83a0a674da59b459008035ee6243bb9a56"
   },
   "public_verification": {
-    "checked_at": "2026-10-12T08:19:31.766441+00:00",
-    "url": "http://43.134.141.10",
-    "http_status": {
-      "/": 200,
-      "/zxa-management/": 200,
-      "/health": 200,
-      "/api/v1/public/config": 200,
-      "/assets/index-9Hhlws33.js": 200,
-      "/assets/paymentResumePolicy-ClAh5BJh.js": 200,
-      "/assets/PaymentChannelOption-4vzbjcll.css": 200,
-      "/assets/CheckoutSteps.vue_vue_type_script_setup_true_lang-DCNeg_fp.js": 200,
-      "/assets/index-CAJAbNIM.css": 200,
-      "/assets/paymentChannelPresentation-CBREC2ca.js": 200,
-      "/assets/Checkout-BB58c8lr.js": 200,
-      "/assets/Payment-Dv7os8-k.js": 200,
-      "/assets/Checkout-tOEv7-aA.js": 200,
-      "/assets/vendor-vue-i18n-BpCdZEcV.js": 200,
-      "/brand/patrick-logo.png": 200,
-      "/brand/jellyfishing-background.png": 200,
-      "/assets/Checkout-Db3bJSKw.css": 200,
-      "/assets/PaymentChannelOption-CgZYHbjD.js": 200,
-      "/assets/Payment-BosBvEuo.js": 200,
-      "/zxa-management/assets/index-BnQtjfuO.js": 200,
-      "/zxa-management/dj.svg": 200,
-      "/zxa-management/assets/vendor-ui-CRd8gcxV.js": 200,
-      "/zxa-management/assets/vendor-vue-CwOXpqUY.js": 200,
-      "/zxa-management/assets/index-eeHfOVlc.css": 200
-    },
-    "app_version": "pi-star-948c37f",
-    "payment_channels": [
-      {
-        "name": "USDT · BNB Smart Chain (BEP-20)",
-        "provider_type": "bscusdt",
-        "channel_type": "usdt-bep20"
-      },
-      {
-        "name": "USDT · Plasma",
-        "provider_type": "plasmausdt",
-        "channel_type": "usdt-plasma"
-      }
-    ]
+    "checked_at": "2026-10-13T01:44:10.762739+08:00",
+    "passed": true,
+    "browser_cases_passed": 9,
+    "viewports": [
+      1920,
+      390,
+      320
+    ],
+    "page_errors": 0,
+    "blocked_writes": 0,
+    "global_prices_preserved": true,
+    "real_orders_submitted": 0,
+    "real_payment_or_purchase_submitted": false
   },
   "catalog": {
     "prices_unchanged": true,
@@ -271,11 +233,18 @@
     "real_payment_or_supplier_purchase_performed": false,
     "content_preserved_by_release": "20261012-153531"
   },
-  "source_identity_verification": "Clean committed-source Go VCS metadata, release manifest, and running executable SHA256 match",
+  "source_identity_verification": {
+    "source_commit": "a9e853fb9b84ddde1d212787560d0883d1f5d450",
+    "source_branch": "main",
+    "source_dirty": false,
+    "binary_build_info_commit_matches": true,
+    "running_binary_sha256_matches": true,
+    "frontend_files_sha256_verified": 437
+  },
   "previous_release": {
-    "release_id": "20261012-141843",
-    "source_commit": "06620f0e61a32fa17760b6f8b94312a29c03fb4e",
-    "binary_sha256": "e3a2a60ac7184352c59a7161832eb7a7aa8bebd9ef7d0b24cd0f3d43fe682f20"
+    "release": "20261012-153531",
+    "source_commit": "948c37f2d33420631eb77a75d3c1debe40d967b6",
+    "retained": true
   },
   "domain_verification": {
     "origin_https_hostname": "www.qzweb.cloud",
@@ -324,13 +293,13 @@
   "previous_build_verification_at": "2026-10-12T08:19:31.766441+00:00",
   "management_url": "https://124.220.2.69:18888/login",
   "frontend_gateway": {
-    "checked_at": "2026-10-12T15:56:57.413599+00:00",
+    "checked_at": "2026-10-13T01:44:10.762739+08:00",
     "frontend_host": "124.220.2.69",
     "backend_host": "43.134.141.10",
-    "frontend_release": "20261012-235241",
-    "source_commit": "02c1a082c3b989adee398f16073e7ef8d89a4806",
-    "archive_sha256": "57f5706e306243b28591cf5a714c819162ad9537b13b956c167ddae233c1e13e",
-    "static_files_verified": 1015,
+    "frontend_release": "20261013-012037",
+    "source_commit": "a9e853fb9b84ddde1d212787560d0883d1f5d450",
+    "archive_sha256": "1da640681eec7388e10682ae26c060b67ca84527e4f84d0cde469973726dd51c",
+    "static_files_verified": 437,
     "storefront_url": "https://www.qzweb.cloud/",
     "management_url": "https://124.220.2.69:18888/login",
     "www_dns_record": "www A 124.220.2.69",
@@ -346,8 +315,8 @@
     "certificate_renewal_verified": true,
     "certificate_timer": "qzweb-certificates.timer",
     "certificate_renewal_report": "/srv/zhixiang-front/shared/work/renew-final-20261012-1644/status.json",
-    "report_path": "/srv/zhixiang-front/shared/work/wechat-contact-release-20261012-235241.json",
-    "backend_report_path": "/srv/zhixiang/shared/reports/shanghai-backend-final-read.json",
+    "report_path": "/srv/zhixiang-front/shared/work/user-prices-release-20261013-012037.json",
+    "backend_report_path": "/srv/zhixiang/shared/reports/user-prices-release-20261013-012037.json",
     "formal_alipay_enabled": false,
     "database_uploaded": false,
     "legacy_singapore_http_entries_retained": true,
@@ -360,11 +329,11 @@
       "browser_current_frontend_confirmed": true,
       "report_path": "/srv/zhixiang-front/shared/work/entry-cache-report.json"
     },
-    "previous_frontend_release": "20261012-231734",
-    "storefront_source_commit": "02c1a082c3b989adee398f16073e7ef8d89a4806",
-    "admin_source_commit": "948c37f2d33420631eb77a75d3c1debe40d967b6",
-    "backup": "/srv/zhixiang-front/backups/before-wechat-contact-20261012-235241",
-    "frontend_only_update": true,
+    "previous_frontend_release": "20261012-235241",
+    "storefront_source_commit": "a9e853fb9b84ddde1d212787560d0883d1f5d450",
+    "admin_source_commit": "a9e853fb9b84ddde1d212787560d0883d1f5d450",
+    "backup": "/srv/zhixiang-front/backups/before-user-prices-20261013-012037",
+    "frontend_only_update": false,
     "previous_hashed_assets_retained": true
   },
   "alipay": {
@@ -522,5 +491,28 @@
     "local_database_uploaded": false,
     "real_payment_or_purchase_submitted": false,
     "backup": "/srv/zhixiang/backups/before-redemption-url-20261013-002736"
+  },
+  "user_product_prices": {
+    "checked_at": "2026-10-13T01:44:10.762739+08:00",
+    "release": "20261013-012037",
+    "source_commit": "a9e853fb9b84ddde1d212787560d0883d1f5d450",
+    "admin_entry": "用户管理 → 用户列表 → 用户详情 → 设置商品单价",
+    "fixed_price_precedence": "SKU > product > existing pricing",
+    "schema": "user_product_prices",
+    "default_rows": 0,
+    "local_browser_checks": 13,
+    "live_browser_checks": 9,
+    "admin_tests": 48,
+    "user_tests": 95,
+    "go_pricing_order_payment_procurement_rbac_regressions_passed": true,
+    "database_integrity": "ok",
+    "financial_records_and_public_prices_preserved": true,
+    "payment_channels": [
+      "bscusdt/usdt-bep20",
+      "plasmausdt/usdt-plasma"
+    ],
+    "mapped_products": 12,
+    "database_uploaded": false,
+    "real_payment_or_purchase_submitted": false
   }
 }

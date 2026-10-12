@@ -30,4 +30,6 @@
 
 GitHub CI 在 `main`、`dev` 推送及 PR 上验证；`v*` 标签触发 GoReleaser 发布包。没有自动部署新加坡的 GitHub 工作流，推送主分支或源码基线标签不会替换生产程序。
 
+嵌套或管理工作区构建时显式设置 `GIT_DIR` 为 `git rev-parse --absolute-git-dir` 的结果、`GIT_WORK_TREE` 为当前源码根目录，避免 Go 自动读取外层工作区的 Git 信息。发布前用 `go version -m` 核对 `vcs.revision` 与已验证提交一致，且 `vcs.modified=false`。
+
 不要用上游通用安装器覆盖智享A社环境，不要将本机库上传覆盖生产库。恢复程序版本和恢复业务数据是不同操作。
