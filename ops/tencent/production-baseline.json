@@ -324,13 +324,13 @@
   "previous_build_verification_at": "2026-10-12T08:19:31.766441+00:00",
   "management_url": "https://124.220.2.69:18888/login",
   "frontend_gateway": {
-    "checked_at": "2026-10-12T15:23:04.697588+00:00",
+    "checked_at": "2026-10-12T15:56:57.413599+00:00",
     "frontend_host": "124.220.2.69",
     "backend_host": "43.134.141.10",
-    "frontend_release": "20261012-231734",
-    "source_commit": "a2cda8e818712a3a23d6b7534f8f795dbca26604",
-    "archive_sha256": "af32120faa193de67fa9aa4d363971c9ac2706023eeae25f1db49f9150645cc1",
-    "static_files_verified": 826,
+    "frontend_release": "20261012-235241",
+    "source_commit": "02c1a082c3b989adee398f16073e7ef8d89a4806",
+    "archive_sha256": "57f5706e306243b28591cf5a714c819162ad9537b13b956c167ddae233c1e13e",
+    "static_files_verified": 1015,
     "storefront_url": "https://www.qzweb.cloud/",
     "management_url": "https://124.220.2.69:18888/login",
     "www_dns_record": "www A 124.220.2.69",
@@ -346,7 +346,7 @@
     "certificate_renewal_verified": true,
     "certificate_timer": "qzweb-certificates.timer",
     "certificate_renewal_report": "/srv/zhixiang-front/shared/work/renew-final-20261012-1644/status.json",
-    "report_path": "/srv/zhixiang-front/shared/work/announcement-release-20261012-231734.json",
+    "report_path": "/srv/zhixiang-front/shared/work/wechat-contact-release-20261012-235241.json",
     "backend_report_path": "/srv/zhixiang/shared/reports/shanghai-backend-final-read.json",
     "formal_alipay_enabled": false,
     "database_uploaded": false,
@@ -360,10 +360,10 @@
       "browser_current_frontend_confirmed": true,
       "report_path": "/srv/zhixiang-front/shared/work/entry-cache-report.json"
     },
-    "previous_frontend_release": "20261012-205131",
-    "storefront_source_commit": "a2cda8e818712a3a23d6b7534f8f795dbca26604",
+    "previous_frontend_release": "20261012-231734",
+    "storefront_source_commit": "02c1a082c3b989adee398f16073e7ef8d89a4806",
     "admin_source_commit": "948c37f2d33420631eb77a75d3c1debe40d967b6",
-    "backup": "/srv/zhixiang-front/backups/before-announcement-20261012-231734",
+    "backup": "/srv/zhixiang-front/backups/before-wechat-contact-20261012-235241",
     "frontend_only_update": true,
     "previous_hashed_assets_retained": true
   },
@@ -434,14 +434,14 @@
     "verification_directory": "work/codex-runtime/announcement-qa/"
   },
   "home_announcement_content": {
-    "checked_at": "2026-10-12T15:38:51.960589+00:00",
-    "configured_at": "20261012-233551",
-    "configuration_source_commit": "6c088c7a20725b5ebcfec10286e6346b2c8870d2",
+    "checked_at": "2026-10-12T15:56:57.413599+00:00",
+    "configured_at": "20261012-235139",
+    "configuration_source_commit": "02c1a082c3b989adee398f16073e7ef8d89a4806",
     "source_file": "docs/catalog/home-announcement.json",
     "enabled": true,
-    "version": "c13a6e2c",
+    "version": "e97dfd7a",
     "title": "购买须知与代理合作",
-    "customer_wechat": "15824485317",
+    "customer_wechat": "Cqz0924ttxk",
     "redemption_url": "https://cdkai.kdns.fr/",
     "agent_price_contact_required": true,
     "actual_public_configuration_verified": true,
@@ -454,10 +454,43 @@
     ],
     "browser_fixture_used": false,
     "backend_release_preserved": "20261012-153531",
-    "frontend_release_preserved": "20261012-231734",
+    "frontend_release_preserved": "20261012-235241",
     "programs_replaced": false,
-    "backup": "/srv/zhixiang/backups/before-announcement-content-20261012-233551",
-    "verification_directory": "work/codex-runtime/announcement-content-qa/",
+    "backup": "/srv/zhixiang/backups/before-wechat-contact-20261012-235139",
+    "verification_directory": "work/codex-runtime/wechat-unified-qa/",
+    "real_payment_or_purchase_submitted": false,
+    "previous_configured_at": "20261012-233551"
+  },
+  "customer_wechat_display": {
+    "release": "20261012-235241",
+    "source_commit": "02c1a082c3b989adee398f16073e7ef8d89a4806",
+    "wechat_id": "Cqz0924ttxk",
+    "telephone_number_displayed": false,
+    "locations": [
+      "homepage_announcement",
+      "homepage_support",
+      "shared_footer"
+    ],
+    "clipboard_verified": [
+      "desktop_homepage_support",
+      "shared_footer_desktop_and_mobile"
+    ],
+    "additional_pages_verified": [
+      "/products/qzweb-5",
+      "/notice"
+    ],
+    "user_tests_passed": 94,
+    "typechecked_production_build": true,
+    "actual_local_and_production_cases_passed": 6,
+    "viewports": [
+      1920,
+      390,
+      320
+    ],
+    "backend_release_preserved": "20261012-153531",
+    "admin_source_preserved": "948c37f",
+    "local_database_uploaded": false,
+    "backend_restarted": false,
     "real_payment_or_purchase_submitted": false
   }
 }

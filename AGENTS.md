@@ -1,5 +1,7 @@
 # π星卡社开发约束
 
+- 客服微信统一使用 `Cqz0924ttxk`，不能用电话号码作为微信号展示或回退值。
+
 - `main` 是唯一正式源码主线，维护当前绿色 Go + Vue 商城，包含已确认的 π星卡社名称、派大星 Logo 和水母背景。用户端为 `frontend/user`，后台为 `frontend/admin`；这些品牌改动属于同一项目主版本。
 - 支付、订单、数据库和采购后端部署在腾讯云新加坡 `43.134.141.10`，账号 `ubuntu`，目录 `/srv/zhixiang`。两套前端部署在上海 `124.220.2.69` 的 `/srv/zhixiang-front`：商城 `https://www.qzweb.cloud/`，管理端 `https://124.220.2.69:18888/login`。上海通过受限 SSH 通道连接新加坡回环 API；维护说明见 `ops/tencent/README.md`。
 - 当前生产运行基准是新加坡发布 `20261012-153531`，构建源码为 `948c37f2d33420631eb77a75d3c1debe40d967b6`，使用 `-mode storefront`、`UPSTREAM_PURCHASE_ENABLED=true`。BEP20 与 Plasma USDT 收款均已启用；精确核验范围以 `ops/tencent/production-baseline.json` 为准，不把后续文档提交自动当作线上程序的 Git 版本。
@@ -10,7 +12,7 @@
 - 库存由独立的 `zhixiang-stock-sync.timer` 每 300 秒只查询和同步。不要重复启动助手或为同步启动完整 worker。自动充值保持关闭。
 - 后续升级保留 storefront 模式、支付及采购队列、持久化 Redis。先备份线上数据，不用本机数据库覆盖线上订单，也不套用旧 api 或 checkout 初始化脚本。
 - 用户已授权跨会话读取、保存并复用服务器信息，2026-10-12 再次确认上海和新加坡使用此前提供的同一 `ubuntu` 登录信息。当前 C 盘工作区 `C:\Codex program\智享A社\deployment\local\` 中，新加坡凭据和指纹为 `tencent-cloud-server.credentials.json`、`tencent-cloud-known-hosts`，上海凭据和指纹为 `shanghai-front-server.credentials.json`、`shanghai-front-known-hosts`；登录均已验证，文件被 Git 忽略，上海密码文件仅当前用户和 SYSTEM 可访问。D 盘工作区原 `work/codex-runtime/tencent-cloud-server.credentials.json` 与 `tencent-known-hosts` 若存在仍可用于新加坡。新会话先检查对应目标的已保存文件，不因旧路径缺失而重复索要信息；仅在所有已保存入口缺失、凭据失效或目标不一致时询问。禁止输出密码。
-- 当前上海前端发布为 `20261012-231734`，商城源码 `a2cda8e818712a3a23d6b7534f8f795dbca26604`，已接入可配置首页公告弹窗并保留详情封面修复；后台仍沿用 `948c37f`，新加坡后端仍为 `20261012-153531`。后台站点设置的“首页公告”可设置图文、开关和排期；2026-10-12 23:35 已通过后台配置启用“购买须知与代理合作”，包含微信 15824485317、ChatGPT 兑换链接及代理价咨询；文案快照 `docs/catalog/home-announcement.json`，版本 `c13a6e2c`。仅更新商城静态资源，保留旧哈希资源，未重启后端或进行付款采购测试，见 `ops/tencent/production-baseline.json`。
+- 当前上海前端发布为 `20261012-235241`，商城源码 `02c1a082c3b989adee398f16073e7ef8d89a4806`；后台沿用 `948c37f`，新加坡后端仍为 `20261012-153531`。首页弹窗已启用，公告版本 `e97dfd7a`，文案快照 `docs/catalog/home-announcement.json`。客服微信统一为 `Cqz0924ttxk`，公告、首页客服区及全站页脚均不展示电话号码，复制内容已核验。只更新商城静态资源和公告配置，没有上传本机库或重启后端，见 `ops/tencent/production-baseline.json`。
 - 凭据只保存在忽略的 `work/` 或 `deployment/local/`，限制本机文件访问权限。不得在源码、提交、对话、日志或构建产物中写入或回显密码、商户密钥、JWT、私钥或助记词；项目文档只记录私有文件路径和连接方式。使用已保存的 SSH 主机指纹核验服务器，指纹变化时停止连接并核查。
 - 商户 1039 使用 `acg-faka`；密钥仅用于本地签名，不随请求发送。余额采购须持久化原子提交状态，未知结果进入人工核查，不能自动重新采购。
 - 商品目录为 6 个分类、16 款商品，供货映射 12 款。`qzweb-55` 售价固定为 1160.00 元；库存及商户进价同步不能覆盖本站售价。
