@@ -13,7 +13,7 @@
 - 登录账号：`ubuntu`。
 - 配置：2 核 CPU、4 GB 内存、60 GB 系统盘。
 - 信息来源：用户确认、腾讯云控制台截图及 SSH 实测。当前正式商城 `https://www.qzweb.cloud/` 和后台 `https://124.220.2.69:18888/login` 为上海前端；新加坡保留订单、支付与采购后端，旧 `http://43.134.141.10/` 入口用于兼容。后续使用正式 HTTPS 商城入口验证页面，具体维护说明见 `remote-latest/ops/tencent/README.md`。
-- 新加坡部署目录 `/srv/zhixiang`，当前后端 `current` 指向 `releases/20261012-153531`，持久化目录 `shared`。服务 `zhixiang-shop.service` 使用系统账号 `zhixiang`，以 `-mode storefront` 运行，开机自启。上海前端 `/srv/zhixiang-front/current` 指向 `releases/20261012-205131`；商城源码 `6d8c1e94105d483e8a55b2318808c6c24a12877a`，后台仍沿用 `948c37f`。
+- 新加坡部署目录 `/srv/zhixiang`，当前后端 `current` 指向 `releases/20261012-153531`，持久化目录 `shared`。服务 `zhixiang-shop.service` 使用系统账号 `zhixiang`，以 `-mode storefront` 运行，开机自启。上海前端 `/srv/zhixiang-front/current` 指向 `releases/20261012-231734`；商城源码 `a2cda8e818712a3a23d6b7534f8f795dbca26604`，后台仍沿用 `948c37f`。
 - 当前运行商城 HTTP、BSC 收款监听、订单维护及自动采购发卡队列，服务环境 `UPSTREAM_PURCHASE_ENABLED=true`。只在确认客户付款后创建采购单；不启动自动充值、不注册库存轮询或采购对账任务。库存仍由独立的 `zhixiang-stock-sync.timer` 每 300 秒只查询/同步，不能为库存同步启动额外完整 worker。实际扣款测试仍未获授权，当前商户 1039 余额 0.00 元，正常自动采购需先补足商户余额。
 
 ## 后续会话与登录凭据
@@ -22,6 +22,12 @@
 - 登录密码已按用户要求保存在本地文件 `deployment/local/tencent-cloud-server.credentials.json`，该文件由 `deployment/local/.gitignore` 排除，不提交到 Git。
 - 2026-10-12 用户进一步确认上海服务器 `124.220.2.69` 同样使用此前提供的 `ubuntu` 登录信息，明确要求保存并在后续直接复用。上海已验证的私有凭据为 `deployment/local/shanghai-front-server.credentials.json`，主机指纹为 `deployment/local/shanghai-front-known-hosts`；密码文件仅当前用户和 SYSTEM 可访问，全部由 Git 忽略。新加坡继续使用上述文件及 `deployment/local/tencent-cloud-known-hosts`。连接前核对目标，并使用对应保存的主机指纹拒绝未知或变化的主机密钥；不要重复询问已有且有效的登录信息。
 - 需要登录服务器时读取对应凭据文件；不要将密码写入项目说明、源码、构建产物或 Git 提交，也不要在对话、命令输出和日志中回显密码。
+
+## 可配置首页公告弹窗（2026-10-12）
+
+- 用户要求首次进入商城时显示可自行设置的弹窗公告，已将既有 `home_announcement` 配置接入当前 `Storefront.vue` 首页并发布上海前端 `20261012-231734`，商城源码 `a2cda8e818712a3a23d6b7534f8f795dbca26604`。后台路径为 **系统设置 → 站点设置 → 首页公告**，支持标题、富文本、图片、链接、开关及起止时间。正式公告尚未填写，线上配置未修改；管理员保存并开启后生效。
+- 关闭后本次会话不重复弹出，支持今日不再提示和不再提示；标题或内容变化后再次提醒。日常本机入口通过实际公告保存、公开接口与 12 项浏览器检查，临时内容已恢复；公网通过 12 项只读检查，弹窗仅在测试浏览器内注入验证，覆盖六种宽度，无页面错误。94 项前台测试、类型检查和生产构建通过。
+- 仅部署商城静态资源，后台、新加坡后端及支付采购配置保持原状态；售价和两条 USDT 渠道核对正常，没有上传本机库或进行付款采购测试。上海备份 `/srv/zhixiang-front/backups/before-announcement-20261012-231734`，新加坡备份 `/srv/zhixiang/backups/before-frontend-announcement-20261012-231734`。私有报告为 `deployment/local/announcement-deployment.json`、`announcement-live-verification.json`；截图与浏览器记录为 `remote-latest/work/codex-runtime/announcement-qa/`，均由 Git 忽略。
 
 ## 商品详情封面完整显示（2026-10-12）
 
