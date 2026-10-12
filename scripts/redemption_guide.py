@@ -20,6 +20,13 @@ GUIDE_END = "<!-- pi-star-redemption-guide:end -->"
 GUIDE_PATTERN = re.compile(re.escape(GUIDE_START) + r".*?" + re.escape(GUIDE_END) + r"\s*", re.S)
 
 
+def replace_redemption_url(content, guide):
+    """Migrate the previous approved host while preserving other product terms."""
+    return content.replace("https://cdkai.kdns.fr/", guide["redemption_url"]).replace(
+        "https://cdkai.kdns.fr", guide["redemption_url"].rstrip("/"),
+    )
+
+
 def load_guide(path=None):
     path = path or Path(__file__).resolve().parents[1] / "docs/catalog/qzweb-redemption-guide.json"
     guide = json.loads(Path(path).read_text(encoding="utf-8-sig"))
@@ -47,7 +54,7 @@ def update_ios_content(slug, content, guide):
 def delivery_instructions(slug, current, guide):
     if slug not in guide["product_slugs"]:
         return current
-    original = GUIDE_PATTERN.sub("", current).strip()
+    original = replace_redemption_url(GUIDE_PATTERN.sub("", current).strip(), guide)
     original = update_ios_content(slug, original, guide)
     url = html.escape(guide["redemption_url"], quote=True)
     steps = "".join("<li>" + html.escape(step) + "</li>" for step in guide["steps"])
@@ -62,8 +69,8 @@ def delivery_instructions(slug, current, guide):
 def catalog_fields(slug, content, instructions, guide):
     if slug not in guide["product_slugs"]:
         return content, instructions
-    content = dict(content)
-    instructions = dict(instructions)
+    content = {locale: replace_redemption_url(body, guide) for locale, body in content.items()}
+    instructions = {locale: replace_redemption_url(body, guide) for locale, body in instructions.items()}
     content["zh-CN"] = update_ios_content(slug, content.get("zh-CN", ""), guide)
     instructions["zh-CN"] = delivery_instructions(
         slug, instructions.get("zh-CN") or content["zh-CN"], guide,

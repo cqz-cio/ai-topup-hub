@@ -62,18 +62,19 @@ class RedemptionGuideTest(unittest.TestCase):
                 self.assertEqual(new, old)
                 continue
             instructions = json.loads(new[3])
-            self.assertIn('href="https://cdkai.kdns.fr/"', instructions["zh-CN"])
-            self.assertIn('>https://cdkai.kdns.fr/</a>', instructions["zh-CN"])
+            self.assertIn('href="https://cdk.bar/"', instructions["zh-CN"])
+            self.assertIn('>https://cdk.bar/</a>', instructions["zh-CN"])
             self.assertIn("确认充值账号和套餐无误", instructions["zh-CN"])
             self.assertEqual(instructions["en-US"], json.loads(old[3])["en-US"])
             if new[1] in self.guide["ios_product_slugs"]:
                 content = json.loads(new[2])["zh-CN"]
                 self.assertNotIn("请勿直接套用普通卡充渠道", content)
-                self.assertIn("https://cdkai.kdns.fr/", content)
+                self.assertIn("https://cdk.bar/", content)
                 self.assertIn("原有剩余时长不会叠加", content)
                 self.assertIn("30 天权益", content)
             else:
-                self.assertEqual(new[2], old[2])
+                expected_content = {locale: body.replace("https://cdkai.kdns.fr/", "https://cdk.bar/") for locale, body in json.loads(old[2]).items()}
+                self.assertEqual(json.loads(new[2]), expected_content)
 
     def test_repeat_is_idempotent(self):
         apply_to_database(self.database, self.guide, apply=True, backup_dir=self.backups)
@@ -92,7 +93,24 @@ class RedemptionGuideTest(unittest.TestCase):
         with closing(sqlite3.connect(self.database)) as db:
             row = db.execute("SELECT typeof(content_json), typeof(instructions_json), instructions_json FROM products WHERE slug = 'qzweb-62'").fetchone()
         self.assertEqual(row[:2], ("blob", "blob"))
-        self.assertIn("https://cdkai.kdns.fr/", json.loads(row[2])["zh-CN"])
+        self.assertIn("https://cdk.bar/", json.loads(row[2])["zh-CN"])
+
+    def test_existing_deployed_guide_moves_all_current_links(self):
+        previous = {**self.guide, "redemption_url": "https://cdkai.kdns.fr/"}
+        apply_to_database(self.database, previous, apply=True, backup_dir=self.backups)
+        before = self.snapshot()
+        with closing(sqlite3.connect(self.database)) as db, db:
+            row = db.execute("SELECT content_json FROM products WHERE slug = 'qzweb-4'").fetchone()
+            content = json.loads(row[0])
+            content["en-US"] = '<a href="https://cdkai.kdns.fr/">Redeem</a>'
+            db.execute("UPDATE products SET content_json = ? WHERE slug = 'qzweb-4'", (json.dumps(content).encode(),))
+        apply_to_database(self.database, self.guide, apply=True, backup_dir=self.backups)
+        after = self.snapshot()
+        self.assertEqual(after["orders"], before["orders"])
+        for row in after["products"]:
+            if row[1] in self.guide["product_slugs"]:
+                self.assertNotIn("cdkai.kdns.fr", str(json.loads(row[2])) + str(json.loads(row[3])))
+                self.assertIn("https://cdk.bar/", json.loads(row[3])["zh-CN"])
 
     def test_missing_product_stops_before_any_write(self):
         with closing(sqlite3.connect(self.database)) as db, db:
