@@ -44,10 +44,11 @@ import (
 // gateway and customer fulfillment all use the production implementations.
 type purchaseFlowSupplier struct {
 	upstream.Adapter
-	mode     string
-	calls    int
-	request  upstream.CreateUpstreamOrderReq
-	queryRef string
+	mode      string
+	calls     int
+	purchases int
+	request   upstream.CreateUpstreamOrderReq
+	queryRef  string
 }
 
 func (*purchaseFlowSupplier) RequiresSingleSubmission() bool { return true }
@@ -55,11 +56,13 @@ func (s *purchaseFlowSupplier) CreateOrder(_ context.Context, request upstream.C
 	s.calls++
 	s.request = request
 	if s.mode == "unknown_result" {
+		s.purchases++
 		return nil, errors.New("simulated response lost after supplier charge")
 	}
 	if s.mode == "insufficient_balance" {
 		return &upstream.CreateUpstreamOrderResp{ErrorCode: "insufficient_balance", ErrorMessage: "simulated empty merchant balance"}, nil
 	}
+	s.purchases++
 	result := &upstream.CreateUpstreamOrderResp{OK: true, OrderNo: "001234567890123456", Amount: "33.00", Currency: "CNY"}
 	if s.mode != "delayed_card" {
 		result.Fulfillment = purchaseFlowCard()
@@ -103,7 +106,7 @@ func (q *purchaseFlowQueue) EnqueuePoll(id uint, _ time.Duration) error {
 
 func TestConfirmedUSDTTransferRunsStorefrontProcurementAndCustomerDelivery(t *testing.T) {
 	for _, networkName := range []string{"bsc", "plasma"} {
-		for _, scenario := range []string{"immediate_card", "delayed_card", "queue_recovery", "insufficient_balance", "unknown_result"} {
+		for _, scenario := range []string{"immediate_card", "delayed_card", "queue_recovery", "insufficient_balance", "unknown_result", "retry_after_topup"} {
 			t.Run(networkName+"/"+scenario, func(t *testing.T) {
 				payments, db, registry := setupPaymentService(t)
 				sqlDB, _ := db.DB()
@@ -121,6 +124,9 @@ func TestConfirmedUSDTTransferRunsStorefrontProcurementAndCustomerDelivery(t *te
 				}
 				orders := orderstore.New(db, "test-guest-key")
 				supplier := &purchaseFlowSupplier{mode: scenario}
+				if scenario == "retry_after_topup" {
+					supplier.mode = "insufficient_balance"
+				}
 				queued := &purchaseFlowQueue{unavailable: scenario == "queue_recovery"}
 				procurements := procurementapp.NewService(procurementapp.Options{
 					Repository: procurementstore.New(db), Orders: procurementorder.New(orders),
@@ -213,6 +219,29 @@ func TestConfirmedUSDTTransferRunsStorefrontProcurementAndCustomerDelivery(t *te
 					}
 				}
 				work(queue.TaskProcurementSubmit)
+				expectedCalls := 1
+				if scenario == "retry_after_topup" {
+					if err = db.First(&procurement, procurement.ID).Error; err != nil || procurement.Status != "rejected" || supplier.purchases != 0 {
+						t.Fatal("empty balance must reject without a supplier purchase", err, procurement.Status, supplier.purchases)
+					}
+					unfulfilled, err := orders.GetByID(order.ID)
+					if err != nil || unfulfilled.Status != constants.OrderStatusPaid || unfulfilled.Fulfillment != nil {
+						t.Fatal("rejected procurement changed the paid order or delivered a card", err)
+					}
+					supplier.mode = "immediate_card" // The merchant has now topped up.
+					work(queue.TaskProcurementSubmit)
+					if supplier.calls != 1 {
+						t.Fatal("a rejected purchase was automatically retried")
+					}
+					if err = procurements.RetryManual(procurement.ID); err != nil {
+						t.Fatal(err)
+					}
+					if len(queued.submit) != 2 || queued.submit[1] != procurement.ID {
+						t.Fatal("manual retry did not enqueue the original procurement")
+					}
+					work(queue.TaskProcurementSubmit)
+					expectedCalls = 2
+				}
 				if scenario == "delayed_card" {
 					if len(queued.poll) != 1 || queued.poll[0] != procurement.ID {
 						t.Fatal("accepted supplier order did not schedule card retrieval")
@@ -223,7 +252,7 @@ func TestConfirmedUSDTTransferRunsStorefrontProcurementAndCustomerDelivery(t *te
 					}
 				}
 				work(queue.TaskProcurementSubmit) // Redelivery must not purchase again.
-				if supplier.calls != 1 || supplier.request.MaxAmount != "33.00" || supplier.request.Currency != "CNY" || supplier.request.SKUID != 4 || supplier.request.Quantity != 1 {
+				if supplier.calls != expectedCalls || supplier.request.MaxAmount != "33.00" || supplier.request.Currency != "CNY" || supplier.request.SKUID != 4 || supplier.request.Quantity != 1 {
 					t.Fatal("supplier request duplicated or lost purchase constraints", supplier.calls)
 				}
 				if err = db.First(&procurement, procurement.ID).Error; err != nil {
@@ -251,7 +280,7 @@ func TestConfirmedUSDTTransferRunsStorefrontProcurementAndCustomerDelivery(t *te
 					t.Fatal("confirmed payment did not deliver exactly one supplier card", err, procurement.Status, got.Status, count)
 				}
 				customerOrder := orderpresenter.NewOrderDetail(got)
-				if customerOrder.Fulfillment == nil || customerOrder.Fulfillment.Payload != purchaseFlowCard().Payload {
+				if customerOrder.Fulfillment == nil || customerOrder.Fulfillment.Payload != purchaseFlowCard().Payload || supplier.purchases != 1 {
 					t.Fatal("delivered supplier card is missing from the customer order response")
 				}
 			})

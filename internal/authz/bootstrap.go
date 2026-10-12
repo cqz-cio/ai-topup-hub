@@ -197,6 +197,8 @@ func BuiltinRoleSeeds() []RoleSeed {
 			Policies: []Policy{
 				{Object: "/admin/chain-payments/bsc-usdt/status", Action: "GET"},
 				{Object: "/admin/chain-payments/bsc-usdt/transfers", Action: "GET"},
+				{Object: "/admin/chain-payments/plasma-usdt/status", Action: "GET"},
+				{Object: "/admin/chain-payments/plasma-usdt/transfers", Action: "GET"},
 				{Object: "/admin/payments", Action: "GET"},
 				{Object: "/admin/payments/:id", Action: "GET"},
 				{Object: "/admin/payments/export", Action: "GET"},

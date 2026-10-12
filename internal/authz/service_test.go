@@ -223,6 +223,50 @@ func TestBootstrapBuiltinRolesRemovesStaleImmutableWildcard(t *testing.T) {
 	}
 }
 
+func TestBootstrapUpgradesExistingFinanceChainReadPermissions(t *testing.T) {
+	svc := setupAuthzServiceTest(t)
+	if err := svc.BootstrapBuiltinRoles(); err != nil {
+		t.Fatal(err)
+	}
+	// Simulate an existing database from before Plasma monitoring was granted.
+	for _, resource := range []string{"status", "transfers"} {
+		if _, err := svc.enforcer.RemovePolicy("role:finance", "/admin/chain-payments/plasma-usdt/"+resource, "GET"); err != nil {
+			t.Fatal(err)
+		}
+	}
+	for id, role := range map[uint]string{31: "finance", 32: "readonly_auditor", 33: "operations"} {
+		if err := svc.SetAdminRoles(id, []string{role}); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if allow, err := svc.EnforceAdmin(31, "/api/v1/admin/chain-payments/plasma-usdt/status", "GET"); err != nil || allow {
+		t.Fatalf("legacy policy should deny Plasma monitoring: allow=%v err=%v", allow, err)
+	}
+	for restart := range 2 {
+		if err := svc.BootstrapBuiltinRoles(); err != nil {
+			t.Fatal(err)
+		}
+		if err := svc.ReloadPolicy(); err != nil {
+			t.Fatal(err)
+		}
+		for _, network := range []string{"bsc-usdt", "plasma-usdt"} {
+			for _, resource := range []string{"status", "transfers"} {
+				path := "/api/v1/admin/chain-payments/" + network + "/" + resource
+				for _, check := range []struct {
+					adminID uint
+					method  string
+					want    bool
+				}{{31, "GET", true}, {31, "POST", false}, {31, "DELETE", false}, {32, "GET", false}, {33, "GET", false}} {
+					allow, err := svc.EnforceAdmin(check.adminID, path, check.method)
+					if err != nil || allow != check.want {
+						t.Fatalf("restart=%d admin=%d %s %s: allow=%v want=%v err=%v", restart, check.adminID, check.method, path, allow, check.want, err)
+					}
+				}
+			}
+		}
+	}
+}
+
 func TestImmutableBuiltinRoleRejectsPolicyMutationAndDeletion(t *testing.T) {
 	svc := setupAuthzServiceTest(t)
 	if err := svc.BootstrapBuiltinRoles(); err != nil {

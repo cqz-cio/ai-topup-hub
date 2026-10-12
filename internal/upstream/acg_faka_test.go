@@ -161,6 +161,21 @@ func TestACGFakaPreflightDoesNotConsumeBalance(t *testing.T) {
 	}
 }
 
+func TestACGFakaRechecksBalanceAfterMerchantTopup(t *testing.T) {
+	fixture := &acgFixture{balance: "0.00", price: "33.00", stock: "8", config: []any{}, widget: []any{}}
+	adapter := testACGFakaAdapter(t, fixture)
+	request := CreateUpstreamOrderReq{SKUID: 4, Quantity: 1, DownstreamOrderNo: "DJ-TOPUP-1", MaxAmount: "33.00", Currency: "CNY"}
+	result, err := adapter.CreateOrder(context.Background(), request)
+	if err != nil || result == nil || result.OK || result.ErrorCode != "insufficient_balance" || fixture.tradeCount != 0 {
+		t.Fatalf("empty balance must not submit a trade: result=%#v err=%v trades=%d", result, err, fixture.tradeCount)
+	}
+	fixture.balance = "100.00"
+	result, err = adapter.CreateOrder(context.Background(), request)
+	if err != nil || result == nil || !result.OK || result.Fulfillment == nil || result.Fulfillment.Payload != "CARD-ONE\n兑换说明" || fixture.tradeCount != 1 {
+		t.Fatalf("funded in-stock purchase should deliver one card: result=%#v err=%v trades=%d", result, err, fixture.tradeCount)
+	}
+}
+
 func TestACGFakaMalformedPurchaseResponseIsUncertain(t *testing.T) {
 	fixture := &acgFixture{balance: "100", price: "33.00", stock: "8", htmlTrade: true}
 	adapter := testACGFakaAdapter(t, fixture)
