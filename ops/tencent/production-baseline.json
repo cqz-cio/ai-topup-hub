@@ -351,7 +351,15 @@
     "formal_alipay_enabled": false,
     "database_uploaded": false,
     "legacy_singapore_http_entries_retained": true,
-    "real_payment_or_purchase_performed": false
+    "real_payment_or_purchase_performed": false,
+    "entry_html_cache": {
+      "checked_at": "2026-10-12T09:13:22.437427+00:00",
+      "etag_disabled": true,
+      "if_modified_since_disabled": true,
+      "conditional_request_http_status": 200,
+      "browser_current_frontend_confirmed": true,
+      "report_path": "/srv/zhixiang-front/shared/work/entry-cache-report.json"
+    }
   },
   "alipay": {
     "code_and_official_sandbox_query_verified": true,

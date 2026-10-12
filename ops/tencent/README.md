@@ -14,6 +14,8 @@
 
 上海证据保存在 `shared/work/frontend-final-report.json` 与 `shared/work/renew-final-20261012-1644/status.json`；新加坡最终只读核验报告为 `/srv/zhixiang/shared/reports/shanghai-backend-final-read.json`。本机截图与记录在忽略的 `work/codex-runtime/alipay-domain-qa/`、`work/codex-logs/`。腾讯云上海实例为 `lhins-kb6tfs2w`；尚未另行提供上海 SSH 凭据，维护可使用账号本人已登录的腾讯云自动化助手，不能借用其他账号或项目凭据。
 
+入口 `index.html` 禁用 ETag 和 If-Modified-Since 条件缓存，刷新返回当前发布内容；带哈希的静态资源保持长期缓存。17:13 验证旧条件请求仍返回最新 HTML，并在浏览器确认新导航已加载。证据为 `shared/work/entry-cache-report.json`，修改前两份 Nginx 配置备份在 `backups/before-entry-cache-20261012-1710`。
+
 ## 已核验的运行基准
 
 2026-10-12 16:11（北京时间）已完成发布 **`20261012-153531`**，应用已确认的第 2 版导航 Logo：派大星图标使用浅绿圆角方块，名称与副标题放在图标外，增加间距和上下留白。品牌图片、商品内容和购买行为保持一致。
