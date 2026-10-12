@@ -112,14 +112,16 @@ func ValidateConfig(cfg *Config, interactionMode string) error {
 	if strings.TrimSpace(cfg.GatewayURL) == "" {
 		return fmt.Errorf("%w: gateway_url is required", ErrConfigInvalid)
 	}
-	if strings.TrimSpace(cfg.NotifyURL) == "" {
+	if strings.TrimSpace(cfg.NotifyURL) == "" && !IsSandboxGateway(cfg.GatewayURL) {
 		return fmt.Errorf("%w: notify_url is required", ErrConfigInvalid)
 	}
 	if _, err := url.ParseRequestURI(strings.TrimSpace(cfg.GatewayURL)); err != nil {
 		return fmt.Errorf("%w: gateway_url is invalid", ErrConfigInvalid)
 	}
-	if _, err := url.ParseRequestURI(strings.TrimSpace(cfg.NotifyURL)); err != nil {
-		return fmt.Errorf("%w: notify_url is invalid", ErrConfigInvalid)
+	if strings.TrimSpace(cfg.NotifyURL) != "" {
+		if _, err := url.ParseRequestURI(strings.TrimSpace(cfg.NotifyURL)); err != nil {
+			return fmt.Errorf("%w: notify_url is invalid", ErrConfigInvalid)
+		}
 	}
 	if strings.TrimSpace(cfg.ReturnURL) != "" {
 		if _, err := url.ParseRequestURI(strings.TrimSpace(cfg.ReturnURL)); err != nil {
@@ -129,7 +131,7 @@ func ValidateConfig(cfg *Config, interactionMode string) error {
 	if !IsSupportedInteractionMode(interactionMode) {
 		return fmt.Errorf("%w: interaction_mode %s is not supported", ErrConfigInvalid, interactionMode)
 	}
-	if requiresReturnURL(interactionMode) && strings.TrimSpace(cfg.ReturnURL) == "" {
+	if requiresReturnURL(interactionMode) && strings.TrimSpace(cfg.ReturnURL) == "" && !IsSandboxGateway(cfg.GatewayURL) {
 		return fmt.Errorf("%w: return_url is required for mode %s", ErrConfigInvalid, interactionMode)
 	}
 	if cfg.SignType != alipaySignTypeRSA2 && cfg.SignType != alipaySignTypeRSA {
@@ -186,7 +188,7 @@ func CreatePayment(ctx context.Context, cfg *Config, input CreateInput, interact
 		"format":      alipayReqFormatJSON,
 		"charset":     alipayReqCharset,
 		"sign_type":   cfg.SignType,
-		"timestamp":   time.Now().Format("2006-01-02 15:04:05"),
+		"timestamp":   time.Now().In(time.FixedZone("CST", 8*3600)).Format("2006-01-02 15:04:05"),
 		"version":     alipayReqVersion,
 		"notify_url":  notifyURL,
 		"biz_content": string(bizContentBytes),

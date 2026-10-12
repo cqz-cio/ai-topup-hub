@@ -1,0 +1,7 @@
+{
+  "app_id": "",
+  "private_key": "",
+  "alipay_public_key": "",
+  "gateway_url": "https://openapi-sandbox.dl.alipaydev.com/gateway.do",
+  "sign_type": "RSA2"
+}
