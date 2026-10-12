@@ -41,6 +41,8 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/local/stop.ps1
 
 ## 验证与构建
 
+先完成本地验证，再推送和上线，完整顺序见 [发布规则](release-process.md)。本地核验使用上述日常入口；支付选项需要同时检查本机私有配置、数据库渠道和实际结算页，商品说明变更须先备份并应用到本机库。源码更新不等于运行中的后端更新；后端改动先停止服务，再执行 `start.ps1 -Build`，最后确认实际入口已经使用新程序。临时代理或展示数据只能用于辅助测试，不能代替本机运行环境核验。
+
 前台和后台各自执行 `pnpm run test`、`pnpm run build`。Windows 构建嵌入式后台时先设置 `$env:VITE_FULLSTACK='1'` 再构建，完成后清除该变量；Linux/CI 使用 `pnpm run build:fullstack`。
 
 后端按变更运行相关测试，单次测试设置 `-timeout`。完整发布先构建两套 Vue 资源并复制到 `internal/web/dist/{user,admin}`，再构建 Go `-tags release,fullstack`。
