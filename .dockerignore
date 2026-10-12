@@ -9,13 +9,22 @@ db/
 uploads/
 logs/
 work/
+deployment/local/
 config.yml
+credentials.json
+*.credentials.json
 *.db
+*.db-shm
+*.db-wal
 *.log
+.env*
+.agents/
+.codex/
 
 # 构建产物：前端 dist 由镜像内的 frontend 阶段重新生成，
 # internal/web/dist 由 COPY --from=frontend 填充，都不能从宿主机带进来
 dist/
 frontend/*/dist/
 frontend/*/node_modules/
+.pnpm-store/
 internal/web/dist/

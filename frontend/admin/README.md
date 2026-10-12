@@ -1,39 +1,22 @@
-# Dujiao-Next Admin
+# 智享A社管理后台
 
-The management console for operating products, orders, users, payment channels, and system settings.
+本目录是 `ai-topup-hub` 的 Vue 3 管理后台，负责商品、订单、供货、支付及系统配置。使用 TypeScript、Vite、Tailwind CSS、reka-ui。
 
-> This directory is part of the [dujiao-next](https://github.com/dujiao-next/dujiao-next)
-> single repository and is no longer released on its own. Production assets are embedded
-> into the server binary via `go:embed` and served by the same process, on the same port,
-> as `frontend/user`.
+从仓库根目录使用 `scripts/local/start.ps1` 启动本机前后台及 API。后台地址为 `http://127.0.0.1:5174/`，代理 `/api` 和 `/uploads` 到本机 8080 端口。配置与停止命令见 [本地开发](../../docs/local-development.md)。
 
-## Tech Stack
-
-Vue 3 · TypeScript · Vite · Tailwind CSS v4 · shadcn-vue / reka-ui
-
-## Local Development
-
-```bash
-pnpm install
-pnpm run dev          # http://localhost:5174 — proxies /api and /uploads to localhost:8080
+```sh
+pnpm install --frozen-lockfile
+pnpm run test
+pnpm run build
 ```
 
-Requires the backend to be running: `go run ./cmd/server` from the repository root.
+`pnpm run build` 生成独立根路径资源。Linux/CI 使用 `pnpm run build:fullstack` 生成嵌入式资源；Windows PowerShell 使用：
 
-## Build
-
-```bash
-pnpm run build            # standalone assets, base = /
-pnpm run build:fullstack  # embeddable assets, base = ./ with a <base> placeholder injected
+```powershell
+$env:VITE_FULLSTACK = '1'
+try { pnpm run build } finally { Remove-Item Env:VITE_FULLSTACK -ErrorAction SilentlyContinue }
 ```
 
-`build:fullstack` injects `<base href="__DJ_ADMIN_BASE__/">` into `index.html`. The backend
-replaces the placeholder with the configured `web.admin_path` at startup, so one build
-artifact can be mounted under any custom prefix. See `internal/web/handler.go`.
+嵌入式构建注入 `<base href="__DJ_ADMIN_BASE__/">`，后端按 `web.admin_path` 替换；现有正式后台路径为 `/zxa-management/`。Dockerfile 与发布工作流负责构建和嵌入。测试、构建采用有限超时的一次性命令，开发服务使用受管理后台进程。
 
-You normally don't run these by hand — `make build-fullstack`, the Docker build, and the
-GitHub Actions release workflow all build and embed the frontends for you.
-
-## Documentation
-
-https://dujiao-next.com
+正式环境见 [生产维护说明](../../ops/tencent/README.md)。上游来源与许可证见 [SOURCE_IMPORT.md](../../SOURCE_IMPORT.md) 和 [LICENSE](../../LICENSE)。

@@ -1,33 +1,30 @@
-.vscode/
+# Private runtime data, backups and machine configuration
 /work/
-/work/codex-logs/
-/work/codex-tools/
-/work/codex-runtime/
-/work/member-pricing-qa/
+/deployment/local/
+/db/
+/uploads/
+/logs/
 config.yml
-.idea
-db
-uploads
+credentials.json
+*.credentials.json
 *.db
 *.db-shm
 *.db-wal
-*.credentials.json
-*.tsbuildinfo
 *.log
 .env*
-.DS_Store
+
+# Dependencies and generated builds
 node_modules/
-# Added by goreleaser init:
+.pnpm-store/
 dist/
-
-# 前端构建产物与依赖（frontend/{admin,user}）
-frontend/*/dist/
-frontend/*/node_modules/
+*.tsbuildinfo
 frontend/*/*.local
-
-# Fullstack 嵌入产物：由前端构建拷贝而来，不进 git 历史
 internal/web/dist/
 
-# Agents 配置
+# Editor / local agent configuration
+.vscode/
+.idea/
+.DS_Store
 .agents/
+.codex/
 skills-lock.json

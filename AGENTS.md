@@ -1,13 +1,14 @@
 # 智享A社开发约束
 
-- 本仓库是当前使用的 Go + Vue 商城；项目父目录的旧 React 页面仅作历史参考。
+- `main` 是唯一正式源码主线，维护当前绿色 Go + Vue 商城。用户端为 `frontend/user`，后台为 `frontend/admin`；旧 React 展示页保存在 `baseline/green-20261012` 标签和本机私有归档。
 - 默认部署目标为腾讯云新加坡服务器 `43.134.141.10`，账号 `ubuntu`，目录 `/srv/zhixiang`。部署和维护说明见 `ops/tencent/README.md`。
-- 2026-10-12 已发布 `20261012-013649`，服务使用 `-mode storefront`，`UPSTREAM_PURCHASE_ENABLED=true`；收款监听、订单维护、采购发卡和恢复队列已启用。
+- 当前生产运行基准是新加坡现有部署，记录发布号 `20261012-013649`，使用 `-mode storefront`、`UPSTREAM_PURCHASE_ENABLED=true`。精确核验范围以 `ops/tencent/production-baseline.json` 为准，不把源码标签自动当作线上程序的 Git 版本。
+- 本地使用 `scripts/local/start.ps1`、`status.ps1`、`stop.ps1`，运行库为 `work/codex-runtime/live/shop.db`，本地采购关闭。旧说明位于 `docs/history/`，不能按历史文档覆盖当前环境。
 - 用户已授权真实客户确认付款后的自动采购发卡，仍禁止主动提交有效采购、转账，或将验收订单改为已付款进行扣款测试。测试使用模拟供应商和临时数据库。
 - 未完成真实资金验收，不得把模拟测试通过描述成真实收款或采购验收。
 - 库存由独立的 `zhixiang-stock-sync.timer` 每 300 秒只查询和同步。不要重复启动助手或为同步启动完整 worker。自动充值保持关闭。
 - 后续升级保留 storefront 模式、支付及采购队列、持久化 Redis。先备份线上数据，不用本机数据库覆盖线上订单，也不套用旧 api 或 checkout 初始化脚本。
-- 服务器登录凭据由父项目 `deployment/local/tencent-cloud-server.credentials.json` 私有保存。不得在源码、提交、对话、日志或构建产物中写入或回显密码、商户密钥、JWT、私钥或助记词。
+- 服务器凭据仅从调用者明确指定的本机私有文件读取，存于忽略的 `work/` 或 `deployment/local/`，不假设其他电脑的旧路径在本机存在。不得在源码、提交、对话、日志或构建产物中写入或回显密码、商户密钥、JWT、私钥或助记词。
 - 商户 1039 使用 `acg-faka`；密钥仅用于本地签名，不随请求发送。余额采购须持久化原子提交状态，未知结果进入人工核查，不能自动重新采购。
 - 商品目录为 6 个分类、16 款商品，供货映射 12 款。`qzweb-55` 售价固定为 1160.00 元；库存及商户进价同步不能覆盖本站售价。
 - 原始目录和用户价格覆盖保存在 `docs/catalog/`；同步脚本优先遵循价格覆盖，不能拿参考站库存替代商户库存。
