@@ -4,9 +4,9 @@
       @touchstart="onImageTouchStart"
       @touchend="onImageTouchEnd">
       <img v-if="currentImage" :src="currentImage" :alt="productTitle"
-        class="w-full aspect-[4/3] object-cover rounded-xl border relative z-10 shadow-lg" />
+        class="block w-full aspect-[5/3] object-contain object-center bg-muted rounded-xl border relative z-10 shadow-lg" />
       <div v-else
-        class="w-full aspect-[4/3] bg-muted rounded-xl border flex items-center justify-center relative z-10">
+        class="w-full aspect-[5/3] bg-muted rounded-xl border flex items-center justify-center relative z-10">
         <ImageIcon class="w-24 h-24 text-muted-foreground" :stroke-width="1.5" />
       </div>
     </div>
@@ -16,7 +16,7 @@
       <div v-for="(image, index) in images" :key="index" @click="$emit('update:currentImage', image)"
         class="cursor-pointer rounded-lg overflow-hidden border-2 transition-all duration-300 shrink-0 w-16 h-16 md:w-auto md:h-auto md:aspect-square snap-start"
         :class="currentImage === image ? 'border-primary ring-1 ring-primary/40 opacity-100' : 'border-transparent opacity-60 hover:opacity-100 hover:scale-105'">
-        <img :src="image" :alt="`Image ${index + 1}`" loading="lazy" class="w-full h-full object-cover" />
+        <img :src="image" :alt="`Image ${index + 1}`" loading="lazy" class="block w-full h-full object-contain object-center bg-muted" />
       </div>
     </div>
   </div>
