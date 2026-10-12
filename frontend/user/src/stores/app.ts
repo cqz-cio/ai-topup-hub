@@ -17,7 +17,7 @@ export const useAppStore = defineStore('app', () => {
     const serverTimeOffset = ref(0)
     const siteIconHref = computed(() => {
         const siteIcon = String(config.value?.brand?.site_icon || '').trim()
-        return siteIcon ? getImageUrl(siteIcon) : (isResellerTenant.value ? '/dj.svg' : '/brand-icon.png')
+        return siteIcon ? getImageUrl(siteIcon) : (isResellerTenant.value ? '/dj.svg' : '/brand/patrick-logo.png')
     })
     const isResellerTenant = computed(() => {
         return String(config.value?.tenant?.mode || '').trim().toLowerCase() === 'reseller'

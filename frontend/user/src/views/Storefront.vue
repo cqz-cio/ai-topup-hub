@@ -122,7 +122,7 @@ const authStore = useUserAuthStore()
 const { t } = useI18n()
 const flowKeys = ['cart', 'checkout', 'payment', 'delivery'] as const
 const siteName = computed(
-  () => String(appStore.config?.brand?.site_name || '').trim() || '智享A社',
+  () => String(appStore.config?.brand?.site_name || '').trim() || 'π星卡社',
 )
 const supportWechat = computed(
   () =>

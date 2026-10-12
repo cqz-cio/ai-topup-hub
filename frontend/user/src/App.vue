@@ -1,5 +1,6 @@
 <template>
-  <div id="app" class="min-h-screen bg-background text-foreground flex flex-col">
+  <div id="app" class="min-h-screen bg-background text-foreground flex flex-col"
+    :class="{ 'brand-scene': !isStandalone && !isVault && !isResellerConsole && !appStore.isResellerTenant }">
     <ErrorBoundary v-if="isStandalone"><RouterView /></ErrorBoundary>
     <!-- vault 模板：自带顶栏/页脚的外壳包裹页面（控制台仍走下方分支） -->
     <VaultLayout v-else-if="isVault && !isResellerConsole">

@@ -3,7 +3,7 @@
     <div class="container mx-auto">
       <div class="brand-footer-top">
         <div>
-          <RouterLink to="/" class="brand-footer-name"><img v-if="brandLogo" :src="brandLogo" :alt="brandSiteName" class="inline-block h-8 max-w-[120px] object-contain mr-3" />{{ brandSiteName }}</RouterLink>
+          <RouterLink to="/" class="brand-footer-name"><img v-if="brandLogo" :src="brandLogo" :alt="brandSiteName" class="inline-block h-12 max-w-[120px] object-contain mr-3" />{{ brandSiteName }}</RouterLink>
           <p class="brand-footer-description">{{ brandDescription || t('shopUi.brandDescription') }}</p>
         </div>
         <div class="brand-footer-links">
@@ -37,7 +37,7 @@ const config = computed(() => appStore.config)
 
 const brandSiteName = computed(() => {
   const siteName = config.value?.brand?.site_name
-  return typeof siteName === 'string' && siteName.trim() ? siteName.trim() : '智享A社'
+  return typeof siteName === 'string' && siteName.trim() ? siteName.trim() : 'π星卡社'
 })
 
 const brandDescription = computed(() => {
@@ -52,7 +52,7 @@ const brandDescription = computed(() => {
 
 const brandLogo = computed(() => {
   const raw = String(config.value?.brand?.site_logo || '').trim()
-  return raw ? getImageUrl(raw) : (appStore.isResellerTenant ? '' : '/brand-icon.png')
+  return raw ? getImageUrl(raw) : (appStore.isResellerTenant ? '' : '/brand/patrick-logo.png')
 })
 
 const isListMode = computed(() => config.value?.template_mode === 'list')

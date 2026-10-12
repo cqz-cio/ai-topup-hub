@@ -10,7 +10,7 @@
           v-if="brandLogo"
           :src="brandLogo"
           :alt="brandSiteName"
-          class="h-8 max-w-[64px] sm:max-w-[120px] shrink-0 object-contain"
+          class="h-12 max-w-[64px] sm:max-w-[120px] shrink-0 object-contain"
         />
         <div>
           <span class="theme-wordmark-text">{{ brandSiteName }}</span>
@@ -255,12 +255,12 @@ const cartCount = computed(() => cartStore.totalItems)
 
 const brandSiteName = computed(() => {
   const text = String(appStore.config?.brand?.site_name || '').trim()
-  return text !== '' ? text : '智享A社'
+  return text !== '' ? text : 'π星卡社'
 })
 
 const brandLogo = computed(() => {
   const raw = String(appStore.config?.brand?.site_logo || '').trim()
-  return raw ? getImageUrl(raw) : (appStore.isResellerTenant ? '' : '/brand-icon.png')
+  return raw ? getImageUrl(raw) : (appStore.isResellerTenant ? '' : '/brand/patrick-logo.png')
 })
 
 const toggleMobileMenu = () => {
