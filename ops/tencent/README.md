@@ -4,19 +4,19 @@
 
 ## 已核验的运行基准
 
-2026-10-12 已备份并发布 **`20261012-111003`**，新增独立 Plasma USDT 收款，保留 BEP20 和此前的 Logo 清晰度修正。发布后已通过 SSH 与公网 GET 核验。
+2026-10-12 已备份并发布 **`20261012-114319`**，补齐财务角色的 Plasma 状态及转账查询权限，保留两条链收款与自动采购发卡流程。发布后已通过 SSH 与公网 GET 核验。
 
 | 项目 | 核验结果 |
 | --- | --- |
-| 当前发布目录 | `/srv/zhixiang/current` → `/srv/zhixiang/releases/20261012-111003` |
+| 当前发布目录 | `/srv/zhixiang/current` → `/srv/zhixiang/releases/20261012-114319` |
 | 正在运行的程序 | 上述目录的 `zhixiang-shop`，90349730 字节 |
-| 程序 SHA-256 | `a3d18cf153fda70210c3c54a4be8890088209565d7b8222e9d41b2dfe38a1e5a` |
+| 程序 SHA-256 | `c27055bbba6ad4a4b93d7a7967d7c897a37603a2b6bf93da9dba2798ce1fcedc` |
 | 发布清单 | `manifest.json` 的程序哈希与运行中程序一致 |
 | 编译信息 | Go 1.26.5，Linux amd64，CGO=0，`release,fullstack` |
 | 运行模式 | `storefront`，`UPSTREAM_PURCHASE_ENABLED=true` |
 | 服务状态 | 商城、专用 Redis、库存定时器均 active |
-| 构建源码 | `main` 的 `800bf983e6eaaf10855eb9b79e707f2132176f9a`，`vcs.modified=false` |
-| 上一个发布 | `20261012-105801`，保留于服务器及升级前备份 |
+| 构建源码 | `main` 的 `c84d444fe7efd6de3a33b30ef62d6a236f5e80fb`，`vcs.modified=false` |
+| 上一个发布 | `20261012-111003`，保留于服务器及升级前备份 |
 | 收款渠道 | BEP20 与 Plasma 均启用，公网支付配置已显示两项 |
 
 完整证据见 [production-baseline.json](production-baseline.json)。本次发布清单与 Go 编译信息均记录完整 Git SHA，运行中程序哈希与本地发布包一致，前后台入口资源及品牌图片哈希核验通过。公网首页、后台、健康接口均为 200；6 个公开分类、原有售价和支付渠道保持不变。后续仅更新文档的提交不表示再次部署程序。库存为动态数据，本地快照不是实时生产库存。
@@ -31,16 +31,16 @@
 | 持久化 Redis | `shared/redis/`，回环地址端口 16379 |
 | 库存助手私有凭据 | `shared/stock-sync.credentials.json` |
 | 库存报告 | `shared/reports/merchant1039-stock-sync.json` |
-| 当前版本升级前备份 | `/srv/zhixiang/backups/before-20261012-111003`，数据库一致性检查通过，包含原配置与旧程序 |
-| 本次发布核验报告 | `shared/reports/plasma-release-20261012-111003.json` |
+| 当前版本升级前备份 | `/srv/zhixiang/backups/before-20261012-114319`，数据库一致性检查通过，包含原配置与旧程序 |
+| 本次发布核验报告 | `shared/reports/finance-release-20261012-114319.json` |
 
 `zhixiang-shop.service` 以 `zhixiang` 用户运行；`40-storefront.conf` 指定当前模式。支付监听、采购/交付 worker 与恢复任务由应用管理。`zhixiang-redis.service` 保存订单队列。`zhixiang-stock-sync.timer` 在每次任务完成后等待 300 秒，仅查询和刷新库存；不要另起重复助手或完整 worker 来同步库存。服务单元模板保存在本目录。
 
 商户 1039 使用 `acg-faka`，已有 12 款供货映射，`auto_sync_price=false`。全部 16 款商品售价独立维护，`qzweb-55` 保持 1160.00 元。自动充值关闭；余额和库存需实时查询，不把历史报告的数值当作当前数值。客户确认付款后的采购已经授权，但没有做真实扣款验收，不主动提交有效采购或修改测试订单为已付款。
 
-客户付到 BEP20 / Plasma 地址的 USDT 与供货商采购余额相互独立；自动采购需要供货商人民币余额充足、映射有效且对应 SKU 有库存。余额不足的采购记录进入 `rejected`，客户订单保留已付款状态，补足余额后需对这些失败记录手动重试；扣款结果未知时进入 `manual_review`，核对上游后再处理，不能直接重新采购。两款本地卡密商品和两款人工交付商品不走供货商采购。
+客户付到 BEP20 / Plasma 地址的 USDT 与供货商采购余额相互独立；自动采购需要供货商人民币余额充足、映射有效且对应 SKU 有库存。余额不足的采购记录进入 `rejected`，客户订单保留已付款状态，补足余额后需对这些失败记录手动重试；扣款结果未知时进入 `manual_review`，核对上游后再处理，不能直接重新采购。两款本地卡密商品和两款人工交付商品不走供货商采购。充值后无需重启，新采购每次都会读取最新余额。2026-10-12 只读核验了实际商户报价、库存、单件购买数量限制与本地采购成本上限，12 款供货商品中 11 款满足余额充足后的采购条件，`qzweb-59` 当时缺货；商品状态与价格会变化，正式采购前仍会重新检查。
 
-链路回归测试位于 `internal/bootstrap/bscusdt/procurement_flow_test.go`：BEP20、Plasma 分别覆盖即时发卡、延迟取卡、队列恢复、余额不足和采购结果未知，共 10 个场景，同时核验最终客户订单响应包含交付内容以及重复任务不重复采购。2026-10-12 已通过；测试采用临时数据库和模拟链、队列传输及供应商，不构成真实资金验收。本机私有检查记录保存在忽略的 `work/codex-runtime/payment-chain-audit-20261012.json`。
+链路回归测试位于 `internal/bootstrap/bscusdt/procurement_flow_test.go`：BEP20、Plasma 分别覆盖即时发卡、延迟取卡、队列恢复、余额不足和采购结果未知、充值后手动重试，共 12 个场景，同时核验最终客户订单响应包含交付内容以及重复任务不重复采购。2026-10-12 已通过；测试采用临时数据库和模拟链、队列传输及供应商，不构成真实资金验收。本机私有检查记录保存在忽略的 `work/codex-runtime/finance-release/verification-summary.json`。
 
 ## 状态检查
 
@@ -85,7 +85,7 @@ plasma_usdt:
 
 首次启用自动创建 `USDT · Plasma` 订单支付渠道；重启不会重新启用已禁用渠道或覆盖商户名称。沿用 storefront 模式即可启动独立 Plasma 监听。后台只读查询入口为 `/api/v1/admin/chain-payments/plasma-usdt/status` 和 `/transfers`，使用已有后台鉴权。核验支付页显示 Plasma、USDT0、正确地址及完整 6 位小数金额；两条链都要求完整金额和最终确认，异常金额或过期付款进入人工核查。
 
-2026-10-12 链路检查发现，维护账号访问两条链的后台监控接口均返回 `compliance_required`，需超级管理员在后台自行确认现有声明，检查脚本不代为确认；此限制不阻断客户支付或链上监听。另有待修复的监控权限遗漏：内置 `finance` 角色目前只有 BEP20 的状态和转账查询权限，尚未加入 Plasma 对应权限；超级管理员不受这一角色策略遗漏影响。本轮检查没有修改线上权限或程序。
+2026-10-12 链路检查发现，维护账号访问两条链的后台监控接口均返回 `compliance_required`，需超级管理员在后台自行确认现有声明，检查脚本不代为确认；此限制不阻断客户支付或链上监听。Plasma 的财务权限遗漏已在发布 `20261012-114319` 修复：内置 `finance` 角色拥有两条链 `status` 和 `transfers` 的 GET 权限。启动时自动补齐已有角色，已从运行中后台权限接口核验；仅增加上述两项策略，未代为确认声明，也未放宽其他角色或写入权限。
 
 ### 正式升级规则
 

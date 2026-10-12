@@ -2,7 +2,7 @@
 
 - `main` 是唯一正式源码主线，维护当前绿色 Go + Vue 商城，包含已确认的 π星卡社名称、派大星 Logo 和水母背景。用户端为 `frontend/user`，后台为 `frontend/admin`；这些品牌改动属于同一项目主版本。
 - 默认部署目标为腾讯云新加坡服务器 `43.134.141.10`，账号 `ubuntu`，目录 `/srv/zhixiang`。部署和维护说明见 `ops/tencent/README.md`。
-- 当前生产运行基准是新加坡发布 `20261012-111003`，构建源码为 `800bf983e6eaaf10855eb9b79e707f2132176f9a`，使用 `-mode storefront`、`UPSTREAM_PURCHASE_ENABLED=true`。BEP20 与 Plasma USDT 收款均已启用；精确核验范围以 `ops/tencent/production-baseline.json` 为准，不把后续文档提交自动当作线上程序的 Git 版本。
+- 当前生产运行基准是新加坡发布 `20261012-114319`，构建源码为 `c84d444fe7efd6de3a33b30ef62d6a236f5e80fb`，使用 `-mode storefront`、`UPSTREAM_PURCHASE_ENABLED=true`。BEP20 与 Plasma USDT 收款均已启用；精确核验范围以 `ops/tencent/production-baseline.json` 为准，不把后续文档提交自动当作线上程序的 Git 版本。
 - 本地使用 `scripts/local/start.ps1`、`status.ps1`、`stop.ps1`，运行库为 `work/codex-runtime/live/shop.db`，本地采购关闭。旧说明位于 `docs/history/`，不能按历史文档覆盖当前环境。
 - 用户已授权真实客户确认付款后的自动采购发卡，仍禁止主动提交有效采购、转账，或将验收订单改为已付款进行扣款测试。测试使用模拟供应商和临时数据库。
 - 未完成真实资金验收，不得把模拟测试通过描述成真实收款或采购验收。

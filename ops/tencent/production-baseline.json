@@ -1,20 +1,20 @@
 {
-  "checked_at": "2026-10-12T03:15:29.526376+00:00",
+  "checked_at": "2026-10-12T03:49:23.404412+00:00",
   "production_url": "http://43.134.141.10",
-  "documented_release_id": "20261012-111003",
-  "verified_release_id": "20261012-111003",
-  "previous_release_id": "20261012-105801",
-  "source_commit": "800bf983e6eaaf10855eb9b79e707f2132176f9a",
+  "documented_release_id": "20261012-114319",
+  "verified_release_id": "20261012-114319",
+  "previous_release_id": "20261012-111003",
+  "source_commit": "c84d444fe7efd6de3a33b30ef62d6a236f5e80fb",
   "source_branch": "main",
   "server_git_commit_verified": true,
-  "source_tag": "production/tencent-20261012-111003",
+  "source_tag": "production/tencent-20261012-114319",
   "production": {
-    "release_path": "/srv/zhixiang/releases/20261012-111003",
-    "running_executable": "/srv/zhixiang/releases/20261012-111003/zhixiang-shop",
+    "release_path": "/srv/zhixiang/releases/20261012-114319",
+    "running_executable": "/srv/zhixiang/releases/20261012-114319/zhixiang-shop",
     "binary_bytes": 90349730,
-    "binary_sha256": "a3d18cf153fda70210c3c54a4be8890088209565d7b8222e9d41b2dfe38a1e5a",
-    "running_binary_sha256": "a3d18cf153fda70210c3c54a4be8890088209565d7b8222e9d41b2dfe38a1e5a",
-    "manifest_binary_sha256": "a3d18cf153fda70210c3c54a4be8890088209565d7b8222e9d41b2dfe38a1e5a",
+    "binary_sha256": "c27055bbba6ad4a4b93d7a7967d7c897a37603a2b6bf93da9dba2798ce1fcedc",
+    "running_binary_sha256": "c27055bbba6ad4a4b93d7a7967d7c897a37603a2b6bf93da9dba2798ce1fcedc",
+    "manifest_binary_sha256": "c27055bbba6ad4a4b93d7a7967d7c897a37603a2b6bf93da9dba2798ce1fcedc",
     "build_info": {
       "go_version": "go1.26.5",
       "build_settings": [
@@ -27,11 +27,11 @@
         "GOOS=linux",
         "GOAMD64=v1",
         "vcs=git",
-        "vcs.revision=800bf983e6eaaf10855eb9b79e707f2132176f9a",
-        "vcs.time=2026-10-12T03:06:39Z",
+        "vcs.revision=c84d444fe7efd6de3a33b30ef62d6a236f5e80fb",
+        "vcs.time=2026-10-12T03:42:18Z",
         "vcs.modified=false"
       ],
-      "command": "GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -buildvcs=true -mod=readonly -trimpath -tags release,fullstack -ldflags '-s -w -X github.com/dujiao-next/internal/version.Version=pi-star-800bf98' ./cmd/server"
+      "command": "GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -buildvcs=true -mod=readonly -trimpath -tags release,fullstack -ldflags '-s -w -X github.com/dujiao-next/internal/version.Version=pi-star-c84d444' ./cmd/server"
     },
     "runtime_mode": "storefront",
     "upstream_purchase_enabled": true,
@@ -42,7 +42,7 @@
       "stock_sync_timer": "active"
     },
     "redis_preserved_without_restart": true,
-    "backup": "/srv/zhixiang/backups/before-20261012-111003",
+    "backup": "/srv/zhixiang/backups/before-20261012-114319",
     "database_backup_quick_check": "ok"
   },
   "payment": {
@@ -83,16 +83,37 @@
       "transfer_logs",
       "transaction_receipt"
     ],
-    "actual_charge_test_performed": false
+    "actual_charge_test_performed": false,
+    "finance_read_permissions": [
+      {
+        "path": "/admin/chain-payments/bsc-usdt/status",
+        "method": "GET"
+      },
+      {
+        "path": "/admin/chain-payments/bsc-usdt/transfers",
+        "method": "GET"
+      },
+      {
+        "path": "/admin/chain-payments/plasma-usdt/status",
+        "method": "GET"
+      },
+      {
+        "path": "/admin/chain-payments/plasma-usdt/transfers",
+        "method": "GET"
+      }
+    ],
+    "finance_permissions_verified_through_live_api": true,
+    "monitor_access_requires_existing_compliance_acknowledgement": true,
+    "compliance_acknowledgement_preserved": true
   },
   "pages": {
     "/": {
-      "html_sha256": "fb1ab6839f213c72d31d04ad9b67fd2d34116457939a2d9a9e116b6e54765f42",
-      "status": 200
+      "status": 200,
+      "html_sha256": "fb1ab6839f213c72d31d04ad9b67fd2d34116457939a2d9a9e116b6e54765f42"
     },
     "/zxa-management/": {
-      "html_sha256": "1852c711fcf6470d3c2eac129790137a5904715dc14753e740c650e1173166ab",
-      "status": 200
+      "status": 200,
+      "html_sha256": "1852c711fcf6470d3c2eac129790137a5904715dc14753e740c650e1173166ab"
     }
   },
   "verified_asset_sha256": {
@@ -107,7 +128,7 @@
     "/brand/jellyfishing-background.png": "c2efe94275b906bf3d8a8e7dee8a06f9394de7ee2d9540557bba0c2a5a569d70"
   },
   "public_verification": {
-    "checked_at": "2026-10-12T03:15:46.709141+00:00",
+    "checked_at": "2026-10-12T03:47:37.876533+00:00",
     "url": "http://43.134.141.10",
     "http_status": {
       "/": 200,
@@ -115,7 +136,7 @@
       "/health": 200,
       "/api/v1/public/config": 200
     },
-    "app_version": "pi-star-800bf98",
+    "app_version": "pi-star-c84d444",
     "payment_channels": [
       {
         "name": "USDT · BNB Smart Chain (BEP-20)",
@@ -139,6 +160,22 @@
     "Mock payment and fulfillment tests passed; no real-money transfer or supplier purchase was performed for acceptance.",
     "Production database and private configuration were backed up in place; no local database was uploaded.",
     "Source commit identifies the deployed binary; later documentation-only commits do not change the running binary.",
-    "Payment channels and assets were verified through public GET requests; no production test order was created."
-  ]
+    "Payment channels and assets were verified through public GET requests; no production test order was created.",
+    "Finance GET permissions were verified in the live policy API; existing payment compliance acknowledgement remains required for monitoring access."
+  ],
+  "procurement_verification": {
+    "mock_end_to_end_scenarios_passed": 12,
+    "both_networks_retry_after_supplier_topup_verified": true,
+    "supplier_adapter_reloads_balance_before_each_purchase": true,
+    "merchant_read_only_preflight_at": "2026-10-12T03:47:15.640678+00:00",
+    "mapped_products": 12,
+    "in_stock_products_ready_if_sufficiently_funded": 11,
+    "out_of_stock_products": [
+      "qzweb-59"
+    ],
+    "new_order_cost_limit_covers_merchant_quote": true,
+    "worker_heartbeat_count": 1,
+    "paid_upstream_orders_missing_procurement": 0,
+    "real_money_acceptance_performed": false
+  }
 }

@@ -13,7 +13,7 @@
 | 本地商城 | http://127.0.0.1:5173/ |
 | 本地后台 | http://127.0.0.1:5174/ |
 | 绿色源码基线 | `baseline/green-20261012`，提交 `419141e` |
-| 生产发布记录 | `20261012-111003`，构建源码 `800bf983e6eaaf10855eb9b79e707f2132176f9a`，见 [生产维护说明](ops/tencent/README.md) |
+| 生产发布记录 | `20261012-114319`，构建源码 `c84d444fe7efd6de3a33b30ef62d6a236f5e80fb`，见 [生产维护说明](ops/tencent/README.md) |
 
 源码标签、服务器发布号和数据库是三个独立对象。线上比对证据与核验范围在 [production-baseline.json](ops/tencent/production-baseline.json)。推送 GitHub 不会自动部署服务器，也不会同步数据库。
 
