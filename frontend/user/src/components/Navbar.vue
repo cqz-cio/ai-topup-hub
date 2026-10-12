@@ -1,18 +1,15 @@
 <template>
   <nav
     class="brand-navbar fixed top-0 left-0 right-0 z-50 bg-card/80 border-b backdrop-blur-md transition-all"
-    :class="scrolled ? 'py-2 shadow-lg' : 'py-4'"
+    :class="scrolled ? 'py-2 shadow-lg' : 'py-[15px]'"
     :style="{ transitionDuration: 'var(--ui-duration-normal)' }">
     <div class="container mx-auto px-4 flex items-center justify-between gap-4">
       <!-- Logo -->
-      <router-link to="/" class="theme-wordmark group relative gap-3" :title="brandSiteName">
-        <img
-          v-if="brandLogo"
-          :src="brandLogo"
-          :alt="brandSiteName"
-          class="h-12 max-w-[64px] sm:max-w-[120px] shrink-0 object-contain"
-        />
-        <div>
+      <router-link to="/" class="brand-wordmark group relative" :title="brandSiteName">
+        <span v-if="brandLogo" class="brand-logo-tile">
+          <img :src="brandLogo" :alt="brandSiteName" class="brand-logo-image" />
+        </span>
+        <div class="brand-wordmark-copy">
           <span class="theme-wordmark-text">{{ brandSiteName }}</span>
           <span class="brand-tagline">{{ t('shopUi.brandLine') }}</span>
         </div>
