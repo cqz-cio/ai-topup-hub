@@ -94,6 +94,11 @@
       <div class="lookup-actions"><RouterLink to="/me/orders" class="store-button is-primary">{{ t('shopUi.memberOrders') }}<ArrowUpRight :size="16" aria-hidden="true" /></RouterLink><RouterLink to="/guest/orders" class="store-button">{{ t('shopUi.guestOrders') }}</RouterLink></div>
     </section>
     <p class="store-service-note"><Check :size="14" aria-hidden="true" />{{ t('shopUi.flowDescription') }}</p>
+    <AnnouncementModal
+      v-if="activeAnnouncement"
+      :announcement="activeAnnouncement"
+      v-model:visible="announcementVisible"
+    />
   </div>
 </template>
 
@@ -106,6 +111,8 @@ import { categoryAPI, productAPI } from '../api/product'
 import { useAppStore } from '../stores/app'
 import { useUserAuthStore } from '../stores/userAuth'
 import { usePageSeo } from '../composables/usePageSeo'
+import AnnouncementModal from '../components/AnnouncementModal.vue'
+import { useAnnouncement, type HomeAnnouncement } from '../composables/useAnnouncement'
 import { getImageUrl } from '../utils/image'
 import { storefrontDisplayDetails } from '../data/storefrontCatalog'
 import {
@@ -118,6 +125,12 @@ import {
 } from '../utils/storefront'
 
 const appStore = useAppStore()
+const { shouldShow } = useAnnouncement()
+const activeAnnouncement = computed<HomeAnnouncement | undefined>(() => appStore.config?.announcement)
+const announcementVisible = ref(false)
+watch(activeAnnouncement, (announcement) => {
+  announcementVisible.value = shouldShow(announcement)
+}, { immediate: true })
 const authStore = useUserAuthStore()
 const { t } = useI18n()
 const flowKeys = ['cart', 'checkout', 'payment', 'delivery'] as const
