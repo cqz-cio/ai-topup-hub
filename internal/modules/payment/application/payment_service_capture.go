@@ -48,20 +48,15 @@ func (s *PaymentService) CapturePayment(input CapturePaymentInput) (*paymentdoma
 	if providerType != constants.PaymentProviderOfficial {
 		return nil, ErrPaymentProviderNotSupported
 	}
-	if strings.TrimSpace(payment.ProviderRef) == "" {
-		return nil, ErrPaymentInvalid
-	}
-
 	// 统一通过 Registry 路由。Registry.Lookup 会返回 channel 对应的 adapter,
-	// 如果 adapter 不实现 Capturer,type assertion 失败,返回 ErrPaymentProviderNotSupported。
+	// 按网关能力选择第三方流水号或商户订单号查询。
 	// 因此无需在此显式检查 channel 是否支持 capture。
 	return s.captureViaRegistry(input, payment, channel)
 }
 
 // captureViaRegistry 通过 PaymentProviderRegistry 路由调用 QueryPayment。
-// stripe + paypal + wechat 实现了 paymentcontract.GatewayCapturer 接口,其它 channel
-// (alipay / epay / epusdt / bepusdt / tokenpay / okpay) 仅实现 webhook 回调,
-// type assertion 失败时返回 ErrPaymentProviderNotSupported。
+// Alipay uses GatewayOrderQuerier so a provider trade number is never mistaken
+// for the merchant order number after a callback updates ProviderRef.
 func (s *PaymentService) captureViaRegistry(input CapturePaymentInput, payment *paymentdomain.Payment, channel *paymentdomain.PaymentChannel) (*paymentdomain.Payment, error) {
 	logger.Infow("payment_capture_via_registry",
 		"payment_id", payment.ID,
@@ -75,8 +70,9 @@ func (s *PaymentService) captureViaRegistry(input CapturePaymentInput, payment *
 	if !ok {
 		return nil, ErrPaymentProviderNotSupported
 	}
-	capturer, ok := p.(paymentcontract.GatewayCapturer)
-	if !ok {
+	capturer, canCapture := p.(paymentcontract.GatewayCapturer)
+	orderQuerier, canQueryOrder := p.(paymentcontract.GatewayOrderQuerier)
+	if !canCapture && !canQueryOrder {
 		logger.Warnw("payment_provider_capture_not_implemented",
 			"provider_type", channel.ProviderType,
 			"channel_type", channel.ChannelType,
@@ -86,16 +82,31 @@ func (s *PaymentService) captureViaRegistry(input CapturePaymentInput, payment *
 
 	// 第二参数是 interactionMode,不是 channelType。stripe/wechat adapter
 	// 会拒绝任何非法 mode,传 channelType 会导致  一律 ErrConfigInvalid。
-	if err := capturer.ValidateConfig(channel.ConfigJSON, channel.InteractionMode); err != nil {
+	if err := p.ValidateConfig(channel.ConfigJSON, channel.InteractionMode); err != nil {
 		return nil, mapProviderErrorToService(err)
 	}
 
 	ctx, cancel := detachOutboundRequestContext(input.Context)
 	defer cancel()
 
-	queryResult, err := capturer.QueryPayment(ctx, channel.ConfigJSON, payment.ProviderRef)
+	var queryResult *paymentcontract.GatewayQueryResult
+	var err error
+	if canQueryOrder {
+		if strings.TrimSpace(payment.GatewayOrderNo) == "" {
+			return nil, ErrPaymentInvalid
+		}
+		queryResult, err = orderQuerier.QueryPaymentByOrderNo(ctx, channel.ConfigJSON, payment.GatewayOrderNo)
+	} else {
+		if strings.TrimSpace(payment.ProviderRef) == "" {
+			return nil, ErrPaymentInvalid
+		}
+		queryResult, err = capturer.QueryPayment(ctx, channel.ConfigJSON, payment.ProviderRef)
+	}
 	if err != nil {
 		return nil, mapProviderErrorToService(err)
+	}
+	if queryResult == nil || (canQueryOrder && queryResult.OrderNo != payment.GatewayOrderNo) {
+		return nil, ErrPaymentGatewayResponseInvalid
 	}
 
 	payload := jsonmap.JSON{}
@@ -109,6 +120,7 @@ func (s *PaymentService) captureViaRegistry(input CapturePaymentInput, payment *
 
 	callbackInput := PaymentCallbackInput{
 		PaymentID:   payment.ID,
+		OrderNo:     queryResult.OrderNo,
 		ChannelID:   channel.ID,
 		Status:      status,
 		ProviderRef: pickFirstNonEmpty(queryResult.ProviderRef, payment.ProviderRef),

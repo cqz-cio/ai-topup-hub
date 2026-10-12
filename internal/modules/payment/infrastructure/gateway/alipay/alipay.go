@@ -59,6 +59,7 @@ const (
 type Config struct {
 	common.ExchangeRateConfig
 	AppID            string `json:"app_id"`
+	SellerID         string `json:"seller_id"`
 	PrivateKey       string `json:"private_key"`
 	AlipayPublicKey  string `json:"alipay_public_key"`
 	GatewayURL       string `json:"gateway_url"`
@@ -103,6 +104,9 @@ func ValidateConfig(cfg *Config, interactionMode string) error {
 	if strings.TrimSpace(cfg.AppID) == "" {
 		return fmt.Errorf("%w: app_id is required", ErrConfigInvalid)
 	}
+	if strings.TrimSpace(cfg.SellerID) == "" && !IsSandboxGateway(cfg.GatewayURL) {
+		return fmt.Errorf("%w: seller_id is required", ErrConfigInvalid)
+	}
 	if strings.TrimSpace(cfg.PrivateKey) == "" {
 		return fmt.Errorf("%w: private_key is required", ErrConfigInvalid)
 	}
@@ -112,14 +116,16 @@ func ValidateConfig(cfg *Config, interactionMode string) error {
 	if strings.TrimSpace(cfg.GatewayURL) == "" {
 		return fmt.Errorf("%w: gateway_url is required", ErrConfigInvalid)
 	}
-	if strings.TrimSpace(cfg.NotifyURL) == "" {
+	if strings.TrimSpace(cfg.NotifyURL) == "" && !IsSandboxGateway(cfg.GatewayURL) {
 		return fmt.Errorf("%w: notify_url is required", ErrConfigInvalid)
 	}
 	if _, err := url.ParseRequestURI(strings.TrimSpace(cfg.GatewayURL)); err != nil {
 		return fmt.Errorf("%w: gateway_url is invalid", ErrConfigInvalid)
 	}
-	if _, err := url.ParseRequestURI(strings.TrimSpace(cfg.NotifyURL)); err != nil {
-		return fmt.Errorf("%w: notify_url is invalid", ErrConfigInvalid)
+	if strings.TrimSpace(cfg.NotifyURL) != "" {
+		if _, err := url.ParseRequestURI(strings.TrimSpace(cfg.NotifyURL)); err != nil {
+			return fmt.Errorf("%w: notify_url is invalid", ErrConfigInvalid)
+		}
 	}
 	if strings.TrimSpace(cfg.ReturnURL) != "" {
 		if _, err := url.ParseRequestURI(strings.TrimSpace(cfg.ReturnURL)); err != nil {
@@ -129,7 +135,7 @@ func ValidateConfig(cfg *Config, interactionMode string) error {
 	if !IsSupportedInteractionMode(interactionMode) {
 		return fmt.Errorf("%w: interaction_mode %s is not supported", ErrConfigInvalid, interactionMode)
 	}
-	if requiresReturnURL(interactionMode) && strings.TrimSpace(cfg.ReturnURL) == "" {
+	if requiresReturnURL(interactionMode) && strings.TrimSpace(cfg.ReturnURL) == "" && !IsSandboxGateway(cfg.GatewayURL) {
 		return fmt.Errorf("%w: return_url is required for mode %s", ErrConfigInvalid, interactionMode)
 	}
 	if cfg.SignType != alipaySignTypeRSA2 && cfg.SignType != alipaySignTypeRSA {
@@ -186,7 +192,7 @@ func CreatePayment(ctx context.Context, cfg *Config, input CreateInput, interact
 		"format":      alipayReqFormatJSON,
 		"charset":     alipayReqCharset,
 		"sign_type":   cfg.SignType,
-		"timestamp":   time.Now().Format("2006-01-02 15:04:05"),
+		"timestamp":   time.Now().In(time.FixedZone("CST", 8*3600)).Format("2006-01-02 15:04:05"),
 		"version":     alipayReqVersion,
 		"notify_url":  notifyURL,
 		"biz_content": string(bizContentBytes),
@@ -290,8 +296,21 @@ func VerifyCallbackOwnership(cfg *Config, form map[string][]string) error {
 	if callbackAppID == "" {
 		return fmt.Errorf("%w: app_id is required", ErrSignatureInvalid)
 	}
-	if !strings.EqualFold(callbackAppID, strings.TrimSpace(cfg.AppID)) {
+	if callbackAppID != strings.TrimSpace(cfg.AppID) {
 		return fmt.Errorf("%w: app_id mismatch", ErrSignatureInvalid)
+	}
+	expectedSellerID := strings.TrimSpace(cfg.SellerID)
+	if expectedSellerID == "" && !IsSandboxGateway(cfg.GatewayURL) {
+		return fmt.Errorf("%w: seller_id is required", ErrConfigInvalid)
+	}
+	if expectedSellerID != "" {
+		callbackSellerID := strings.TrimSpace(firstFormValue(form, "seller_id"))
+		if callbackSellerID == "" {
+			return fmt.Errorf("%w: seller_id is required", ErrSignatureInvalid)
+		}
+		if callbackSellerID != expectedSellerID {
+			return fmt.Errorf("%w: seller_id mismatch", ErrSignatureInvalid)
+		}
 	}
 	return nil
 }
@@ -617,6 +636,7 @@ func requiresReturnURL(mode string) bool {
 
 func (c *Config) Normalize() {
 	c.AppID = strings.TrimSpace(c.AppID)
+	c.SellerID = strings.TrimSpace(c.SellerID)
 	c.PrivateKey = strings.TrimSpace(c.PrivateKey)
 	c.AlipayPublicKey = strings.TrimSpace(c.AlipayPublicKey)
 	c.GatewayURL = strings.TrimSpace(c.GatewayURL)

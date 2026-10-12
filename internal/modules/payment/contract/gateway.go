@@ -43,6 +43,7 @@ type GatewayCreateResult struct {
 
 // GatewayQueryResult 是主动查询网关支付状态的结果。
 type GatewayQueryResult struct {
+	OrderNo     string
 	ProviderRef string
 	Status      string
 	Amount      money.Amount
@@ -82,6 +83,13 @@ type GatewayProvider interface {
 type GatewayCapturer interface {
 	GatewayProvider
 	QueryPayment(ctx context.Context, cfg jsonmap.JSON, providerRef string) (*GatewayQueryResult, error)
+}
+
+// GatewayOrderQuerier queries by the immutable merchant order number. Some
+// page-payment gateways do not return a provider trade number at creation time.
+type GatewayOrderQuerier interface {
+	GatewayProvider
+	QueryPaymentByOrderNo(ctx context.Context, cfg jsonmap.JSON, orderNo string) (*GatewayQueryResult, error)
 }
 
 type GatewayWebhooker interface {

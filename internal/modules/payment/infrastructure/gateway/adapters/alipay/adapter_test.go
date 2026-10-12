@@ -64,6 +64,7 @@ func TestAlipayAdapter_ValidateConfig_ValidConfig_C3Regression(t *testing.T) {
 	// 使用 alipay native test 中确认有效的最小配置（QR 模式不要求 return_url）
 	raw := jsonmap.JSON{
 		"app_id":            "2026000000000000",
+		"seller_id":         "2088000000000000",
 		"private_key":       "k",
 		"alipay_public_key": "p",
 		"gateway_url":       "https://openapi.alipay.com/gateway.do",
@@ -84,6 +85,7 @@ func TestAlipayAdapter_ValidateConfig_EmptyInteractionModeUsesDefault(t *testing
 	a := NewAlipayAdapter()
 	raw := jsonmap.JSON{
 		"app_id":            "2026000000000000",
+		"seller_id":         "2088000000000000",
 		"private_key":       "k",
 		"alipay_public_key": "p",
 		"gateway_url":       "https://openapi.alipay.com/gateway.do",
@@ -122,6 +124,7 @@ func TestAlipayAdapter_CreatePayment_ExchangeRate_AuditFields(t *testing.T) {
 	a := NewAlipayAdapter()
 	raw := jsonmap.JSON{
 		"app_id":            "2026000000000000",
+		"seller_id":         "2088000000000000",
 		"private_key":       privateKeyPEM,
 		"alipay_public_key": publicKeyPEM,
 		"gateway_url":       server.URL,

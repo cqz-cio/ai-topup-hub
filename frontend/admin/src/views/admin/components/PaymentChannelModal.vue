@@ -105,6 +105,7 @@ const stripeConfig = reactive({
 
 const alipayConfig = reactive({
   app_id: '',
+  seller_id: '',
   private_key: '',
   alipay_public_key: '',
   gateway_url: 'https://openapi.alipay.com/gateway.do',
@@ -377,6 +378,7 @@ const resetStripeConfig = () => {
 
 const resetAlipayConfig = () => {
   alipayConfig.app_id = ''
+  alipayConfig.seller_id = ''
   alipayConfig.private_key = ''
   alipayConfig.alipay_public_key = ''
   alipayConfig.gateway_url = 'https://openapi.alipay.com/gateway.do'
@@ -520,6 +522,7 @@ const applyStripeConfig = (raw: Record<string, unknown>) => {
 
 const applyAlipayConfig = (raw: Record<string, unknown>) => {
   alipayConfig.app_id = String(raw.app_id || '')
+  alipayConfig.seller_id = String(raw.seller_id || '')
   alipayConfig.private_key = String(raw.private_key || '')
   alipayConfig.alipay_public_key = String(raw.alipay_public_key || '')
   alipayConfig.gateway_url = String(raw.gateway_url || 'https://openapi.alipay.com/gateway.do')
@@ -690,6 +693,7 @@ const buildAlipayConfig = () => {
     }
   }
   setIfNotEmpty('app_id', alipayConfig.app_id)
+  setIfNotEmpty('seller_id', alipayConfig.seller_id)
   setIfNotEmpty('private_key', alipayConfig.private_key)
   setIfNotEmpty('alipay_public_key', alipayConfig.alipay_public_key)
   setIfNotEmpty('gateway_url', alipayConfig.gateway_url)
@@ -1633,6 +1637,10 @@ const closeModal = () => {
             <div class="min-w-0">
               <label class="block text-xs font-medium text-muted-foreground mb-1.5">{{ t('admin.paymentChannels.modal.alipaySignType') }}</label>
               <Input v-model="alipayConfig.sign_type" :placeholder="t('admin.paymentChannels.modal.alipaySignTypePlaceholder')" />
+            </div>
+            <div class="min-w-0 md:col-span-2">
+              <label class="block text-xs font-medium text-muted-foreground mb-1.5">{{ t('admin.paymentChannels.modal.alipaySellerId') }}</label>
+              <Input v-model="alipayConfig.seller_id" :placeholder="t('admin.paymentChannels.modal.alipaySellerIdPlaceholder')" />
             </div>
             <div class="min-w-0 md:col-span-2">
               <label class="block text-xs font-medium text-muted-foreground mb-1.5">{{ t('admin.paymentChannels.modal.alipayPrivateKey') }}</label>

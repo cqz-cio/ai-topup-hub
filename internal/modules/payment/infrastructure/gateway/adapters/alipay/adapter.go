@@ -25,9 +25,7 @@ import (
 // 订单完成时间标记、webhook payload 全错。
 var alipayLocation = time.FixedZone("CST", 8*3600)
 
-// alipayAdapter 是 alipay 网关的 paymentcontract.GatewayProvider + paymentcontract.GatewayCallbackVerifier 实现。
-// alipay 没有主动查询 API，callback 是同步 form POST（不是 JSON webhook），
-// 所以**不**实现 paymentcontract.GatewayCapturer 和 paymentcontract.GatewayWebhooker。
+// alipayAdapter 支持网页下单、异步通知验签和按商户订单号主动查询。
 type alipayAdapter struct{}
 
 // NewAlipayAdapter 实例化 alipay adapter。
@@ -37,6 +35,7 @@ func NewAlipayAdapter() paymentcontract.GatewayProvider { return &alipayAdapter{
 var (
 	_ paymentcontract.GatewayProvider         = (*alipayAdapter)(nil)
 	_ paymentcontract.GatewayCallbackVerifier = (*alipayAdapter)(nil)
+	_ paymentcontract.GatewayOrderQuerier     = (*alipayAdapter)(nil)
 )
 
 // Type 返回 provider 标识。
@@ -144,7 +143,7 @@ func (a *alipayAdapter) CreatePayment(ctx context.Context, raw jsonmap.JSON, inp
 // VerifyCallback 实现 paymentcontract.GatewayCallbackVerifier。alipay 用 form POST，body 参数忽略。
 // 依次执行：
 //  1. alipay.VerifyCallback   — 签名验证（防篡改）
-//  2. alipay.VerifyCallbackOwnership — 归属校验（防跨商户注入：app_id 必须与配置一致）
+//  2. alipay.VerifyCallbackOwnership — app_id 和收款 seller_id 必须与渠道配置一致。
 func (a *alipayAdapter) VerifyCallback(raw jsonmap.JSON, form map[string][]string, _ []byte) (*paymentcontract.GatewayCallbackResult, error) {
 	cfg, err := alipay.ParseConfig(raw)
 	if err != nil {
@@ -192,6 +191,38 @@ func (a *alipayAdapter) VerifyCallback(raw jsonmap.JSON, form map[string][]strin
 		Currency:    "CNY",
 		PaidAt:      paidAt,
 		Payload:     gatewaycommon.FormToJSON(form),
+	}, nil
+}
+
+// QueryPaymentByOrderNo only returns facts from a verified Alipay response.
+func (a *alipayAdapter) QueryPaymentByOrderNo(ctx context.Context, raw jsonmap.JSON, orderNo string) (*paymentcontract.GatewayQueryResult, error) {
+	cfg, err := alipay.ParseConfig(raw)
+	if err != nil {
+		return nil, mapAlipayError(err)
+	}
+	result, err := alipay.QueryPaymentByOrderNo(ctx, cfg, orderNo)
+	if err != nil {
+		return nil, mapAlipayError(err)
+	}
+	status := constants.PaymentStatusPending
+	switch result.TradeStatus {
+	case "TRADE_SUCCESS", "TRADE_FINISHED":
+		status = constants.PaymentStatusSuccess
+	case "TRADE_CLOSED":
+		status = constants.PaymentStatusFailed
+	}
+	amount, err := decimal.NewFromString(result.TotalAmount)
+	if err != nil {
+		return nil, paymentcontract.ErrGatewayResponseInvalid
+	}
+	var paidAt *time.Time
+	if parsed, err := time.ParseInLocation("2006-01-02 15:04:05", result.SendPayDate, alipayLocation); err == nil {
+		paidAt = &parsed
+	}
+	return &paymentcontract.GatewayQueryResult{
+		OrderNo: result.OutTradeNo, ProviderRef: result.TradeNo, Status: status,
+		Amount: money.FromDecimal(amount), Currency: "CNY", PaidAt: paidAt,
+		Payload: jsonmap.JSON(result.Raw),
 	}, nil
 }
 
