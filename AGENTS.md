@@ -23,6 +23,12 @@
 - 2026-10-12 用户进一步确认上海服务器 `124.220.2.69` 同样使用此前提供的 `ubuntu` 登录信息，明确要求保存并在后续直接复用。上海已验证的私有凭据为 `deployment/local/shanghai-front-server.credentials.json`，主机指纹为 `deployment/local/shanghai-front-known-hosts`；密码文件仅当前用户和 SYSTEM 可访问，全部由 Git 忽略。新加坡继续使用上述文件及 `deployment/local/tencent-cloud-known-hosts`。连接前核对目标，并使用对应保存的主机指纹拒绝未知或变化的主机密钥；不要重复询问已有且有效的登录信息。
 - 需要登录服务器时读取对应凭据文件；不要将密码写入项目说明、源码、构建产物或 Git 提交，也不要在对话、命令输出和日志中回显密码。
 
+## ChatGPT 兑换入口更换（2026-10-13）
+
+- 用户指定后续统一使用 `https://cdk.bar/`。公告及 11 款 ChatGPT 商品购买说明、新订单发货指引已同步；源码配置 `0448e64db4058e52f6b16fe5ac1a23c70975578a`，公告版本 `bf3a1445`。客服微信保持 `Cqz0924ttxk`，不展示电话号码。
+- 商品同步工具会将源快照和已有商品中的旧兑换地址迁移为当前配置，保留套餐、质保及 iOS 不叠加时长的原规则；原站资料快照不修改。只更新目标商品内容和交付说明，历史订单及已保存交付快照不回写，Gemini、DEMO 不套用此地址。
+- 9 项数据库范围、备份、回滚及迁移测试通过；日常本机和正式站的公告、11款公开商品及桌面手机实际页面核验通过。未替换程序、重启后端、上传本机库或进行付款采购测试。线上备份 `/srv/zhixiang/backups/before-redemption-url-20261013-002736`、`/srv/zhixiang/backups/before-redemption-announcement-20261013-002738`；私有报告 `deployment/local/redemption-url-product-deployment.json`、`redemption-announcement-deployment.json`，浏览器记录 `remote-latest/work/codex-runtime/redemption-url-qa/`。
+
 ## 客服微信统一设置（2026-10-12）
 
 - 用户明确指定客服微信为 `Cqz0924ttxk`，要求统一使用微信号且不要展示电话号码。首页公告、首页客服区及全站页脚已全部更换；对应复制按钮内容已核验，后续不能回退到电话号码。
@@ -31,7 +37,7 @@
 
 ## 可配置首页公告弹窗（2026-10-12）
 
-- 用户要求首次进入商城时显示可自行设置的弹窗公告，已将既有 `home_announcement` 配置接入当前 `Storefront.vue` 首页并发布上海前端 `20261012-231734`，商城源码 `a2cda8e818712a3a23d6b7534f8f795dbca26604`。后台路径为 **系统设置 → 站点设置 → 首页公告**，支持标题、富文本、图片、链接、开关及起止时间。2026-10-12 23:35 已按用户参考图片整理并启用正式公告“购买须知与代理合作”：购买与发货说明、ChatGPT 卡密兑换须知、诚招代理及代理价咨询、客服微信 Cqz0924ttxk；兑换入口 https://cdkai.kdns.fr/。文案快照 `remote-latest/docs/catalog/home-announcement.json`，配置来源提交 `6c088c7a20725b5ebcfec10286e6346b2c8870d2`，公开版本 `c13a6e2c`。后续可在后台修改。
+- 用户要求首次进入商城时显示可自行设置的弹窗公告，已将既有 `home_announcement` 配置接入当前 `Storefront.vue` 首页并发布上海前端 `20261012-231734`，商城源码 `a2cda8e818712a3a23d6b7534f8f795dbca26604`。后台路径为 **系统设置 → 站点设置 → 首页公告**，支持标题、富文本、图片、链接、开关及起止时间。2026-10-12 23:35 已按用户参考图片整理并启用正式公告“购买须知与代理合作”：购买与发货说明、ChatGPT 卡密兑换须知、诚招代理及代理价咨询、客服微信 Cqz0924ttxk；兑换入口 https://cdk.bar/。文案快照 `remote-latest/docs/catalog/home-announcement.json`，配置来源提交 `6c088c7a20725b5ebcfec10286e6346b2c8870d2`，公开版本 `c13a6e2c`。后续可在后台修改。
 - 关闭后本次会话不重复弹出，支持今日不再提示和不再提示；标题或内容变化后再次提醒。日常本机入口通过实际公告保存、公开接口与 12 项浏览器检查，临时内容已恢复；公网通过 12 项只读检查，弹窗仅在测试浏览器内注入验证，覆盖六种宽度，无页面错误。94 项前台测试、类型检查和生产构建通过。
 - 仅部署商城静态资源，后台、新加坡后端及支付采购配置保持原状态；售价和两条 USDT 渠道核对正常，没有上传本机库或进行付款采购测试。上海备份 `/srv/zhixiang-front/backups/before-announcement-20261012-231734`，新加坡备份 `/srv/zhixiang/backups/before-frontend-announcement-20261012-231734`。私有报告为 `deployment/local/announcement-deployment.json`、`announcement-live-verification.json`；截图与浏览器记录为 `remote-latest/work/codex-runtime/announcement-qa/`，均由 Git 忽略。
 
