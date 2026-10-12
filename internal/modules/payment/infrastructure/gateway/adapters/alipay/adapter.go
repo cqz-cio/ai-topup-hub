@@ -143,7 +143,7 @@ func (a *alipayAdapter) CreatePayment(ctx context.Context, raw jsonmap.JSON, inp
 // VerifyCallback 实现 paymentcontract.GatewayCallbackVerifier。alipay 用 form POST，body 参数忽略。
 // 依次执行：
 //  1. alipay.VerifyCallback   — 签名验证（防篡改）
-//  2. alipay.VerifyCallbackOwnership — 归属校验（防跨商户注入：app_id 必须与配置一致）
+//  2. alipay.VerifyCallbackOwnership — app_id 和收款 seller_id 必须与渠道配置一致。
 func (a *alipayAdapter) VerifyCallback(raw jsonmap.JSON, form map[string][]string, _ []byte) (*paymentcontract.GatewayCallbackResult, error) {
 	cfg, err := alipay.ParseConfig(raw)
 	if err != nil {

@@ -87,7 +87,7 @@ func TestAlipayQuerySettlesThroughExistingPaymentValidation(t *testing.T) {
 				Name: "Alipay test", ProviderType: constants.PaymentProviderOfficial, ChannelType: constants.PaymentChannelTypeAlipay,
 				InteractionMode: constants.PaymentInteractionPage,
 				ConfigJSON: jsonmap.JSON{
-					"app_id": "2026000000000000", "gateway_url": server.URL, "sign_type": "RSA2",
+					"app_id": "2026000000000000", "seller_id": "2088000000000000", "gateway_url": server.URL, "sign_type": "RSA2",
 					"private_key":       string(pem.EncodeToMemory(&pem.Block{Type: "PRIVATE KEY", Bytes: privateDER})),
 					"alipay_public_key": string(pem.EncodeToMemory(&pem.Block{Type: "PUBLIC KEY", Bytes: publicDER})),
 					"notify_url":        "https://example.com/api/v1/payments/callback", "return_url": "https://example.com/pay",

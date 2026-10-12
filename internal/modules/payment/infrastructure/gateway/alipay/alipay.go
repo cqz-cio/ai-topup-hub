@@ -59,6 +59,7 @@ const (
 type Config struct {
 	common.ExchangeRateConfig
 	AppID            string `json:"app_id"`
+	SellerID         string `json:"seller_id"`
 	PrivateKey       string `json:"private_key"`
 	AlipayPublicKey  string `json:"alipay_public_key"`
 	GatewayURL       string `json:"gateway_url"`
@@ -102,6 +103,9 @@ func ValidateConfig(cfg *Config, interactionMode string) error {
 	}
 	if strings.TrimSpace(cfg.AppID) == "" {
 		return fmt.Errorf("%w: app_id is required", ErrConfigInvalid)
+	}
+	if strings.TrimSpace(cfg.SellerID) == "" && !IsSandboxGateway(cfg.GatewayURL) {
+		return fmt.Errorf("%w: seller_id is required", ErrConfigInvalid)
 	}
 	if strings.TrimSpace(cfg.PrivateKey) == "" {
 		return fmt.Errorf("%w: private_key is required", ErrConfigInvalid)
@@ -292,8 +296,21 @@ func VerifyCallbackOwnership(cfg *Config, form map[string][]string) error {
 	if callbackAppID == "" {
 		return fmt.Errorf("%w: app_id is required", ErrSignatureInvalid)
 	}
-	if !strings.EqualFold(callbackAppID, strings.TrimSpace(cfg.AppID)) {
+	if callbackAppID != strings.TrimSpace(cfg.AppID) {
 		return fmt.Errorf("%w: app_id mismatch", ErrSignatureInvalid)
+	}
+	expectedSellerID := strings.TrimSpace(cfg.SellerID)
+	if expectedSellerID == "" && !IsSandboxGateway(cfg.GatewayURL) {
+		return fmt.Errorf("%w: seller_id is required", ErrConfigInvalid)
+	}
+	if expectedSellerID != "" {
+		callbackSellerID := strings.TrimSpace(firstFormValue(form, "seller_id"))
+		if callbackSellerID == "" {
+			return fmt.Errorf("%w: seller_id is required", ErrSignatureInvalid)
+		}
+		if callbackSellerID != expectedSellerID {
+			return fmt.Errorf("%w: seller_id mismatch", ErrSignatureInvalid)
+		}
 	}
 	return nil
 }
@@ -619,6 +636,7 @@ func requiresReturnURL(mode string) bool {
 
 func (c *Config) Normalize() {
 	c.AppID = strings.TrimSpace(c.AppID)
+	c.SellerID = strings.TrimSpace(c.SellerID)
 	c.PrivateKey = strings.TrimSpace(c.PrivateKey)
 	c.AlipayPublicKey = strings.TrimSpace(c.AlipayPublicKey)
 	c.GatewayURL = strings.TrimSpace(c.GatewayURL)

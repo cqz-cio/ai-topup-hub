@@ -20,6 +20,7 @@ import (
 func TestParseAndValidateConfig(t *testing.T) {
 	cfg, err := ParseConfig(map[string]interface{}{
 		"app_id":              "2026000000000000",
+		"seller_id":           "2088000000000000",
 		"private_key":         "-----BEGIN PRIVATE KEY-----abc",
 		"alipay_public_key":   "-----BEGIN PUBLIC KEY-----abc",
 		"gateway_url":         "https://openapi.alipay.com/gateway.do",
@@ -43,6 +44,7 @@ func TestParseAndValidateConfig(t *testing.T) {
 func TestValidateConfigRequireReturnURL(t *testing.T) {
 	cfg, err := ParseConfig(map[string]interface{}{
 		"app_id":            "2026000000000000",
+		"seller_id":         "2088000000000000",
 		"private_key":       "k",
 		"alipay_public_key": "p",
 		"gateway_url":       "https://openapi.alipay.com/gateway.do",
@@ -59,6 +61,7 @@ func TestValidateConfigRequireReturnURL(t *testing.T) {
 func TestValidateConfigSupportsQRWithoutReturnURL(t *testing.T) {
 	cfg, err := ParseConfig(map[string]interface{}{
 		"app_id":            "2026000000000000",
+		"seller_id":         "2088000000000000",
 		"private_key":       "k",
 		"alipay_public_key": "p",
 		"gateway_url":       "https://openapi.alipay.com/gateway.do",
@@ -284,7 +287,8 @@ func TestVerifyCallbackInvalidSign(t *testing.T) {
 func TestVerifyCallbackOwnershipSuccess(t *testing.T) {
 	cfg := buildTestConfig("https://openapi.alipay.com/gateway.do")
 	form := map[string][]string{
-		"app_id": []string{cfg.AppID},
+		"app_id":    []string{cfg.AppID},
+		"seller_id": []string{cfg.SellerID},
 	}
 	if err := VerifyCallbackOwnership(cfg, form); err != nil {
 		t.Fatalf("expected ownership verify success, got: %v", err)
@@ -328,11 +332,43 @@ func buildTestConfig(gatewayURL string) *Config {
 	publicKeyPEM := pem.EncodeToMemory(&pem.Block{Type: "PUBLIC KEY", Bytes: publicKeyDER})
 	return &Config{
 		AppID:           "2026000000000000",
+		SellerID:        "2088000000000000",
 		PrivateKey:      string(privateKeyPEM),
 		AlipayPublicKey: string(publicKeyPEM),
 		GatewayURL:      gatewayURL,
 		NotifyURL:       "https://example.com/api/v1/payments/callback",
 		ReturnURL:       "https://example.com/pay/return",
 		SignType:        "RSA2",
+	}
+}
+
+func TestAlipayRequiresSellerIDForProduction(t *testing.T) {
+	cfg := buildTestConfig(alipayGatewayDefault)
+	cfg.SellerID = ""
+	if err := ValidateConfig(cfg, constants.PaymentInteractionPage); err == nil {
+		t.Fatal("production configuration without seller_id was accepted")
+	}
+	cfg.GatewayURL = SandboxGateway
+	if err := ValidateConfig(cfg, constants.PaymentInteractionPage); err != nil {
+		t.Fatalf("isolated sandbox configuration should remain usable: %v", err)
+	}
+}
+
+func TestAlipayCallbackRejectsWrongOrMissingSeller(t *testing.T) {
+	cfg := buildTestConfig(alipayGatewayDefault)
+	for name, seller := range map[string]string{
+		"missing seller":   "",
+		"different seller": "2088999999999999",
+	} {
+		t.Run(name, func(t *testing.T) {
+			form := map[string][]string{"app_id": {cfg.AppID}, "seller_id": {seller}}
+			if err := VerifyCallbackOwnership(cfg, form); err == nil {
+				t.Fatal("callback without matching merchant ownership was accepted")
+			}
+		})
+	}
+	cfg.SellerID = ""
+	if err := VerifyCallbackOwnership(cfg, map[string][]string{"app_id": {cfg.AppID}}); err == nil {
+		t.Fatal("production callback accepted with no configured seller")
 	}
 }
