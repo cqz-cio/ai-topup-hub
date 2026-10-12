@@ -16,6 +16,8 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
+from redemption_guide import catalog_fields, load_guide
+
 
 def main():
     repo = Path(__file__).resolve().parents[1]
@@ -58,6 +60,7 @@ def main():
         return payload
 
     manifest = json.loads(args.manifest.read_text(encoding="utf-8-sig"))
+    redemption_guide = load_guide()
     groups = manifest.get("categories") or [{**manifest["category"], "products": manifest["products"]}]
     items = [item for group in groups for item in group["products"]]
     assert len({group["id"] for group in groups}) == len(groups)
@@ -113,6 +116,9 @@ def main():
         category = category_map[source_category["id"]]
         slug = f"qzweb-{item['id']}"
         prior = existing.get(slug)
+        content, instructions = catalog_fields(
+            slug, {"zh-CN": item["content_html"]}, {"zh-CN": item["content_html"]}, redemption_guide,
+        )
         intro = re.search(r"<p(?:\s[^>]*)?>(.*?)</p>", item["content_html"], re.S | re.I)
         summary = html.unescape(re.sub(r"<[^>]*>", "", intro.group(1))).strip() if intro else item["name"]
         sku = {
@@ -132,8 +138,8 @@ def main():
             "category_id": category["id"], "slug": slug,
             "title": {"zh-CN": item["name"]},
             "description": {"zh-CN": summary},
-            "content": {"zh-CN": item["content_html"]},
-            "instructions": {"zh-CN": item["content_html"]},
+            "content": content,
+            "instructions": instructions,
             "price_amount": float(price),
             "cost_price_amount": float(prior.get("cost_price_amount") or 0) if prior else 0,
             "images": [item["local_cover"]],
@@ -155,7 +161,8 @@ def main():
         public = api("GET", f"/public/products/{slug}")["data"]
         assert public["title"]["zh-CN"] == item["name"]
         assert Decimal(public["price_amount"]) == price
-        assert public["content"]["zh-CN"] == item["content_html"]
+        assert public["content"] == content
+        assert product["instructions"] == instructions
         assert public["images"] == [item["local_cover"]]
         assert Decimal(public["skus"][0]["price_amount"]) == price
         assert public["category_id"] == category["id"]
