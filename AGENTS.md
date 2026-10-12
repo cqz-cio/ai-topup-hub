@@ -13,7 +13,7 @@
 - 登录账号：`ubuntu`。
 - 配置：2 核 CPU、4 GB 内存、60 GB 系统盘。
 - 信息来源：用户确认、腾讯云控制台截图及 SSH 实测。当前正式商城 `https://www.qzweb.cloud/` 和后台 `https://124.220.2.69:18888/login` 为上海前端；新加坡保留订单、支付与采购后端，旧 `http://43.134.141.10/` 入口用于兼容。后续使用正式 HTTPS 商城入口验证页面，具体维护说明见 `remote-latest/ops/tencent/README.md`。
-- 新加坡部署目录 `/srv/zhixiang`，当前后端 `current` 指向 `releases/20261012-153531`，持久化目录 `shared`。服务 `zhixiang-shop.service` 使用系统账号 `zhixiang`，以 `-mode storefront` 运行，开机自启。上海前端 `/srv/zhixiang-front/current` 指向 `releases/20261012-235241`；商城源码 `02c1a082c3b989adee398f16073e7ef8d89a4806`，后台仍沿用 `948c37f`。
+- 新加坡部署目录 `/srv/zhixiang`，当前后端 `current` 指向 `releases/20261013-012037`，持久化目录 `shared`。服务 `zhixiang-shop.service` 使用系统账号 `zhixiang`，以 `-mode storefront` 运行，开机自启。上海前端 `/srv/zhixiang-front/current` 指向 `releases/20261013-012037`；程序、商城与后台源码均为 `a9e853fb9b84ddde1d212787560d0883d1f5d450`。
 - 当前运行商城 HTTP、BSC 收款监听、订单维护及自动采购发卡队列，服务环境 `UPSTREAM_PURCHASE_ENABLED=true`。只在确认客户付款后创建采购单；不启动自动充值、不注册库存轮询或采购对账任务。库存仍由独立的 `zhixiang-stock-sync.timer` 每 300 秒只查询/同步，不能为库存同步启动额外完整 worker。实际扣款测试仍未获授权，当前商户 1039 余额 0.00 元，正常自动采购需先补足商户余额。
 
 ## 后续会话与登录凭据
@@ -146,3 +146,10 @@
 - 线上商城、Redis 和库存定时器 active/enabled，采购 worker 和每分钟恢复调度已通过 Redis 只读元数据验证，支付监听游标正常推进。真实转账到账及上游资金采购仍未经资金验收，不能把模拟通过表述为已完成真实扣款测试。
 - 本机预览已同步为 `remote-latest/work/codex-runtime/local-preview-storefront-v2-server.exe -mode storefront`，进程环境启用采购；原 Redis 和库存助手继续运行，未重复启动。切换前备份两份本机库，并确认不存在历史待采购已付款订单。预览运行信息仍在 `local-preview-logs/runtime.json`。
 - 发布快照 `deployment/local/tencent-release/20261012-013649/`；私有报告 `auto-procurement-deployment.json`、`auto-procurement-live-verification.json`、`auto-procurement-local-verification.json` 与 `auto-procurement-tests.log` 均被 Git 忽略。复用脚本 `prepare-auto-procurement-release.py`、`deploy-auto-procurement.py`、`deploy-auto-procurement-server.py` 和 `verify-auto-procurement-server.py`；服务器报告在 `shared/reports/auto-procurement-upgrade.json` 与 `auto-procurement-runtime-verification.json`。后续程序升级必须保留当前 storefront 模式和支付/采购队列配置；不要套用旧 api 或首次 checkout 初始化脚本。
+
+## 按用户设置商品单价（2026-10-13）
+
+- 已上线 `20261013-012037`，源码 `a9e853fb9b84ddde1d212787560d0883d1f5d450`。后台入口 **用户管理 → 用户列表 → 用户详情 → 设置商品单价**；直接输入每款商品的金额，规格价优先于商品价，留空恢复现有规则。对应用户登录后展示、购物车与结账预览使用相同单价；个人单价不叠加等级、活动或数量折扣，优惠券按原规则处理。公开售价、采购成本、其他用户和已生成订单分别保持原数据。新表 `user_product_prices` 按用户隔离，金额须大于零且最多两位小数；正式表目前为空，没有给真实用户填测试金额。
+- 先在日常本机入口重建并通过 13 项浏览器核验，再推送 main 并上线；商城 95 项、后台 48 项测试、类型构建、价格与订单、支付、模拟采购、RBAC 和架构回归通过。正式站通过 9 项只读页面检查和 437 项新静态文件哈希核验，覆盖 1920、390、320px。
+- 两地备份 `/srv/zhixiang/backups/before-user-prices-20261013-012037`、`/srv/zhixiang-front/backups/before-user-prices-20261013-012037`。原订单、支付、用户、卡密、采购、交付、链上记录、全部公开售价与成本及供货连接摘要一致；两条 USDT 渠道、storefront 模式、持久化 Redis、独立库存定时器和正式采购授权保留，没有上传本机库或进行实际付款、采购测试。
+- 本次 C 盘日常预览仍使用原 `brand-preview/shop.db`，已通过 `remote-latest/scripts/local/` 重建，**本机采购明确关闭**；当前状态在 `work/codex-logs/`，旧 runtime 兼容记录也已更新。库存助手和 Redis 未重复启动。私有发布快照 `deployment/local/user-price-releases/20261013-012037/`，脱敏报告 `user-price-deployment.json`、`user-price-live-verification.json`、`user-price-runtime-verification.json`；截图与复用工具在 `remote-latest/work/user-price-qa/`。
