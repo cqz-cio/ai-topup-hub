@@ -6,7 +6,7 @@ import { useI18n } from 'vue-i18n'
 import { adminAPI } from '@/api/admin'
 import type { AdminProduct, AdminCategory, AdminProductSKU } from '@/api/types'
 import IdCell from '@/components/IdCell.vue'
-import { getFirstImageUrl } from '@/utils/image'
+import ProductThumbnail from '@/components/ProductThumbnail.vue'
 import { formatMoney, getLocalizedText } from '@/utils/format'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -643,10 +643,7 @@ watch(
             </TableCell>
             <TableCell class="px-6 py-4">
               <div class="flex min-w-[320px] items-center gap-4">
-                <div class="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-muted/40 text-xs text-muted-foreground">
-                  <img v-if="getFirstImageUrl(product.images)" :src="getFirstImageUrl(product.images)" class="h-full w-full object-cover" />
-                  <span v-else>{{ t('admin.common.noImage') }}</span>
-                </div>
+                <ProductThumbnail :images="product.images" :alt="getLocalizedText(product.title)" />
                 <div class="min-w-0 flex-1">
                   <div class="font-medium text-foreground break-words">{{ getLocalizedText(product.title) }}</div>
                   <div class="text-xs text-muted-foreground font-mono break-all">{{ product.slug }}</div>

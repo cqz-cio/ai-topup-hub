@@ -49,6 +49,15 @@ export default defineConfig({
         target: 'http://localhost:8080',
         changeOrigin: true,
       },
+      // Catalog images live in the storefront's public directory.
+      '/catalog-products/': {
+        target: 'http://127.0.0.1:5173',
+        changeOrigin: true,
+      },
+      '^/products/[^/]+\\.(?:avif|gif|jpe?g|png|svg|webp|ico)(?:\\?.*)?$': {
+        target: 'http://127.0.0.1:5173',
+        changeOrigin: true,
+      },
     },
   },
   build: {

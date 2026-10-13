@@ -15,7 +15,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { getLocalizedText, formatMoney } from '@/utils/format'
-import { getFirstImageUrl } from '@/utils/image'
+import ProductThumbnail from '@/components/ProductThumbnail.vue'
 import { notifyError, notifySuccess } from '@/utils/notify'
 import { confirmAction } from '@/utils/confirm'
 import {
@@ -396,10 +396,7 @@ onMounted(async () => {
             </TableCell>
             <TableCell class="px-6 py-4">
               <div class="flex min-w-[320px] items-center gap-4">
-                <div class="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-muted/40 text-xs text-muted-foreground">
-                  <img v-if="getFirstImageUrl(product.images)" :src="getFirstImageUrl(product.images)" class="h-full w-full object-cover" />
-                  <span v-else>{{ t('admin.common.noImage') }}</span>
-                </div>
+                <ProductThumbnail :images="product.images" :alt="productName(product)" />
                 <div class="min-w-0 flex-1">
                   <div class="break-words font-medium text-foreground">{{ productName(product) }}</div>
                   <div class="break-all font-mono text-xs text-muted-foreground">{{ product.slug }}</div>
