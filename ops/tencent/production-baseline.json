@@ -295,12 +295,12 @@
   "previous_build_verification_at": "2026-10-12T08:19:31.766441+00:00",
   "management_url": "https://124.220.2.69:18888/login",
   "frontend_gateway": {
-    "checked_at": "2026-10-13T06:38:09.259786+00:00",
+    "checked_at": "2026-10-13T07:47:22.936247+00:00",
     "frontend_host": "124.220.2.69",
     "backend_host": "43.134.141.10",
-    "frontend_release": "20261013-143008",
-    "source_commit": "ebee216118e6ee8d7d3c53c4ab36449b371850b3",
-    "archive_sha256": "b34280455a7c0aa0570d2920b5ef1b2b50b5db180e417d0b42da7696dc26e1d7",
+    "frontend_release": "20261013-153730",
+    "source_commit": "471ded02e1b265520a53485288bdcc4f47dbece9",
+    "archive_sha256": "0b5be05fd57d667c937acdb4207d4ccc163d00452fb3ee0fee09a0ad52110104",
     "static_files_verified": 1587,
     "storefront_url": "https://www.qzweb.cloud/",
     "management_url": "https://124.220.2.69:18888/login",
@@ -317,7 +317,7 @@
     "certificate_renewal_verified": true,
     "certificate_timer": "qzweb-certificates.timer",
     "certificate_renewal_report": "/srv/zhixiang-front/shared/work/renew-final-20261012-1644/status.json",
-    "report_path": "/srv/zhixiang-front/shared/work/admin-brand-release-20261013-143008.json",
+    "report_path": "/srv/zhixiang-front/shared/work/product-thumbnails-20261013-153730.json",
     "backend_report_path": "/srv/zhixiang/shared/reports/member-prices-release-20261013-114011.json",
     "formal_alipay_enabled": false,
     "database_uploaded": false,
@@ -331,10 +331,10 @@
       "browser_current_frontend_confirmed": true,
       "report_path": "/srv/zhixiang-front/shared/work/entry-cache-report.json"
     },
-    "previous_frontend_release": "20261013-114011",
+    "previous_frontend_release": "20261013-143008",
     "storefront_source_commit": "aaff34ff2af8d62f9a2cc4061007c6e41b54ea80",
-    "admin_source_commit": "ebee216118e6ee8d7d3c53c4ab36449b371850b3",
-    "backup": "/srv/zhixiang-front/backups/before-admin-brand-20261013-143008",
+    "admin_source_commit": "471ded02e1b265520a53485288bdcc4f47dbece9",
+    "backup": "/srv/zhixiang-front/backups/before-product-thumbnails-20261013-153730",
     "frontend_only_update": true,
     "previous_hashed_assets_retained": true,
     "verified_services": {
@@ -342,7 +342,7 @@
       "zhixiang-api-tunnel.service": "active",
       "qzweb-certificates.timer": "active"
     },
-    "release_scope": "admin-only",
+    "release_scope": "admin-static-and-product-image-routes",
     "admin_files_verified": 119,
     "storefront_files_preserved": 1468
   },
@@ -753,6 +753,45 @@
     "verification_directory": "work/codex-runtime/admin-error-icon/",
     "production_outage_induced": false,
     "business_writes": false,
+    "real_payment_or_purchase_submitted": false
+  },
+  "admin_product_thumbnails": {
+    "checked_at": "2026-10-13T07:47:22.936247+00:00",
+    "release": "20261013-153730",
+    "source_commit": "471ded02e1b265520a53485288bdcc4f47dbece9",
+    "source_tag": "production/admin-product-thumbnails-20261013-153730",
+    "approved_variant": "B",
+    "thumbnail_size": [
+      100,
+      60
+    ],
+    "object_fit": "contain",
+    "error_placeholder": true,
+    "admin_tests_passed": 58,
+    "typecheck_and_build_passed": true,
+    "local_http_checks_passed": 50,
+    "local_browser_checks_passed": 7,
+    "server_http_checks_passed": 49,
+    "production_browser_checks_passed": 9,
+    "product_image_paths_verified": 40,
+    "production_product_rows_verified": 44,
+    "viewports": [
+      1920,
+      390,
+      320
+    ],
+    "known_preexisting_320px_topbar_overflow_px": 5,
+    "script_errors": 0,
+    "admin_files_verified": 119,
+    "storefront_files_preserved": 1468,
+    "backend_release_preserved": "20261013-114011",
+    "backend_and_redis_processes_preserved": true,
+    "prices_costs_images_payment_settings_and_personal_prices_preserved": true,
+    "backend_backup": "/srv/zhixiang/backups/before-product-thumbnails-20261013-153730",
+    "frontend_backup": "/srv/zhixiang-front/backups/before-product-thumbnails-20261013-153730",
+    "verification_directory": "work/codex-runtime/product-thumbnails/",
+    "business_writes": false,
+    "local_database_uploaded": false,
     "real_payment_or_purchase_submitted": false
   }
 }

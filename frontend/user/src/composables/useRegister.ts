@@ -180,6 +180,13 @@ export function useRegister() {
         captcha_payload: getCaptchaPayload(),
       })
       startCountdown()
+      // A successful verification consumes the challenge; prepare a fresh one for resending.
+      if (captchaProvider.value === 'image') {
+        imageCaptchaRef.value?.refresh()
+      }
+      if (captchaProvider.value === 'turnstile') {
+        turnstileRef.value?.reset()
+      }
     } catch (err: any) {
       error.value = err.message || t('auth.register.errors.sendCodeFailed')
       if (captchaProvider.value === 'image') {
