@@ -28,6 +28,8 @@ import (
 // ── SubmitToUpstream tests ──
 
 func TestSubmitToUpstream_Success(t *testing.T) {
+	// This test uses only its httptest supplier and isolated database.
+	t.Setenv("UPSTREAM_PURCHASE_ENABLED", "true")
 	db := setupProcurementTestDB(t)
 
 	order := createProcTestOrder(t, db, "PROC-SUBMIT-001", constants.OrderStatusPaid, constants.FulfillmentTypeUpstream)
@@ -100,6 +102,8 @@ func TestSubmitToUpstream_Success(t *testing.T) {
 }
 
 func TestSubmitToUpstream_NonRetryableError_Rejects(t *testing.T) {
+	// This test uses only its httptest supplier and isolated database.
+	t.Setenv("UPSTREAM_PURCHASE_ENABLED", "true")
 	db := setupProcurementTestDB(t)
 
 	order := createProcTestOrder(t, db, "PROC-NONRETRY-001", constants.OrderStatusFulfilling, constants.FulfillmentTypeUpstream)
@@ -146,6 +150,8 @@ func TestSubmitToUpstream_NonRetryableError_Rejects(t *testing.T) {
 }
 
 func TestSubmitToUpstream_RetryableError_Retries(t *testing.T) {
+	// This test uses only its httptest supplier and isolated database.
+	t.Setenv("UPSTREAM_PURCHASE_ENABLED", "true")
 	db := setupProcurementTestDB(t)
 
 	order := createProcTestOrder(t, db, "PROC-RETRY-001", constants.OrderStatusFulfilling, constants.FulfillmentTypeUpstream)
@@ -191,6 +197,8 @@ func TestSubmitToUpstream_RetryableError_Retries(t *testing.T) {
 }
 
 func TestHandleSubmitFailure_MaxRetriesExhausted(t *testing.T) {
+	// This test uses only its httptest supplier and isolated database.
+	t.Setenv("UPSTREAM_PURCHASE_ENABLED", "true")
 	db := setupProcurementTestDB(t)
 
 	order := createProcTestOrder(t, db, "PROC-MAXRETRY-001", constants.OrderStatusFulfilling, constants.FulfillmentTypeUpstream)
