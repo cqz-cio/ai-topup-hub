@@ -162,7 +162,7 @@
     "https://124.220.2.69:18888/payment-channels"
   ],
   "verified_asset_sha256": {
-    "user/index.html": "6d1852190fc2bd71cd87436181d6d32e07b44759a78dc4c80a01d0ff2e12d301",
+    "user/index.html": "78bbc34f6b8e776c773a5da78edb761d36b2d019c5ac7fd5679971823fe49eed",
     "admin/index.html": "a54d9a3e008bb46f26552894a7e6230ddeaae32635889e6e53a734da50550b61"
   },
   "public_verification": {
@@ -325,12 +325,12 @@
   "previous_build_verification_at": "2026-10-12T08:19:31.766441+00:00",
   "management_url": "https://124.220.2.69:18888/login",
   "frontend_gateway": {
-    "checked_at": "2026-10-13T09:33:37.987898+00:00",
+    "checked_at": "2026-10-13T09:57:21.384Z",
     "frontend_host": "124.220.2.69",
     "backend_host": "43.134.141.10",
-    "frontend_release": "20261013-173020",
-    "source_commit": "9020d261d49e3b7a706125708beafa3c2e4823af",
-    "static_files_verified": 441,
+    "frontend_release": "20261013-174612",
+    "source_commit": "e249905d2e75d0d6e87c576367bc80ae62e25fe8",
+    "static_files_verified": 1010,
     "storefront_url": "https://www.qzweb.cloud/",
     "management_url": "https://124.220.2.69:18888/login",
     "www_dns_record": "www A 124.220.2.69",
@@ -346,8 +346,8 @@
     "certificate_renewal_verified": true,
     "certificate_timer": "qzweb-certificates.timer",
     "certificate_renewal_report": "/srv/zhixiang-front/shared/work/renew-final-20261012-1644/status.json",
-    "report_path": "/srv/zhixiang-front/shared/work/xorpay-admin-base-20261013-173020.json",
-    "backend_report_path": "/srv/zhixiang/shared/reports/xorpay-release-20261013-172211.json",
+    "report_path": "work/codex-runtime/payment-return/final-frontend-verification.json",
+    "backend_report_path": "work/codex-runtime/payment-return/final-backend-verification.json",
     "formal_alipay_enabled": false,
     "database_uploaded": false,
     "legacy_singapore_http_entries_retained": true,
@@ -360,28 +360,27 @@
       "browser_current_frontend_confirmed": true,
       "report_path": "/srv/zhixiang-front/shared/work/entry-cache-report.json"
     },
-    "previous_frontend_release": "20261013-165016",
-    "storefront_source_commit": "1f4584c19123f4c187403be7ce22db8cf3ed167c",
+    "previous_frontend_release": "20261013-173020",
+    "storefront_source_commit": "e249905d2e75d0d6e87c576367bc80ae62e25fe8",
     "admin_source_commit": "1f4584c19123f4c187403be7ce22db8cf3ed167c",
-    "backup": "/srv/zhixiang-front/backups/before-xorpay-20261013-172211",
-    "frontend_only_update": false,
+    "backup": "/srv/zhixiang-front/backups/before-payment-return-20261013-174612",
+    "frontend_only_update": true,
     "previous_hashed_assets_retained": true,
     "verified_services": {
       "nginx": "active",
       "zhixiang-api-tunnel.service": "active",
       "qzweb-certificates.timer": "active"
     },
-    "release_scope": "xorpay-wechat-backend-admin-and-storefront",
-    "admin_files_verified": 119,
-    "storefront_files_verified": 322,
-    "backend_program_preserved": false,
-    "backend_setting_changes": [
-      "payment_channels: add XorPay channel 3"
-    ],
-    "frontend_build_source_commit": "1f4584c19123f4c187403be7ce22db8cf3ed167c",
-    "frontend_source_identical_to_backend": true,
+    "release_scope": "storefront-payment-product-return",
+    "admin_files_verified": 687,
+    "storefront_files_verified": 323,
+    "backend_program_preserved": true,
+    "backend_setting_changes": [],
+    "frontend_build_source_commit": "e249905d2e75d0d6e87c576367bc80ae62e25fe8",
+    "frontend_source_identical_to_backend": false,
     "admin_base": "/",
-    "base_repair_backup": "/srv/zhixiang-front/backups/before-xorpay-admin-base-20261013-173020"
+    "base_repair_backup": "/srv/zhixiang-front/backups/before-xorpay-admin-base-20261013-173020",
+    "all_storefront_files": 2223
   },
   "alipay": {
     "code_and_official_sandbox_query_verified": true,
@@ -1068,5 +1067,53 @@
     "real_payment_or_purchase": false,
     "local_database_uploaded": false,
     "verification_directory": "work/codex-runtime/xorpay/"
+  },
+  "payment_return_release": {
+    "checked_at": "2026-10-13T09:57:21.384Z",
+    "release": "20261013-174612",
+    "source_commit": "e249905d2e75d0d6e87c576367bc80ae62e25fe8",
+    "source_tag": "production/payment-return-20261013-174612",
+    "storefront_tests_passed": 103,
+    "typechecked_build": true,
+    "local_browser_checks_passed": 30,
+    "production_browser_checks_passed": 30,
+    "viewports": [
+      1920,
+      390,
+      320
+    ],
+    "script_errors": 0,
+    "production_order_creation": "simulated within test browser",
+    "business_data_writes": false,
+    "backend_program_and_pids_preserved": true,
+    "preserved_data_groups": [
+      "settings",
+      "users",
+      "orders",
+      "order_items",
+      "payments",
+      "procurement_orders",
+      "wallet_accounts",
+      "wallet_transactions",
+      "wallet_recharge_orders",
+      "user_product_prices",
+      "member_levels",
+      "member_level_prices",
+      "chain_payment_invoices",
+      "chain_payment_transfers",
+      "payment_channels",
+      "products",
+      "skus",
+      "site_connections_configuration"
+    ],
+    "site_connections_runtime_fields_excluded": [
+      "last_ping_at",
+      "updated_at"
+    ],
+    "singapore_backup": "/srv/zhixiang/backups/before-payment-return-20261013-174612",
+    "shanghai_backup": "/srv/zhixiang-front/backups/before-payment-return-20261013-174612",
+    "report_directory": "work/codex-runtime/payment-return/",
+    "real_payment_or_purchase_performed": false,
+    "database_uploaded": false
   }
 }
