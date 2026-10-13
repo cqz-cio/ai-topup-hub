@@ -1123,6 +1123,14 @@
       "passwordLabel": "密码",
       "passwordPlaceholder": "设置登录密码",
       "imageCaptchaLabel": "图形验证码",
+      "codeSent": {
+        "title": "验证码已发送",
+        "description": "验证码已发送至您的邮箱，请注意查收。",
+        "spamHint": "如果长时间未收到，请检查邮箱中的{spam}或{promotions}文件夹。",
+        "spamFolder": "垃圾邮件",
+        "promotionsFolder": "广告邮件",
+        "confirm": "我知道了"
+      },
       "codeLabel": "邮箱验证码",
       "codePlaceholder": "输入邮箱验证码",
       "sendCode": "发送验证码",

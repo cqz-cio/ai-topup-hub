@@ -1170,6 +1170,14 @@
       "passwordLabel": "Password",
       "passwordPlaceholder": "Set login password",
       "imageCaptchaLabel": "Image captcha",
+      "codeSent": {
+        "title": "Verification code sent",
+        "description": "The verification code has been sent to your email. Please check your inbox.",
+        "spamHint": "If it has not arrived after a while, check your {spam} or {promotions} folder.",
+        "spamFolder": "Spam",
+        "promotionsFolder": "Promotions",
+        "confirm": "Got it"
+      },
       "codeLabel": "Email verification code",
       "codePlaceholder": "Enter email code",
       "sendCode": "Send code",
