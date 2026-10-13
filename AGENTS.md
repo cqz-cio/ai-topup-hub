@@ -1,6 +1,8 @@
 # π星卡社开发约束
 
 - 客服微信统一使用 `Cqz0924ttxk`，不能用电话号码作为微信号展示或回退值。
+- 2026-10-13 已将“购买须知与代理合作”发布为 `notice` 文章（ID 1，slug `purchase-and-agent-guide`），公开列表 `/notice`、详情 `/blog/purchase-and-agent-guide`，文案快照 `docs/catalog/purchase-notice.json`。后台 **内容管理 → 公告列表** 维护文章；首页弹窗仍在站点设置维护，两处不会自动同步。正文与弹窗一致，客服微信和 `https://cdk.bar/` 正确。本机及正式站各通过 1920、390、320px 的实际导航、列表、详情、刷新和返回检查。
+- 本次公告仅增加内容数据，程序仍为发布 `20261013-012037`，首页弹窗版本仍为 `bf3a1445`；售价、成本、专属价格、支付渠道和站点设置核对一致，没有重启或上传本机库。备份 `/srv/zhixiang/backups/before-notice-post-20261013-104352`，私有报告为外层 `deployment/local/notice-post-production-deployment.json`。发布时服务器 `stock-sync.credentials.json` 和本机 `deployment/local/credentials.json` 的后台密码均被正式 API 拒绝；SSH 指纹核验及服务器维护登录有效。本次通过已授权的 SSH 维护通道精确新增这条公告，未重置账号。后续不要反复使用这两份无效口令登录正式后台，应核对新的有效凭据；该状态不表示 SSH 凭据失效。
 - 2026-10-13 已补齐并上线中文隐私政策和服务条款，文案快照为 `docs/catalog/site-legal.json`，配置来源 `9b260f889420d8c386c6c2c20d76c27e1630a94d`。后台 **系统设置 → 站点设置 → 法律条款** 可继续编辑；公开入口 `/privacy`、`/terms`，注册页实际链接已核验。仅修改 `site_config.legal.privacy.zh-CN` 和 `site_config.legal.terms.zh-CN`，保留其他配置及语言内容。条款中的兑换入口遵循各笔订单交付说明，质保和退款按具体商品约定及适用法律处理；不写统一永久质保或“概不退款”。本机、正式站各通过 1920、390、320px 共 9 项只读页面检查，记录在忽略目录 `work/codex-runtime/site-legal-qa/`。线上备份 `/srv/zhixiang/backups/before-site-legal-20261013-003435`，未更换程序、重启后端、上传本机库或执行付款采购测试。
 
 - `main` 是唯一正式源码主线，维护当前绿色 Go + Vue 商城，包含已确认的 π星卡社名称、派大星 Logo 和水母背景。用户端为 `frontend/user`，后台为 `frontend/admin`；这些品牌改动属于同一项目主版本。
