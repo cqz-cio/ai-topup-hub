@@ -1,7 +1,7 @@
 {
   "title": "XorPay 微信支付手续费规则",
   "confirmed_on": "2026-10-13",
-  "status": "用户已确认；待接入实现和验收，不代表运行配置已生效",
+  "status": "已按用户确认于 2026-10-13 在正式微信渠道 ID 3 启用；接口出码和模拟测试通过，真实资金验收未完成",
   "provider_type": "xorpay",
   "channel_type": "wechat",
   "currency": "CNY",
@@ -34,6 +34,6 @@
     "其他支付渠道和商品公开标价保持原有规则。",
     "先完成本地计算、页面及模拟回调验证，再进行支付联调验收；未完成真实支付时不得标记真实收款验收通过。"
   ],
-  "implementation_note": "记录时现有后端 calculatePaymentAmounts 使用 Round(2)，因此仅填写 1.6% 费率不能满足向上取整要求；接入时须同步调整本渠道的前后端计费逻辑。",
+  "implementation_note": "已为 XorPay 渠道使用前后端一致的向上取分逻辑，并通过渠道级 customer_fee_enabled 覆盖配置启用；其他支付渠道保持原有舍入与承担规则。发布和验收范围见 xorpay-wechat.md。",
   "platform_balance_note": "向客户加收手续费不会自动充值 XorPay 账户；平台余额仍需单独维护。"
 }

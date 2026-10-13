@@ -33,3 +33,5 @@ GitHub CI 在 `main`、`dev` 推送及 PR 上验证；`v*` 标签触发 GoReleas
 嵌套或管理工作区构建时显式设置 `GIT_DIR` 为 `git rev-parse --absolute-git-dir` 的结果、`GIT_WORK_TREE` 为当前源码根目录，避免 Go 自动读取外层工作区的 Git 信息。发布前用 `go version -m` 核对 `vcs.revision` 与已验证提交一致，且 `vcs.modified=false`。
 
 不要用上游通用安装器覆盖智享A社环境，不要将本机库上传覆盖生产库。恢复程序版本和恢复业务数据是不同操作。
+
+上海独立静态后台以 `/` 为资源根路径。若复用 `VITE_FULLSTACK=1` 的嵌入式构建，打包阶段须将后台 HTML 中的 `__DJ_ADMIN_BASE__` 渲染为空字符串，使 `<base href="/">` 生效，并重新计算 HTML 清单哈希；Go 内嵌资源保留占位符供后端渲染。部署前后检查入口引用的 JS/CSS 实际返回正确文件与 MIME，并在真实浏览器打开后台路由。仅首页 HTTP 200 或文件哈希一致不能证明页面可用。

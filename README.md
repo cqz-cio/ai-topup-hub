@@ -4,7 +4,7 @@
 
 本机日常开发固定使用 `D:\卡网` 的 `main`。新会话从 [AGENTS.md](AGENTS.md) 和本页开始；独立开发草稿在各自工作区维护，历史资料只用于明确请求的追溯或恢复。
 
-当前线上程序包含已确认的品牌、Logo 清晰度和导航留白修正，以及 BEP20、Plasma 两种 USDT 支付渠道。推送源码不等于部署，实际构建来源以 [生产发布记录](ops/tencent/README.md) 为准。
+当前线上程序包含已确认的品牌、Logo 清晰度和导航留白修正，以及 BEP20、Plasma USDT 和 XorPay 微信扫码支付。推送源码不等于部署，实际构建来源以 [生产发布记录](ops/tencent/README.md) 为准。
 
 | 入口 | 地址 / 位置 |
 | --- | --- |
@@ -14,9 +14,9 @@
 | 本地商城 | http://127.0.0.1:5173/ |
 | 本地后台 | http://127.0.0.1:5174/ |
 | 绿色源码基线 | `baseline/green-20261012`，提交 `419141e` |
-| 后端源码基准 | `20261013-171054`，构建源码 `414a1fe84ba56adea03c00e3af97bb03d96cd23e`，见 [USDT 付款数量规则](docs/usdt-payment-amounts.md) |
-| 商城注册验证码发布 | 上海静态 `20261013-165016`，商城源码 `e6c56be1a964d6c3ef98220c25e60775d7b997a6`，见 [注册图形验证码](docs/registration-captcha.md) 与 [发送成功提醒](docs/registration-email-reminder.md) |
-| 后台组件来源 | 保留 `20261013-153730` 的后台资源，源码 `471ded02e1b265520a53485288bdcc4f47dbece9` |
+| 后端源码基准 | `20261013-172211`，构建源码 `9020d261d49e3b7a706125708beafa3c2e4823af`，见 [微信支付接入](docs/xorpay-wechat.md) |
+| 商城与后台静态发布 | 上海 `20261013-173020`，前端构建来源 `1f4584c19123f4c187403be7ce22db8cf3ed167c`；前端源码与后端提交一致 |
+| 微信支付 | 已启用 Native 扫码，客户手续费 1.6% 向上取分；真实资金验收尚未完成 |
 
 源码标签、服务器发布号和数据库是三个独立对象。线上比对证据与核验范围在 [production-baseline.json](ops/tencent/production-baseline.json)。推送 GitHub 不会自动部署服务器，也不会同步数据库。2026-10-12 已将 `www` 解析切到上海；两套前端发布 `20261012-164700` 与新加坡后端的构建源码 `948c37f` 对齐，域名 HTTPS、管理端登录鉴权和证书自动续期已核验。旧新加坡 HTTP 入口保留兼容，日常使用上表 HTTPS 地址。正式支付宝仍未启用，代码和沙箱结果见 [支付宝接入记录](docs/alipay-web-payment.md)。
 
@@ -64,7 +64,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/local/stop.ps1
 
 后台 **用户管理 → 用户列表 → 用户详情 → 设置商品单价** 可直接为每位用户设置商品或规格的固定金额，登录后展示与下单计价一致；留空沿用现有价格。使用方法见 [按用户设置商品单价](docs/user-product-prices.md)。
 
-商城 **个人中心 → 我的钱包** 已支持 BEP20、Plasma 充值；后台 **用户详情 → 钱包明细** 可增加或扣减余额，首次使用需超级管理员本人完成现有声明。渠道配置、操作与验证范围见 [钱包充值与后台余额调整](docs/wallet-recharge.md)。
+商城 **个人中心 → 我的钱包** 已支持 BEP20、Plasma 和微信充值；后台 **用户详情 → 钱包明细** 可增加或扣减余额，首次使用需超级管理员本人完成现有声明。渠道配置、操作与验证范围见 [钱包充值与后台余额调整](docs/wallet-recharge.md)。
 
 后台品牌、系统信息和运营入口的维护说明见 [后台品牌与运营入口](docs/admin-branding.md)。
 
@@ -74,6 +74,8 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/local/stop.ps1
 
 本项目基于 Dujiao-Next v1.4.8 独立导入，沿用 Go 模块路径及底层程序名称以保持兼容；它们不表示存在另一套正式商城。来源及许可证见 [SOURCE_IMPORT.md](SOURCE_IMPORT.md) 和 [LICENSE](LICENSE)。[历史上游说明](docs/history/README.md)中的通用安装、升级命令不作为智享A社生产部署入口。
 
-经营者[成交与上游余额邮件](docs/sale-email.md)已启用：订单、采购金额、当前上游余额和查询时间合并通知。该功能首次发布于 `20261013-162050`；当前后端为 `20261013-171054`，并已补齐[验证码邮件网址与有效期](docs/verification-email.md)。上海商城现为 `20261013-165016`，已增加邮箱验证码发送成功提醒。
+经营者[成交与上游余额邮件](docs/sale-email.md)已启用：订单、采购金额、当前上游余额和查询时间合并通知。该功能首次发布于 `20261013-162050`；当前后端为 `20261013-172211`，并已补齐[验证码邮件网址与有效期](docs/verification-email.md)。上海商城现为 `20261013-173020`，已增加邮箱验证码发送成功提醒。
 
 USDT 新支付单统一向上取到两位小数，同额时按 0.01 USDT 选择最小可用金额，最大增加 0.99；旧单保留原金额。规则与容量限制见 [USDT 付款数量](docs/usdt-payment-amounts.md)。
+
+[微信支付](docs/xorpay-wechat.md)已接入 XorPay，支持商品付款与钱包充值。客户手续费为 1.6%，不足一分向上取整，例如 99.00 元实付 100.59 元。回调验签、金额核对与重复通知处理已接入既有支付流程；已验证实际接口出码和正式页面，尚未进行真实资金验收。
