@@ -7,7 +7,7 @@
 
 - `main` 是唯一正式源码主线，维护当前绿色 Go + Vue 商城，包含已确认的 π星卡社名称、派大星 Logo 和水母背景。用户端为 `frontend/user`，后台为 `frontend/admin`；这些品牌改动属于同一项目主版本。
 - 支付、订单、数据库和采购后端部署在腾讯云新加坡 `43.134.141.10`，账号 `ubuntu`，目录 `/srv/zhixiang`。两套前端部署在上海 `124.220.2.69` 的 `/srv/zhixiang-front`：商城 `https://www.qzweb.cloud/`，管理端 `https://124.220.2.69:18888/login`。上海通过受限 SSH 通道连接新加坡回环 API；维护说明见 `ops/tencent/README.md`。
-- 当前新加坡后端发布为 `20261013-114011`，程序与保留的商城资源源码为 `aaff34ff2af8d62f9a2cc4061007c6e41b54ea80`；上海静态发布为 `20261013-153730`，其中后台源码为 `471ded02e1b265520a53485288bdcc4f47dbece9`。后端使用 `-mode storefront`、`UPSTREAM_PURCHASE_ENABLED=true`。BEP20 与 Plasma USDT 收款均已启用，支持商品订单与钱包充值；精确核验范围以 `ops/tencent/production-baseline.json` 为准，不把后续文档提交自动当作线上程序的 Git 版本。
+- 当前新加坡后端发布为 `20261013-114011`，程序及其内嵌旧商城资源源码为 `aaff34ff2af8d62f9a2cc4061007c6e41b54ea80`；上海静态发布为 `20261013-160811`，商城源码为 `c0d5e48c1407261e5d800969c228f03a644732d7`，后台资源保留 `471ded02e1b265520a53485288bdcc4f47dbece9`。后端使用 `-mode storefront`、`UPSTREAM_PURCHASE_ENABLED=true`。BEP20 与 Plasma USDT 收款均已启用，支持商品订单与钱包充值；精确核验范围以 `ops/tencent/production-baseline.json` 为准，不把后续文档提交自动当作线上程序的 Git 版本。
 - 本地使用 `scripts/local/start.ps1`、`status.ps1`、`stop.ps1`，运行库为 `work/codex-runtime/live/shop.db`，本地采购关闭。旧说明位于 `docs/history/`，不能按历史文档覆盖当前环境。
 - 用户要求固定执行“先本地验证，再推送和上线”：先在日常本地入口验证实际运行程序、配置、相关数据和页面，保存验证记录；通过后才推送已验证提交并部署所需改动。后端改动须重建并重启本地后端，支付渠道及商品说明不能只在临时测试入口核验。上线后对照核验本地与生产；环境私有配置、订单和实时库存独立维护，不互相覆盖。
 - 用户已授权真实客户确认付款后的自动采购发卡，仍禁止主动提交有效采购、转账，或将验收订单改为已付款进行扣款测试。测试使用模拟供应商和临时数据库。
@@ -76,3 +76,9 @@
 - 后台须保留 `/catalog-products/` 到当前商城资源的映射，以及 `/products/` 下仅匹配图片扩展名的规则；不能用整个 `/products/` 前缀拦截管理页面。日常本地后台通过 5173 读取相同图片，须同时运行商城入口。
 - 上海发布 `20261013-153730`，后台源码 `471ded02e1b265520a53485288bdcc4f47dbece9`；119 个后台文件、1468 个保留商城文件核验通过。40 个商品图片地址及全部 44 条后台记录的实际加载正常。本地 58 项测试、类型构建、50 项 HTTP 检查、7 项浏览器检查，以及正式 49 项服务器检查、9 项浏览器检查通过；截图覆盖 1920、390、320px。320px 且有系统滚动条时，未改动的顶部控件仍有 5px 溢出，商品表自身横向滚动正常。
 - 两地备份均为各自 `backups/before-product-thumbnails-20261013-153730`；核验记录在忽略目录 `work/codex-runtime/product-thumbnails/`。新加坡程序仍为 `20261013-114011`，后端与 Redis 进程、商城资源、商品图地址、价格与成本、支付及专属价配置均与本次切换前备份一致。未上传本机库或进行付款采购测试。
+
+## 注册图形验证码（2026-10-13）
+
+- 已按批准预览启用注册图形验证码，并区分“图形验证码”与“邮箱验证码”。先通过图形校验才能发送邮箱验证码；注册继续要求有效邮箱验证码。注册发送成功或失败后刷新已消耗的图片，保留邮箱和密码。后台“系统设置 → 验证码设置”维护，最小配置为 `docs/catalog/registration-captcha.json`，操作说明见 `docs/registration-captcha.md`。保持邮箱验证开启；登录、找回密码、游客下单和礼品卡场景本次未启用。
+- 上海发布 `20261013-160811`，商城源码 `c0d5e48c1407261e5d800969c228f03a644732d7`。97 项商城测试、类型构建、验证码及注册相关 Go 回归、本机 13 项和正式站 11 项浏览器检查通过，覆盖 1920、390、320px 和三语，无脚本错误或横向溢出。正式 322 个新商城文件及 588 个保留后台文件核验通过；旧散列资源、商品图及 Nginx 配置保留。
+- 两地备份为 `/srv/zhixiang/backups/before-registration-captcha-20261013-160811`、`/srv/zhixiang/backups/before-registration-captcha-settings-20261013-160811`、`/srv/zhixiang-front/backups/before-registration-captcha-20261013-160811`；证据在忽略目录 `work/codex-runtime/register-captcha-preview-20261013/`。仅更新商城资源及 `captcha_config.provider=image`、`captcha_config.scenes.register_send_code=true`。新加坡程序与后端、Redis 进程保持原状态；其他站点和私有配置、售价与成本、收款渠道及个人专属价一致。未上传本机库、创建正式测试用户、发送真实验收邮件或进行付款采购测试；成功发信后的前端状态使用浏览器模拟响应验证。
