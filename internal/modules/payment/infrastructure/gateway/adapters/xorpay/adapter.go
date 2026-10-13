@@ -139,7 +139,7 @@ func (a *adapter) CreatePayment(ctx context.Context, raw jsonmap.JSON, in paymen
 		return nil, paymentcontract.ErrGatewayRequestFailed
 	}
 	qr, err := url.Parse(result.Info.QR)
-	if err != nil || qr.Host == "" || qr.User != nil || (qr.Scheme != "weixin" && qr.Scheme != "https") || strings.TrimSpace(result.AOID) == "" {
+	if err != nil || qr.Host == "" || qr.User != nil || (qr.Scheme != "weixin" && qr.Scheme != "https" && qr.Scheme != "http") || strings.TrimSpace(result.AOID) == "" {
 		return nil, paymentcontract.ErrGatewayResponseInvalid
 	}
 	// Official examples use both spellings. Never extend the store's deadline.

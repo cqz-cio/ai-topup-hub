@@ -185,3 +185,16 @@ func TestClientRejectsRedirects(t *testing.T) {
 		t.Fatal("redirect accepted")
 	}
 }
+
+func TestNativeAcceptsProviderCashierQR(t *testing.T) {
+	for _, qr := range []string{"http://xorpay.com/qr/fixture", "https://xorpay.com/qr/fixture", "weixin://wxpay/bizpayurl?pr=fixture"} {
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			fmt.Fprintf(w, `{"status":"ok","aoid":"fixture","expires_in":"300","info":{"qr":%q}}`, qr)
+		}))
+		result, err := (&adapter{client: server.Client(), baseURL: server.URL}).CreatePayment(context.Background(), testConfig(), testInput())
+		server.Close()
+		if err != nil || result.QRCodeURL != qr {
+			t.Fatalf("provider QR protocol not preserved: %v", err)
+		}
+	}
+}

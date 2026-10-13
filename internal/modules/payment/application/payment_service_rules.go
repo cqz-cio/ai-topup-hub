@@ -171,6 +171,9 @@ func shouldUseCNYPaymentCurrency(channel *paymentdomain.PaymentChannel) bool {
 		return false
 	}
 	providerType := strings.ToLower(strings.TrimSpace(channel.ProviderType))
+	if providerType == constants.PaymentProviderXorpay {
+		return true
+	}
 	if providerType != constants.PaymentProviderOfficial {
 		return false
 	}
