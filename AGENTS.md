@@ -7,7 +7,7 @@
 
 - `main` 是唯一正式源码主线，维护当前绿色 Go + Vue 商城，包含已确认的 π星卡社名称、派大星 Logo 和水母背景。用户端为 `frontend/user`，后台为 `frontend/admin`；这些品牌改动属于同一项目主版本。
 - 支付、订单、数据库和采购后端部署在腾讯云新加坡 `43.134.141.10`，账号 `ubuntu`，目录 `/srv/zhixiang`。两套前端部署在上海 `124.220.2.69` 的 `/srv/zhixiang-front`：商城 `https://www.qzweb.cloud/`，管理端 `https://124.220.2.69:18888/login`。上海通过受限 SSH 通道连接新加坡回环 API；维护说明见 `ops/tencent/README.md`。
-- 当前生产运行基准是新加坡及上海发布 `20261013-114011`，程序与两套前端构建源码为 `aaff34ff2af8d62f9a2cc4061007c6e41b54ea80`，使用 `-mode storefront`、`UPSTREAM_PURCHASE_ENABLED=true`。BEP20 与 Plasma USDT 收款均已启用，支持商品订单与钱包充值；精确核验范围以 `ops/tencent/production-baseline.json` 为准，不把后续文档提交自动当作线上程序的 Git 版本。
+- 当前新加坡后端发布为 `20261013-114011`，程序与保留的商城资源源码为 `aaff34ff2af8d62f9a2cc4061007c6e41b54ea80`；上海静态发布为 `20261013-143008`，其中后台源码为 `ebee216118e6ee8d7d3c53c4ab36449b371850b3`。后端使用 `-mode storefront`、`UPSTREAM_PURCHASE_ENABLED=true`。BEP20 与 Plasma USDT 收款均已启用，支持商品订单与钱包充值；精确核验范围以 `ops/tencent/production-baseline.json` 为准，不把后续文档提交自动当作线上程序的 Git 版本。
 - 本地使用 `scripts/local/start.ps1`、`status.ps1`、`stop.ps1`，运行库为 `work/codex-runtime/live/shop.db`，本地采购关闭。旧说明位于 `docs/history/`，不能按历史文档覆盖当前环境。
 - 用户要求固定执行“先本地验证，再推送和上线”：先在日常本地入口验证实际运行程序、配置、相关数据和页面，保存验证记录；通过后才推送已验证提交并部署所需改动。后端改动须重建并重启本地后端，支付渠道及商品说明不能只在临时测试入口核验。上线后对照核验本地与生产；环境私有配置、订单和实时库存独立维护，不互相覆盖。
 - 用户已授权真实客户确认付款后的自动采购发卡，仍禁止主动提交有效采购、转账，或将验收订单改为已付款进行扣款测试。测试使用模拟供应商和临时数据库。
@@ -15,7 +15,7 @@
 - 库存由独立的 `zhixiang-stock-sync.timer` 每 300 秒只查询和同步。不要重复启动助手或为同步启动完整 worker。自动充值保持关闭。
 - 后续升级保留 storefront 模式、支付及采购队列、持久化 Redis。先备份线上数据，不用本机数据库覆盖线上订单，也不套用旧 api 或 checkout 初始化脚本。
 - 用户已授权跨会话读取、保存并复用服务器信息，2026-10-12 再次确认上海和新加坡使用此前提供的同一 `ubuntu` 登录信息。当前 C 盘工作区 `C:\Codex program\智享A社\deployment\local\` 中，新加坡凭据和指纹为 `tencent-cloud-server.credentials.json`、`tencent-cloud-known-hosts`，上海凭据和指纹为 `shanghai-front-server.credentials.json`、`shanghai-front-known-hosts`；登录均已验证，文件被 Git 忽略，上海密码文件仅当前用户和 SYSTEM 可访问。D 盘工作区原 `work/codex-runtime/tencent-cloud-server.credentials.json` 与 `tencent-known-hosts` 若存在仍可用于新加坡。新会话先检查对应目标的已保存文件，不因旧路径缺失而重复索要信息；仅在所有已保存入口缺失、凭据失效或目标不一致时询问。禁止输出密码。
-- 当前上海与新加坡发布均为 `20261013-114011`，商城、后台及程序源码为 `aaff34ff2af8d62f9a2cc4061007c6e41b54ea80`。首页公告、客服微信 `Cqz0924ttxk`、`https://cdk.bar/` 兑换指引及法律条款保持原配置。2026-10-13 已新增后台用户详情的“设置商品单价”入口；独立表 `user_product_prices` 保存个人固定金额，规格价优先于商品价，留空回退现有定价。个人单价不叠加等级、活动或数量折扣，不改变公开售价、采购成本和历史订单。详见 `docs/user-product-prices.md`。
+- 当前后台品牌与运营入口已统一为 π星卡社，实际发布和组件来源分别按上文记录。首页公告、客服微信 `Cqz0924ttxk`、`https://cdk.bar/` 兑换指引及法律条款保持原配置。2026-10-13 已新增后台用户详情的“设置商品单价”入口；独立表 `user_product_prices` 保存个人固定金额，规格价优先于商品价，留空回退现有定价。个人单价不叠加等级、活动或数量折扣，不改变公开售价、采购成本和历史订单。详见 `docs/user-product-prices.md`。
 - 凭据只保存在忽略的 `work/` 或 `deployment/local/`，限制本机文件访问权限。不得在源码、提交、对话、日志或构建产物中写入或回显密码、商户密钥、JWT、私钥或助记词；项目文档只记录私有文件路径和连接方式。使用已保存的 SSH 主机指纹核验服务器，指纹变化时停止连接并核查。
 - 商户 1039 使用 `acg-faka`；密钥仅用于本地签名，不随请求发送。余额采购须持久化原子提交状态，未知结果进入人工核查，不能自动重新采购。
 - 商品目录为 6 个分类、16 款商品，供货映射 12 款。`qzweb-55` 售价固定为 1160.00 元；库存及商户进价同步不能覆盖本站售价。
@@ -51,3 +51,10 @@
 - `http://qzweb.cloud` 和 `https://qzweb.cloud` 已统一 308 跳转到 `https://www.qzweb.cloud`，保留路径与查询参数。配置源码 `2774d53935c098d9a1c86b90a425ca826e91bdc3`，模板 `ops/tencent/frontend-gateway/nginx-apex.conf`，上海实际文件 `/etc/nginx/conf.d/qzweb-apex.conf`。根域独立证书已纳入现有 `qzweb-certificates.timer`；维护时须保留根域与 WWW 两套入口及 ACME 目录。
 - 此前根域没有被已加载的商城配置接管，请求落到上海默认家具站 `oakved.conf`，页面在 `/opt/oakved/frontend/furniture`。家具配置没有显式声明根域；旧 `sites-enabled/qzweb.cloud` 当前不被 Nginx 加载。时间证据与限制详见 `ops/tencent/README.md`，不得把文件时间说成确定的域名绑定时间。
 - 本机 10 项检查、正式公网 9 项检查及实际浏览器导航通过。两地备份均为各自 `backups/before-apex-domain-20261013-135130`，私有证据在 `work/codex-runtime/domain-diagnostic/`。本次只增加根域配置与证书、平滑重载 Nginx；未改 DNS、家具站及原商城配置、应用程序或业务数据，生产程序仍为 `20261013-114011`。
+
+## 后台品牌与运营入口统一（2026-10-13）
+
+- 已按批准的预览统一登录页、三语标题、桌面/手机侧栏、折叠 Logo、页脚及默认图标，移除原项目广告、赞助和 Telegram Bot 购买推广。顶部为只读「系统信息」，不再提供上游一键升级。设置示例和恢复码文件名使用本站名称；真实支付/供货协议名称、许可证说明与财务声明确认流程保留。见 `docs/admin-branding.md`。
+- 后台商城入口固定指向 `https://www.qzweb.cloud/`；正式 `site_config.brand.site_url` 中既有的本机预览地址没有被本次发布改写，也不再覆盖这两个后台入口。客服微信仍为 `Cqz0924ttxk`，ChatGPT 兑换入口仍为 `https://cdk.bar/`。
+- 55 项后台测试、类型构建、本机与正式站各 19 项浏览器检查通过，覆盖 1920、390、320px 及三种语言；无脚本错误、横向溢出、后台广告/升级请求或验收业务写入。上海 `20261013-143008` 仅替换后台静态资源，核验 119 个后台文件，保留商城 1468 个文件；后台源码 `ebee216118e6ee8d7d3c53c4ab36449b371850b3`，新加坡程序与商城资源仍为原基准。
+- 两地备份均为各自 `backups/before-admin-brand-20261013-143008`；核验记录在忽略目录 `work/codex-runtime/admin-brand-qa/`、`work/codex-runtime/admin-brand-release/`。发布前准备期间的订单、支付及专属价记录更新已保留；发布区间以切换前一致性备份比对，业务数据一致。后端与 Redis 进程、收款配置、售价与成本、Nginx 配置保持原状态，未上传本机库或进行真实付款采购测试。

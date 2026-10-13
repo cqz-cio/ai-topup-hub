@@ -295,13 +295,13 @@
   "previous_build_verification_at": "2026-10-12T08:19:31.766441+00:00",
   "management_url": "https://124.220.2.69:18888/login",
   "frontend_gateway": {
-    "checked_at": "2026-10-13T03:43:17.845895+00:00",
+    "checked_at": "2026-10-13T06:38:09.259786+00:00",
     "frontend_host": "124.220.2.69",
     "backend_host": "43.134.141.10",
-    "frontend_release": "20261013-114011",
-    "source_commit": "aaff34ff2af8d62f9a2cc4061007c6e41b54ea80",
-    "archive_sha256": "772cf5e3c6d203f50f91fa4cb5da15fe81d19bf2e81110a893046689bf8adf59",
-    "static_files_verified": 437,
+    "frontend_release": "20261013-143008",
+    "source_commit": "ebee216118e6ee8d7d3c53c4ab36449b371850b3",
+    "archive_sha256": "b34280455a7c0aa0570d2920b5ef1b2b50b5db180e417d0b42da7696dc26e1d7",
+    "static_files_verified": 1587,
     "storefront_url": "https://www.qzweb.cloud/",
     "management_url": "https://124.220.2.69:18888/login",
     "www_dns_record": "www A 124.220.2.69",
@@ -317,7 +317,7 @@
     "certificate_renewal_verified": true,
     "certificate_timer": "qzweb-certificates.timer",
     "certificate_renewal_report": "/srv/zhixiang-front/shared/work/renew-final-20261012-1644/status.json",
-    "report_path": "/srv/zhixiang-front/shared/work/member-prices-release-20261013-114011.json",
+    "report_path": "/srv/zhixiang-front/shared/work/admin-brand-release-20261013-143008.json",
     "backend_report_path": "/srv/zhixiang/shared/reports/member-prices-release-20261013-114011.json",
     "formal_alipay_enabled": false,
     "database_uploaded": false,
@@ -331,17 +331,20 @@
       "browser_current_frontend_confirmed": true,
       "report_path": "/srv/zhixiang-front/shared/work/entry-cache-report.json"
     },
-    "previous_frontend_release": "20261013-110949",
+    "previous_frontend_release": "20261013-114011",
     "storefront_source_commit": "aaff34ff2af8d62f9a2cc4061007c6e41b54ea80",
-    "admin_source_commit": "aaff34ff2af8d62f9a2cc4061007c6e41b54ea80",
-    "backup": "/srv/zhixiang-front/backups/before-member-prices-20261013-114011",
-    "frontend_only_update": false,
+    "admin_source_commit": "ebee216118e6ee8d7d3c53c4ab36449b371850b3",
+    "backup": "/srv/zhixiang-front/backups/before-admin-brand-20261013-143008",
+    "frontend_only_update": true,
     "previous_hashed_assets_retained": true,
     "verified_services": {
       "nginx": "active",
       "zhixiang-api-tunnel.service": "active",
       "qzweb-certificates.timer": "active"
-    }
+    },
+    "release_scope": "admin-only",
+    "admin_files_verified": 119,
+    "storefront_files_preserved": 1468
   },
   "alipay": {
     "code_and_official_sandbox_query_verified": true,
@@ -660,5 +663,42 @@
     "backend_backup": "/srv/zhixiang/backups/before-member-prices-20261013-114011",
     "frontend_backup": "/srv/zhixiang-front/backups/before-member-prices-20261013-114011",
     "release_evidence_directory": "work/codex-runtime/member-prices-release/"
+  },
+  "admin_branding": {
+    "checked_at": "2026-10-13T06:38:09.259786+00:00",
+    "release": "20261013-143008",
+    "source_commit": "ebee216118e6ee8d7d3c53c4ab36449b371850b3",
+    "documentation": "docs/admin-branding.md",
+    "approved_rendering_directory": "work/codex-runtime/admin-brand-preview-20261013/",
+    "local_verification_directory": "work/codex-runtime/admin-brand-qa/",
+    "release_evidence_directory": "work/codex-runtime/admin-brand-release/",
+    "admin_tests_passed": 55,
+    "admin_typecheck_and_build_passed": true,
+    "local_daily_browser_checks_passed": 19,
+    "production_read_only_browser_checks_passed": 19,
+    "viewports": [
+      1920,
+      390,
+      320
+    ],
+    "locales": [
+      "zh-CN",
+      "zh-TW",
+      "en-US"
+    ],
+    "brand": "π星卡社",
+    "legacy_promotions_and_upstream_updater_removed": true,
+    "canonical_storefront_entries_verified": true,
+    "business_data_matches_immediate_release_backup": true,
+    "preflight_business_changes_preserved": true,
+    "backend_binary_and_configuration_preserved": true,
+    "backend_and_redis_processes_preserved": true,
+    "admin_files_verified": 119,
+    "storefront_files_preserved": 1468,
+    "backend_backup": "/srv/zhixiang/backups/before-admin-brand-20261013-143008",
+    "frontend_backup": "/srv/zhixiang-front/backups/before-admin-brand-20261013-143008",
+    "local_database_uploaded": false,
+    "real_payment_or_purchase_submitted": false,
+    "source_tag": "production/shanghai-admin-20261013-143008"
   }
 }

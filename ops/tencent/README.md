@@ -18,9 +18,15 @@
 
 先在日常本地入口保存正文、核对实际页面，再推送文案并更新正式配置；本机与正式站各通过 1920、390、320px 共 9 项只读页面检查，两页各 9 节完整显示，注册页两个链接实际点击、刷新保留、未自动勾选协议、无横向溢出和脚本错误均通过。没有注入测试配置。线上备份 `/srv/zhixiang/backups/before-site-legal-20261013-003435`，报告 `/srv/zhixiang/shared/reports/site-legal-20261013-003435.json`；本机报告与截图位于忽略目录 `work/codex-runtime/site-legal-qa/`，配置更新报告为工作区私有文件 `deployment/local/site-legal-deployment.json`。前后端发布、其他站点设置、商品/SKU 售价、两条支付渠道和 storefront 服务状态保持一致；未替换程序、重启服务、上传本机库或提交付款及采购测试。
 
-当前两套前端发布 `/srv/zhixiang-front/releases/20261013-114011`，新加坡程序发布 `/srv/zhixiang/releases/20261013-114011`，两处 `current` 均指向该版本；程序、商城与后台源码均为 `aaff34ff2af8d62f9a2cc4061007c6e41b54ea80`。本次将会员统一折扣改为商品/规格固定优惠金额，保留会员等级和升级规则、个人专属价、钱包充值以及现有支付采购流程。
+当前上海静态发布 `/srv/zhixiang-front/releases/20261013-143008`，本次只替换后台资源，后台源码为 `ebee216118e6ee8d7d3c53c4ab36449b371850b3`；商城文件从原正式版本逐项校验后保留，源码仍为 `aaff34ff2af8d62f9a2cc4061007c6e41b54ea80`。新加坡程序仍为 `/srv/zhixiang/releases/20261013-114011`，程序源码同为 `aaff34ff2af8d62f9a2cc4061007c6e41b54ea80`。两地 `current` 分别指向上述实际版本，不以之后的文档提交替代组件构建来源。
 
-本次发布说明见 [会员商品优惠价](../../docs/member-pricing.md)。日常本地入口验证了价格保存、清空、跨等级隔离及实际商品接口与订单预览金额，临时会员已清理。正式站 437 个前端文件哈希、商城与后台登录页、服务和业务数据对比核验通过；未在生产创建验收会员或改价。新备份为 `/srv/zhixiang/backups/before-member-prices-20261013-114011`、`/srv/zhixiang-front/backups/before-member-prices-20261013-114011`，核验资料在 `work/codex-runtime/member-prices-release/` 和 `work/codex-runtime/member-prices-qa/`。历史钱包发布记录如下。
+2026-10-13 已完成 [后台品牌与运营入口统一](../../docs/admin-branding.md)：按批准预览采用 π星卡社与派大星 Logo，清理原项目名称、旧域名示例、推广位和上游升级入口。后台的商城入口固定使用 `https://www.qzweb.cloud/`，避免正式站已有的本机预览配置覆盖链接；本次未改写该旧配置值。55 项后台测试、类型构建，以及本机、正式站各 19 项真实浏览器只读检查通过，覆盖 1920、390、320px、三种语言与实际导航；核验 119 个后台资源和 1468 个保留商城文件。
+
+两地备份分别为 `/srv/zhixiang/backups/before-admin-brand-20261013-143008`、`/srv/zhixiang-front/backups/before-admin-brand-20261013-143008`；报告为新加坡 `shared/reports/admin-brand-backup-20261013-143008.json` 与上海 `shared/work/admin-brand-release-20261013-143008.json`，本机证据在 `work/codex-runtime/admin-brand-qa/`、`work/codex-runtime/admin-brand-release/`。准备阶段已有业务记录更新，本次保留了这些更新，并以切换前数据库一致性备份核对发布区间。程序、服务进程、支付与私有配置、业务数据、公开售价和成本、Nginx 配置核对一致；未上传本机库、提交真实付款或采购测试。
+
+此前会员价发布 `20261013-114011` 将统一折扣改为商品/规格固定优惠金额，保留会员等级和升级规则、个人专属价、钱包充值以及现有支付采购流程。
+
+会员价发布说明见 [会员商品优惠价](../../docs/member-pricing.md)。日常本地入口验证了价格保存、清空、跨等级隔离及实际商品接口与订单预览金额，临时会员已清理。正式站 437 个前端文件哈希、商城与后台登录页、服务和业务数据对比核验通过；未在生产创建验收会员或改价。新备份为 `/srv/zhixiang/backups/before-member-prices-20261013-114011`、`/srv/zhixiang-front/backups/before-member-prices-20261013-114011`，核验资料在 `work/codex-runtime/member-prices-release/` 和 `work/codex-runtime/member-prices-qa/`。历史钱包发布记录如下。
 
 2026-10-13 11:13 已为现有 BEP20、Plasma 渠道启用钱包充值，补齐充值支付期限、确认入账和收银页链上信息；后台 **用户详情 → 钱包明细** 正常提示超级管理员本人完成声明，确认后可主动加减余额。未代签正式声明。使用方法见 [钱包充值](../../docs/wallet-recharge.md)。日常本地入口实际验证加减余额和两条充值渠道，后台 52 项、商城 97 项测试及相关 Go 回归、类型构建通过；上线后 5 项只读浏览器检查、437 个静态文件哈希核验通过。
 

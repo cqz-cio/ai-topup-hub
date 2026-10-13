@@ -14,7 +14,8 @@
 | 本地商城 | http://127.0.0.1:5173/ |
 | 本地后台 | http://127.0.0.1:5174/ |
 | 绿色源码基线 | `baseline/green-20261012`，提交 `419141e` |
-| 生产发布记录 | `20261013-114011`，构建源码 `aaff34ff2af8d62f9a2cc4061007c6e41b54ea80`，见 [生产维护说明](ops/tencent/README.md) |
+| 后端与商城源码基准 | `20261013-114011`，构建源码 `aaff34ff2af8d62f9a2cc4061007c6e41b54ea80` |
+| 后台品牌发布 | 上海静态 `20261013-143008`，后台源码 `ebee216118e6ee8d7d3c53c4ab36449b371850b3`，见 [生产维护说明](ops/tencent/README.md) |
 
 源码标签、服务器发布号和数据库是三个独立对象。线上比对证据与核验范围在 [production-baseline.json](ops/tencent/production-baseline.json)。推送 GitHub 不会自动部署服务器，也不会同步数据库。2026-10-12 已将 `www` 解析切到上海；两套前端发布 `20261012-164700` 与新加坡后端的构建源码 `948c37f` 对齐，域名 HTTPS、管理端登录鉴权和证书自动续期已核验。旧新加坡 HTTP 入口保留兼容，日常使用上表 HTTPS 地址。正式支付宝仍未启用，代码和沙箱结果见 [支付宝接入记录](docs/alipay-web-payment.md)。
 
@@ -63,6 +64,8 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/local/stop.ps1
 后台 **用户管理 → 用户列表 → 用户详情 → 设置商品单价** 可直接为每位用户设置商品或规格的固定金额，登录后展示与下单计价一致；留空沿用现有价格。使用方法见 [按用户设置商品单价](docs/user-product-prices.md)。
 
 商城 **个人中心 → 我的钱包** 已支持 BEP20、Plasma 充值；后台 **用户详情 → 钱包明细** 可增加或扣减余额，首次使用需超级管理员本人完成现有声明。渠道配置、操作与验证范围见 [钱包充值与后台余额调整](docs/wallet-recharge.md)。
+
+后台品牌、系统信息和运营入口的维护说明见 [后台品牌与运营入口](docs/admin-branding.md)。
 
 ## 构建与来源
 
