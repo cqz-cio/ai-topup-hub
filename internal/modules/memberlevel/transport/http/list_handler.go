@@ -46,7 +46,7 @@ func (h *PublicHandler) List(c *gin.Context) {
 			Name:              l.NameJSON,
 			Slug:              l.Slug,
 			Icon:              l.Icon,
-			DiscountRate:      l.DiscountRate.Decimal.InexactFloat64(),
+			DiscountRate:      100, // Legacy clients must not apply percentage discounts.
 			RechargeThreshold: l.RechargeThreshold.Decimal.InexactFloat64(),
 			SpendThreshold:    l.SpendThreshold.Decimal.InexactFloat64(),
 			IsDefault:         l.IsDefault,
@@ -101,7 +101,7 @@ func (h *ChannelHandler) List(c *gin.Context) {
 			Name:              resolveLocalizedJSON(l.NameJSON, locale, defaultLocale),
 			Slug:              l.Slug,
 			Icon:              l.Icon,
-			DiscountRate:      l.DiscountRate.Decimal.InexactFloat64(),
+			DiscountRate:      100,
 			RechargeThreshold: l.RechargeThreshold.Decimal.InexactFloat64(),
 			SpendThreshold:    l.SpendThreshold.Decimal.InexactFloat64(),
 			IsDefault:         l.IsDefault,

@@ -5,6 +5,7 @@ import (
 	memberlevelcontract "github.com/dujiao-next/internal/modules/memberlevel/contract"
 	memberleveldomain "github.com/dujiao-next/internal/modules/memberlevel/domain"
 
+	"github.com/dujiao-next/internal/shared/money"
 	"github.com/shopspring/decimal"
 )
 
@@ -49,6 +50,8 @@ func (s *Service) ListActiveLevels() ([]memberleveldomain.MemberLevel, error) {
 }
 
 func (s *Service) CreateLevel(level *memberleveldomain.MemberLevel) error {
+	// Retain the legacy column for older clients, but percentage discounts no longer apply.
+	level.DiscountRate = money.FromDecimal(decimal.NewFromInt(100))
 	existing, err := s.levelRepo.GetBySlug(level.Slug)
 	if err != nil {
 		return err
@@ -68,6 +71,7 @@ func (s *Service) CreateLevel(level *memberleveldomain.MemberLevel) error {
 }
 
 func (s *Service) UpdateLevel(level *memberleveldomain.MemberLevel) error {
+	level.DiscountRate = money.FromDecimal(decimal.NewFromInt(100))
 	existing, err := s.levelRepo.GetBySlug(level.Slug)
 	if err != nil {
 		return err
@@ -118,6 +122,33 @@ func (s *Service) DeleteLevel(id uint) error {
 
 func (s *Service) GetLevelPricesByProduct(productID uint) ([]memberleveldomain.MemberLevelPrice, error) {
 	return s.priceRepo.ListByProduct(productID)
+}
+
+func (s *Service) GetLevelPricesByLevel(levelID uint) ([]memberleveldomain.MemberLevelPrice, error) {
+	level, err := s.levelRepo.GetByID(levelID)
+	if err != nil {
+		return nil, err
+	}
+	if level == nil {
+		return nil, memberlevelcontract.ErrNotFound
+	}
+	return s.priceRepo.ListByLevel(levelID)
+}
+
+// ReplacePricesForLevel atomically replaces only this level's product/SKU prices.
+func (s *Service) ReplacePricesForLevel(levelID uint, prices []memberleveldomain.MemberLevelPrice) error {
+	if levelID == 0 {
+		return memberlevelcontract.ErrPriceInvalid
+	}
+	for _, price := range prices {
+		if price.MemberLevelID != levelID {
+			return memberlevelcontract.ErrPriceInvalid
+		}
+	}
+	if err := s.validateLevelPrices(prices); err != nil {
+		return err
+	}
+	return s.priceRepo.ReplaceByLevel(levelID, prices)
 }
 
 func (s *Service) BatchUpsertLevelPrices(prices []memberleveldomain.MemberLevelPrice) error {
@@ -194,7 +225,7 @@ func (s *Service) DeleteLevelPrice(id uint) error {
 // --- 价格解析 ---
 
 // ResolveMemberPrice 解析会员价
-// 优先级：SKU级覆盖 > 商品级覆盖 > 等级折扣率 * basePrice
+// 优先级：SKU级固定价 > 商品级固定价 > 当前售价；不再按等级折扣率计算。
 // 返回会员价和会员优惠金额
 func (s *Service) ResolveMemberPrice(levelID, productID, skuID uint, basePrice decimal.Decimal) (memberPrice decimal.Decimal, memberDiscount decimal.Decimal) {
 	if levelID == 0 {
@@ -229,15 +260,7 @@ func (s *Service) ResolveMemberPrice(levelID, productID, skuID uint, basePrice d
 		return basePrice, decimal.Zero
 	}
 
-	// 使用等级折扣率
-	rate := level.DiscountRate.Decimal
-	if rate.LessThanOrEqual(decimal.Zero) || rate.GreaterThanOrEqual(decimal.NewFromInt(100)) {
-		return basePrice, decimal.Zero
-	}
-	mp := basePrice.Mul(rate).Div(decimal.NewFromInt(100)).Round(2)
-	if mp.LessThan(basePrice) {
-		return mp, basePrice.Sub(mp).Round(2)
-	}
+	// Unconfigured products retain the current public price, including better public offers.
 	return basePrice, decimal.Zero
 }
 

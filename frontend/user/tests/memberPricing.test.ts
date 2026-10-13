@@ -14,18 +14,18 @@ const product = {
   ],
 }
 
-test('fixed variant and product prices take precedence over the level rate', () => {
+test('fixed variant and product prices work without a level-wide rate', () => {
   assert.equal(resolveMemberPriceAmount(product, 11, '100.00', 2, 50), '70.00')
   assert.equal(resolveMemberPriceAmount(product, 12, '100.00', 2, 50), '75.00')
-  assert.equal(resolveMemberPriceAmount({ member_prices: [] }, 11, '100.00', 2, 80), '80.00')
+  assert.equal(resolveMemberPriceAmount({ member_prices: [] }, 11, '100.00', 2, 80), null)
   assert.equal(resolveMemberPriceAmount(product, 11, '100.00', 0, 80), null)
 })
 
 test('fixed overrides do not stack the rate or raise a better promotion price', () => {
   assert.equal(resolveMemberPriceAmount(product, 11, '80.00', 2, 80), '70.00')
   assert.equal(resolveMemberPriceAmount(product, 11, '60.00', 2, 80), null)
-  assert.equal(resolveMemberPriceAmount({}, 11, '80.00', 2, 80), '64.00')
-  assert.equal(resolveMemberPriceAmount({}, 11, '0.03', 2, '50.00'), '0.02')
+  assert.equal(resolveMemberPriceAmount({}, 11, '80.00', 2, 80), null)
+  assert.equal(resolveMemberPriceAmount({}, 11, '0.03', 2, '50.00'), null)
 })
 
 test('a legacy zero variant override falls through to the product price', () => {

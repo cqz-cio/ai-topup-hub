@@ -50,6 +50,54 @@ func (r *PriceStore) ListByProduct(productID uint) ([]memberleveldomain.MemberLe
 	return prices, nil
 }
 
+func (r *PriceStore) ListByLevel(levelID uint) ([]memberleveldomain.MemberLevelPrice, error) {
+	prices := make([]memberleveldomain.MemberLevelPrice, 0)
+	err := r.db.Where("deleted_at IS NULL AND member_level_id = ?", levelID).
+		Where("product_id IN (?)", r.db.Table("products").Select("id").Where("deleted_at IS NULL")).
+		Where("sku_id = 0 OR sku_id IN (?)", r.db.Table("product_skus").Select("id").Where("deleted_at IS NULL")).
+		Order("product_id, sku_id").Find(&prices).Error
+	return prices, err
+}
+
+func (r *PriceStore) ReplaceByLevel(levelID uint, prices []memberleveldomain.MemberLevelPrice) error {
+	return r.db.Transaction(func(tx *gorm.DB) error {
+		var count int64
+		if err := tx.Table("member_levels").Where("id = ? AND deleted_at IS NULL", levelID).Count(&count).Error; err != nil {
+			return err
+		}
+		if count != 1 {
+			return memberlevelcontract.ErrNotFound
+		}
+		checked := make(map[uint]bool)
+		for _, price := range prices {
+			if price.MemberLevelID != levelID {
+				return memberlevelcontract.ErrPriceInvalid
+			}
+			if !checked[price.ProductID] {
+				if err := tx.Table("products").Where("id = ? AND deleted_at IS NULL", price.ProductID).Count(&count).Error; err != nil {
+					return err
+				}
+				if count != 1 {
+					return memberlevelcontract.ErrPriceInvalid
+				}
+				checked[price.ProductID] = true
+			}
+			if price.SKUID > 0 {
+				if err := tx.Table("product_skus").Where("id = ? AND product_id = ? AND deleted_at IS NULL", price.SKUID, price.ProductID).Count(&count).Error; err != nil {
+					return err
+				}
+				if count != 1 {
+					return memberlevelcontract.ErrPriceInvalid
+				}
+			}
+		}
+		if err := tx.Model(&memberleveldomain.MemberLevelPrice{}).Where("member_level_id = ? AND deleted_at IS NULL", levelID).Update("deleted_at", time.Now()).Error; err != nil {
+			return err
+		}
+		return upsertPrices(tx, prices)
+	})
+}
+
 // ListByLevelAndProducts 获取指定等级和商品集合的等级价
 func (r *PriceStore) ListByLevelAndProducts(levelID uint, productIDs []uint) ([]memberleveldomain.MemberLevelPrice, error) {
 	if len(productIDs) == 0 {

@@ -430,11 +430,11 @@ func TestBuildOrderResultExcludesWholesaleItemsWhenCouponDisabledWholesalePrice(
 	}
 }
 
-func TestBuildOrderResultAppliesMemberDiscountAfterWholesale(t *testing.T) {
+func TestBuildOrderResultIgnoresLegacyMemberRateAfterWholesale(t *testing.T) {
 	wholesalePrices := productdomain.WholesalePriceTiers{
 		{MinQuantity: 5, UnitPrice: money.FromDecimal(decimal.NewFromInt(80))},
 	}
-	memberRate := decimal.NewFromInt(80) // 批发价 80 后再打 8 折，最终 64。
+	memberRate := decimal.NewFromInt(80) // Historical percentage must not reduce the current wholesale price.
 	fixture := setupWholesaleOrderFixture(t, "member_after_wholesale", wholesalePrices, nil, &memberRate)
 
 	result, err := fixture.svc.buildOrderResult(orderCreateParams{
@@ -448,14 +448,14 @@ func TestBuildOrderResultAppliesMemberDiscountAfterWholesale(t *testing.T) {
 	if !result.WholesaleDiscountAmount.Equal(decimal.NewFromInt(100)) {
 		t.Fatalf("expected wholesale discount 100, got %s", result.WholesaleDiscountAmount.String())
 	}
-	if !result.MemberDiscountAmount.Equal(decimal.NewFromInt(80)) {
-		t.Fatalf("expected member discount 80, got %s", result.MemberDiscountAmount.String())
+	if !result.MemberDiscountAmount.IsZero() {
+		t.Fatalf("expected member discount 0, got %s", result.MemberDiscountAmount.String())
 	}
-	if !result.TotalAmount.Equal(decimal.NewFromInt(320)) {
-		t.Fatalf("expected total 320, got %s", result.TotalAmount.String())
+	if !result.TotalAmount.Equal(decimal.NewFromInt(400)) {
+		t.Fatalf("expected total 400, got %s", result.TotalAmount.String())
 	}
 	item := result.Plans[0].Item
-	if item.UnitPrice.String() != "64.00" || item.WholesaleDiscount.String() != "100.00" || item.MemberDiscount.String() != "80.00" {
+	if item.UnitPrice.String() != "80.00" || item.WholesaleDiscount.String() != "100.00" || item.MemberDiscount.String() != "0.00" {
 		t.Fatalf("unexpected item price result: unit=%s wholesale=%s member=%s", item.UnitPrice.String(), item.WholesaleDiscount.String(), item.MemberDiscount.String())
 	}
 }

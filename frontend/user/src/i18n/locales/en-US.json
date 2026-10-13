@@ -410,6 +410,9 @@
       "emptyOrders": "No recent orders"
     },
     "memberLevel": {
+      "productPricing": "Product pricing",
+      "fixedPriceValue": "Per-product prices",
+      "fixedPriceHint": "See each product page for its member price",
       "currentLevel": "Current Level",
       "discountRate": "Member Discount",
       "discountOff": "{n}% off",

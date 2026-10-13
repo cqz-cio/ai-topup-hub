@@ -13,7 +13,7 @@ type MemberLevel struct {
 	NameJSON          jsonmap.JSON `gorm:"type:json;not null" json:"name"`                                  // 多语言名称
 	Slug              string       `gorm:"uniqueIndex;not null" json:"slug"`                                // 唯一标识（default/silver/gold/diamond）
 	Icon              string       `gorm:"default:''" json:"icon"`                                          // 等级图标（emoji 或图片 URL）
-	DiscountRate      money.Amount `gorm:"type:decimal(6,2);not null;default:100" json:"discount_rate"`     // 全局折扣率（100=原价, 90=9折, 80=8折）
+	DiscountRate      money.Amount `gorm:"type:decimal(6,2);not null;default:100" json:"discount_rate"`     // 兼容历史字段，新增/更新固定为 100，不参与定价
 	RechargeThreshold money.Amount `gorm:"type:decimal(20,2);not null;default:0" json:"recharge_threshold"` // 充值累计升级阈值（0=不按此条件）
 	SpendThreshold    money.Amount `gorm:"type:decimal(20,2);not null;default:0" json:"spend_threshold"`    // 消费累计升级阈值（0=不按此条件）
 	IsDefault         bool         `gorm:"not null;default:false" json:"is_default"`                        // 是否默认等级（仅一个）

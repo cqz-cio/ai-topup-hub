@@ -1,4 +1,4 @@
-import { amountToCents, centsToAmount, rateToBasisPoints } from './money.ts'
+import { amountToCents, centsToAmount } from './money.ts'
 
 export function hasUserPriceForSku(product: any, skuId: unknown): boolean {
   const id = Number(skuId || 0)
@@ -7,10 +7,10 @@ export function hasUserPriceForSku(product: any, skuId: unknown): boolean {
   return price !== null && price > 0
 }
 
-// Same precedence and rounding as the order service: SKU, product, level rate.
+// Same precedence as checkout: fixed SKU price, fixed product price, public price.
 export function resolveMemberPriceAmount(
   product: any, skuId: unknown, basePrice: unknown,
-  memberLevelId: unknown, discountRate?: unknown,
+  memberLevelId: unknown, _legacyDiscountRate?: unknown,
 ): string | null {
   if (hasUserPriceForSku(product, skuId)) return null
   const base = amountToCents(basePrice)
@@ -22,12 +22,7 @@ export function resolveMemberPriceAmount(
     const override = amountToCents(row?.price_amount)
     if (override !== null && override > 0) return override < base ? centsToAmount(override) : null
   }
-  const rate = rateToBasisPoints(discountRate)
-  if (rate === null || rate <= 0 || rate >= 10000) return null
-  const scaled = base * rate
-  if (!Number.isSafeInteger(scaled)) return null
-  const member = Math.round(scaled / 10000)
-  return member < base ? centsToAmount(member) : null
+  return null
 }
 
 export function resolveCatalogSkuPrice(product: any, sku: any): string | null {

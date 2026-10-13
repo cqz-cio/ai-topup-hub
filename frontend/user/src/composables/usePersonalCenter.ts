@@ -112,13 +112,7 @@ export function usePersonalCenter(sectionGetter: () => PersonalSection) {
     return userProfileStore.profile?.email_verified_at ? 'success' : 'warning'
   })
 
-  const discountText = computed(() => {
-    const lvl = userProfileStore.currentLevel
-    if (lvl && lvl.discount_rate < 100) {
-      return t('personalCenter.memberLevel.discountOff', { n: lvl.discount_rate / 10 })
-    }
-    return t('personalCenter.memberLevel.noDiscount')
-  })
+  const memberPriceText = computed(() => t('personalCenter.memberLevel.fixedPriceValue'))
 
   const isImagePath = (icon: string | undefined | null) => icon?.startsWith('/uploads/') || icon?.startsWith('http')
 
@@ -162,7 +156,7 @@ export function usePersonalCenter(sectionGetter: () => PersonalSection) {
     formatDate,
     emailVerifiedLabel,
     emailVerifiedVariant,
-    discountText,
+    memberPriceText,
     isImagePath,
     levelName,
   }

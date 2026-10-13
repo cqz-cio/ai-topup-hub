@@ -112,7 +112,7 @@ async function save() {
         <p v-if="!levels.length" class="text-sm text-muted-foreground">{{ t('admin.memberPrices.noLevels') }}</p>
         <fieldset v-for="level in levels" :key="level.id" :disabled="saving || !canSave" class="rounded-lg border border-border p-4">
           <legend class="px-2 font-semibold">{{ getLocalizedText(level.name) }} <span v-if="level.is_default" class="text-xs font-normal text-muted-foreground">{{ t('admin.memberPrices.default') }}</span></legend>
-          <p class="mb-3 text-xs text-muted-foreground">{{ level.is_active ? t('admin.memberPrices.rate', { rate: level.discount_rate }) : t('admin.memberPrices.inactive') }}</p>
+          <p class="mb-3 text-xs text-muted-foreground">{{ level.is_active ? t('admin.memberPrices.fixedOnly') : t('admin.memberPrices.inactive') }}</p>
           <div class="grid gap-3 sm:grid-cols-2">
             <div v-for="row in rowsForLevel(level.id)" :key="row.sku_id">
               <label :for="`member-price-${level.id}-${row.sku_id}`" class="mb-1 block text-sm">{{ scopeLabel(row.sku_id) }}</label>

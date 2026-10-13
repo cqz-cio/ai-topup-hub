@@ -46,7 +46,7 @@ func TestOrderUsesExactUserPriceInsteadOfPromotionWholesaleAndLevelDiscount(t *t
 		t.Fatal(err)
 	}
 	result, err := f.svc.buildOrderResult(orderCreateParams{UserID: f.user.ID, Items: []CreateOrderItem{{ProductID: f.product.ID, SKUID: f.sku.ID, Quantity: 3}}})
-	if err != nil || !result.TotalAmount.Equal(decimal.NewFromInt(96)) {
+	if err != nil || !result.TotalAmount.Equal(decimal.NewFromInt(120)) {
 		t.Fatalf("cleared price failed to restore ordinary pricing: %v, %+v", err, result)
 	}
 }

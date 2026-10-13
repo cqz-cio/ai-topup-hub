@@ -410,6 +410,9 @@
       "emptyOrders": "暫無最近訂單"
     },
     "memberLevel": {
+      "productPricing": "商品優惠",
+      "fixedPriceValue": "按商品定價",
+      "fixedPriceHint": "各商品優惠金額以商品頁為準",
       "currentLevel": "當前等級",
       "discountRate": "會員折扣",
       "discountOff": "{n}折",

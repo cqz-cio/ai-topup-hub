@@ -115,6 +115,9 @@ func TestCatalogPricesFollowCurrentUserGradeAndPreserveOtherVaryHeaders(t *testi
 			if product.SKUs[0].EffectivePriceAmount == nil || !product.SKUs[0].EffectivePriceAmount.Decimal.Equal(decimal.NewFromInt(wantAmount)) {
 				t.Fatalf("SKU price differs from list display: %+v", product.SKUs)
 			}
+			if wantLevel > 0 && product.MemberDiscountRate.StringFixed(2) != "100.00" {
+				t.Fatal("legacy percentage leaked into catalog pricing")
+			}
 			for _, row := range product.MemberPrices {
 				if row.MemberLevelID != wantLevel {
 					t.Fatal("another grade's prices leaked")
@@ -149,7 +152,7 @@ func TestCatalogPricesFollowCurrentUserGradeAndPreserveOtherVaryHeaders(t *testi
 	if err := db.Where("member_level_id = ?", agent.ID).Delete(&memberleveldomain.MemberLevelPrice{}).Error; err != nil {
 		t.Fatal(err)
 	}
-	check(80, agent.ID, 0)
+	check(100, agent.ID, 0)
 	if err := svc.SetUserLevel(user.ID, 0); err != nil {
 		t.Fatal(err)
 	}

@@ -66,10 +66,10 @@
               </div>
             </div>
             <div class="flex items-center gap-3 rounded-lg border bg-card p-4">
-              <div class="grid h-[42px] w-[42px] flex-none place-items-center rounded-xl bg-[color:var(--gold-soft)] text-[color:var(--gold-strong)]"><Percent class="h-5 w-5" /></div>
+              <div class="grid h-[42px] w-[42px] flex-none place-items-center rounded-xl bg-[color:var(--gold-soft)] text-[color:var(--gold-strong)]"><Tag class="h-5 w-5" /></div>
               <div>
-                <div class="text-xs text-muted-foreground">{{ t('personalCenter.memberLevel.discountRate') }}</div>
-                <div class="mt-[3px] text-lg font-extrabold">{{ discountText }}</div>
+                <div class="text-xs text-muted-foreground">{{ t('personalCenter.memberLevel.productPricing') }}</div>
+                <div class="mt-[3px] text-lg font-extrabold">{{ memberPriceText }}</div>
               </div>
             </div>
             <div class="flex items-center gap-3 rounded-lg border bg-card p-4">
@@ -96,10 +96,8 @@
               </div>
               <div class="flex flex-wrap items-center gap-2">
                 <span class="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-1 text-[12.5px] font-semibold text-primary">
-                  {{ t('personalCenter.memberLevel.discountRate') }}
-                  {{ userProfileStore.currentLevel && userProfileStore.currentLevel.discount_rate < 100
-                    ? t('personalCenter.memberLevel.discountOff', { n: userProfileStore.currentLevel.discount_rate / 10 })
-                    : t('personalCenter.memberLevel.noDiscount') }}
+                  {{ t('personalCenter.memberLevel.productPricing') }}
+                  {{ t('personalCenter.memberLevel.fixedPriceHint') }}
                 </span>
                 <span v-if="!userProfileStore.nextLevel && userProfileStore.currentLevel" class="inline-flex items-center rounded-full bg-[color:var(--teal-soft)] px-2.5 py-1 text-[12.5px] font-semibold text-[color:var(--teal-strong)]">{{ t('personalCenter.memberLevel.highestLevel') }}</span>
               </div>
@@ -115,7 +113,6 @@
                   <p class="text-[11px] uppercase tracking-[0.06em] text-muted-foreground">{{ t('personalCenter.memberLevel.nextLevel') }}</p>
                   <div class="flex items-center gap-2">
                     <span class="text-sm font-bold text-muted-foreground">{{ levelName(userProfileStore.nextLevel) }}</span>
-                    <span v-if="userProfileStore.nextLevel.discount_rate < 100" class="text-xs font-semibold text-primary">{{ t('personalCenter.memberLevel.discountOff', { n: userProfileStore.nextLevel.discount_rate / 10 }) }}</span>
                   </div>
                 </div>
               </div>
@@ -189,7 +186,7 @@
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import { Crown, ShoppingBag, ShieldCheck, Percent } from 'lucide-vue-next'
+import { Crown, ShoppingBag, ShieldCheck, Tag } from 'lucide-vue-next'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { getImageUrl } from '../../utils/image'
@@ -211,6 +208,6 @@ const props = withDefaults(defineProps<{ section?: PersonalSection }>(), {
 const {
   userProfileStore, canAccessResellerConsole, visibleSectionItems, currentSection, globalAlert,
   displayInitial, switchSection, statusLabel, statusVariant, formatMoney, formatDate,
-  emailVerifiedLabel, emailVerifiedVariant, discountText, isImagePath, levelName,
+  emailVerifiedLabel, emailVerifiedVariant, memberPriceText, isImagePath, levelName,
 } = usePersonalCenter(() => props.section)
 </script>

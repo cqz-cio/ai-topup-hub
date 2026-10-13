@@ -104,9 +104,9 @@
                 </template>
               </StatCard>
               <StatCard
-                :label="t('personalCenter.memberLevel.discountRate')"
-                :value="discountText"
-                :icon="Percent"
+                :label="t('personalCenter.memberLevel.productPricing')"
+                :value="memberPriceText"
+                :icon="Tag"
                 tone="warning"
               />
               <StatCard
@@ -136,11 +136,8 @@
                 </div>
                 <div class="flex flex-wrap items-center gap-2">
                   <Badge variant="accent" class="rounded-full px-3 py-1">
-                    {{ t('personalCenter.memberLevel.discountRate') }}
-                    {{ userProfileStore.currentLevel && userProfileStore.currentLevel.discount_rate < 100
-                      ? t('personalCenter.memberLevel.discountOff', { n: userProfileStore.currentLevel.discount_rate / 10 })
-                      : t('personalCenter.memberLevel.noDiscount')
-                    }}
+                    {{ t('personalCenter.memberLevel.productPricing') }}
+                    {{ t('personalCenter.memberLevel.fixedPriceHint') }}
                   </Badge>
                   <Badge
                     v-if="!userProfileStore.nextLevel && userProfileStore.currentLevel"
@@ -165,9 +162,6 @@
                       <p class="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">{{ t('personalCenter.memberLevel.nextLevel') }}</p>
                       <div class="mt-0.5 flex items-center gap-2">
                         <span class="truncate text-sm font-bold text-muted-foreground">{{ levelName(userProfileStore.nextLevel) }}</span>
-                        <span v-if="userProfileStore.nextLevel.discount_rate < 100" class="shrink-0 text-xs font-medium text-primary">
-                          {{ t('personalCenter.memberLevel.discountOff', { n: userProfileStore.nextLevel.discount_rate / 10 }) }}
-                        </span>
                       </div>
                     </div>
                   </div>
@@ -285,7 +279,7 @@
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import { Crown, ShoppingBag, ShieldCheck, Percent } from 'lucide-vue-next'
+import { Crown, ShoppingBag, ShieldCheck, Tag } from 'lucide-vue-next'
 import { getImageUrl } from '../utils/image'
 import { pageAlertVariant, pageAlertToneClass } from '../utils/alerts'
 import StatCard from '../components/shared/StatCard.vue'
@@ -310,6 +304,6 @@ const props = withDefaults(defineProps<{ section?: PersonalSection }>(), {
 const {
   userProfileStore, canAccessResellerConsole, visibleSectionItems, currentSection, globalAlert,
   displayInitial, switchSection, statusLabel, statusVariant, formatMoney, formatDate,
-  emailVerifiedLabel, emailVerifiedVariant, discountText, isImagePath, levelName,
+  emailVerifiedLabel, emailVerifiedVariant, memberPriceText, isImagePath, levelName,
 } = usePersonalCenter(() => props.section)
 </script>

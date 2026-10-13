@@ -363,6 +363,9 @@
       "emptyOrders": "暂无最近订单"
     },
     "memberLevel": {
+      "productPricing": "商品优惠",
+      "fixedPriceValue": "按商品定价",
+      "fixedPriceHint": "各商品优惠金额以商品页为准",
       "currentLevel": "当前等级",
       "discountRate": "会员折扣",
       "discountOff": "{n}折",

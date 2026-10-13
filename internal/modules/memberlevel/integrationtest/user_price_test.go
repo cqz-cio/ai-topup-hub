@@ -229,10 +229,10 @@ func TestPublicCatalogPersonalPricesDoNotLeakOrStackDiscounts(t *testing.T) {
 		}
 	}
 	check(a.ID, "95.55", true)
-	check(b.ID, "16.00", false)
+	check(b.ID, "20.00", false)
 	check(0, "20.00", false)
 	if err := svc.ReplaceUserPrices(a.ID, nil); err != nil {
 		t.Fatal(err)
 	}
-	check(a.ID, "16.00", false)
+	check(a.ID, "20.00", false)
 }

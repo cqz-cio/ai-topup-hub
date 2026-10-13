@@ -209,7 +209,7 @@ func TestBuildOrderResultRejectsZeroPromotionPrice(t *testing.T) {
 	}
 }
 
-func TestPreviewOrderAppliesMemberDiscountForManualProductBeforeFormCompleted(t *testing.T) {
+func TestPreviewOrderAppliesFixedMemberPriceForManualProductBeforeFormCompleted(t *testing.T) {
 	dsn := fmt.Sprintf("file:order_service_manual_member_preview_%d?mode=memory&cache=shared", time.Now().UnixNano())
 	db, err := gorm.Open(sqlite.Open(dsn), &gorm.Config{})
 	if err != nil {
@@ -300,6 +300,11 @@ func TestPreviewOrderAppliesMemberDiscountForManualProductBeforeFormCompleted(t 
 		t.Fatalf("create sku failed: %v", err)
 	}
 
+	// A configured amount is used as-is, even when a legacy rate exists.
+	if err := db.Create(&memberleveldomain.MemberLevelPrice{MemberLevelID: level.ID, ProductID: product.ID, SKUID: sku.ID, PriceAmount: money.FromDecimal(decimal.NewFromInt(80))}).Error; err != nil {
+		t.Fatal(err)
+	}
+
 	levelRepo := memberlevelgormstore.NewLevelStore(db)
 	priceRepo := memberlevelgormstore.NewPriceStore(db)
 	userRepo := userstore.New(db)
@@ -340,7 +345,7 @@ func TestPreviewOrderAppliesMemberDiscountForManualProductBeforeFormCompleted(t 
 	}
 }
 
-func TestBuildOrderResultStacksPromotionAndMemberDiscount(t *testing.T) {
+func TestBuildOrderResultUsesFixedMemberPriceWithoutStackingRate(t *testing.T) {
 	dsn := fmt.Sprintf("file:order_service_stack_promo_member_%d?mode=memory&cache=shared", time.Now().UnixNano())
 	db, err := gorm.Open(sqlite.Open(dsn), &gorm.Config{})
 	if err != nil {
@@ -429,6 +434,11 @@ func TestBuildOrderResultStacksPromotionAndMemberDiscount(t *testing.T) {
 	}
 	if err := db.Create(&promotion).Error; err != nil {
 		t.Fatalf("create promotion failed: %v", err)
+	}
+
+	// A configured amount is used as-is, even when a legacy rate exists.
+	if err := db.Create(&memberleveldomain.MemberLevelPrice{MemberLevelID: level.ID, ProductID: product.ID, SKUID: sku.ID, PriceAmount: money.FromDecimal(decimal.NewFromInt(72))}).Error; err != nil {
+		t.Fatal(err)
 	}
 
 	levelRepo := memberlevelgormstore.NewLevelStore(db)

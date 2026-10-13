@@ -180,7 +180,7 @@ func (h *PublicHandler) decoratePublicProduct(product *productdomain.Product, pr
 	if len(userLevel) > 0 && userLevel[0] != nil && userLevel[0].IsActive {
 		memberLevelID = userLevel[0].ID
 		item.PricingMemberLevelID = memberLevelID
-		item.MemberDiscountRate = userLevel[0].DiscountRate
+		item.MemberDiscountRate = money.FromDecimal(decimal.NewFromInt(100))
 	}
 	if h.memberLevels != nil && memberLevelID > 0 {
 		levelPrices, err := h.memberLevels.GetLevelPricesByProduct(product.ID)

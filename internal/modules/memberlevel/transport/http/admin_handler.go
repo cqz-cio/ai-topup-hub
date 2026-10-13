@@ -21,6 +21,8 @@ type AdminService interface {
 	UpdateLevel(level *memberleveldomain.MemberLevel) error
 	DeleteLevel(id uint) error
 	GetLevelPricesByProduct(productID uint) ([]memberleveldomain.MemberLevelPrice, error)
+	GetLevelPricesByLevel(levelID uint) ([]memberleveldomain.MemberLevelPrice, error)
+	ReplacePricesForLevel(levelID uint, prices []memberleveldomain.MemberLevelPrice) error
 	BatchUpsertLevelPrices(prices []memberleveldomain.MemberLevelPrice) error
 	ReplaceLevelPrices(productID uint, prices []memberleveldomain.MemberLevelPrice) error
 	DeleteLevelPrice(id uint) error
@@ -41,7 +43,6 @@ type CreateMemberLevelRequest struct {
 	NameJSON          jsonmap.JSON `json:"name" binding:"required"`
 	Slug              string       `json:"slug" binding:"required"`
 	Icon              string       `json:"icon"`
-	DiscountRate      float64      `json:"discount_rate"`
 	RechargeThreshold float64      `json:"recharge_threshold"`
 	SpendThreshold    float64      `json:"spend_threshold"`
 	IsDefault         bool         `json:"is_default"`
@@ -90,7 +91,7 @@ func (h *AdminHandler) CreateMemberLevel(c *gin.Context) {
 		NameJSON:          req.NameJSON,
 		Slug:              req.Slug,
 		Icon:              req.Icon,
-		DiscountRate:      money.FromDecimal(decimal.NewFromFloat(req.DiscountRate)),
+		DiscountRate:      money.FromDecimal(decimal.NewFromInt(100)),
 		RechargeThreshold: money.FromDecimal(decimal.NewFromFloat(req.RechargeThreshold)),
 		SpendThreshold:    money.FromDecimal(decimal.NewFromFloat(req.SpendThreshold)),
 		IsDefault:         req.IsDefault,
@@ -140,7 +141,7 @@ func (h *AdminHandler) UpdateMemberLevel(c *gin.Context) {
 	existing.NameJSON = req.NameJSON
 	existing.Slug = req.Slug
 	existing.Icon = req.Icon
-	existing.DiscountRate = money.FromDecimal(decimal.NewFromFloat(req.DiscountRate))
+	existing.DiscountRate = money.FromDecimal(decimal.NewFromInt(100))
 	existing.RechargeThreshold = money.FromDecimal(decimal.NewFromFloat(req.RechargeThreshold))
 	existing.SpendThreshold = money.FromDecimal(decimal.NewFromFloat(req.SpendThreshold))
 	existing.IsDefault = req.IsDefault
@@ -189,16 +190,26 @@ func (h *AdminHandler) DeleteMemberLevel(c *gin.Context) {
 	response.Success(c, gin.H{"deleted": true})
 }
 
-// GetMemberLevelPrices 获取商品的等级价列表
+// GetMemberLevelPrices 获取单个商品或单个会员等级的固定价格。
 func (h *AdminHandler) GetMemberLevelPrices(c *gin.Context) {
 	productID, err := ginutil.ParseQueryUint(c.Query("product_id"), false)
-	if err != nil || productID == 0 {
+	levelID, levelErr := ginutil.ParseQueryUint(c.Query("member_level_id"), false)
+	if err != nil || levelErr != nil || (productID == 0) == (levelID == 0) {
 		ginutil.RespondError(c, response.CodeBadRequest, "error.bad_request", err)
 		return
 	}
 
-	prices, err := h.service.GetLevelPricesByProduct(productID)
+	var prices []memberleveldomain.MemberLevelPrice
+	if levelID > 0 {
+		prices, err = h.service.GetLevelPricesByLevel(levelID)
+	} else {
+		prices, err = h.service.GetLevelPricesByProduct(productID)
+	}
 	if err != nil {
+		if errors.Is(err, memberlevelcontract.ErrNotFound) {
+			ginutil.RespondError(c, response.CodeNotFound, "error.member_level_not_found", nil)
+			return
+		}
 		ginutil.RespondError(c, response.CodeInternal, "error.member_level_price_fetch_failed", err)
 		return
 	}
@@ -208,8 +219,9 @@ func (h *AdminHandler) GetMemberLevelPrices(c *gin.Context) {
 
 // BatchUpsertMemberLevelPricesRequest 批量设置等级价请求
 type BatchUpsertMemberLevelPricesRequest struct {
-	ProductID uint                    `json:"product_id"`
-	Prices    []MemberLevelPriceInput `json:"prices" binding:"required"`
+	ProductID     uint                    `json:"product_id"`
+	MemberLevelID uint                    `json:"member_level_id"`
+	Prices        []MemberLevelPriceInput `json:"prices" binding:"required"`
 }
 
 // MemberLevelPriceInput 等级价输入
@@ -225,6 +237,10 @@ func (h *AdminHandler) BatchUpsertMemberLevelPrices(c *gin.Context) {
 	var req BatchUpsertMemberLevelPricesRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		ginutil.RespondBindError(c, err)
+		return
+	}
+	if req.ProductID > 0 && req.MemberLevelID > 0 {
+		ginutil.RespondError(c, response.CodeBadRequest, "error.bad_request", nil)
 		return
 	}
 
@@ -244,7 +260,9 @@ func (h *AdminHandler) BatchUpsertMemberLevelPrices(c *gin.Context) {
 	}
 
 	var err error
-	if req.ProductID > 0 {
+	if req.MemberLevelID > 0 {
+		err = h.service.ReplacePricesForLevel(req.MemberLevelID, prices)
+	} else if req.ProductID > 0 {
 		err = h.service.ReplaceLevelPrices(req.ProductID, prices)
 	} else {
 		err = h.service.BatchUpsertLevelPrices(prices)

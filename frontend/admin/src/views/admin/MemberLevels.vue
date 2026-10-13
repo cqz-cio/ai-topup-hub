@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { adminAPI } from '@/api/admin'
 import type { AdminMemberLevel } from '@/api/types'
+import { useAdminAuthStore } from '@/stores/auth'
+import MemberLevelPricePanel from './components/MemberLevelPricePanel.vue'
 import IdCell from '@/components/IdCell.vue'
 import MediaPicker from '@/components/admin/MediaPicker.vue'
 import { Button } from '@/components/ui/button'
@@ -21,6 +23,18 @@ const isImagePath = (val: string) => !!val && val.includes('/')
 
 const { t } = useI18n()
 
+const auth = useAdminAuthStore()
+const canReadPrices = computed(() => auth.hasPermission('GET:/admin/member-level-prices') && auth.hasPermission('GET:/admin/products'))
+const priceLevel = ref<AdminMemberLevel | null>(null)
+const priceSaving = ref(false)
+const siteCurrency = ref('CNY')
+const fetchCurrency = async () => {
+  try {
+    const response = await adminAPI.getSettings({ key: 'site_config' })
+    const raw = String(response.data?.data?.currency || 'CNY').trim().toUpperCase()
+    siteCurrency.value = /^[A-Z]{3}$/.test(raw) ? raw : 'CNY'
+  } catch { siteCurrency.value = 'CNY' }
+}
 const loading = ref(true)
 const { refreshing, refreshList } = useListRefresh()
 const levels = ref<AdminMemberLevel[]>([])
@@ -53,7 +67,6 @@ const form = reactive({
   name: {} as Record<string, string>,
   slug: '',
   icon: '',
-  discount_rate: 100,
   recharge_threshold: 0,
   spend_threshold: 0,
   is_default: false,
@@ -65,7 +78,6 @@ const resetForm = () => {
   form.name = {}
   form.slug = ''
   form.icon = ''
-  form.discount_rate = 100
   form.recharge_threshold = 0
   form.spend_threshold = 0
   form.is_default = false
@@ -113,7 +125,6 @@ const openEditModal = (level: AdminMemberLevel) => {
   form.name = { ...(level.name || {}) }
   form.slug = level.slug || ''
   form.icon = level.icon || ''
-  form.discount_rate = Number(level.discount_rate) || 100
   form.recharge_threshold = Number(level.recharge_threshold) || 0
   form.spend_threshold = Number(level.spend_threshold) || 0
   form.is_default = Boolean(level.is_default)
@@ -143,7 +154,6 @@ const handleSubmit = async () => {
       name: form.name,
       slug: form.slug.trim(),
       icon: form.icon.trim(),
-      discount_rate: Number(form.discount_rate),
       recharge_threshold: Number(form.recharge_threshold),
       spend_threshold: Number(form.spend_threshold),
       is_default: form.is_default,
@@ -205,6 +215,7 @@ const getLocaleLabel = (loc: string) => {
 }
 
 onMounted(() => {
+  fetchCurrency()
   fetchLevels()
 })
 </script>
@@ -241,7 +252,7 @@ onMounted(() => {
             <TableHead class="min-w-[88px] px-6 py-3">{{ t('admin.memberLevels.table.icon') }}</TableHead>
             <TableHead class="min-w-[90px] px-6 py-3">{{ t('admin.memberLevels.table.name') }}</TableHead>
             <TableHead class="min-w-[80px] px-6 py-3">{{ t('admin.memberLevels.table.slug') }}</TableHead>
-            <TableHead class="min-w-[80px] px-6 py-3">{{ t('admin.memberLevels.table.discountRate') }}</TableHead>
+            <TableHead class="min-w-[80px] px-6 py-3">{{ t('admin.memberLevels.productPrices') }}</TableHead>
             <TableHead class="min-w-[90px] px-6 py-3">{{ t('admin.memberLevels.table.rechargeThreshold') }}</TableHead>
             <TableHead class="min-w-[90px] px-6 py-3">{{ t('admin.memberLevels.table.spendThreshold') }}</TableHead>
             <TableHead class="min-w-[90px] px-6 py-3">{{ t('admin.memberLevels.table.sortOrder') }}</TableHead>
@@ -285,7 +296,8 @@ onMounted(() => {
               {{ level.slug }}
             </TableCell>
             <TableCell class="min-w-[80px] px-6 py-4 text-foreground font-mono">
-              {{ level.discount_rate }}%
+              <Button v-if="canReadPrices" size="sm" variant="outline" :aria-label="getLocalizedText(level.name) + ' ' + t('admin.memberLevels.setProductPrices')" @click="priceLevel = level">{{ t('admin.memberLevels.setProductPrices') }}</Button>
+              <span v-else class="text-xs text-muted-foreground">{{ t('admin.memberLevels.productPrices') }}</span>
             </TableCell>
             <TableCell class="min-w-[90px] px-6 py-4 text-xs text-muted-foreground font-mono">
               {{ Number(level.recharge_threshold) || '-' }}
@@ -319,6 +331,14 @@ onMounted(() => {
         </TableBody>
       </Table>
     </div>
+
+    <Dialog :open="Boolean(priceLevel)" @update:open="(open) => { if (!open && !priceSaving) priceLevel = null }">
+      <DialogScrollContent class="w-[calc(100vw-1rem)] max-w-5xl p-4 sm:p-6" @escape-key-down="priceSaving && $event.preventDefault()" @interact-outside="$event.preventDefault()">
+        <DialogHeader><DialogTitle>{{ priceLevel ? getLocalizedText(priceLevel.name) : '' }} · {{ t('admin.memberLevels.productPrices') }}</DialogTitle></DialogHeader>
+        <p v-if="priceLevel && !priceLevel.is_active" class="text-sm text-muted-foreground">{{ t('admin.memberPrices.inactive') }}</p>
+        <MemberLevelPricePanel v-if="priceLevel" :key="priceLevel.id" :level-id="priceLevel.id" :site-currency="siteCurrency" @busy="priceSaving = $event" />
+      </DialogScrollContent>
+    </Dialog>
 
     <Dialog v-model:open="showModal" @update:open="(value: boolean) => { if (!value) closeModal() }">
       <DialogScrollContent class="w-[calc(100vw-1rem)] max-w-3xl p-4 sm:p-6" @interact-outside="(e: Event) => e.preventDefault()">
@@ -379,15 +399,7 @@ onMounted(() => {
               <MediaPicker v-else v-model="form.icon" scene="common" />
             </div>
 
-            <div>
-              <label class="mb-1.5 block text-xs font-medium text-muted-foreground">
-                {{ t('admin.memberLevels.form.discountRate') }}
-              </label>
-              <Input v-model.number="form.discount_rate" type="number" step="0.01" min="0" max="100" placeholder="100" />
-              <p class="mt-1 text-[11px] leading-5 text-muted-foreground">
-                {{ t('admin.memberLevels.form.discountRateHint') }}
-              </p>
-            </div>
+            <p class="text-sm text-muted-foreground md:col-span-2">{{ t('admin.memberLevels.fixedPriceHint') }}</p>
 
             <div>
               <label class="mb-1.5 block text-xs font-medium text-muted-foreground">
