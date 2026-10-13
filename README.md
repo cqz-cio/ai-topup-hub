@@ -14,7 +14,7 @@
 | 本地商城 | http://127.0.0.1:5173/ |
 | 本地后台 | http://127.0.0.1:5174/ |
 | 绿色源码基线 | `baseline/green-20261012`，提交 `419141e` |
-| 生产发布记录 | `20261013-012037`，构建源码 `a9e853fb9b84ddde1d212787560d0883d1f5d450`，见 [生产维护说明](ops/tencent/README.md) |
+| 生产发布记录 | `20261013-110949`，构建源码 `4623e55c6caae3356880dc81d5db98c64c34c60c`，见 [生产维护说明](ops/tencent/README.md) |
 
 源码标签、服务器发布号和数据库是三个独立对象。线上比对证据与核验范围在 [production-baseline.json](ops/tencent/production-baseline.json)。推送 GitHub 不会自动部署服务器，也不会同步数据库。2026-10-12 已将 `www` 解析切到上海；两套前端发布 `20261012-164700` 与新加坡后端的构建源码 `948c37f` 对齐，域名 HTTPS、管理端登录鉴权和证书自动续期已核验。旧新加坡 HTTP 入口保留兼容，日常使用上表 HTTPS 地址。正式支付宝仍未启用，代码和沙箱结果见 [支付宝接入记录](docs/alipay-web-payment.md)。
 
@@ -56,11 +56,13 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/local/stop.ps1
 - 数据库保存实际商品、上架状态、库存、订单和用户；配置与凭据私有保存。
 - `git pull` 只更新源码，目录文件需要显式导入，真实库存来自供货渠道。
 - 本地预览使用库存快照，不表示拥有真实卡密，不连接生产采购。
-- 11 款 ChatGPT 卡密（含 iOS）发货附 `https://cdkai.kdns.fr/` 兑换链接和自助充值指引，线上已应用；文案配置见 `docs/catalog/qzweb-redemption-guide.json`。
+- 11 款 ChatGPT 卡密（含 iOS）发货附 `https://cdk.bar/` 兑换链接和自助充值指引，线上已应用；文案配置见 `docs/catalog/qzweb-redemption-guide.json`。
 
 详见 [商品与购买流程](docs/self-service-storefront.md)、[供货接入](docs/ellaixshop-distribution.md) 和 [发布规则](docs/release-process.md)。生产库不得被本地预览库覆盖。
 
 后台 **用户管理 → 用户列表 → 用户详情 → 设置商品单价** 可直接为每位用户设置商品或规格的固定金额，登录后展示与下单计价一致；留空沿用现有价格。使用方法见 [按用户设置商品单价](docs/user-product-prices.md)。
+
+商城 **个人中心 → 我的钱包** 已支持 BEP20、Plasma 充值；后台 **用户详情 → 钱包明细** 可增加或扣减余额，首次使用需超级管理员本人完成现有声明。渠道配置、操作与验证范围见 [钱包充值与后台余额调整](docs/wallet-recharge.md)。
 
 ## 构建与来源
 

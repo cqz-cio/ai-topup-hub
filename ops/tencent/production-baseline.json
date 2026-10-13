@@ -1,20 +1,20 @@
 {
-  "checked_at": "2026-10-13T01:44:10.762739+08:00",
+  "checked_at": "2026-10-13T03:23:46.301337+00:00",
   "production_url": "https://www.qzweb.cloud/",
-  "documented_release_id": "20261013-012037",
-  "verified_release_id": "20261013-012037",
-  "previous_release_id": "20261012-153531",
-  "source_commit": "a9e853fb9b84ddde1d212787560d0883d1f5d450",
+  "documented_release_id": "20261013-110949",
+  "verified_release_id": "20261013-110949",
+  "previous_release_id": "20261013-012037",
+  "source_commit": "4623e55c6caae3356880dc81d5db98c64c34c60c",
   "source_branch": "main",
   "server_git_commit_verified": true,
-  "source_tag": "production/tencent-20261013-012037",
+  "source_tag": "production/tencent-20261013-110949",
   "production": {
-    "release_path": "/srv/zhixiang/releases/20261013-012037",
-    "running_executable": "/srv/zhixiang/releases/20261013-012037/zhixiang-shop",
-    "binary_bytes": 94548130,
-    "binary_sha256": "2e4ddf2f050143b6f02c6503b7b40f227450a8e2a6a592a1af14d653e63994fe",
-    "running_binary_sha256": "2e4ddf2f050143b6f02c6503b7b40f227450a8e2a6a592a1af14d653e63994fe",
-    "manifest_binary_sha256": "2e4ddf2f050143b6f02c6503b7b40f227450a8e2a6a592a1af14d653e63994fe",
+    "release_path": "/srv/zhixiang/releases/20261013-110949",
+    "running_executable": "/srv/zhixiang/releases/20261013-110949/zhixiang-shop",
+    "binary_bytes": 90415266,
+    "binary_sha256": "21c9637b9536f6ea912dd29fd87c5187ada946a4ea5b68ae74c51dcb38418a82",
+    "running_binary_sha256": "21c9637b9536f6ea912dd29fd87c5187ada946a4ea5b68ae74c51dcb38418a82",
+    "manifest_binary_sha256": "21c9637b9536f6ea912dd29fd87c5187ada946a4ea5b68ae74c51dcb38418a82",
     "build_info": {
       "go_version": "go1.26.5",
       "build_settings": [
@@ -27,8 +27,8 @@
         "GOOS=linux",
         "GOAMD64=v1",
         "vcs=git",
-        "vcs.revision=a9e853fb9b84ddde1d212787560d0883d1f5d450",
-        "vcs.time=2026-10-12T17:19:04Z",
+        "vcs.revision=4623e55c6caae3356880dc81d5db98c64c34c60c",
+        "vcs.time=2026-10-13T03:04:59Z",
         "vcs.modified=false"
       ],
       "git_metadata_pinned": true
@@ -42,19 +42,27 @@
       "stock_sync_timer": "active"
     },
     "redis_preserved_without_restart": true,
-    "backup": "/srv/zhixiang/backups/before-user-prices-20261013-012037",
+    "backup": "/srv/zhixiang/backups/before-wallet-20261013-110949-retry",
     "database_backup_quick_check": "ok",
-    "report_path": "/srv/zhixiang/shared/reports/user-prices-release-20261013-012037.json",
-    "configuration_unchanged": true,
+    "report_path": "/srv/zhixiang/shared/reports/wallet-release-20261013-110949.json",
+    "configuration_unchanged": false,
     "nginx_configuration_preserved": true,
-    "source_dirty": false
+    "source_dirty": false,
+    "private_configuration_unchanged": true,
+    "configuration_changes": [
+      "Existing channel IDs 1 and 2 payment_types changed from order to order,wallet."
+    ]
   },
   "payment": {
     "bep20": {
       "enabled": true,
       "recipient": "0x66a8bab15067eab1efc948ac03684f0397c8416f",
       "chain_id": 56,
-      "decimals": 18
+      "decimals": 18,
+      "payment_types": [
+        "order",
+        "wallet"
+      ]
     },
     "plasma": {
       "id": 2,
@@ -64,7 +72,11 @@
       "recipient": "0x66a8bab15067eab1efc948ac03684f0397c8416f",
       "chain_id": 9745,
       "token_contract": "0xb8ce59fc3717ada4c02eadf9682a9e934f625ebb",
-      "decimals": 6
+      "decimals": 6,
+      "payment_types": [
+        "order",
+        "wallet"
+      ]
     },
     "cny_per_usdt": "6.66",
     "confirmations": 15,
@@ -110,36 +122,34 @@
     "monitor_access_requires_existing_compliance_acknowledgement": true,
     "compliance_acknowledgement_preserved": true,
     "previous_detailed_verification_recorded_at": "2026-10-12T05:45:38.041686+00:00",
-    "current_release_verification_scope": "Public channels and database channel rows verified; configuration, role policies and compliance rows preserved. Prior RPC and finance API evidence was not repeated for this CSS-only release."
+    "current_release_verification_scope": "Both existing USDT channels now allow order and wallet. Local daily services verified unpaid recharge creation, exact chain payment details and manual balance adjustments. Mock-chain tests verified settlement, idempotency and expiry. Production channel rows, unchanged financial data, 437 frontend hashes and the authenticated administrator confirmation dialog were verified. Production acknowledgement was not submitted; no real payment or purchase was tested."
   },
   "pages": [
-    "https://www.qzweb.cloud/",
-    "https://www.qzweb.cloud/products/qzweb-4",
+    "https://www.qzweb.cloud/notice",
+    "https://www.qzweb.cloud/me/wallet",
     "https://124.220.2.69:18888/users"
   ],
   "verified_asset_sha256": {
-    "admin/assets/AdminLayout--gBStOb-.js": "ef6d3daae955ecd78b366dedb6ebcc4384bd77898b269b8d2a1738667ece08b7",
-    "admin/assets/AdminLayout-hQuMUW9A.css": "586d41aa7856f850f5ea88a434b89a111597c16cd51df017d666ffbe58cfb334",
-    "admin/assets/index-BovJh1VF.js": "a885c661351fd0aa5118b17c12983c41137ee22afcfea3a7340c4c09fd3778dd",
-    "admin/assets/index-DbM9Ft6U.js": "58eba0b0266d969a64ead9070eb98824a39d37b787974a476b96b0161a2b602c",
-    "admin/assets/index-FKeDju8L.css": "eb3d018fc9d71a41c78d0e72edc542f286f83d4fc91c110cfa561083a5675a3d",
-    "admin/assets/UserDetail-DxERPFcs.js": "db068b3cb269a64e29174576671facea4393125d56677d0a2f85ff62241d70fa",
-    "admin/index.html": "8975ad1cc139f5019c32bc62ecd7561f5d3213b94b14f5c152e6b4a556056cc5",
-    "user/assets/Cart-BGTz1GRt.js": "4dede589162acd79c9be3b53b0b025028ecc847c4ea7a17008177fb2e5d99194",
-    "user/assets/Cart-BuvG_Fk4.js": "76ef4507ee59fc380af522a2d44f1791916260627e567db4787685c321e7f7ff",
-    "user/assets/Cart-Cj9pM7PQ.css": "2f0a82b34df269829f9cf539560ad7d929b1bbdcb638ad06bbe11d65eb5274da",
-    "user/assets/index-BD-AVwxy.js": "5900aba45d6799c9487f8513503be499b5b5c63dca8da79db372c09a97459d5f",
-    "user/assets/index-Cc_6as7e.css": "70832b98e94cd24099268c21a7dc5c2736ff1a1069586d2f64dd6c9e9dcb93bf",
-    "user/assets/index-DRgQeIze.js": "fbcda5b92cf65cb671326df72abcce711399d6d68647ec8e261b797aa8f8bdf8",
-    "user/assets/index-mEN1y8s4.js": "97cd88cc2ab8a44103aee272c257af3d977b9e2164491aa6f75983b37b9a3c5e",
-    "user/assets/useCheckout-BaiH7Y67.js": "b3e3fba26a428a6c38e70c5aba55a766e39c2d1cf865666fac2dee3bc5830d4c",
-    "user/assets/useProductDetail-D96-XI11.js": "39848d8330f8552b75223405d4b84afc1a946de7c8ca28d7a806fdcb18da9912",
-    "user/index.html": "5ef55885f87dfeb2487b89735d282f83a0a674da59b459008035ee6243bb9a56"
+    "admin/assets/ComplianceGuardWrapper-CVy3v2n1.css": "4b788d978cd929dfbf8cccd2abbc64eb273a6bf0f0d12e3ea7b3ce4c879f7b68",
+    "admin/assets/UserDetail-kRJe5t-h.js": "46349f4c07a140269d51acd3c77a9e49b68e1f1a7a03205f81dba99275606e3f",
+    "admin/assets/Wallet-B1PC7WiM.js": "820e86947e53892431d43d2f29d1298b1e3bae12bd2a92e7368439067b867e84",
+    "admin/assets/index--n4s4ELt.js": "e441f702788539e1be8b6c8ddfbb7c9f7672a5d7171488ffc59fbfa769c03e69",
+    "admin/assets/index-BawXUzGu.css": "0d0c28f6203a27b45cc6768038af08d0cae9f29af4b1cb248723af581f2aa943",
+    "admin/assets/index-y8jG2zkA.js": "32803ca383fac49b39f620918f675d15f30dfdef94ab125528afa618d7156267",
+    "admin/index.html": "b7d9a6c8590ad4a8d167d356601b73f52395d5e6abc8a48dcf81ba4f13999fbf",
+    "user/assets/RechargeOrderDetail-BJYwJ4HJ.js": "40239beb6e564a9656053ed57bc7ca4023d1a0d56631cf1c757909d50f13ec5a",
+    "user/assets/RechargeOrderDetail-BXjo9Bqq.js": "e275dd4f2a1c332c1e0e2ffd7e0fdc590acebf22f66ea71f51b0dc1bff2dc31d",
+    "user/assets/index-CA_m4_yF.js": "4631e51d9d19ed5d9bfd9f14e14a802c52631467679df82eaee26bcdf85c9d78",
+    "user/assets/index-VHjQQDXI.css": "adc411e77e3ade5dc5e90c30d8bcc82d57c4062fd215ecb592dc66070383cce9",
+    "user/assets/index-_xIkVAiD.js": "2e2fbe0fddeca6ae28aee5f2d916f82c9fa61b53514319f99d06ff228e501d66",
+    "user/assets/index-kL9E2DQx.js": "f567096d6e9b92253027a8d94444eb7fcd14b4a2bec13dcaf74e55fff912d3c0",
+    "user/assets/useRechargeOrderDetail-B4UECo9-.js": "be7f52a63fdb9a0c4bd0cf50b2de10529f50342fd9560996f37febc6964c131b",
+    "user/index.html": "4f6280af7fdb314c46df8316b869be8deb6da7d9b47f904aea2706d4d06176b5"
   },
   "public_verification": {
-    "checked_at": "2026-10-13T01:44:10.762739+08:00",
+    "checked_at": "2026-10-13T03:23:46.301337+00:00",
     "passed": true,
-    "browser_cases_passed": 9,
+    "browser_cases_passed": 5,
     "viewports": [
       1920,
       390,
@@ -149,7 +159,11 @@
     "blocked_writes": 0,
     "global_prices_preserved": true,
     "real_orders_submitted": 0,
-    "real_payment_or_purchase_submitted": false
+    "real_payment_or_purchase_submitted": false,
+    "administrator_confirmation_dialog_verified": true,
+    "production_acknowledgement_submitted": false,
+    "production_balances_modified": false,
+    "verification_directory": "work/codex-runtime/wallet-repair-qa/"
   },
   "catalog": {
     "prices_unchanged": true,
@@ -234,7 +248,7 @@
     "content_preserved_by_release": "20261012-153531"
   },
   "source_identity_verification": {
-    "source_commit": "a9e853fb9b84ddde1d212787560d0883d1f5d450",
+    "source_commit": "4623e55c6caae3356880dc81d5db98c64c34c60c",
     "source_branch": "main",
     "source_dirty": false,
     "binary_build_info_commit_matches": true,
@@ -242,8 +256,8 @@
     "frontend_files_sha256_verified": 437
   },
   "previous_release": {
-    "release": "20261012-153531",
-    "source_commit": "948c37f2d33420631eb77a75d3c1debe40d967b6",
+    "release": "20261013-012037",
+    "source_commit": "a9e853fb9b84ddde1d212787560d0883d1f5d450",
     "retained": true
   },
   "domain_verification": {
@@ -254,8 +268,8 @@
       "url": "https://www.qzweb.cloud/",
       "status": 200,
       "final_url": "https://www.qzweb.cloud/",
-      "sha256": "33da431f05f1721822c2a62a509bba1582206ff478a58a8381a598e02299179b",
-      "checked_at": "2026-10-12T08:53:32.669735+00:00",
+      "sha256": "4f6280af7fdb314c46df8316b869be8deb6da7d9b47f904aea2706d4d06176b5",
+      "checked_at": "2026-10-13T03:23:46.301337+00:00",
       "serves_deployed_frontend": true,
       "browser_confirmed_legacy_shop": false
     },
@@ -293,12 +307,12 @@
   "previous_build_verification_at": "2026-10-12T08:19:31.766441+00:00",
   "management_url": "https://124.220.2.69:18888/login",
   "frontend_gateway": {
-    "checked_at": "2026-10-13T01:44:10.762739+08:00",
+    "checked_at": "2026-10-13T03:13:58.019880+00:00",
     "frontend_host": "124.220.2.69",
     "backend_host": "43.134.141.10",
-    "frontend_release": "20261013-012037",
-    "source_commit": "a9e853fb9b84ddde1d212787560d0883d1f5d450",
-    "archive_sha256": "1da640681eec7388e10682ae26c060b67ca84527e4f84d0cde469973726dd51c",
+    "frontend_release": "20261013-110949",
+    "source_commit": "4623e55c6caae3356880dc81d5db98c64c34c60c",
+    "archive_sha256": "9647abba04a9f957c3a92870078b88993295d5322df04d0faeeca8bdf64fed61",
     "static_files_verified": 437,
     "storefront_url": "https://www.qzweb.cloud/",
     "management_url": "https://124.220.2.69:18888/login",
@@ -315,8 +329,8 @@
     "certificate_renewal_verified": true,
     "certificate_timer": "qzweb-certificates.timer",
     "certificate_renewal_report": "/srv/zhixiang-front/shared/work/renew-final-20261012-1644/status.json",
-    "report_path": "/srv/zhixiang-front/shared/work/user-prices-release-20261013-012037.json",
-    "backend_report_path": "/srv/zhixiang/shared/reports/user-prices-release-20261013-012037.json",
+    "report_path": "/srv/zhixiang-front/shared/work/wallet-release-20261013-110949.json",
+    "backend_report_path": "/srv/zhixiang/shared/reports/wallet-release-20261013-110949.json",
     "formal_alipay_enabled": false,
     "database_uploaded": false,
     "legacy_singapore_http_entries_retained": true,
@@ -329,12 +343,17 @@
       "browser_current_frontend_confirmed": true,
       "report_path": "/srv/zhixiang-front/shared/work/entry-cache-report.json"
     },
-    "previous_frontend_release": "20261012-235241",
-    "storefront_source_commit": "a9e853fb9b84ddde1d212787560d0883d1f5d450",
-    "admin_source_commit": "a9e853fb9b84ddde1d212787560d0883d1f5d450",
-    "backup": "/srv/zhixiang-front/backups/before-user-prices-20261013-012037",
+    "previous_frontend_release": "20261013-012037",
+    "storefront_source_commit": "4623e55c6caae3356880dc81d5db98c64c34c60c",
+    "admin_source_commit": "4623e55c6caae3356880dc81d5db98c64c34c60c",
+    "backup": "/srv/zhixiang-front/backups/before-wallet-20261013-110949",
     "frontend_only_update": false,
-    "previous_hashed_assets_retained": true
+    "previous_hashed_assets_retained": true,
+    "verified_services": {
+      "nginx": "active",
+      "zhixiang-api-tunnel.service": "active",
+      "qzweb-certificates.timer": "active"
+    }
   },
   "alipay": {
     "code_and_official_sandbox_query_verified": true,
@@ -557,5 +576,42 @@
     "local_database_uploaded": false,
     "real_payment_or_purchase_submitted": false,
     "verification_directory": "work/codex-runtime/notice-post-qa/"
+  },
+  "wallet_repair": {
+    "checked_at": "2026-10-13T03:23:46.301337+00:00",
+    "release": "20261013-110949",
+    "source_commit": "4623e55c6caae3356880dc81d5db98c64c34c60c",
+    "documentation": "docs/wallet-recharge.md",
+    "enabled_wallet_channel_ids": [
+      1,
+      2
+    ],
+    "local_admin_tests_passed": 52,
+    "local_user_tests_passed": 97,
+    "payment_wallet_authorization_architecture_go_regressions_passed": true,
+    "both_frontend_typechecks_and_production_builds_passed": true,
+    "local_daily_endpoints_verified": [
+      "8080",
+      "5173",
+      "5174"
+    ],
+    "local_manual_balance_credit_debit_and_ledger_verified": true,
+    "local_both_chain_unpaid_recharge_pages_verified": true,
+    "mock_chain_settlement_idempotency_expiry_verified": true,
+    "local_temporary_users_and_financial_records_removed": true,
+    "production_read_only_browser_checks_passed": 5,
+    "production_frontend_files_verified": 437,
+    "production_financial_records_prices_and_private_configuration_preserved": true,
+    "production_compliance_acknowledgement_preserved": true,
+    "production_acknowledgement_submitted": false,
+    "production_admin_confirmation_dialog_verified": true,
+    "redis_preserved_without_restart": true,
+    "local_database_uploaded": false,
+    "production_test_balance_changes": false,
+    "real_payment_or_purchase_submitted": false,
+    "backend_backup": "/srv/zhixiang/backups/before-wallet-20261013-110949-retry",
+    "frontend_backup": "/srv/zhixiang-front/backups/before-wallet-20261013-110949",
+    "verification_directory": "work/codex-runtime/wallet-repair-qa/",
+    "release_evidence_directory": "work/codex-runtime/wallet-release/"
   }
 }
