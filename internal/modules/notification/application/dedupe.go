@@ -3,6 +3,7 @@ package application
 import (
 	"context"
 	"crypto/sha1"
+	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
 	"sort"
@@ -12,6 +13,7 @@ import (
 	"github.com/dujiao-next/internal/cache"
 	"github.com/dujiao-next/internal/constants"
 	"github.com/dujiao-next/internal/modules/notification/application/format"
+	"github.com/dujiao-next/internal/modules/notification/contract"
 	settingsmessaging "github.com/dujiao-next/internal/modules/settings/schema/messaging"
 	"github.com/dujiao-next/internal/queue"
 )
@@ -118,4 +120,57 @@ func resolvePaymentOrderAlertTypeKey(data map[string]interface{}) string {
 		return normalized
 	}
 	return ""
+}
+
+func isSaleNotification(payload queue.NotificationDispatchPayload) bool {
+	return payload.EventType == constants.NotificationEventOrderPaidSuccess &&
+		payload.BizType == constants.NotificationBizTypeOrder && payload.BizID > 0
+}
+
+// A supplier balance changes between attempts. Delivery identity therefore uses
+// the order and recipient, not the rendered body or the balance query timestamp.
+func (s *Service) sendNotification(ctx context.Context, payload queue.NotificationDispatchPayload, attempt notificationSendAttempt, send func() error) error {
+	if isSaleNotification(payload) && !payload.Force {
+		signature := fmt.Sprintf("%s|%s|%d|%s|%s", payload.EventType, payload.BizType, payload.BizID, attempt.channel, strings.TrimSpace(attempt.recipient))
+		key := fmt.Sprintf("notification:sale:%x", sha256.Sum256([]byte(signature)))
+		delivered, err := s.logService.HasSuccessfulDelivery(payload.EventType, payload.BizType, payload.BizID, attempt.channel, attempt.recipient)
+		if err != nil || delivered {
+			return err
+		}
+		cached, err := cache.GetString(ctx, key+":sent")
+		if err != nil || cached == "1" {
+			return err
+		}
+		locked, err := cache.SetNX(ctx, key+":sending", "1", 2*time.Minute)
+		if err != nil {
+			return err
+		}
+		if !locked {
+			return contract.ErrDeliveryBusy
+		}
+		defer func() {
+			cleanupCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 5*time.Second)
+			defer cancel()
+			_ = cache.Del(cleanupCtx, key+":sending")
+		}()
+		// Another worker may have finished between the first lookup and our lock.
+		delivered, err = s.logService.HasSuccessfulDelivery(payload.EventType, payload.BizType, payload.BizID, attempt.channel, attempt.recipient)
+		if err != nil || delivered {
+			return err
+		}
+		cached, err = cache.GetString(ctx, key+":sent")
+		if err != nil || cached == "1" {
+			return err
+		}
+		attempt.sendErr = send()
+		if attempt.sendErr == nil {
+			// The database log remains the durable receipt; this also covers a
+			// temporary log-write failure after SMTP has accepted the message.
+			_ = cache.SetString(ctx, key+":sent", "1", 7*24*time.Hour)
+		}
+	} else {
+		attempt.sendErr = send()
+	}
+	s.recordSendAttempt(attempt)
+	return attempt.sendErr
 }

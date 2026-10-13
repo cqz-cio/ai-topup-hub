@@ -23,6 +23,16 @@ type EmailSender interface {
 	SendCustomEmail(toEmail, subject, body string) error
 }
 
+// SaleSummaryReader reads procurement results and current supplier balances;
+// it must never submit or retry a purchase.
+type SaleSummaryReader interface {
+	Build(context.Context, uint, string, bool) (map[string]interface{}, error)
+}
+
+type SuccessfulDeliveryReader interface {
+	HasSuccessfulDelivery(eventType, bizType string, bizID uint, channel, recipient string) (bool, error)
+}
+
 // OrderStatusEmailInput carries the order facts required to render an email.
 type OrderStatusEmailInput struct {
 	OrderNo           string

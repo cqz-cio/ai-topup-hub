@@ -3,6 +3,7 @@ package application
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/dujiao-next/internal/constants"
@@ -14,6 +15,8 @@ import (
 	"github.com/dujiao-next/internal/shared/jsonmap"
 	"github.com/dujiao-next/internal/shared/outboundctx"
 )
+
+var saleSummaryVariable = regexp.MustCompile(`\{\{\s*upstream_summary\s*\}\}`)
 
 func detachOutboundRequestContext(parent context.Context) (context.Context, context.CancelFunc) {
 	return outboundctx.Detach(parent, outboundctx.DefaultTimeout)
@@ -126,7 +129,7 @@ func (s *Service) SendTest(ctx context.Context, input contract.TestSendInput) er
 }
 
 func (s *Service) dispatchSingleEvent(ctx context.Context, setting settingsmessaging.NotificationCenterSetting, payload queue.NotificationDispatchPayload) error {
-	if !payload.Force {
+	if !payload.Force && !isSaleNotification(payload) {
 		ok, err := acquireNotificationDedupe(ctx, setting.DedupeTTLSeconds, payload)
 		if err != nil {
 			logger.Warnw("notification_dedupe_failed", "event_type", payload.EventType, "error", err)
@@ -141,6 +144,11 @@ func (s *Service) dispatchSingleEvent(ctx context.Context, setting settingsmessa
 	variables := format.BuildTemplateVariables(payload)
 	title := format.RenderTemplate(template.Title, variables)
 	body := format.RenderTemplate(template.Body, variables)
+	if isSaleNotification(payload) && !saleSummaryVariable.MatchString(template.Body) {
+		if summary, ok := variables["upstream_summary"].(string); ok && strings.TrimSpace(summary) != "" {
+			body = strings.TrimSpace(body) + "\n\n" + summary
+		}
+	}
 	if strings.TrimSpace(body) == "" {
 		body = title
 	}
@@ -151,13 +159,7 @@ func (s *Service) dispatchSingleEvent(ctx context.Context, setting settingsmessa
 	var firstErr error
 	if setting.Channels.Email.Enabled && len(setting.Channels.Email.Recipients) > 0 {
 		for _, recipient := range setting.Channels.Email.Recipients {
-			var sendErr error
-			if s.emailService == nil {
-				sendErr = contract.ErrSendFailed
-			} else {
-				sendErr = s.emailService.SendCustomEmail(recipient, title, body)
-			}
-			s.recordSendAttempt(notificationSendAttempt{
+			sendErr := s.sendNotification(ctx, payload, notificationSendAttempt{
 				eventType: payload.EventType,
 				bizType:   payload.BizType,
 				bizID:     payload.BizID,
@@ -167,7 +169,11 @@ func (s *Service) dispatchSingleEvent(ctx context.Context, setting settingsmessa
 				title:     title,
 				body:      body,
 				variables: variables,
-				sendErr:   sendErr,
+			}, func() error {
+				if s.emailService == nil {
+					return contract.ErrSendFailed
+				}
+				return s.emailService.SendCustomEmail(recipient, title, body)
 			})
 			if sendErr != nil {
 				logger.Warnw("notification_email_send_failed",
@@ -186,13 +192,7 @@ func (s *Service) dispatchSingleEvent(ctx context.Context, setting settingsmessa
 	if setting.Channels.Telegram.Enabled && len(setting.Channels.Telegram.Recipients) > 0 {
 		message := format.ComposePlainTextMessage(title, body)
 		for _, recipient := range setting.Channels.Telegram.Recipients {
-			var sendErr error
-			if s.telegramSender == nil {
-				sendErr = contract.ErrSendFailed
-			} else {
-				sendErr = s.telegramSender.SendMessage(ctx, recipient, message)
-			}
-			s.recordSendAttempt(notificationSendAttempt{
+			sendErr := s.sendNotification(ctx, payload, notificationSendAttempt{
 				eventType: payload.EventType,
 				bizType:   payload.BizType,
 				bizID:     payload.BizID,
@@ -202,7 +202,11 @@ func (s *Service) dispatchSingleEvent(ctx context.Context, setting settingsmessa
 				title:     title,
 				body:      body,
 				variables: variables,
-				sendErr:   sendErr,
+			}, func() error {
+				if s.telegramSender == nil {
+					return contract.ErrSendFailed
+				}
+				return s.telegramSender.SendMessage(ctx, recipient, message)
 			})
 			if sendErr != nil {
 				logger.Warnw("notification_telegram_send_failed",
@@ -221,20 +225,7 @@ func (s *Service) dispatchSingleEvent(ctx context.Context, setting settingsmessa
 	if setting.Channels.Feishu.Enabled && len(setting.Channels.Feishu.Recipients) > 0 {
 		message := format.ComposePlainTextMessage(title, body)
 		for _, recipient := range setting.Channels.Feishu.Recipients {
-			var sendErr error
-			if s.feishuSender == nil {
-				sendErr = contract.ErrSendFailed
-			} else {
-				sendErr = s.feishuSender.SendMessage(
-					ctx,
-					setting.Channels.Feishu.AppID,
-					setting.Channels.Feishu.AppSecret,
-					setting.Channels.Feishu.ReceiveIDType,
-					recipient,
-					message,
-				)
-			}
-			s.recordSendAttempt(notificationSendAttempt{
+			sendErr := s.sendNotification(ctx, payload, notificationSendAttempt{
 				eventType: payload.EventType,
 				bizType:   payload.BizType,
 				bizID:     payload.BizID,
@@ -244,7 +235,12 @@ func (s *Service) dispatchSingleEvent(ctx context.Context, setting settingsmessa
 				title:     title,
 				body:      body,
 				variables: variables,
-				sendErr:   sendErr,
+			}, func() error {
+				if s.feishuSender == nil {
+					return contract.ErrSendFailed
+				}
+				return s.feishuSender.SendMessage(ctx, setting.Channels.Feishu.AppID,
+					setting.Channels.Feishu.AppSecret, setting.Channels.Feishu.ReceiveIDType, recipient, message)
 			})
 			if sendErr != nil {
 				logger.Warnw("notification_feishu_send_failed",

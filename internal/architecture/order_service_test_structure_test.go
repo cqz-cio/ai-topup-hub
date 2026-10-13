@@ -45,8 +45,8 @@ func TestOrderServiceTestsAreSplitByResponsibility(t *testing.T) {
 		},
 		filepath.Join(applicationDirectory, "order_service_pricing_test.go"): {
 			"assertBuildOrderResultRejectsPurchaseQuantity", "TestBuildOrderResultRejectsZeroPromotionPrice",
-			"TestPreviewOrderAppliesMemberDiscountForManualProductBeforeFormCompleted",
-			"TestBuildOrderResultStacksPromotionAndMemberDiscount",
+			"TestPreviewOrderAppliesFixedMemberPriceForManualProductBeforeFormCompleted",
+			"TestBuildOrderResultUsesFixedMemberPriceWithoutStackingRate",
 			"TestBuildOrderResultRejectsProductMaxPurchaseQuantityExceeded",
 			"TestBuildOrderResultRejectsProductMinPurchaseQuantityNotMet",
 			"TestBuildOrderResultOriginalAmountBeforePromotion",

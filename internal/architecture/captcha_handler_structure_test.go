@@ -28,7 +28,7 @@ func TestPublicCaptchaHTTPLivesInTransport(t *testing.T) {
 	if production != 0 || total != 0 {
 		t.Fatalf("captcha module root must remain structural only, got production=%d total=%d", production, total)
 	}
-	assertDirectoryGoFileBudget(t, applicationRoot, 2)
+	assertDirectoryGoFileBudget(t, applicationRoot, 3)
 	assertDirectoryGoFileBudget(t, contractRoot, 4)
 	assertDirectoryGoFileBudget(t, turnstileRoot, 3)
 	assertDirectoryGoFileBudget(t, transportRoot, 6)

@@ -24,6 +24,15 @@ func (r *LogStore) Create(log *domain.NotificationLog) error {
 	return r.db.Create(log).Error
 }
 
+func (r *LogStore) HasSuccessfulDelivery(eventType, bizType string, bizID uint, channel, recipient string) (bool, error) {
+	var count int64
+	err := r.db.Model(&domain.NotificationLog{}).
+		Where("event_type = ? AND biz_type = ? AND biz_id = ? AND channel = ? AND recipient = ? AND status = ? AND is_test = ?",
+			eventType, bizType, bizID, channel, recipient, "success", false).
+		Limit(1).Count(&count).Error
+	return count > 0, err
+}
+
 // ListAdmin 管理端查询通知日志
 func (r *LogStore) ListAdmin(filter contract.LogListFilter) ([]domain.NotificationLog, int64, error) {
 	query := r.db.Model(&domain.NotificationLog{})

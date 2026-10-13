@@ -40,6 +40,17 @@ func NewLogService(repo contract.LogRepository) *LogService {
 	return &LogService{repo: repo}
 }
 
+func (s *LogService) HasSuccessfulDelivery(eventType, bizType string, bizID uint, channel, recipient string) (bool, error) {
+	if s == nil {
+		return false, nil
+	}
+	reader, ok := s.repo.(contract.SuccessfulDeliveryReader)
+	if !ok {
+		return false, nil
+	}
+	return reader.HasSuccessfulDelivery(eventType, bizType, bizID, channel, recipient)
+}
+
 // Record 记录通知发送日志
 func (s *LogService) Record(input LogRecordInput) error {
 	if s == nil || s.repo == nil {
