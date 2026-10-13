@@ -14,4 +14,6 @@ var (
 	ErrEmailServiceDisabled   = errors.New("email service disabled")
 	ErrEmailNotConfigured     = errors.New("email service not configured")
 	ErrEmailRecipientRejected = errors.New("email recipient rejected")
+	ErrProcurementPending     = errors.New("sale notification is waiting for procurement")
+	ErrDeliveryBusy           = errors.New("notification delivery is already in progress")
 )

@@ -48,7 +48,7 @@ func TestMemberLevelImplementationLivesInBoundedContextDirectories(t *testing.T)
 	assertDirectoryGoFileBudget(t, storeRoot, 6)
 	assertDirectoryGoFileBudget(t, transportRoot, 5)
 	assertDirectoryGoFileBudget(t, presenterRoot, 2)
-	assertDirectoryGoFileBudget(t, integrationTestRoot, 3)
+	assertDirectoryGoFileBudget(t, integrationTestRoot, 4)
 }
 
 func TestMemberLevelLegacyFlatFilesStayRemoved(t *testing.T) {

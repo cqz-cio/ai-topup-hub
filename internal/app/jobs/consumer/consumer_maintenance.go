@@ -3,10 +3,13 @@ package consumer
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"strings"
 	"time"
 
+	"github.com/dujiao-next/internal/constants"
 	"github.com/dujiao-next/internal/logger"
+	notificationcontract "github.com/dujiao-next/internal/modules/notification/contract"
 	"github.com/dujiao-next/internal/queue"
 
 	"github.com/hibiken/asynq"
@@ -31,7 +34,26 @@ func (c *Consumer) handleNotificationDispatch(ctx context.Context, task *asynq.T
 		logger.Debugw("worker_notification_dispatch_skip_empty_event")
 		return nil
 	}
+	// Waiting for a purchase must not consume SMTP retry attempts or acquire a
+	// notification delivery lock. Requeue only the read-only notification task.
+	if payload.EventType == constants.NotificationEventOrderPaidSuccess && payload.BizType == constants.NotificationBizTypeOrder {
+		if payload.Data == nil {
+			payload.Data = map[string]interface{}{}
+		}
+		started, _ := payload.Data["sale_wait_started_at"].(string)
+		waitStarted, parseErr := time.Parse(time.RFC3339Nano, started)
+		if parseErr != nil {
+			waitStarted = time.Now()
+			payload.Data["sale_wait_started_at"] = waitStarted.Format(time.RFC3339Nano)
+		}
+		if time.Since(waitStarted) >= 10*time.Minute {
+			payload.Data["sale_wait_timeout"] = true
+		}
+	}
 	if err := c.NotificationService.Dispatch(ctx, payload); err != nil {
+		if errors.Is(err, notificationcontract.ErrProcurementPending) && c.QueueClient != nil {
+			return c.QueueClient.EnqueueNotificationDispatch(payload, asynq.ProcessIn(15*time.Second), asynq.MaxRetry(5))
+		}
 		logger.Warnw("worker_notification_dispatch_failed",
 			"event_type", payload.EventType,
 			"biz_type", payload.BizType,

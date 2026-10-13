@@ -42,3 +42,38 @@ func TestLogStoreListAdminFiltersStatusChannelAndTestFlag(t *testing.T) {
 		t.Fatalf("unexpected result total=%d rows=%#v", total, rows)
 	}
 }
+
+func TestSuccessfulDeliveryReceiptIsScopedToOrderChannelAndRecipient(t *testing.T) {
+	db, err := gorm.Open(sqlite.Open(fmt.Sprintf("file:sale_receipts_%d?mode=memory&cache=shared", time.Now().UnixNano())), &gorm.Config{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := db.AutoMigrate(&domain.NotificationLog{}); err != nil {
+		t.Fatal(err)
+	}
+	store := gormstore.NewLogStore(db)
+	for _, item := range []domain.NotificationLog{
+		{EventType: "order_paid_success", BizType: "order", BizID: 10, Channel: "email", Recipient: "owner@example.com", Status: "failed"},
+		{EventType: "order_paid_success", BizType: "order", BizID: 10, Channel: "email", Recipient: "owner@example.com", Status: "success", IsTest: true},
+		{EventType: "order_paid_success", BizType: "order", BizID: 11, Channel: "email", Recipient: "owner@example.com", Status: "success"},
+	} {
+		if err := store.Create(&item); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if found, err := store.HasSuccessfulDelivery("order_paid_success", "order", 10, "email", "owner@example.com"); err != nil || found {
+		t.Fatalf("test/failed/other-order receipts must not suppress delivery: %v %v", found, err)
+	}
+	if err := store.Create(&domain.NotificationLog{EventType: "order_paid_success", BizType: "order", BizID: 10, Channel: "email", Recipient: "owner@example.com", Status: "success"}); err != nil {
+		t.Fatal(err)
+	}
+	if found, err := store.HasSuccessfulDelivery("order_paid_success", "order", 10, "email", "owner@example.com"); err != nil || !found {
+		t.Fatalf("missing successful receipt: %v %v", found, err)
+	}
+	if found, err := store.HasSuccessfulDelivery("order_paid_success", "order", 10, "email", "backup@example.com"); err != nil || found {
+		t.Fatalf("recipient receipt leaked: %v %v", found, err)
+	}
+	if found, err := store.HasSuccessfulDelivery("order_paid_success", "order", 10, "telegram", "owner@example.com"); err != nil || found {
+		t.Fatalf("channel receipt leaked: %v %v", found, err)
+	}
+}

@@ -19,6 +19,11 @@ type Service struct {
 	logService     *LogService
 	telegramSender contract.TelegramSender
 	feishuSender   contract.FeishuSender
+	saleSummary    contract.SaleSummaryReader
+}
+
+func (s *Service) SetSaleSummaryReader(reader contract.SaleSummaryReader) {
+	s.saleSummary = reader
 }
 
 // NewService 创建通知中心服务。
@@ -83,6 +88,24 @@ func (s *Service) Dispatch(ctx context.Context, payload queue.NotificationDispat
 
 	if eventType == constants.NotificationEventExceptionAlertCheck {
 		return s.dispatchExceptionAlertCheck(ctx, setting, payload)
+	}
+	if eventType == constants.NotificationEventOrderPaidSuccess && payload.BizID > 0 &&
+		payload.BizType == constants.NotificationBizTypeOrder && s.saleSummary != nil &&
+		((setting.Channels.Email.Enabled && len(setting.Channels.Email.Recipients) > 0) ||
+			(setting.Channels.Telegram.Enabled && len(setting.Channels.Telegram.Recipients) > 0) ||
+			(setting.Channels.Feishu.Enabled && len(setting.Channels.Feishu.Recipients) > 0)) {
+		allowPending, _ := payload.Data["sale_wait_timeout"].(bool)
+		variables, err := s.saleSummary.Build(ctx, payload.BizID, format.ResolveLocale(payload.Locale, setting.DefaultLocale), allowPending)
+		if err != nil {
+			return err
+		}
+		payload.Data = format.CloneVariables(payload.Data)
+		if payload.Data == nil {
+			payload.Data = map[string]interface{}{}
+		}
+		for key, value := range variables {
+			payload.Data[key] = value
+		}
 	}
 	return s.dispatchSingleEvent(ctx, setting, payload)
 }

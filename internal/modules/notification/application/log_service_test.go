@@ -248,3 +248,110 @@ func TestServiceDispatchSingleEventSendsFeishuAndRecordsEachRecipient(t *testing
 		t.Fatalf("unexpected feishu log statuses: %#v", statuses)
 	}
 }
+
+type saleSummaryStub struct {
+	err     error
+	calls   int
+	summary string
+}
+
+func (s *saleSummaryStub) Build(context.Context, uint, string, bool) (map[string]interface{}, error) {
+	s.calls++
+	return map[string]interface{}{"upstream_summary": s.summary}, s.err
+}
+
+type saleEmailStub struct {
+	calls  map[string]int
+	bodies []string
+	fail   string
+}
+
+func (s *saleEmailStub) SendCustomEmail(recipient, _, body string) error {
+	s.calls[recipient]++
+	s.bodies = append(s.bodies, body)
+	if recipient == s.fail {
+		return errors.New("temporary SMTP failure")
+	}
+	return nil
+}
+
+type saleLogStub struct{ notificationLogRepositoryStub }
+
+func (s *saleLogStub) HasSuccessfulDelivery(event, biz string, id uint, channel, recipient string) (bool, error) {
+	for _, item := range s.items {
+		if item.EventType == event && item.BizType == biz && item.BizID == id && item.Channel == channel && item.Recipient == recipient && item.Status == "success" && !item.IsTest {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+func TestSaleNotificationCombinesBalanceAndRetriesOnlyFailedRecipient(t *testing.T) {
+	setting := settingsmessaging.NotificationCenterDefaultSetting()
+	setting.Channels.Email = settingsmessaging.NotificationChannelSetting{Enabled: true, Recipients: []string{"owner@example.com", "backup@example.com"}}
+	setting.Templates.OrderPaidSuccess.ZHCN.Body = "订单 {{order_no}}，实收 {{amount}} CNY"
+	email := &saleEmailStub{calls: map[string]int{}, fail: "backup@example.com"}
+	logs := &saleLogStub{}
+	s := NewService(notificationSettingsStub{notification: setting}, email, nil, nil, NewLogService(logs), nil, nil)
+	reader := &saleSummaryStub{err: contract.ErrProcurementPending, summary: "采购 33.00 CNY；剩余余额 67.00 CNY"}
+	s.SetSaleSummaryReader(reader)
+	payload := queue.NotificationDispatchPayload{EventType: constants.NotificationEventOrderPaidSuccess, BizType: constants.NotificationBizTypeOrder, BizID: 7, Data: map[string]interface{}{"order_no": "SALE-7", "amount": "50.00"}}
+	if err := s.Dispatch(context.Background(), payload); !errors.Is(err, contract.ErrProcurementPending) {
+		t.Fatal(err)
+	}
+	if len(email.calls) != 0 {
+		t.Fatal("email sent before procurement was ready")
+	}
+	reader.err = nil
+	if err := s.Dispatch(context.Background(), payload); err == nil {
+		t.Fatal("SMTP failure must remain retryable")
+	}
+	if !strings.Contains(email.bodies[0], "SALE-7") || !strings.Contains(email.bodies[0], "67.00 CNY") {
+		t.Fatal(email.bodies)
+	}
+	email.fail = ""
+	reader.summary = "采购 33.00 CNY；剩余余额 60.00 CNY"
+	if err := s.Dispatch(context.Background(), payload); err != nil {
+		t.Fatal(err)
+	}
+	if email.calls["owner@example.com"] != 1 || email.calls["backup@example.com"] != 2 {
+		t.Fatal(email.calls)
+	}
+	if err := s.Dispatch(context.Background(), payload); err != nil {
+		t.Fatal(err)
+	}
+	if email.calls["owner@example.com"] != 1 || email.calls["backup@example.com"] != 2 {
+		t.Fatal("duplicate task resent sale email")
+	}
+	if _, ok := payload.Data["upstream_summary"]; ok {
+		t.Fatal("dispatch mutated original task payload")
+	}
+}
+
+func TestSaleSummaryPlaceholderDoesNotAppendTwice(t *testing.T) {
+	setting := settingsmessaging.NotificationCenterDefaultSetting()
+	setting.Channels.Email = settingsmessaging.NotificationChannelSetting{Enabled: true, Recipients: []string{"owner@example.com"}}
+	setting.Templates.OrderPaidSuccess.ZHCN.Body = "{{order_no}}\n{{ upstream_summary }}"
+	email := &saleEmailStub{calls: map[string]int{}}
+	s := NewService(notificationSettingsStub{notification: setting}, email, nil, nil, nil, nil, nil)
+	s.SetSaleSummaryReader(&saleSummaryStub{summary: "余额 67.00 CNY"})
+	if err := s.Dispatch(context.Background(), queue.NotificationDispatchPayload{EventType: constants.NotificationEventOrderPaidSuccess, BizType: constants.NotificationBizTypeOrder, BizID: 8}); err != nil {
+		t.Fatal(err)
+	}
+	if strings.Count(email.bodies[0], "67.00") != 1 {
+		t.Fatal(email.bodies)
+	}
+}
+
+func TestDisabledSaleNotificationsDoNotQuerySupplier(t *testing.T) {
+	setting := settingsmessaging.NotificationCenterDefaultSetting()
+	reader := &saleSummaryStub{err: contract.ErrProcurementPending}
+	s := NewService(notificationSettingsStub{notification: setting}, nil, nil, nil, nil, nil, nil)
+	s.SetSaleSummaryReader(reader)
+	if err := s.Dispatch(context.Background(), queue.NotificationDispatchPayload{EventType: constants.NotificationEventOrderPaidSuccess, BizType: constants.NotificationBizTypeOrder, BizID: 8}); err != nil {
+		t.Fatal(err)
+	}
+	if reader.calls != 0 {
+		t.Fatal("disabled channel queried supplier")
+	}
+}

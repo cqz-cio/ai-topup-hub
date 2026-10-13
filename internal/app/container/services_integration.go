@@ -20,6 +20,7 @@ import (
 	notificationapp "github.com/dujiao-next/internal/modules/notification/application"
 	notificationasyncqueue "github.com/dujiao-next/internal/modules/notification/infrastructure/asyncqueue"
 	notificationfeishu "github.com/dujiao-next/internal/modules/notification/infrastructure/feishu"
+	notificationsale "github.com/dujiao-next/internal/modules/notification/infrastructure/salereader"
 	paymentapp "github.com/dujiao-next/internal/modules/payment/application"
 	paymentqueue "github.com/dujiao-next/internal/modules/payment/infrastructure/queueadapter"
 	procurementapp "github.com/dujiao-next/internal/modules/procurement/application"
@@ -59,6 +60,7 @@ func (c *Container) initIntegrationServices() {
 	)
 	c.ApiCredentialService = apicredentialapp.NewService(c.ApiCredentialRepo)
 	c.SiteConnectionService = siteconnectionapp.NewService(c.SiteConnectionRepo, c.Config.App.SecretKey, "uploads")
+	c.NotificationService.SetSaleSummaryReader(notificationsale.New(c.OrderStore, c.ProcurementOrderRepo, c.SiteConnectionService))
 	mediaCore := contentapp.NewMediaService(
 		contentgormstore.NewMediaStore(gormdb.DB),
 		localfilestore.New(),
