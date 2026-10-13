@@ -121,7 +121,7 @@
           <div v-if="emailVerificationEnabled && sendCodeCaptchaEnabled">
             <label class="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
               <ShieldCheck class="h-3.5 w-3.5 opacity-60" />
-              {{ t('auth.common.captchaLabel') }}
+              {{ captchaProvider === 'image' ? t('auth.register.imageCaptchaLabel') : t('auth.common.captchaLabel') }}
             </label>
             <ImageCaptcha
               v-if="captchaProvider === 'image'"

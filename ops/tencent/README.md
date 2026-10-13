@@ -6,6 +6,10 @@
 
 ## 上海入口维护
 
+2026-10-13 15:38 已按批准的 B 方案上线[后台商品缩略图修复](../../docs/admin-product-thumbnails.md)：100×60 完整横图、加载失败占位，并恢复后台对商城 `/catalog-products/` 及 `/products/` 图片文件的访问。上海发布 `20261013-153730`，源码 `471ded02e1b265520a53485288bdcc4f47dbece9`；只替换后台资源及后台 Nginx 配置并平滑重载。新加坡程序 `20261013-114011` 与商城资源来源保持原基准。
+
+本机 58 项后台测试、类型构建、50 项 HTTP 和 7 项实际浏览器检查通过；正式 49 项服务器检查、9 项浏览器检查通过，40 个商品图片地址及 44 条列表记录均正常，119 个后台文件和 1468 个保留商城文件核验通过。320px 且有系统滚动条时，原顶部控件有 5px 溢出，已记录；本次未改顶栏布局。两地备份分别为 `/srv/zhixiang/backups/before-product-thumbnails-20261013-153730`、`/srv/zhixiang-front/backups/before-product-thumbnails-20261013-153730`，报告为上海 `shared/work/product-thumbnails-20261013-153730.json`，本机证据位于 `work/codex-runtime/product-thumbnails/`。售价、成本、商品图地址、支付与站点配置、个人专属价及后端和 Redis 进程与切换前备份一致，未上传本机库、修改业务数据或进行付款采购测试。
+
 2026-10-13 14:43 已修复商品列表直接访问的 403 和服务器错误页残留旧图标。`/products` 与商城静态图片目录同名，原 `try_files $uri $uri/ /index.html` 优先命中目录并触发禁止目录列表；现改为 `try_files $uri /index.html`，真实图片仍直接读取，商品列表及带尾斜杠、查询参数的地址交给 Vue 路由。根域继续跳转到 WWW。
 
 2026-10-13 14:52 已补齐后台错误页标签图标的响应类型修复，配置源码 `7a669ccbf6d6165a26daf82e5a4aa3cb06e52ff9`：缺失 `.js`、`.css`、`.png` 等资源时，命名错误位置清空扩展名 MIME 映射并明确返回 HTML，浏览器才能解析图标声明。错误状态码、版本化派大星图标、API 错误透传保留。本机 37 项 HTTP 和 22 项浏览器检查、正式站 16 项浏览器和 12 项服务器 HTTP 检查通过；本机覆盖六类错误状态，正式站只读验证 403/404、登录页、浏览器内模拟接口失败和失效登录，未制造正式服务中断。两地备份均为各自 `backups/before-admin-error-icon-20261013-145235`；报告 `/srv/zhixiang-front/shared/work/admin-error-icon-20261013-145235.json`，本机证据 `work/codex-runtime/admin-error-icon/`。仅更新共享错误片段并平滑重载 Nginx，现有 1960 个前端文件及程序发布、后端与 Redis 进程、价格和收款配置保持一致。
@@ -26,7 +30,7 @@
 
 先在日常本地入口保存正文、核对实际页面，再推送文案并更新正式配置；本机与正式站各通过 1920、390、320px 共 9 项只读页面检查，两页各 9 节完整显示，注册页两个链接实际点击、刷新保留、未自动勾选协议、无横向溢出和脚本错误均通过。没有注入测试配置。线上备份 `/srv/zhixiang/backups/before-site-legal-20261013-003435`，报告 `/srv/zhixiang/shared/reports/site-legal-20261013-003435.json`；本机报告与截图位于忽略目录 `work/codex-runtime/site-legal-qa/`，配置更新报告为工作区私有文件 `deployment/local/site-legal-deployment.json`。前后端发布、其他站点设置、商品/SKU 售价、两条支付渠道和 storefront 服务状态保持一致；未替换程序、重启服务、上传本机库或提交付款及采购测试。
 
-当前上海静态发布 `/srv/zhixiang-front/releases/20261013-143008`，本次只替换后台资源，后台源码为 `ebee216118e6ee8d7d3c53c4ab36449b371850b3`；商城文件从原正式版本逐项校验后保留，源码仍为 `aaff34ff2af8d62f9a2cc4061007c6e41b54ea80`。新加坡程序仍为 `/srv/zhixiang/releases/20261013-114011`，程序源码同为 `aaff34ff2af8d62f9a2cc4061007c6e41b54ea80`。两地 `current` 分别指向上述实际版本，不以之后的文档提交替代组件构建来源。
+当前上海静态发布 `/srv/zhixiang-front/releases/20261013-153730`，本次只替换后台资源并补齐商品图片映射，后台源码为 `471ded02e1b265520a53485288bdcc4f47dbece9`；商城文件从原正式版本逐项校验后保留，源码仍为 `aaff34ff2af8d62f9a2cc4061007c6e41b54ea80`。新加坡程序仍为 `/srv/zhixiang/releases/20261013-114011`，程序源码同为 `aaff34ff2af8d62f9a2cc4061007c6e41b54ea80`。两地 `current` 分别指向上述实际版本，不以之后的文档提交替代组件构建来源。
 
 2026-10-13 已完成 [后台品牌与运营入口统一](../../docs/admin-branding.md)：按批准预览采用 π星卡社与派大星 Logo，清理原项目名称、旧域名示例、推广位和上游升级入口。后台的商城入口固定使用 `https://www.qzweb.cloud/`，避免正式站已有的本机预览配置覆盖链接；本次未改写该旧配置值。55 项后台测试、类型构建，以及本机、正式站各 19 项真实浏览器只读检查通过，覆盖 1920、390、320px、三种语言与实际导航；核验 119 个后台资源和 1468 个保留商城文件。
 

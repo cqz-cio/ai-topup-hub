@@ -1,0 +1,6 @@
+{
+  "provider": "image",
+  "scenes": {
+    "register_send_code": true
+  }
+}
