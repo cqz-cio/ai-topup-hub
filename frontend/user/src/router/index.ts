@@ -5,6 +5,7 @@ import { useTelegramMiniAppStore } from '../stores/telegramMiniApp'
 import { captureAffiliateFromRoute } from '../utils/affiliate'
 import { templateView } from '../templates/registry'
 import { GOOGLE_REDIRECT_FRONTEND_CALLBACK_PATH } from '../utils/googleRedirect'
+import { completedCheckoutReturnPath } from '../utils/checkoutNavigation'
 
 type RouteComponentLoader = () => Promise<unknown>
 
@@ -334,6 +335,11 @@ const router = createRouter({
 
 // Navigation Guard
 router.beforeEach(async (to, from, next) => {
+    const checkoutReturn = completedCheckoutReturnPath(to.fullPath, router.options.history.location, router.options.history.state)
+    if (checkoutReturn) {
+        next({ path: checkoutReturn, replace: true })
+        return
+    }
     // Start a fresh document across this boundary so storefront custom scripts
     // cannot survive into a page accepting Session credentials.
     if (from.name && to.name !== from.name && (to.name === 'redemption' || from.name === 'redemption')) {
