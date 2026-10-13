@@ -8,6 +8,8 @@
 
 2026-10-13 14:43 已修复商品列表直接访问的 403 和服务器错误页残留旧图标。`/products` 与商城静态图片目录同名，原 `try_files $uri $uri/ /index.html` 优先命中目录并触发禁止目录列表；现改为 `try_files $uri /index.html`，真实图片仍直接读取，商品列表及带尾斜杠、查询参数的地址交给 Vue 路由。根域继续跳转到 WWW。
 
+2026-10-13 14:52 已补齐后台错误页标签图标的响应类型修复，配置源码 `7a669ccbf6d6165a26daf82e5a4aa3cb06e52ff9`：缺失 `.js`、`.css`、`.png` 等资源时，命名错误位置清空扩展名 MIME 映射并明确返回 HTML，浏览器才能解析图标声明。错误状态码、版本化派大星图标、API 错误透传保留。本机 37 项 HTTP 和 22 项浏览器检查、正式站 16 项浏览器和 12 项服务器 HTTP 检查通过；本机覆盖六类错误状态，正式站只读验证 403/404、登录页、浏览器内模拟接口失败和失效登录，未制造正式服务中断。两地备份均为各自 `backups/before-admin-error-icon-20261013-145235`；报告 `/srv/zhixiang-front/shared/work/admin-error-icon-20261013-145235.json`，本机证据 `work/codex-runtime/admin-error-icon/`。仅更新共享错误片段并平滑重载 Nginx，现有 1960 个前端文件及程序发布、后端与 Redis 进程、价格和收款配置保持一致。
+
 商城和后台共同加载 [错误页与图标配置](frontend-gateway/nginx-errors.conf)，安装位置 `/etc/nginx/snippets/qzweb-errors.conf`。默认 `/favicon.ico` 直接返回现有派大星 PNG，明确图片类型并要求重新校验缓存；403、404、500、502、503、504 错误页在 HTML 中指定带版本的图标地址，保留原状态码和错误正文结构，不依赖 Vue、API 或旧图标缓存。后端 API 错误响应不拦截。以后安装或更新 [商城配置](frontend-gateway/nginx-www.conf)、[后台配置](frontend-gateway/nginx-admin-ip.conf) 时，须先安装这一共享片段，再执行 `nginx -t` 和平滑重载；若更换默认 Logo，同时更新错误页图标 URL 的版本值。
 
 配置源码 `9fd00866eb655b0da9e95c8fdaca20152c73911e` 先通过本机 Nginx 1.24 的 35 项检查及日常 `5173/5174/8080` 入口核验，再推送部署。正式服务器 15 项、公网 16 项 HTTP 检查通过；实际浏览器复查商品列表、刷新、403 与 404 页面的图标引用。新加坡一致性备份 `/srv/zhixiang/backups/before-favicon-route-20261013-144241`，上海配置与证书备份 `/srv/zhixiang-front/backups/before-favicon-route-20261013-144241`，服务器报告 `/srv/zhixiang-front/shared/work/favicon-route-20261013-144241.json`，本机报告和截图在忽略目录 `work/codex-runtime/favicon-repair/`。仅安装三份 Nginx 配置并平滑重载：上海发布仍为 `20261013-143008`，现有 1960 个前端文件哈希不变；新加坡程序仍为 `20261013-114011`，后端、Redis、库存定时器及 storefront 模式正常。公开售价与成本、专属价格、两条支付渠道、站点设置与私有配置均与部署前备份一致，未修改业务数据或执行付款采购测试。

@@ -700,5 +700,59 @@
     "local_database_uploaded": false,
     "real_payment_or_purchase_submitted": false,
     "source_tag": "production/shanghai-admin-20261013-143008"
+  },
+  "admin_error_favicon": {
+    "checked_at": "2026-10-13T06:53:45.895Z",
+    "configuration_release": "20261013-145235",
+    "source_commit": "7a669ccbf6d6165a26daf82e5a4aa3cb06e52ff9",
+    "source_tag": "production/admin-error-icon-20261013-145235",
+    "configuration_file": "ops/tencent/frontend-gateway/nginx-errors.conf",
+    "configuration_sha256": "45255d750500f8f48d73b84a4f6fd6880b3276e4c5d51ec33d0f553b9b3660af",
+    "fix": "Clear inherited extension MIME mappings so error HTML is parsed and its versioned store favicon is applied.",
+    "local_http_checks_passed": 37,
+    "local_browser_checks_passed": 22,
+    "production_browser_checks_passed": 16,
+    "server_http_checks_passed": 12,
+    "local_error_statuses": [
+      403,
+      404,
+      500,
+      502,
+      503,
+      504
+    ],
+    "production_error_statuses": [
+      403,
+      404
+    ],
+    "resource_extensions_tested": [
+      "",
+      ".js",
+      ".css",
+      ".png",
+      ".json"
+    ],
+    "viewports": [
+      1920,
+      390,
+      320
+    ],
+    "daily_local_admin_verified": true,
+    "mock_api_error_and_expired_login_verified": true,
+    "api_errors_passthrough_preserved": true,
+    "favicon_sha256": "21e992a7dc7dd3783a2d1169c53a73d8643360121d5585d7f1692bf4fc0beb19",
+    "frontend_release_preserved": "20261013-143008",
+    "backend_release_preserved": "20261013-114011",
+    "frontend_files_preserved": 1960,
+    "backend_and_redis_processes_preserved": true,
+    "prices_payment_channels_and_private_configuration_preserved": true,
+    "unrelated_nginx_configuration_preserved": true,
+    "backend_backup": "/srv/zhixiang/backups/before-admin-error-icon-20261013-145235",
+    "frontend_backup": "/srv/zhixiang-front/backups/before-admin-error-icon-20261013-145235",
+    "server_report": "/srv/zhixiang-front/shared/work/admin-error-icon-20261013-145235.json",
+    "verification_directory": "work/codex-runtime/admin-error-icon/",
+    "production_outage_induced": false,
+    "business_writes": false,
+    "real_payment_or_purchase_submitted": false
   }
 }
