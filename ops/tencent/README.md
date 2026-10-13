@@ -6,6 +6,14 @@
 
 ## 上海入口维护
 
+2026-10-13 已修复不带 `www` 的根域进入家具页面的问题。新增 [根域入口配置](frontend-gateway/nginx-apex.conf)，实际安装于上海 `/etc/nginx/conf.d/qzweb-apex.conf`：`http://qzweb.cloud` 与 `https://qzweb.cloud` 均以 308 跳转到 `https://www.qzweb.cloud`，保留原路径和查询参数。根域使用独立的有效证书，续期配置位于 `/srv/zhixiang-front/shared/letsencrypt/renewal/qzweb.cloud.conf`，由现有 `qzweb-certificates.timer` 管理；HTTP 的 ACME 验证目录仍为 `/var/lib/letsencrypt`。DNS 没有修改。
+
+原因是当前 Nginx 只加载 `/etc/nginx/conf.d/*.conf`，此前已加载的商城配置只声明 `www.qzweb.cloud`，根域请求落入 80 端口的默认家具站 `/etc/nginx/conf.d/oakved.conf`，其页面目录为 `/opt/oakved/frontend/furniture`、标题为 `RH Layout Extraction Preview`。该家具配置仅声明服务器 IP，没有显式绑定 `qzweb.cloud`。旧 `/etc/nginx/sites-enabled/qzweb.cloud` 指向另一套旧站配置，当前没有被加载，不应据此判断正在运行的入口。
+
+追溯证据均按北京时间记录：腾讯云控制台已有记录表显示根域 `@ A 124.220.2.69` 的最后操作时间为 **2026-06-02 10:50:12**，`www` 为 **2026-10-12 16:30:35**；检查时控制台要求重新登录，以上取自已显示记录表，并非新查询的操作审计。服务器家具首页文件创建于 **2026-07-22 09:03:15**，当前 `oakved.conf` 的创建及修改时间均为 **2026-09-21 09:46:32**。这些证据分别说明解析记录和文件时间，不能认定有人在其中某一时刻单独把根域绑定到家具站，也不能由此确定操作者。
+
+配置源码 `2774d53935c098d9a1c86b90a425ca826e91bdc3` 先通过本机 Nginx 1.24 的 6 项 HTTP/HTTPS 跳转、1 项 ACME 入口及日常 `5173/5174/8080` 检查，再推送上线。正式公网 9 项检查覆盖根域两种协议、路径和参数、原 `www` 入口及管理端，实际浏览器也从根域进入 π星卡社。新加坡一致性数据库备份为 `/srv/zhixiang/backups/before-apex-domain-20261013-135130`；上海 Nginx 与证书备份为 `/srv/zhixiang-front/backups/before-apex-domain-20261013-135130`。服务器报告为 `/srv/zhixiang-front/shared/work/apex-domain-20261013-135130.json`，本机证据在忽略目录 `work/codex-runtime/domain-diagnostic/` 和 `work/codex-logs/`。仅增加根域配置及证书并平滑重载 Nginx；家具站与原商城配置哈希保持一致，程序仍为 `20261013-114011`，未替换应用、修改业务数据或进行付款采购测试。
+
 2026-10-13 00:34 按用户要求补齐注册页链接对应的[隐私政策](https://www.qzweb.cloud/privacy)和[服务条款](https://www.qzweb.cloud/terms)。文案快照为 [site-legal.json](../../docs/catalog/site-legal.json)，配置来源 `9b260f889420d8c386c6c2c20d76c27e1630a94d`；通过既有后台 API 仅更新 `site_config` 中的 `legal.privacy.zh-CN`、`legal.terms.zh-CN`。后台 **系统设置 → 站点设置 → 法律条款** 可继续编辑。正文覆盖邮箱注册、订单查询、USDT 核验、卡密交付、具体商品质保与退款、信息收集与存储、个人信息权利及客服微信 `Cqz0924ttxk`；兑换入口遵循订单说明。
 
 先在日常本地入口保存正文、核对实际页面，再推送文案并更新正式配置；本机与正式站各通过 1920、390、320px 共 9 项只读页面检查，两页各 9 节完整显示，注册页两个链接实际点击、刷新保留、未自动勾选协议、无横向溢出和脚本错误均通过。没有注入测试配置。线上备份 `/srv/zhixiang/backups/before-site-legal-20261013-003435`，报告 `/srv/zhixiang/shared/reports/site-legal-20261013-003435.json`；本机报告与截图位于忽略目录 `work/codex-runtime/site-legal-qa/`，配置更新报告为工作区私有文件 `deployment/local/site-legal-deployment.json`。前后端发布、其他站点设置、商品/SKU 售价、两条支付渠道和 storefront 服务状态保持一致；未替换程序、重启服务、上传本机库或提交付款及采购测试。
@@ -32,7 +40,7 @@
 
 `zhixiang-api-tunnel.service` 使用上海本机私钥，将 `127.0.0.1:18880` 转发到新加坡 `127.0.0.1:8080`。新加坡账号 `zhixiang-api-proxy` 只接受上海来源和这一转发目标，禁止终端、其他转发、代理转发与数据库访问；上海私钥不复制至开发机或提交 Git。Nginx 配置和服务模板见本目录 `frontend-gateway/`。后端反代禁止自动重试付款请求；管理 API 未登录返回业务状态码 401。
 
-两张证书由独立 Certbot 5.8.0 环境管理，配置目录为 `/srv/zhixiang-front/shared/letsencrypt`。`qzweb-certificates.timer` 每日 00、06、12、18 时 15 分触发，续期成功后校验并重载 Nginx；管理端使用短期 IP 证书，必须保持该定时器运行。两张证书的实际续期、Webroot 配置、定时服务和 HTTPS 访问均已核验。WWW Webroot 为 `/var/lib/letsencrypt`，管理 IP Webroot 为 `/var/lib/enterprise-exam-acme`，不能互相覆盖；未改动服务器其他站点的证书环境。
+根域、WWW 与管理 IP 的三张证书由独立 Certbot 5.8.0 环境管理，配置目录为 `/srv/zhixiang-front/shared/letsencrypt`。`qzweb-certificates.timer` 每日 00、06、12、18 时 15 分触发，续期成功后校验并重载 Nginx；管理端使用短期 IP 证书，必须保持该定时器运行。原有 WWW 和管理 IP 两张证书的实际续期、Webroot 配置、定时服务和 HTTPS 访问均已核验；根域证书于 2026-10-13 签发并核验 HTTPS，续期配置已纳入同一定时器。根域及 WWW Webroot 为 `/var/lib/letsencrypt`，管理 IP Webroot 为 `/var/lib/enterprise-exam-acme`，不能互相覆盖；未改动服务器其他站点的证书环境。
 
 上海证据保存在 `shared/work/frontend-final-report.json` 与 `shared/work/renew-final-20261012-1644/status.json`；新加坡最终只读核验报告为 `/srv/zhixiang/shared/reports/shanghai-backend-final-read.json`。本机截图与记录在忽略的 `work/codex-runtime/alipay-domain-qa/`、`work/codex-logs/`。腾讯云上海实例为 `lhins-kb6tfs2w`；尚未另行提供上海 SSH 凭据，维护可使用账号本人已登录的腾讯云自动化助手，不能借用其他账号或项目凭据。
 

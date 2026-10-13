@@ -45,3 +45,9 @@
 - 本次通过忽略文件 `work/codex-runtime/private-admin-access/production-admin.credentials.json` 完成一次正式后台只读登录；账号没有重置。此前公告记录中的两份失效口令仍不应重试。
 
 - 会员等级保留默认等级、充值/消费升级和用户归属，统一百分比折扣已停用。通过「会员等级 → 设置商品价」分别设置商品和规格的固定优惠金额；个人专属价优先，未设置会员价沿用商城当前价，更低的活动价和数量优惠保留。不得重新叠加历史 `discount_rate`。操作见 `docs/member-pricing.md`。
+
+## 根域入口修复（2026-10-13）
+
+- `http://qzweb.cloud` 和 `https://qzweb.cloud` 已统一 308 跳转到 `https://www.qzweb.cloud`，保留路径与查询参数。配置源码 `2774d53935c098d9a1c86b90a425ca826e91bdc3`，模板 `ops/tencent/frontend-gateway/nginx-apex.conf`，上海实际文件 `/etc/nginx/conf.d/qzweb-apex.conf`。根域独立证书已纳入现有 `qzweb-certificates.timer`；维护时须保留根域与 WWW 两套入口及 ACME 目录。
+- 此前根域没有被已加载的商城配置接管，请求落到上海默认家具站 `oakved.conf`，页面在 `/opt/oakved/frontend/furniture`。家具配置没有显式声明根域；旧 `sites-enabled/qzweb.cloud` 当前不被 Nginx 加载。时间证据与限制详见 `ops/tencent/README.md`，不得把文件时间说成确定的域名绑定时间。
+- 本机 10 项检查、正式公网 9 项检查及实际浏览器导航通过。两地备份均为各自 `backups/before-apex-domain-20261013-135130`，私有证据在 `work/codex-runtime/domain-diagnostic/`。本次只增加根域配置与证书、平滑重载 Nginx；未改 DNS、家具站及原商城配置、应用程序或业务数据，生产程序仍为 `20261013-114011`。
