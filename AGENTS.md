@@ -58,3 +58,9 @@
 - 后台商城入口固定指向 `https://www.qzweb.cloud/`；正式 `site_config.brand.site_url` 中既有的本机预览地址没有被本次发布改写，也不再覆盖这两个后台入口。客服微信仍为 `Cqz0924ttxk`，ChatGPT 兑换入口仍为 `https://cdk.bar/`。
 - 55 项后台测试、类型构建、本机与正式站各 19 项浏览器检查通过，覆盖 1920、390、320px 及三种语言；无脚本错误、横向溢出、后台广告/升级请求或验收业务写入。上海 `20261013-143008` 仅替换后台静态资源，核验 119 个后台文件，保留商城 1468 个文件；后台源码 `ebee216118e6ee8d7d3c53c4ab36449b371850b3`，新加坡程序与商城资源仍为原基准。
 - 两地备份均为各自 `backups/before-admin-brand-20261013-143008`；核验记录在忽略目录 `work/codex-runtime/admin-brand-qa/`、`work/codex-runtime/admin-brand-release/`。发布前准备期间的订单、支付及专属价记录更新已保留；发布区间以切换前一致性备份比对，业务数据一致。后端与 Redis 进程、收款配置、售价与成本、Nginx 配置保持原状态，未上传本机库或进行真实付款采购测试。
+
+## 错误页图标与商品列表路由修复（2026-10-13）
+
+- 配置源码 `9fd00866eb655b0da9e95c8fdaca20152c73911e` 已上线。商城 Nginx 必须使用 `try_files $uri /index.html`，不能恢复 `$uri/`：`/products` 与真实图片目录同名，优先匹配目录会使商品列表直接访问或刷新报 403。
+- 商城和后台共同加载 `/etc/nginx/snippets/qzweb-errors.conf`，来源 `ops/tencent/frontend-gateway/nginx-errors.conf`；默认 `/favicon.ico` 返回派大星 PNG，403/404/500/502/503/504 错误页明确引用带版本的图标地址。更新两套 Nginx 入口模板时须先安装共享片段，保留状态码和 API 错误透传；更换 Logo 时同步更新图标 URL 版本。
+- 本机 35 项、正式服务器 15 项、公网 16 项检查及实际浏览器商品页、403/404 图标核验通过。两地备份均为各自 `backups/before-favicon-route-20261013-144241`，私有记录在 `work/codex-runtime/favicon-repair/`。仅平滑重载 Nginx，上海发布仍为 `20261013-143008`，新加坡程序仍为 `20261013-114011`；现有前端资源、价格与成本、支付渠道、专属价格、站点及私有配置保持一致，未重启应用或执行付款采购测试。

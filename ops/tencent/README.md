@@ -6,6 +6,12 @@
 
 ## 上海入口维护
 
+2026-10-13 14:43 已修复商品列表直接访问的 403 和服务器错误页残留旧图标。`/products` 与商城静态图片目录同名，原 `try_files $uri $uri/ /index.html` 优先命中目录并触发禁止目录列表；现改为 `try_files $uri /index.html`，真实图片仍直接读取，商品列表及带尾斜杠、查询参数的地址交给 Vue 路由。根域继续跳转到 WWW。
+
+商城和后台共同加载 [错误页与图标配置](frontend-gateway/nginx-errors.conf)，安装位置 `/etc/nginx/snippets/qzweb-errors.conf`。默认 `/favicon.ico` 直接返回现有派大星 PNG，明确图片类型并要求重新校验缓存；403、404、500、502、503、504 错误页在 HTML 中指定带版本的图标地址，保留原状态码和错误正文结构，不依赖 Vue、API 或旧图标缓存。后端 API 错误响应不拦截。以后安装或更新 [商城配置](frontend-gateway/nginx-www.conf)、[后台配置](frontend-gateway/nginx-admin-ip.conf) 时，须先安装这一共享片段，再执行 `nginx -t` 和平滑重载；若更换默认 Logo，同时更新错误页图标 URL 的版本值。
+
+配置源码 `9fd00866eb655b0da9e95c8fdaca20152c73911e` 先通过本机 Nginx 1.24 的 35 项检查及日常 `5173/5174/8080` 入口核验，再推送部署。正式服务器 15 项、公网 16 项 HTTP 检查通过；实际浏览器复查商品列表、刷新、403 与 404 页面的图标引用。新加坡一致性备份 `/srv/zhixiang/backups/before-favicon-route-20261013-144241`，上海配置与证书备份 `/srv/zhixiang-front/backups/before-favicon-route-20261013-144241`，服务器报告 `/srv/zhixiang-front/shared/work/favicon-route-20261013-144241.json`，本机报告和截图在忽略目录 `work/codex-runtime/favicon-repair/`。仅安装三份 Nginx 配置并平滑重载：上海发布仍为 `20261013-143008`，现有 1960 个前端文件哈希不变；新加坡程序仍为 `20261013-114011`，后端、Redis、库存定时器及 storefront 模式正常。公开售价与成本、专属价格、两条支付渠道、站点设置与私有配置均与部署前备份一致，未修改业务数据或执行付款采购测试。
+
 2026-10-13 已修复不带 `www` 的根域进入家具页面的问题。新增 [根域入口配置](frontend-gateway/nginx-apex.conf)，实际安装于上海 `/etc/nginx/conf.d/qzweb-apex.conf`：`http://qzweb.cloud` 与 `https://qzweb.cloud` 均以 308 跳转到 `https://www.qzweb.cloud`，保留原路径和查询参数。根域使用独立的有效证书，续期配置位于 `/srv/zhixiang-front/shared/letsencrypt/renewal/qzweb.cloud.conf`，由现有 `qzweb-certificates.timer` 管理；HTTP 的 ACME 验证目录仍为 `/var/lib/letsencrypt`。DNS 没有修改。
 
 原因是当前 Nginx 只加载 `/etc/nginx/conf.d/*.conf`，此前已加载的商城配置只声明 `www.qzweb.cloud`，根域请求落入 80 端口的默认家具站 `/etc/nginx/conf.d/oakved.conf`，其页面目录为 `/opt/oakved/frontend/furniture`、标题为 `RH Layout Extraction Preview`。该家具配置仅声明服务器 IP，没有显式绑定 `qzweb.cloud`。旧 `/etc/nginx/sites-enabled/qzweb.cloud` 指向另一套旧站配置，当前没有被加载，不应据此判断正在运行的入口。
