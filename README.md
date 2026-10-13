@@ -52,7 +52,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/local/stop.ps1
 
 ## 商品与库存
 
-当前目录为 **6 个分类、16 款商品、12 款供货映射**。`qzweb-55` 售价固定为 **1160.00 元**。
+目录快照现为 **6 个分类、17 款商品、13 条供货映射**（实际在售状态以后台为准）。`qzweb-55` 售价固定为 **1160.00 元**。
 
 - Git 保存源码、公开商品资料、图片、价格覆盖和工具。
 - 数据库保存实际商品、上架状态、库存、订单和用户；配置与凭据私有保存。
@@ -79,3 +79,5 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/local/stop.ps1
 USDT 新支付单统一向上取到两位小数，同额时按 0.01 USDT 选择最小可用金额，最大增加 0.99；旧单保留原金额。规则与容量限制见 [USDT 付款数量](docs/usdt-payment-amounts.md)。
 
 [微信支付](docs/xorpay-wechat.md)已接入 XorPay，支持商品付款与钱包充值。客户手续费为 1.6%，不足一分向上取整，例如 99.00 元实付 100.59 元。回调验签、金额核对与重复通知处理已接入既有支付流程；已验证实际接口出码和正式页面，尚未进行真实资金验收。
+
+2026-10-13 已补充[渠道一 ChatGPT Pro 5x](docs/channel-one-5x.md)，售价 700.00 元，复用既有供货及库存同步；渠道二 5x 保持独立。
