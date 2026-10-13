@@ -17,6 +17,12 @@
       "shared_code": "ellaix_zovocard_plus_v1"
     },
     {
+      "slug": "qzweb-6",
+      "source_id": 6,
+      "upstream_product_id": 6,
+      "shared_code": "ellaix_zovocard_pro_5x_v1"
+    },
+    {
       "slug": "qzweb-55",
       "source_id": 55,
       "upstream_product_id": 55,

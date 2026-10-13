@@ -7,7 +7,7 @@
 
 - `main` 是唯一正式源码主线，维护当前绿色 Go + Vue 商城，包含已确认的 π星卡社名称、派大星 Logo 和水母背景。用户端为 `frontend/user`，后台为 `frontend/admin`；这些品牌改动属于同一项目主版本。
 - 支付、订单、数据库和采购后端部署在腾讯云新加坡 `43.134.141.10`，账号 `ubuntu`，目录 `/srv/zhixiang`。两套前端部署在上海 `124.220.2.69` 的 `/srv/zhixiang-front`：商城 `https://www.qzweb.cloud/`，管理端 `https://124.220.2.69:18888/login`。上海通过受限 SSH 通道连接新加坡回环 API；维护说明见 `ops/tencent/README.md`。
-- 当前新加坡后端发布为 `20261013-171054`，程序及内嵌资源源码为 `414a1fe84ba56adea03c00e3af97bb03d96cd23e`；上海静态发布为 `20261013-165016`，商城源码为 `e6c56be1a964d6c3ef98220c25e60775d7b997a6`，后台资源保留 `471ded02e1b265520a53485288bdcc4f47dbece9`。后端使用 `-mode storefront`、`UPSTREAM_PURCHASE_ENABLED=true`。BEP20 与 Plasma USDT 收款均已启用，支持商品订单与钱包充值；精确核验范围以 `ops/tencent/production-baseline.json` 为准，不把后续文档提交自动当作线上程序的 Git 版本。
+- 当前新加坡后端发布为 `20261013-172211`，程序及内嵌资源源码为 `9020d261d49e3b7a706125708beafa3c2e4823af`；上海静态发布为 `20261013-173020`，两套前端构建来源 `1f4584c19123f4c187403be7ce22db8cf3ed167c`，前端源码与后端提交完全一致。后端使用 `-mode storefront`、`UPSTREAM_PURCHASE_ENABLED=true`。BEP20、Plasma USDT 和 XorPay 微信扫码均已启用，支持商品订单与钱包充值；微信客户手续费为 1.6% 向上取分。精确核验范围以 `ops/tencent/production-baseline.json` 为准，不把后续文档提交自动当作线上程序的 Git 版本。
 - 本地使用 `scripts/local/start.ps1`、`status.ps1`、`stop.ps1`，运行库为 `work/codex-runtime/live/shop.db`，本地采购关闭。旧说明位于 `docs/history/`，不能按历史文档覆盖当前环境。
 - 用户要求固定执行“先本地验证，再推送和上线”：先在日常本地入口验证实际运行程序、配置、相关数据和页面，保存验证记录；通过后才推送已验证提交并部署所需改动。后端改动须重建并重启本地后端，支付渠道及商品说明不能只在临时测试入口核验。上线后对照核验本地与生产；环境私有配置、订单和实时库存独立维护，不互相覆盖。
 - 用户已授权真实客户确认付款后的自动采购发卡，仍禁止主动提交有效采购、转账，或将验收订单改为已付款进行扣款测试。测试使用模拟供应商和临时数据库。
@@ -109,4 +109,19 @@
 
 - 安全修复 `c359b57` 已合入本地主线：公开发信仅允许注册/找回密码，邮箱与全站邮件额度在 SMTP 前原子预占，验证码原子计次和消费；认证、验证码、用户写操作按 IP/账号分层限流，限制请求大小与并发。自定义支付回调也使用独立回调保护。SMTP 总超时 30 秒；已启用订单风控在 Redis 故障时停止放行。配置和注意事项见 `docs/abuse-protection.md`。
 - 1933 项回归结果通过（含子测试），3 项外部 SMTP/PostgreSQL 测试跳过；日常入口 14 项及实际浏览器检查通过。本地后端构建源码 `45ccfe7721c6266ec4f277afaf7d8faf26e2d08b`，`storefront`、采购关闭。保留其他会话文档改动，`vcs.modified=true`，本机产物不能直接作为正式发布产物。
-- 订单、余额、售价、成本、支付渠道与设置未变；核对期间商品 107 的排序及 SKU 1107 的规格文案有并行修改，已保留。私有证据 `work/codex-runtime/security-hardening/verified-report.json`，本机备份 `work/codex-runtime/security-hardening/before-local-security-20261013-173844.db`。没有真实发信、注册验收账号、付款或有效采购；本次未执行推送或生产部署，不能把主线安全源码误认为线上已生效。
+- 订单、余额、售价、成本、支付渠道与设置未变；核对期间商品 107 的排序及 SKU 1107 的规格文案有并行修改，已保留。私有证据 `work/codex-runtime/security-hardening/verified-report.json`，本机备份 `work/codex-runtime/security-hardening/before-local-security-20261013-173844.db`。没有真实发信、注册验收账号、付款或有效采购；本次安全验证未执行生产部署，后续主线推送不表示线上已启用防护。
+
+## XorPay 微信支付（2026-10-13）
+
+- 正式渠道 ID 3「微信支付」已启用，XorPay / 微信 / Native 二维码，支持订单与钱包充值、游客与会员。客户承担 1.6% 手续费并向上取分，99.00 元实付 100.59 元；渠道级 `customer_fee_enabled=true`，全局承担策略和两条 USDT 渠道不变。钱包只入账本金。见 `docs/xorpay-wechat.md` 和 `docs/xorpay-payment-fee-policy.json`。
+- 实际商户充值后，Go 适配器已成功返回短时未付款二维码；没有真实付款、创建正式测试订单、代签声明或执行采购。Native 扫码不代表已接入手机 JSAPI；普通二维码相册/长按识别限制见文档。密钥只保存在忽略目录及服务端，不能输出或提交。
+- 商城 98 项、后台 58 项测试、两套类型构建，以及支付/钱包/订单/容器/架构/模拟采购 Go 回归通过。日常本地程序已重建重启；用户明确要求不确认本地声明、直接配置正式版，因此本地未写入微信渠道，也未声称本地支付页面全流程通过。正式已有声明确认有效，本次未重新签署。正式后台配置、结算页 38.00 + 0.61 = 38.61 及切换 USDT 恢复无手续费通过，无脚本错误。
+- 新加坡发布 `20261013-172211`，上海最终静态发布 `20261013-173020`。首次静态包的后台 HTML 残留 `__DJ_ADMIN_BASE__`，已修正为根路径并验证真实 JS/CSS 响应；独立静态部署不得直接使用未渲染的内嵌 HTML。441 个前端文件核验通过，旧资源与商品图保留，Nginx 未改。
+- 两地备份均为各自 `backups/before-xorpay-20261013-172211`，上海另有 `backups/before-xorpay-admin-base-20261013-173020`；私有证据 `work/codex-runtime/xorpay/`。18 组业务/价格/原渠道数据与发布前一致，仅新增微信渠道。Redis 未重启，库存 timer 与 storefront 模式保留、自动充值关闭；未上传本机库。真实收款、到账回调和采购发卡的资金验收仍未完成。
+
+## 渠道一 5x 商品补充（2026-10-13）
+
+- 已定向新增并上架 `qzweb-6`：ChatGPT Pro 5x 渠道一，用户确认售价 700.00 元，当次商户报价 625.00 元；正式商品/SKU ID 45、映射 ID 13，对应商户 1039 商品/SKU ID 6。保留渠道二 `qzweb-57` 的 680.00 元售价，库存同步不覆盖本站售价。目录快照现为 17 款商品、13 条供货映射，兑换指引包含 12 款 ChatGPT 卡密；实际在售状态以后台为准。详见 `docs/channel-one-5x.md`。
+- 本地与正式站桌面、390、320px 验收通过；封面通过持久化 `/uploads/catalog-products/pro5x-ph-20261001.svg` 提供。未替换程序或重启服务，生产程序保持当时 `20261013-172211`。备份 `/srv/zhixiang/backups/before-channel1-5x-20261013-094217`，私有证据 `work/codex-runtime/product5x/`。未上传本机库、下验收订单、付款或采购。
+- 原有库存 timer 因旧后台口令失败，已将服务器 `shared/stock-sync.credentials.json` 更新为本机 `work/codex-runtime/private-admin-access/production-admin.credentials.json` 中验证有效的登录信息，保留权限及原件备份，未重置账号。现有单次任务已同步成功并包含新商品，继续使用每 300 秒 timer，不另起助手。早期“服务器 stock-sync 口令无效”的记录已被本次修复取代；其他旧本地口令不因此变为有效。
+- 恢复源头同步后，已不可售的渠道二 Plus（`qzweb-64`）被既有规则自动下架；其他商品售价与成本保留。不要为保留旧页面状态而重新上架已被源头停供的商品。

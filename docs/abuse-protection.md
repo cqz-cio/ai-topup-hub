@@ -49,4 +49,4 @@
 
 2026-10-13 本地验证：认证、通知、订单、支付、钱包、模拟采购和架构共 1933 个测试结果通过（含子测试），3 项依赖外部 SMTP/PostgreSQL 的测试跳过；日常 `8080/5173/5174` 入口 14 项检查及实际浏览器检查通过。重启稳定后，注册图形验证码正常加载，注册页无新增控制台错误，原后台会话正常。
 
-本地程序构建源码为 `45ccfe7721c6266ec4f277afaf7d8faf26e2d08b`，模式 `storefront`，采购关闭。保留其他会话文档改动，因此本地二进制标记 `vcs.modified=true`，不作为正式发布产物。订单、余额、售价、成本、渠道和设置核对未变；并行商品排序与规格文案修改已单独记录并保留。私有证据在 `work/codex-runtime/security-hardening/verified-report.json`，完整日志在 `work/codex-logs/security-*.log`。没有真实发信、创建验收用户、付款或有效采购。本次未执行推送或生产部署。
+本地程序构建源码为 `45ccfe7721c6266ec4f277afaf7d8faf26e2d08b`，模式 `storefront`，采购关闭。保留其他会话文档改动，因此本地二进制标记 `vcs.modified=true`，不作为正式发布产物。订单、余额、售价、成本、渠道和设置核对未变；并行商品排序与规格文案修改已单独记录并保留。私有证据在 `work/codex-runtime/security-hardening/verified-report.json`，完整日志在 `work/codex-logs/security-*.log`。没有真实发信、创建验收用户、付款或有效采购。本次安全验证未执行生产部署；后续主线推送不表示线上已启用防护。
