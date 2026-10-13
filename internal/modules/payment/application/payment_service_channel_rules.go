@@ -231,10 +231,13 @@ func (s *PaymentService) GetAvailableChannels(filter AvailablePaymentChannelFilt
 			"interaction_mode": channel.InteractionMode, "min_amount": channel.MinAmount,
 			"max_amount": channel.MaxAmount, "hide_amount_out_range": channel.HideAmountOutRange,
 		}
-		if customerFeeEnabled {
+		if paymentCustomerFeeEnabled(&channel, customerFeeEnabled) {
 			item["fee_policy"] = constants.PaymentFeePolicyCustomerSurcharge
 			item["fee_rate"] = channel.FeeRate
 			item["fixed_fee"] = channel.FixedFee
+			if channel.ProviderType == constants.PaymentProviderXorpay {
+				item["fee_rounding"] = "ceil"
+			}
 		}
 		if channel.Icon != "" {
 			item["icon"] = channel.Icon

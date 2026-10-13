@@ -285,6 +285,10 @@
                 {{ t('checkout.noPaymentChannels') }}
               </div>
             </template>
+            <div v-if="expectedFeeCents > 0" class="text-xs text-warning grid gap-1">
+              <div>{{ t('payment.feeAmountLabel') }}：{{ expectedFeeDisplay }}</div>
+              <div>{{ t('payment.payableAmountLabel') }}：{{ expectedPaymentTotalDisplay }}</div>
+            </div>
             <div v-if="!requiresOnlineChannel" class="text-xs text-success">
               {{ t('checkout.walletCoversAll') }}
             </div>
@@ -336,6 +340,7 @@ const {
   previewLoading, couponRefreshing, previewStatusText, hasPositiveAmount, formatDiscountPrice, checkoutAlert,
   showBalanceOption, walletLoading, walletBalance, useBalance, walletOnlyPayment,
   expectedWalletPaidDisplay, expectedOnlinePayDisplay, expectedOnlinePayCents,
+  expectedFeeCents, expectedFeeDisplay, expectedPaymentTotalDisplay,
   requiresOnlineChannel, paymentChannels, selectedChannelId, isChannelDisabledForAmount, channelAmountLimitHint,
   handleSelectChannel, formatChannelFeeRate, formatChannelFixedFee,
   submitting, canSubmit, handleSubmit,

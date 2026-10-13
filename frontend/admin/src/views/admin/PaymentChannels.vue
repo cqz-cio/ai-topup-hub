@@ -116,6 +116,7 @@ const providerTypeLabel = (value?: string) => {
     official: t('admin.paymentChannels.providerTypes.official'),
     bscusdt: 'USDT · BNB Smart Chain (BEP-20)',
     plasmausdt: 'USDT · Plasma',
+    xorpay: 'XorPay',
     epay: t('admin.paymentChannels.providerTypes.epay'),
     bepusdt: t('admin.paymentChannels.providerTypes.bepusdt'),
     epusdt: t('admin.paymentChannels.providerTypes.epusdt'),
@@ -339,6 +340,7 @@ watch(
                   </span>
                 </span>
               </SelectItem>
+              <SelectItem value="xorpay">XorPay</SelectItem>
               <SelectItem value="epay">{{ t('admin.paymentChannels.providerTypes.epay') }}</SelectItem>
               <SelectItem value="bepusdt">{{ t('admin.paymentChannels.providerTypes.bepusdt') }}</SelectItem>
               <SelectItem value="epusdt">{{ t('admin.paymentChannels.providerTypes.epusdt') }}</SelectItem>

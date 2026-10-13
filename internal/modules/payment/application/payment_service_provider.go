@@ -143,6 +143,15 @@ func (s *PaymentService) applyProviderPayment(input CreatePaymentInput, order *o
 	// 空值时自动读取 channel.ConfigJSON 里配置的 notify_url / return_url。
 	// P1.2c Task 3: returnURLQuery 携带 biz_type/order_no/marker 等，由 wrapper append 到 ReturnURL。
 	extra := jsonmap.JSON{}
+	if providerType == constants.PaymentProviderXorpay {
+		deadline := payment.ExpiredAt
+		if order.ExpiresAt != nil && (deadline == nil || order.ExpiresAt.Before(*deadline)) {
+			deadline = order.ExpiresAt
+		}
+		if deadline != nil {
+			extra["expires_at"] = *deadline
+		}
+	}
 	if interactionMode := strings.TrimSpace(channel.InteractionMode); interactionMode != "" {
 		extra["interaction_mode"] = interactionMode
 	}
@@ -314,6 +323,9 @@ func (s *PaymentService) ValidateChannel(channel *paymentdomain.PaymentChannel) 
 	if providerType != constants.PaymentProviderOfficial {
 		mode := strings.ToLower(strings.TrimSpace(channel.InteractionMode))
 		if mode != constants.PaymentInteractionQR && mode != constants.PaymentInteractionRedirect {
+			return ErrPaymentChannelConfigInvalid
+		}
+		if providerType == constants.PaymentProviderXorpay && mode != constants.PaymentInteractionQR {
 			return ErrPaymentChannelConfigInvalid
 		}
 		if providerType == constants.PaymentProviderBepusdt && mode == constants.PaymentInteractionQR {

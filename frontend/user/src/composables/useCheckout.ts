@@ -8,7 +8,7 @@ import { useUserAuthStore } from '../stores/userAuth'
 import { guestOrderAPI, userOrderAPI, walletAPI, type CaptchaPayload } from '../api'
 import { debounceAsync } from '../utils/debounce'
 import { type PageAlert } from '../utils/alerts'
-import { amountToCents, basisPointsToPercent, centsToAmount, parseInteger, rateToBasisPoints } from '../utils/money'
+import { amountToCents, basisPointsToPercent, calculateChannelFeeCents, centsToAmount, parseInteger, rateToBasisPoints } from '../utils/money'
 import { buildSkuDisplayText, normalizeSkuId } from '../utils/sku'
 import { refreshCartStockSnapshots, cartItemPurchaseLimit as itemPurchaseLimit, cartItemPurchaseMin as itemPurchaseMin } from '../utils/cartStock'
 import { getImageUrl } from '../utils/image'
@@ -139,6 +139,10 @@ export function useCheckout() {
   })
   const expectedWalletPaidDisplay = computed(() => formatPrice(centsToAmount(expectedWalletPaidCents.value), previewCurrency.value))
   const expectedOnlinePayDisplay = computed(() => formatPrice(centsToAmount(expectedOnlinePayCents.value), previewCurrency.value))
+  const selectedPaymentChannel = computed(() => paymentChannels.value.find((item: any) => Number(item.id) === selectedChannelId.value))
+  const expectedFeeCents = computed(() => calculateChannelFeeCents(expectedOnlinePayCents.value, selectedPaymentChannel.value))
+  const expectedFeeDisplay = computed(() => formatPrice(centsToAmount(expectedFeeCents.value), previewCurrency.value))
+  const expectedPaymentTotalDisplay = computed(() => formatPrice(centsToAmount(expectedOnlinePayCents.value + expectedFeeCents.value), previewCurrency.value))
   const requiresOnlineChannel = computed(() => {
     if (!userAuthStore.isAuthenticated) return true
     if (!useBalance.value) return true
@@ -1212,6 +1216,7 @@ export function useCheckout() {
     walletOnlyPayment,
     expectedWalletPaidDisplay,
     expectedOnlinePayDisplay,
+    expectedFeeCents, expectedFeeDisplay, expectedPaymentTotalDisplay,
     expectedOnlinePayCents,
     // payment channels
     requiresOnlineChannel,

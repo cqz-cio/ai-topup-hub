@@ -53,11 +53,11 @@ export const basisPointsToPercent = (basisPoints: number): string => {
   return `${negative ? '-' : ''}${major}.${minor}`
 }
 
-export const calculateFeeCents = (baseCents: number, rateBasisPoints: number): number | null => {
+export const calculateFeeCents = (baseCents: number, rateBasisPoints: number, rounding: string = 'round'): number | null => {
   if (!Number.isSafeInteger(baseCents) || !Number.isSafeInteger(rateBasisPoints)) return null
   const multiplied = baseCents * rateBasisPoints
   if (!Number.isFinite(multiplied) || Math.abs(multiplied) > Number.MAX_SAFE_INTEGER) return null
-  const fee = Math.round(multiplied / 10000)
+  const fee = rounding === 'ceil' ? Math.ceil(multiplied / 10000) : Math.round(multiplied / 10000)
   if (!Number.isSafeInteger(fee)) return null
   return fee
 }
@@ -68,4 +68,11 @@ export const parseInteger = (value: unknown): number | null => {
   if (!Number.isFinite(num) || !Number.isInteger(num)) return null
   if (!Number.isSafeInteger(num)) return null
   return num
+}
+
+export const calculateChannelFeeCents = (baseCents: number, channel?: { fee_policy?: string; fee_rate?: unknown; fixed_fee?: unknown; fee_rounding?: string } | null): number => {
+  if (!channel || channel.fee_policy !== 'customer_surcharge' || baseCents <= 0) return 0
+  const rate = rateToBasisPoints(channel.fee_rate) || 0
+  const fixed = amountToCents(channel.fixed_fee) || 0
+  return (calculateFeeCents(baseCents, rate, channel.fee_rounding) || 0) + fixed
 }

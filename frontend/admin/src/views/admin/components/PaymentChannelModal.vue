@@ -168,6 +168,8 @@ const tokenpayConfig = reactive({
   base_currency: 'CNY',
 })
 
+const xorpayConfig = reactive({ aid: '', app_secret: '', notify_url: '', customer_fee_enabled: true })
+
 const okpayConfig = reactive({
   gateway_url: 'https://api.okaypay.me/shop',
   merchant_id: '',
@@ -242,6 +244,7 @@ const memberLevelOptions = computed(() =>
 )
 
 const formChannelOptions = computed(() => {
+  if (form.provider_type === 'xorpay') return epayChannelOptions.filter(option => option.value === 'wechat')
   if (form.provider_type === 'epay') {
     return epayChannelOptions
   }
@@ -258,6 +261,7 @@ const formChannelOptions = computed(() => {
 })
 
 const interactionModeOptions = computed(() => {
+  if (form.provider_type === 'xorpay') return [{ value: 'qr', label: 'admin.paymentChannels.interactionModes.qr' }]
   if (form.provider_type === 'epay') {
     return [
       { value: 'qr', label: 'admin.paymentChannels.interactionModes.qr' },
@@ -464,6 +468,7 @@ const resetDujiaoPayConfig = () => {
 }
 
 const resetAllConfigs = () => {
+  Object.assign(xorpayConfig, { aid: '', app_secret: '', notify_url: '', customer_fee_enabled: true })
   resetEpayConfig()
   resetPaypalConfig()
   resetStripeConfig()
@@ -868,7 +873,10 @@ watch(
     if (applyingChannelData.value) {
       return
     }
-    if (value === 'epay') {
+    if (value === 'xorpay') {
+      form.channel_type = 'wechat'
+      form.interaction_mode = 'qr'
+    } else if (value === 'epay') {
       const allowed = epayChannelOptions.map((option) => option.value)
       if (!allowed.includes(form.channel_type)) {
         form.channel_type = allowed[0] || 'wechat'
@@ -1051,6 +1059,7 @@ watch(
         form.is_active = !!channel.is_active
         form.sort_order = channel.sort_order || 0
         if (channel.config_json && typeof channel.config_json === 'object') {
+          Object.assign(xorpayConfig, { aid: String(channel.config_json.aid || ''), app_secret: String(channel.config_json.app_secret || ''), notify_url: String(channel.config_json.notify_url || ''), customer_fee_enabled: channel.config_json.customer_fee_enabled === true })
           applyEpayConfig(channel.config_json)
           applyPaypalConfig(channel.config_json)
           applyStripeConfig(channel.config_json)
@@ -1118,7 +1127,9 @@ const handleSubmit = async () => {
     }
   }
 
-  if (form.provider_type === 'epay') {
+  if (form.provider_type === 'xorpay') {
+    configJson = { aid: xorpayConfig.aid.trim(), app_secret: xorpayConfig.app_secret.trim(), notify_url: xorpayConfig.notify_url.trim(), customer_fee_enabled: xorpayConfig.customer_fee_enabled }
+  } else if (form.provider_type === 'epay') {
     if (epayConfig.epay_version === 'v1') {
       delete configJson.private_key
       delete configJson.platform_public_key
@@ -1279,7 +1290,8 @@ const closeModal = () => {
                     </span>
                   </span>
                 </SelectItem>
-                <SelectItem value="epay">{{ t('admin.paymentChannels.providerTypes.epay') }}</SelectItem>
+                <SelectItem value="xorpay">XorPay</SelectItem>
+              <SelectItem value="epay">{{ t('admin.paymentChannels.providerTypes.epay') }}</SelectItem>
                 <SelectItem value="bepusdt">{{ t('admin.paymentChannels.providerTypes.bepusdt') }}</SelectItem>
                 <SelectItem value="epusdt">{{ t('admin.paymentChannels.providerTypes.epusdt') }}</SelectItem>
                 <SelectItem value="okpay">{{ t('admin.paymentChannels.providerTypes.okpay') }}</SelectItem>
@@ -1366,6 +1378,26 @@ const closeModal = () => {
             <Switch v-model="form.is_active" />
             <Label class="text-xs text-muted-foreground">{{ t('admin.common.enabled') }}</Label>
           </div>
+        </div>
+
+        <div v-if="form.provider_type === 'xorpay'" class="min-w-0 rounded-xl border border-border bg-muted/20 p-4 overflow-hidden">
+          <div class="text-sm font-semibold text-foreground mb-3">{{ t('admin.paymentChannels.modal.xorpaySection') }}</div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="min-w-0">
+              <label for="xorpay-aid" class="block text-xs font-medium text-muted-foreground mb-1.5">{{ t('admin.paymentChannels.modal.xorpayAid') }}</label>
+              <Input id="xorpay-aid" v-model="xorpayConfig.aid" inputmode="numeric" placeholder="aid" />
+            </div>
+            <div class="min-w-0">
+              <label for="xorpay-secret" class="block text-xs font-medium text-muted-foreground mb-1.5">App Secret</label>
+              <Input id="xorpay-secret" v-model="xorpayConfig.app_secret" type="password" autocomplete="new-password" placeholder="App Secret" />
+            </div>
+            <div class="min-w-0 md:col-span-2">
+              <label for="xorpay-notify" class="block text-xs font-medium text-muted-foreground mb-1.5">{{ t('admin.paymentChannels.modal.notifyUrl') }}</label>
+              <Input id="xorpay-notify" v-model="xorpayConfig.notify_url" placeholder="https://www.qzweb.cloud/api/v1/payments/callback" />
+            </div>
+          </div>
+          <label class="mt-3 flex items-center gap-2 text-sm"><input v-model="xorpayConfig.customer_fee_enabled" type="checkbox" />{{ t('admin.paymentChannels.modal.xorpayCustomerFee') }}</label>
+          <p class="mt-3 text-xs text-muted-foreground">{{ t('admin.paymentChannels.modal.xorpayHint') }}</p>
         </div>
 
         <div v-if="form.provider_type === 'epay'" class="min-w-0 rounded-xl border border-border bg-muted/20 p-4 overflow-hidden">

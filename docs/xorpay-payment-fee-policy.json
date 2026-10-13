@@ -1,0 +1,39 @@
+{
+  "title": "XorPay 微信支付手续费规则",
+  "confirmed_on": "2026-10-13",
+  "status": "用户已确认；待接入实现和验收，不代表运行配置已生效",
+  "provider_type": "xorpay",
+  "channel_type": "wechat",
+  "currency": "CNY",
+  "fee_policy": "customer_surcharge",
+  "fee_rate_percent": "1.60",
+  "fee_rate_basis_points": 160,
+  "fixed_fee": "0.00",
+  "rounding": {
+    "applies_to": "本渠道支付手续费",
+    "decimal_places": 2,
+    "mode": "ceiling",
+    "description": "手续费保留两位小数；不足一分钱的部分向上取整。金额恰好到分时不额外加一分钱。不得使用四舍五入。"
+  },
+  "calculation": {
+    "base_amount": "按商城现有优惠及余额抵扣规则确定的本渠道应付金额，不含本次手续费",
+    "fee_amount": "ceil(base_amount * 0.016 * 100) / 100",
+    "payment_amount": "base_amount + fee_amount",
+    "integer_cents_formula": "fee_cents = (base_cents * 160 + 9999) // 10000；payment_cents = base_cents + fee_cents；仅适用于非负整数分",
+    "description": "按应付金额加收 1.6%，不采用倒推净收金额的算法，不重复加收微信或 XorPay 手续费。"
+  },
+  "examples": [
+    { "base_amount": "99.00", "fee_amount": "1.59", "payment_amount": "100.59" },
+    { "base_amount": "100.00", "fee_amount": "1.60", "payment_amount": "101.60" },
+    { "base_amount": "1160.00", "fee_amount": "18.56", "payment_amount": "1178.56" }
+  ],
+  "acceptance_requirements": [
+    "客户确认付款前展示应付金额、1.6% 手续费及最终实付金额。",
+    "前端预览与后端计费均按分向上取整，后端是最终金额依据。",
+    "XorPay 下单金额、收银页金额及回调金额校验均使用含手续费的最终实付金额。",
+    "其他支付渠道和商品公开标价保持原有规则。",
+    "先完成本地计算、页面及模拟回调验证，再进行支付联调验收；未完成真实支付时不得标记真实收款验收通过。"
+  ],
+  "implementation_note": "记录时现有后端 calculatePaymentAmounts 使用 Round(2)，因此仅填写 1.6% 费率不能满足向上取整要求；接入时须同步调整本渠道的前后端计费逻辑。",
+  "platform_balance_note": "向客户加收手续费不会自动充值 XorPay 账户；平台余额仍需单独维护。"
+}

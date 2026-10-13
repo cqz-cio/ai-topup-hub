@@ -74,6 +74,7 @@ func (h *Handler) PaymentCallback(c *gin.Context) {
 	for _, handle := range []func(*gin.Context) bool{
 		h.handleWechatCallback,
 		h.handleOkpayCallback,
+		h.handleXorpayCallback,
 		h.handleAlipayCallback,
 		h.handleEpayCallback,
 		h.handleTokenPayCallback,

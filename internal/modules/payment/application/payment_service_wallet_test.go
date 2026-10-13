@@ -3,9 +3,12 @@ package application
 import (
 	"context"
 	"crypto/hmac"
+	"crypto/md5"
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	xorpayadapter "github.com/dujiao-next/internal/modules/payment/infrastructure/gateway/adapters/xorpay"
+	"net/url"
 	"strconv"
 	"sync"
 	"testing"
@@ -1438,5 +1441,185 @@ func TestStripeExchangeRateUnderpaidCallbackRejected(t *testing.T) {
 	}
 	if reloadedOrder.Status != constants.OrderStatusPendingPayment || reloadedOrder.PaidAt != nil {
 		t.Fatalf("rejected stripe gbp payment must not fulfill order, got status=%s paid_at=%v", reloadedOrder.Status, reloadedOrder.PaidAt)
+	}
+}
+
+// Mock only the outbound create call; retain the real XorPay verifier.
+type xorpayFixtureGateway struct {
+	paymentcontract.GatewayCallbackVerifier
+}
+
+func (g xorpayFixtureGateway) CreatePayment(_ context.Context, _ jsonmap.JSON, in paymentcontract.GatewayCreateInput) (*paymentcontract.GatewayCreateResult, error) {
+	return &paymentcontract.GatewayCreateResult{ProviderRef: "ao-" + in.OrderNo, QRCodeURL: "weixin://wxpay/bizpayurl?pr=mock"}, nil
+}
+func xorpayFixture(t *testing.T) (*PaymentService, *gorm.DB, *paymentdomain.PaymentChannel, *userdomain.User) {
+	t.Helper()
+	svc, db := setupPaymentServiceWalletTest(t)
+	registerTestGateway(t, svc, constants.PaymentProviderXorpay, "", xorpayFixtureGateway{xorpayadapter.NewXorpayAdapter().(paymentcontract.GatewayCallbackVerifier)})
+	user := &userdomain.User{Email: "xorpay@example.com", PasswordHash: "fixture", Status: constants.UserStatusActive}
+	if err := db.Create(user).Error; err != nil {
+		t.Fatal(err)
+	}
+	channel := &paymentdomain.PaymentChannel{FeeRate: money.FromDecimal(decimal.RequireFromString("1.60")), Name: "微信支付", ProviderType: constants.PaymentProviderXorpay, ChannelType: "wechat", InteractionMode: "qr", IsActive: true, PaymentTypes: jsonslice.Strings{"order", "wallet"}, ConfigJSON: jsonmap.JSON{"aid": "12345", "app_secret": "fixture-secret", "customer_fee_enabled": true, "notify_url": "https://shop.example/api/v1/payments/callback"}}
+	if err := svc.ValidateChannel(channel); err != nil {
+		t.Fatal(err)
+	}
+	if err := db.Create(channel).Error; err != nil {
+		t.Fatal(err)
+	}
+	return svc, db, channel, user
+}
+func xorpayForm(payment *paymentdomain.Payment) url.Values {
+	f := url.Values{"aoid": {payment.ProviderRef}, "order_id": {payment.GatewayOrderNo}, "pay_price": {payment.Amount.String()}, "pay_time": {time.Now().In(time.FixedZone("Asia/Shanghai", 8*3600)).Format("2006-01-02 15:04:05")}}
+	signXorpayForm(f)
+	return f
+}
+func signXorpayForm(f url.Values) {
+	f.Set("sign", fmt.Sprintf("%x", md5.Sum([]byte(f.Get("aoid")+f.Get("order_id")+f.Get("pay_price")+f.Get("pay_time")+"fixture-secret"))))
+}
+func xorpayOrder(t *testing.T, db *gorm.DB, userID uint) *orderdomain.Order {
+	t.Helper()
+	amount := money.FromDecimal(decimal.RequireFromString("12.30"))
+	deadline := time.Now().Add(15 * time.Minute)
+	o := &orderdomain.Order{OrderNo: "DJ-XORPAY-TEST", UserID: userID, Status: constants.OrderStatusPendingPayment, Currency: "CNY", OriginalAmount: amount, TotalAmount: amount, OnlinePaidAmount: amount, ExpiresAt: &deadline}
+	if err := db.Create(o).Error; err != nil {
+		t.Fatal(err)
+	}
+	return o
+}
+
+func TestXorpayOrderCallbackFactsAndIdempotency(t *testing.T) {
+	for _, scenario := range []string{"success", "bad-sign", "wrong-amount", "wrong-aoid", "wrong-order", "duplicate-field"} {
+		t.Run(scenario, func(t *testing.T) {
+			svc, db, ch, user := xorpayFixture(t)
+			order := xorpayOrder(t, db, user.ID)
+			created, err := svc.CreatePayment(CreatePaymentInput{OrderID: order.ID, ChannelID: ch.ID, Context: context.Background()})
+			if err != nil {
+				t.Fatal(err)
+			}
+			f := xorpayForm(created.Payment)
+			switch scenario {
+			case "bad-sign":
+				f.Set("sign", "forged")
+			case "wrong-amount":
+				f.Set("pay_price", "0.01")
+				signXorpayForm(f)
+			case "wrong-aoid":
+				f.Set("aoid", "another-payment")
+				signXorpayForm(f)
+			case "wrong-order":
+				f.Set("order_id", "another-order")
+				signXorpayForm(f)
+			case "duplicate-field":
+				f.Add("order_id", created.Payment.GatewayOrderNo)
+			}
+			_, err = svc.HandleSyncCallback(ch, f, nil)
+			if scenario == "success" {
+				if err != nil {
+					t.Fatal(err)
+				}
+				for i := 0; i < 3; i++ {
+					if _, err := svc.HandleSyncCallback(ch, f, nil); err != nil {
+						t.Fatal(err)
+					}
+				}
+			} else if err == nil {
+				t.Fatal("invalid callback accepted")
+			}
+			var saved orderdomain.Order
+			db.First(&saved, order.ID)
+			if scenario == "success" {
+				if saved.Status != constants.OrderStatusPaid || saved.OnlinePaidAmount.String() != "12.30" {
+					t.Fatalf("order not settled exactly once: %+v", saved)
+				}
+			} else if saved.Status != constants.OrderStatusPendingPayment || saved.PaidAt != nil {
+				t.Fatal("invalid callback changed order")
+			}
+		})
+	}
+}
+
+func TestXorpayWalletCallbackCreditsExactlyOnce(t *testing.T) {
+	svc, db, ch, user := xorpayFixture(t)
+	result, err := svc.CreateWalletRechargePayment(CreateWalletRechargePaymentInput{UserID: user.ID, ChannelID: ch.ID, Amount: money.FromDecimal(decimal.RequireFromString("12.30")), Currency: "CNY", Context: context.Background()})
+	if err != nil {
+		t.Fatal(err)
+	}
+	f := xorpayForm(result.Payment)
+	bad := xorpayForm(result.Payment)
+	bad.Set("pay_price", "0.01")
+	signXorpayForm(bad)
+	if _, err := svc.HandleSyncCallback(ch, bad, nil); err == nil {
+		t.Fatal("underpaid recharge accepted")
+	}
+	for i := 0; i < 4; i++ {
+		if _, err := svc.HandleSyncCallback(ch, f, nil); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if balance := walletBalance(t, db, user.ID); balance != "12.30" {
+		t.Fatalf("wrong balance %s", balance)
+	}
+	var count int64
+	db.Model(&walletdomain.Transaction{}).Where("user_id = ?", user.ID).Count(&count)
+	if count != 1 {
+		t.Fatalf("duplicate wallet credit: %d", count)
+	}
+}
+
+func TestXorpayExpiredOrderDoesNotFulfill(t *testing.T) {
+	svc, db, ch, user := xorpayFixture(t)
+	order := xorpayOrder(t, db, user.ID)
+	result, err := svc.CreatePayment(CreatePaymentInput{OrderID: order.ID, ChannelID: ch.ID, Context: context.Background()})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := db.Model(order).Update("status", constants.OrderStatusCanceled).Error; err != nil {
+		t.Fatal(err)
+	}
+	if _, err := svc.HandleSyncCallback(ch, xorpayForm(result.Payment), nil); err != nil {
+		t.Fatal(err)
+	}
+	var saved orderdomain.Order
+	db.First(&saved, order.ID)
+	if saved.Status != constants.OrderStatusCanceled {
+		t.Fatal("late payment fulfilled canceled order")
+	}
+	var payment paymentdomain.Payment
+	db.First(&payment, result.Payment.ID)
+	if payment.ExceptionCode == "" {
+		t.Fatal("late payment not flagged for review")
+	}
+}
+
+func TestXorpayRejectsRedirectConfiguration(t *testing.T) {
+	svc, _, ch, _ := xorpayFixture(t)
+	ch.InteractionMode = "redirect"
+	if svc.ValidateChannel(ch) == nil {
+		t.Fatal("unsupported interaction allowed")
+	}
+}
+
+func TestXorpayFeeRoundingAndChannelIsolation(t *testing.T) {
+	svc, _, ch, _ := xorpayFixture(t)
+	for _, tc := range []struct{ base, fee, total string }{{"99.00", "1.59", "100.59"}, {"100.00", "1.60", "101.60"}, {"1160.00", "18.56", "1178.56"}, {"0.01", "0.01", "0.02"}, {"12.30", "0.20", "12.50"}} {
+		total, fee, policy := calculateChannelPaymentAmounts(decimal.RequireFromString(tc.base), ch, false)
+		if total.StringFixed(2) != tc.total || fee.StringFixed(2) != tc.fee || policy != constants.PaymentFeePolicyCustomerSurcharge {
+			t.Fatalf("wrong fee for %s: %s %s %s", tc.base, total, fee, policy)
+		}
+	}
+	channels, err := svc.GetAvailableChannels(AvailablePaymentChannelFilter{PaymentType: constants.PaymentTypeOrder})
+	if err != nil || len(channels) != 1 || channels[0]["fee_rounding"] != "ceil" || channels[0]["fee_policy"] != constants.PaymentFeePolicyCustomerSurcharge {
+		t.Fatalf("public fee preview mismatch: %v %v", channels, err)
+	}
+	ch.ConfigJSON["customer_fee_enabled"] = false
+	total, _, policy := calculateChannelPaymentAmounts(decimal.NewFromInt(99), ch, true)
+	if total.StringFixed(2) != "99.00" || policy != constants.PaymentFeePolicyMerchantAbsorbed {
+		t.Fatal("explicit merchant fee not honored")
+	}
+	ch.ProviderType = constants.PaymentProviderEpay
+	total, fee, policy := calculateChannelPaymentAmounts(decimal.NewFromInt(99), ch, false)
+	if total.StringFixed(2) != "99.00" || fee.StringFixed(2) != "1.58" || policy != constants.PaymentFeePolicyMerchantAbsorbed {
+		t.Fatal("other provider fee policy changed")
 	}
 }

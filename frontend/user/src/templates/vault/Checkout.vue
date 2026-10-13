@@ -200,7 +200,11 @@
             </div>
             <div v-else-if="requiresOnlineChannel && paymentChannels.length === 0" class="text-[13px] text-muted-foreground">{{ t('checkout.noPaymentChannels') }}</div>
           </template>
-          <div v-if="!requiresOnlineChannel" class="text-[13px] text-[color:var(--teal-strong)]">{{ t('checkout.walletCoversAll') }}</div>
+          <div v-if="expectedFeeCents > 0" class="text-xs text-warning grid gap-1">
+              <div>{{ t('payment.feeAmountLabel') }}：{{ expectedFeeDisplay }}</div>
+              <div>{{ t('payment.payableAmountLabel') }}：{{ expectedPaymentTotalDisplay }}</div>
+            </div>
+            <div v-if="!requiresOnlineChannel" class="text-[13px] text-[color:var(--teal-strong)]">{{ t('checkout.walletCoversAll') }}</div>
         </div>
 
         <Button class="h-11 w-full rounded-full font-bold" :disabled="!canSubmit" @click="handleSubmit">
@@ -240,6 +244,7 @@ const {
   previewLoading, couponRefreshing, previewStatusText, hasPositiveAmount, formatDiscountPrice, checkoutAlert,
   showBalanceOption, walletLoading, walletBalance, useBalance, walletOnlyPayment,
   expectedWalletPaidDisplay, expectedOnlinePayDisplay, expectedOnlinePayCents,
+  expectedFeeCents, expectedFeeDisplay, expectedPaymentTotalDisplay,
   requiresOnlineChannel, paymentChannels, selectedChannelId, isChannelDisabledForAmount, channelAmountLimitHint,
   handleSelectChannel, formatChannelFeeRate, formatChannelFixedFee,
   submitting, canSubmit, handleSubmit,

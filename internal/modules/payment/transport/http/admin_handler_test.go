@@ -616,3 +616,18 @@ func TestGetAdminPaymentsBadQueryReturnsBadRequestCode(t *testing.T) {
 		t.Fatalf("status_code want 400 got %d", resp.StatusCode)
 	}
 }
+
+func TestXorpayAppSecretUsesPaymentCredentialMasking(t *testing.T) {
+	if !isSensitivePaymentConfigKey("app_secret") {
+		t.Fatal("XorPay secret is not classified as sensitive")
+	}
+	original := jsonmap.JSON{"aid": "12345", "app_secret": "fixture-secret"}
+	merged := mergePaymentChannelConfig(original, map[string]interface{}{"aid": "12345", "app_secret": redactedPaymentConfigValue})
+	if merged["app_secret"] != "fixture-secret" {
+		t.Fatal("editing masked config lost saved secret")
+	}
+	rotated := mergePaymentChannelConfig(original, map[string]interface{}{"app_secret": "fixture-rotated"})
+	if rotated["app_secret"] != "fixture-rotated" {
+		t.Fatal("secret rotation ignored")
+	}
+}

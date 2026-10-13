@@ -20,6 +20,7 @@
       :fee-rate-display="selectedChannelFeeRateDisplay"
       :fixed-fee-display="selectedChannelFixedFeeDisplay"
       :fee-amount-display="selectedChannelFeeAmountDisplay"
+      :total-display="selectedChannelTotalDisplay"
       @update:amount="rechargeForm.amount = $event"
       @update:channel-id="rechargeForm.channelId = $event"
       @update:remark="rechargeForm.remark = $event"
@@ -44,7 +45,7 @@ import { useI18n } from 'vue-i18n'
 import { walletAPI } from '../../api'
 import { useAppStore } from '../../stores/app'
 import type { PageAlert } from '../../utils/alerts'
-import { amountToCents, basisPointsToPercent, calculateFeeCents, centsToAmount, rateToBasisPoints } from '../../utils/money'
+import { amountToCents, basisPointsToPercent, calculateChannelFeeCents, centsToAmount, rateToBasisPoints } from '../../utils/money'
 import WalletBalanceCard from '../../components/wallet/WalletBalanceCard.vue'
 import WalletRechargeForm from '../../components/wallet/WalletRechargeForm.vue'
 import WalletTransactionList from '../../components/wallet/WalletTransactionList.vue'
@@ -143,6 +144,7 @@ const mapChannel = (channel: any) => ({
   name: String(channel.name || channel.channel_type || channel.id),
   channel_type: String(channel.channel_type || ''),
   fee_policy: String(channel.fee_policy || ''),
+  fee_rounding: String(channel.fee_rounding || 'round'),
   fee_rate: String(channel.fee_rate ?? '0'),
   fixed_fee: String(channel.fixed_fee ?? '0'),
   min_amount: String(channel.min_amount ?? '0'),
@@ -266,10 +268,11 @@ const selectedChannelFixedFeeDisplay = computed(() => {
 const selectedChannelFeeAmountDisplay = computed(() => {
   const amountCents = amountToCents(rechargeForm.amount)
   if (amountCents === null || amountCents <= 0) return formatMoney('0.00', selectedChannelCurrency.value)
-  const rate = rateToBasisPoints(selectedChannel.value?.fee_rate) || 0
-  const fixedFeeCents = amountToCents(selectedChannel.value?.fixed_fee) || 0
-  const variableFeeCents = calculateFeeCents(amountCents, rate) || 0
-  return formatMoney(centsToAmount(variableFeeCents + fixedFeeCents), selectedChannelCurrency.value)
+  return formatMoney(centsToAmount(calculateChannelFeeCents(amountCents, selectedChannel.value)), selectedChannelCurrency.value)
+})
+const selectedChannelTotalDisplay = computed(() => {
+  const amount = amountToCents(rechargeForm.amount) || 0
+  return formatMoney(centsToAmount(amount + calculateChannelFeeCents(amount, selectedChannel.value)), selectedChannelCurrency.value)
 })
 const balanceDisplay = computed(() => formatMoney(wallet.value?.balance, String(appStore.config?.currency || 'CNY')))
 

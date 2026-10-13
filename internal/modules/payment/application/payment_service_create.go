@@ -218,7 +218,7 @@ func (s *PaymentService) CreatePayment(input CreatePaymentInput) (*CreatePayment
 			fixedFee = channel.FixedFee.Decimal.Round(2)
 		}
 
-		paymentAmount, feeAmount, feePolicy := calculatePaymentAmounts(onlineAmount, feeRate, fixedFee, feeConfig.CustomerFeeEnabled)
+		paymentAmount, feeAmount, feePolicy := calculateChannelPaymentAmounts(onlineAmount, channel, feeConfig.CustomerFeeEnabled)
 		payment = &paymentdomain.Payment{
 			OrderID:         lockedOrder.ID,
 			ChannelID:       channel.ID,

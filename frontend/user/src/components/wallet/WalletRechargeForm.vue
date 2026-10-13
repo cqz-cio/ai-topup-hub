@@ -65,6 +65,7 @@
         <div class="mt-1 font-semibold text-foreground">{{ feeAmountDisplay }}</div>
       </div>
     </div>
+    <p v-if="selectedChannel?.fee_policy === 'customer_surcharge'" class="mt-3 text-sm font-semibold">{{ t('payment.payableAmountLabel') }}：{{ totalDisplay }}</p>
     <p v-if="channelLoading" class="mt-3 text-xs text-muted-foreground">
       {{ t('common.loading') }}
     </p>
@@ -95,6 +96,7 @@ defineProps<{
   feeRateDisplay: string
   fixedFeeDisplay: string
   feeAmountDisplay: string
+  totalDisplay: string
 }>()
 
 defineEmits<{

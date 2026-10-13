@@ -59,6 +59,12 @@ func (s *PaymentService) HandleSyncCallback(
 		return nil, err
 	}
 
+	if channel.ProviderType == constants.PaymentProviderXorpay {
+		if payment.ProviderType != constants.PaymentProviderXorpay || payment.GatewayOrderNo != result.OrderNo ||
+			(payment.ProviderRef != "" && payment.ProviderRef != payment.GatewayOrderNo && payment.ProviderRef != result.ProviderRef) {
+			return nil, ErrPaymentInvalid
+		}
+	}
 	payload := jsonmap.JSON{}
 	if result.Payload != nil {
 		payload = result.Payload

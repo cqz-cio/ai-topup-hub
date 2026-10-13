@@ -22,6 +22,7 @@ const redactedPaymentConfigValue = "••••••••"
 
 var sensitivePaymentConfigKeys = map[string]struct{}{
 	"api_secret":           {},
+	"app_secret":           {},
 	"api_v3_key":           {},
 	"auth_token":           {},
 	"client_secret":        {},

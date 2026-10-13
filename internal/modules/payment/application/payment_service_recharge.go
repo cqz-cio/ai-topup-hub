@@ -95,7 +95,7 @@ func (s *PaymentService) CreateWalletRechargePayment(input CreateWalletRechargeP
 	if s.settingService != nil {
 		feeConfig = s.settingService.GetPaymentFeeConfig()
 	}
-	paymentAmount, feeAmount, feePolicy := calculatePaymentAmounts(amount, feeRate, fixedFee, feeConfig.CustomerFeeEnabled)
+	paymentAmount, feeAmount, feePolicy := calculateChannelPaymentAmounts(amount, channel, feeConfig.CustomerFeeEnabled)
 	currency := strings.ToUpper(strings.TrimSpace(input.Currency))
 	if currency == "" {
 		currency = "CNY"

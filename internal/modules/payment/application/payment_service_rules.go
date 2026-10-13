@@ -31,6 +31,33 @@ func calculatePaymentAmounts(baseAmount, feeRate, fixedFee decimal.Decimal, cust
 	return baseAmount, feeAmount, constants.PaymentFeePolicyMerchantAbsorbed
 }
 
+// paymentCustomerFeeEnabled allows XorPay's explicit channel setting without changing other providers.
+func paymentCustomerFeeEnabled(channel *paymentdomain.PaymentChannel, fallback bool) bool {
+	if channel.ProviderType == constants.PaymentProviderXorpay {
+		if enabled, ok := channel.ConfigJSON["customer_fee_enabled"].(bool); ok {
+			return enabled
+		}
+	}
+	return fallback
+}
+
+func calculateChannelPaymentAmounts(baseAmount decimal.Decimal, channel *paymentdomain.PaymentChannel, fallback bool) (decimal.Decimal, decimal.Decimal, string) {
+	enabled := paymentCustomerFeeEnabled(channel, fallback)
+	rate, fixed := channel.FeeRate.Decimal.Round(2), channel.FixedFee.Decimal.Round(2)
+	if channel.ProviderType != constants.PaymentProviderXorpay {
+		return calculatePaymentAmounts(baseAmount, rate, fixed, enabled)
+	}
+	baseAmount = baseAmount.Round(2)
+	fee := baseAmount.Mul(rate).Div(decimal.NewFromInt(100)).Add(fixed).RoundCeil(2)
+	if fee.IsZero() {
+		return baseAmount, fee, constants.PaymentFeePolicyNone
+	}
+	if enabled {
+		return baseAmount.Add(fee), fee, constants.PaymentFeePolicyCustomerSurcharge
+	}
+	return baseAmount, fee, constants.PaymentFeePolicyMerchantAbsorbed
+}
+
 // paymentExchangeRate 读取创建支付时存下的渠道换汇汇率快照
 // （ProviderPayload["exchange_rate"]）。存在即说明这笔支付发生过法币换汇（渠道配置了
 // target_currency + exchange_rate，见各 adapter 的 cfg.NeedsCurrencyConversion 分支），
