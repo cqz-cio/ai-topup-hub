@@ -14,7 +14,7 @@
 | 本地商城 | http://127.0.0.1:5173/ |
 | 本地后台 | http://127.0.0.1:5174/ |
 | 绿色源码基线 | `baseline/green-20261012`，提交 `419141e` |
-| 后端源码基准 | `20261013-114011`，构建源码 `aaff34ff2af8d62f9a2cc4061007c6e41b54ea80` |
+| 后端源码基准 | `20261013-162050`，构建源码 `2bbb4e0b802114dd3bda394b28cddcf83639228a`，见 [成交与上游余额邮件](docs/sale-email.md) |
 | 商城注册验证码发布 | 上海静态 `20261013-160811`，商城源码 `c0d5e48c1407261e5d800969c228f03a644732d7`，见 [注册图形验证码](docs/registration-captcha.md) |
 | 后台组件来源 | 保留 `20261013-153730` 的后台资源，源码 `471ded02e1b265520a53485288bdcc4f47dbece9` |
 
@@ -73,3 +73,5 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/local/stop.ps1
 前台与后台由 Vite 构建，`release,fullstack` 将两者嵌入同一个 Go 程序。Dockerfile 和 GitHub 工作流仅构建 `frontend/user`、`frontend/admin`。
 
 本项目基于 Dujiao-Next v1.4.8 独立导入，沿用 Go 模块路径及底层程序名称以保持兼容；它们不表示存在另一套正式商城。来源及许可证见 [SOURCE_IMPORT.md](SOURCE_IMPORT.md) 和 [LICENSE](LICENSE)。[历史上游说明](docs/history/README.md)中的通用安装、升级命令不作为智享A社生产部署入口。
+
+经营者[成交与上游余额邮件](docs/sale-email.md)已启用：订单、采购金额、当前上游余额和查询时间合并通知。新加坡后端发布 `20261013-162050`；上海前端保持 `20261013-160811`。
