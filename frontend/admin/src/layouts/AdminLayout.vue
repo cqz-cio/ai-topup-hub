@@ -109,7 +109,7 @@ const route = useRoute()
 const authStore = useAdminAuthStore()
 const isDark = ref(false)
 const appVersion = ref('')
-const siteUrl = ref(STOREFRONT_URL)
+const siteUrl = STOREFRONT_URL
 
 // 本站版本由独立发布流程维护，后台仅展示系统信息。
 const systemInfoOpen = ref(false)
@@ -722,17 +722,14 @@ onMounted(() => {
   }
   window.addEventListener('resize', handleResize)
 
-  // Fetch app version and site URL
+  // The admin storefront entry uses this store's canonical public URL.
+  // Site settings may still contain a local preview address from an older setup.
   adminAPI.getPublicConfig().then((res) => {
     const payload = res.data?.data
     applySiteIcon(payload?.brand?.site_icon)
     const ver = payload?.app_version
     if (typeof ver === 'string') {
       appVersion.value = ver
-    }
-    const url = payload?.brand?.site_url
-    if (typeof url === 'string' && url) {
-      siteUrl.value = url
     }
   }).catch(() => {})
 })
