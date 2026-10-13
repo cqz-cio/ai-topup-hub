@@ -28,7 +28,7 @@ const downloadTxt = () => {
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
-  a.download = 'dujiao-2fa-recovery-codes.txt'
+  a.download = 'pi-star-admin-2fa-recovery-codes.txt'
   a.click()
   URL.revokeObjectURL(url)
 }

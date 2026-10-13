@@ -1,7 +1,8 @@
 import { getImageUrl } from './image'
+import { ADMIN_BRAND_LOGO } from './branding'
 
 const SITE_ICON_LINK_ID = 'site-favicon'
-const DEFAULT_SITE_ICON = '/dj.svg'
+const DEFAULT_SITE_ICON = ADMIN_BRAND_LOGO
 
 export function resolveSiteIconHref(value: unknown): string {
   const icon = String(value || '').trim()
