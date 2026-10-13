@@ -14,6 +14,7 @@ import { refreshCartStockSnapshots, cartItemPurchaseLimit as itemPurchaseLimit, 
 import { getImageUrl } from '../utils/image'
 import { getAffiliateCode, getAffiliateVisitorKey } from '../utils/affiliate'
 import { saveGuestOrderAuth } from '../utils/guestOrderAuth'
+import { checkoutReturnPath, openCheckoutPayment } from '../utils/checkoutNavigation'
 import ImageCaptcha from '../components/captcha/ImageCaptcha.vue'
 import TurnstileCaptcha from '../components/captcha/TurnstileCaptcha.vue'
 import { useLocalized, useProductLabels } from './useProduct'
@@ -841,6 +842,7 @@ export function useCheckout() {
         channel_id: requiresOnlineChannel.value ? (selectedChannelId.value || undefined) : undefined,
         use_balance: useBalance.value,
       }
+      const returnPath = checkoutReturnPath(cartItems.value)
 
       let responseData: any
 
@@ -871,7 +873,7 @@ export function useCheckout() {
       const query = userAuthStore.isAuthenticated
         ? `order_no=${encodeURIComponent(responseData.order_no)}`
         : `guest=1&order_no=${encodeURIComponent(responseData.order_no)}`
-      router.push(`/pay?${query}`)
+      await openCheckoutPayment(router, `/pay?${query}`, returnPath)
     } catch (err: any) {
       error.value = err.message || t('checkout.errors.submitFailed')
       if (guestCaptchaEnabled.value && captchaProvider.value === 'image') {
