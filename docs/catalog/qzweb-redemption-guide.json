@@ -1,8 +1,18 @@
 {
   "redemption_url": "https://cdk.bar/",
   "product_slugs": [
-    "qzweb-4", "qzweb-5", "qzweb-55", "qzweb-7", "qzweb-56",
-    "qzweb-63", "qzweb-58", "qzweb-64", "qzweb-57", "qzweb-59", "qzweb-62"
+    "qzweb-4",
+    "qzweb-5",
+    "qzweb-6",
+    "qzweb-55",
+    "qzweb-7",
+    "qzweb-56",
+    "qzweb-63",
+    "qzweb-58",
+    "qzweb-64",
+    "qzweb-57",
+    "qzweb-59",
+    "qzweb-62"
   ],
   "title": "卡密自助充值指引",
   "steps": [
@@ -12,5 +22,8 @@
     "提交后可在兑换网站的自助查询或批量查询中查看处理进度；处理中请勿重复提交。"
   ],
   "notice": "收到卡密不代表充值已完成，请以兑换网站的处理结果为准。请妥善保管卡密，不要转发给他人。",
-  "ios_product_slugs": ["qzweb-59", "qzweb-62"]
+  "ios_product_slugs": [
+    "qzweb-59",
+    "qzweb-62"
+  ]
 }
