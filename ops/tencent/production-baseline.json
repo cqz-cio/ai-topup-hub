@@ -1,20 +1,20 @@
 {
-  "checked_at": "2026-10-13T16:29:54.650166+08:00",
+  "checked_at": "2026-10-13T09:14:06.240199+00:00",
   "production_url": "https://www.qzweb.cloud/",
-  "documented_release_id": "20261013-162754",
-  "verified_release_id": "20261013-162754",
-  "previous_release_id": "20261013-162050",
-  "source_commit": "6770a90ad543240e5c208f60f4916a9be8d7631b",
+  "documented_release_id": "20261013-171054",
+  "verified_release_id": "20261013-171054",
+  "previous_release_id": "20261013-162754",
+  "source_commit": "414a1fe84ba56adea03c00e3af97bb03d96cd23e",
   "source_branch": "main",
   "server_git_commit_verified": true,
-  "source_tag": "production/verification-email-20261013-162754",
+  "source_tag": "production/usdt-cents-20261013-171054",
   "production": {
-    "release_path": "/srv/zhixiang/releases/20261013-162754",
-    "running_executable": "/srv/zhixiang/releases/20261013-162754/zhixiang-shop",
-    "binary_bytes": 90357922,
-    "binary_sha256": "f63c2aac81dc9eae36324cd51f61fbf86a9afe2e1bc85a8886e3a75639034249",
-    "running_binary_sha256": "f63c2aac81dc9eae36324cd51f61fbf86a9afe2e1bc85a8886e3a75639034249",
-    "manifest_binary_sha256": "f63c2aac81dc9eae36324cd51f61fbf86a9afe2e1bc85a8886e3a75639034249",
+    "release_path": "/srv/zhixiang/releases/20261013-171054",
+    "running_executable": "/srv/zhixiang/releases/20261013-171054/zhixiang-shop",
+    "binary_bytes": 90370210,
+    "binary_sha256": "14ef8b1747418b70734ed2c6ab2d80249278146ddd46352120e5310cd4f13b55",
+    "running_binary_sha256": "14ef8b1747418b70734ed2c6ab2d80249278146ddd46352120e5310cd4f13b55",
+    "manifest_binary_sha256": "14ef8b1747418b70734ed2c6ab2d80249278146ddd46352120e5310cd4f13b55",
     "build_info": {
       "go_version": "go1.26.5",
       "build_settings": [
@@ -27,11 +27,13 @@
         "GOOS=linux",
         "GOAMD64=v1",
         "vcs=git",
-        "vcs.revision=6770a90ad543240e5c208f60f4916a9be8d7631b",
-        "vcs.time=2026-10-13T08:20:07Z",
+        "vcs.revision=414a1fe84ba56adea03c00e3af97bb03d96cd23e",
+        "vcs.time=2026-10-13T09:07:17Z",
         "vcs.modified=false"
       ],
-      "git_metadata_pinned": true
+      "git_metadata_pinned": true,
+      "vcs_revision": "414a1fe84ba56adea03c00e3af97bb03d96cd23e",
+      "vcs_modified": false
     },
     "runtime_mode": "storefront",
     "upstream_purchase_enabled": true,
@@ -42,20 +44,20 @@
       "stock_sync_timer": "active"
     },
     "redis_preserved_without_restart": true,
-    "backup": "/srv/zhixiang/backups/before-verification-email-20261013-162754",
+    "backup": "/srv/zhixiang/backups/before-usdt-cent-20261013-171054",
     "database_backup_quick_check": "ok",
-    "report_path": "/srv/zhixiang/shared/reports/verification-email-release-20261013-162754.json",
+    "report_path": "/srv/zhixiang/shared/reports/usdt-cent-release-20261013-171054.json",
     "configuration_unchanged": true,
     "nginx_configuration_preserved": true,
     "source_dirty": false,
     "private_configuration_unchanged": true,
     "configuration_changes": [],
-    "source_commit": "6770a90ad543240e5c208f60f4916a9be8d7631b"
+    "source_commit": "414a1fe84ba56adea03c00e3af97bb03d96cd23e"
   },
   "payment": {
     "bep20": {
       "enabled": true,
-      "recipient": "0x66a8bab15067eab1efc948ac03684f0397c8416f",
+      "recipient": "0xA265E6d58B56757aEC3EB3a16b9Edf41De79A26F",
       "chain_id": 56,
       "decimals": 18,
       "payment_types": [
@@ -68,7 +70,7 @@
       "name": "USDT · Plasma",
       "channel_type": "usdt-plasma",
       "enabled": true,
-      "recipient": "0x66a8bab15067eab1efc948ac03684f0397c8416f",
+      "recipient": "0xA265E6d58B56757aEC3EB3a16b9Edf41De79A26F",
       "chain_id": 9745,
       "token_contract": "0xb8ce59fc3717ada4c02eadf9682a9e934f625ebb",
       "decimals": 6,
@@ -77,7 +79,7 @@
         "wallet"
       ]
     },
-    "cny_per_usdt": "6.66",
+    "cny_per_usdt": "6.649820455",
     "confirmations": 15,
     "public_channels": [
       {
@@ -121,7 +123,8 @@
     "monitor_access_requires_existing_compliance_acknowledgement": true,
     "compliance_acknowledgement_preserved": true,
     "previous_detailed_verification_recorded_at": "2026-10-12T05:45:38.041686+00:00",
-    "current_release_verification_scope": "Existing BEP20 and Plasma order/wallet channel configuration, private settings and financial data were preserved during the member fixed product price release. Both services and storefront mode were verified. No real payment or procurement test was submitted. Prior wallet acceptance evidence remains in wallet_repair."
+    "current_release_verification_scope": "Existing BEP20 and Plasma order/wallet channel configuration, private settings and financial data were preserved during the member fixed product price release. Both services and storefront mode were verified. No real payment or procurement test was submitted. Prior wallet acceptance evidence remains in wallet_repair.",
+    "new_invoice_amount_decimals": 2
   },
   "pages": [
     "https://www.qzweb.cloud/",
@@ -239,16 +242,16 @@
     "content_preserved_by_release": "20261012-153531"
   },
   "source_identity_verification": {
-    "source_commit": "2bbb4e0b802114dd3bda394b28cddcf83639228a",
+    "source_commit": "414a1fe84ba56adea03c00e3af97bb03d96cd23e",
     "source_branch": "main",
     "source_dirty": false,
     "binary_build_info_commit_matches": true,
     "running_binary_sha256_matches": true,
-    "frontend_files_sha256_verified": 2247
+    "frontend_files_sha256_verified": 2437
   },
   "previous_release": {
-    "release": "20261013-114011",
-    "source_commit": "aaff34ff2af8d62f9a2cc4061007c6e41b54ea80",
+    "release": "20261013-162754",
+    "source_commit": "6770a90ad543240e5c208f60f4916a9be8d7631b",
     "retained": true
   },
   "domain_verification": {
@@ -848,7 +851,7 @@
     "real_payment_or_purchase_submitted": false,
     "verification_directory": "work/codex-runtime/register-captcha-preview-20261013/"
   },
-  "previous_verification_checked_at": "2026-10-13T03:45:39.908335+00:00",
+  "previous_verification_checked_at": "2026-10-13T16:29:54.650166+08:00",
   "sale_email": {
     "release": "20261013-162050",
     "source_commit": "2bbb4e0b802114dd3bda394b28cddcf83639228a",
@@ -962,5 +965,29 @@
     "actual_email_sent": false,
     "account_created": false,
     "payment_or_purchase_performed": false
+  },
+  "usdt_amount_rule": {
+    "release": "20261013-171054",
+    "source_commit": "414a1fe84ba56adea03c00e3af97bb03d96cd23e",
+    "checked_at": "2026-10-13T09:14:06.240199+00:00",
+    "rounding": "ceil(CNY / invoice_rate, 2)",
+    "collision_increment_usdt": "0.01",
+    "maximum_collision_uplift_usdt": "0.99",
+    "candidate_count": 100,
+    "historical_amount_reuse": false,
+    "legacy_six_decimal_invoices_preserved": true,
+    "local_unpaid_invoices_verified": 6,
+    "local_data_restored": true,
+    "production_test_orders_created": false,
+    "real_money_acceptance": false,
+    "backup": "/srv/zhixiang/backups/before-usdt-cent-20261013-171054",
+    "private_verification_directory": "work/codex-runtime/usdt-cent/",
+    "shanghai_preserved": {
+      "release": "20261013-165016",
+      "files": 2437,
+      "assets_sha256": "d25d903f7436a4d2b23806671d6d3a8e5db2874391f7c72f4d19c2c31405877f",
+      "nginx_sha256": "9351767d961a639affbcaa896114ea753a9710c796eda1155afa5718874a4603",
+      "nginx_active": "active"
+    }
   }
 }
