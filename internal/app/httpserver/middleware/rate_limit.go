@@ -2,9 +2,11 @@ package middleware
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -119,17 +121,21 @@ func (l *localRateLimiter) shouldWarnRedisFallback(now time.Time) bool {
 // Redis 未配置或运行时暂时不可用时使用进程内兜底；该兜底仅对当前实例生效，
 // 多实例部署必须配置共享 Redis 才能获得全局一致的计数。Redis 故障降级和
 // 本地容量耗尽都会输出节流后的 warning，避免故障期间产生日志洪泛。
+// This admission guard leaves chain advancement to Gin so custom callbacks can
+// apply it before dispatching their handler without running unrelated routes.
 func RateLimitMiddleware(client *redis.Client, rule RateLimitRule, keyFunc RateLimitKeyFunc) gin.HandlerFunc {
 	local := &localRateLimiter{}
 	return func(c *gin.Context) {
 		if rule.WindowSeconds <= 0 || rule.MaxRequests <= 0 {
-			c.Next()
 			return
 		}
 
 		key := ""
 		if keyFunc != nil {
 			key = strings.TrimSpace(keyFunc(c))
+		}
+		if c.IsAborted() {
+			return
 		}
 		if key == "" {
 			key = c.ClientIP()
@@ -155,14 +161,16 @@ func RateLimitMiddleware(client *redis.Client, rule RateLimitRule, keyFunc RateL
 		if client == nil {
 			incrementLocal()
 		} else {
+			ctx, cancel := context.WithTimeout(c.Request.Context(), time.Second)
 			result, err := rateLimitScript.Run(
-				c.Request.Context(),
+				ctx,
 				client,
 				[]string{key},
 				rule.WindowSeconds,
 				rule.MaxRequests,
 				rule.BlockSeconds,
 			).Result()
+			cancel()
 			if err != nil {
 				if local.shouldWarnRedisFallback(now) {
 					logger.Warnw("rate_limit_redis_fallback", "prefix", rule.Prefix, "error", err)
@@ -204,6 +212,7 @@ func RateLimitMiddleware(client *redis.Client, rule RateLimitRule, keyFunc RateL
 			if waitSeconds < 1 {
 				waitSeconds = 1
 			}
+			c.Header("Retry-After", strconv.Itoa(waitSeconds))
 			msgKey := strings.TrimSpace(rule.MessageKey)
 			if msgKey == "" {
 				msgKey = "error.rate_limited"
@@ -218,7 +227,6 @@ func RateLimitMiddleware(client *redis.Client, rule RateLimitRule, keyFunc RateL
 			return
 		}
 
-		c.Next()
 	}
 }
 
@@ -282,7 +290,11 @@ func readJSONField(c *gin.Context, field string) string {
 	if c == nil || c.Request == nil || c.Request.Body == nil {
 		return ""
 	}
-	body, err := io.ReadAll(c.Request.Body)
+	body, err := io.ReadAll(io.LimitReader(c.Request.Body, (64<<10)+1))
+	if len(body) > 64<<10 {
+		rejectLargeBody(c)
+		return ""
+	}
 	if err != nil {
 		return ""
 	}

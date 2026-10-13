@@ -8,6 +8,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"mime"
+	"net"
 	"net/mail"
 	"net/smtp"
 	"strings"
@@ -490,17 +491,33 @@ func buildEmailMessage(from, to, subject, body string, replyTo ...string) string
 	return buf.String()
 }
 
-func sendMailWithSSL(addr, host, from string, to []string, msg []byte, username, password string) (err error) {
-	conn, err := tls.Dial("tcp", addr, &tls.Config{ServerName: host})
+// A deadline covers greeting, TLS, authentication, DATA and QUIT; a stalled
+// SMTP peer must not permanently occupy HTTP or notification worker capacity.
+func dialSMTPClient(addr, host string, implicitTLS bool, budget time.Duration) (*smtp.Client, error) {
+	deadline := time.Now().Add(budget)
+	dialer := net.Dialer{Timeout: min(10*time.Second, budget), Deadline: deadline}
+	conn, err := dialer.Dial("tcp", addr)
 	if err != nil {
-		return err
+		return nil, err
 	}
-
+	if err := conn.SetDeadline(deadline); err != nil {
+		_ = conn.Close()
+		return nil, err
+	}
+	if implicitTLS {
+		conn = tls.Client(conn, &tls.Config{ServerName: host, MinVersion: tls.VersionTLS12})
+	}
 	client, err := smtp.NewClient(conn, host)
 	if err != nil {
-		if closeErr := conn.Close(); closeErr != nil && !isSMTPAlreadyClosedError(closeErr) {
-			logger.Debugw("smtp_tls_conn_close_failed", "host", host, "addr", addr, "error", closeErr)
-		}
+		_ = conn.Close()
+		return nil, err
+	}
+	return client, nil
+}
+
+func sendMailWithSSL(addr, host, from string, to []string, msg []byte, username, password string) (err error) {
+	client, err := dialSMTPClient(addr, host, true, 30*time.Second)
+	if err != nil {
 		return err
 	}
 	defer closeSMTPClientOnError(client, &err, host, addr)
@@ -514,7 +531,7 @@ func sendMailWithSSL(addr, host, from string, to []string, msg []byte, username,
 }
 
 func sendMailWithStartTLS(addr, host, from string, to []string, msg []byte, username, password string) (err error) {
-	client, err := smtp.Dial(addr)
+	client, err := dialSMTPClient(addr, host, false, 30*time.Second)
 	if err != nil {
 		return err
 	}
@@ -533,7 +550,7 @@ func sendMailWithStartTLS(addr, host, from string, to []string, msg []byte, user
 }
 
 func sendMailPlain(addr, host, from string, to []string, msg []byte, username, password string) (err error) {
-	client, err := smtp.Dial(addr)
+	client, err := dialSMTPClient(addr, host, false, 30*time.Second)
 	if err != nil {
 		return err
 	}

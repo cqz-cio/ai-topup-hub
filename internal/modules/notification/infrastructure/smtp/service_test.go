@@ -4,12 +4,15 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
+	"io"
+	"net"
 	"net/mail"
 	"net/smtp"
 	"os"
 	"strconv"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/dujiao-next/internal/config"
 	"github.com/dujiao-next/internal/i18n"
@@ -537,6 +540,51 @@ func TestIsSMTPAlreadyClosedError(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := isSMTPAlreadyClosedError(tt.err); got != tt.want {
 				t.Fatalf("isSMTPAlreadyClosedError() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestSMTPDeadlineCoversGreetingTLSAndProtocolCommands(t *testing.T) {
+	for _, tc := range []struct {
+		name          string
+		ssl, greeting bool
+	}{{"greeting", false, false}, {"TLS handshake", true, false}, {"after greeting", false, true}} {
+		t.Run(tc.name, func(t *testing.T) {
+			listener, err := net.Listen("tcp", "127.0.0.1:0")
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer listener.Close()
+			release, done := make(chan struct{}), make(chan struct{})
+			go func() {
+				defer close(done)
+				conn, err := listener.Accept()
+				if err != nil {
+					return
+				}
+				defer conn.Close()
+				_ = conn.SetDeadline(time.Now().Add(time.Second))
+				if tc.greeting {
+					_, _ = io.WriteString(conn, "220 mock.local ESMTP\r\n")
+				}
+				<-release
+			}()
+			start := time.Now()
+			client, err := dialSMTPClient(listener.Addr().String(), "localhost", tc.ssl, 100*time.Millisecond)
+			if err == nil {
+				err = client.Mail("test@example.com")
+				_ = client.Close()
+			}
+			close(release)
+			_ = listener.Close()
+			<-done
+			var networkErr net.Error
+			if !errors.As(err, &networkErr) || !networkErr.Timeout() {
+				t.Fatalf("expected deadline error, got %v", err)
+			}
+			if time.Since(start) > time.Second {
+				t.Fatal("SMTP deadline was not enforced")
 			}
 		})
 	}

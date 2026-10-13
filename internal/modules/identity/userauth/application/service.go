@@ -3,16 +3,18 @@ package application
 import (
 	"context"
 	"crypto/rand"
+	"crypto/subtle"
 	"errors"
 	"fmt"
-	"github.com/dujiao-next/internal/telegramidentity"
 	"math/big"
 	"net/mail"
 	"strings"
 	"time"
 
 	usercontract "github.com/dujiao-next/internal/modules/identity/user/contract"
+	"github.com/dujiao-next/internal/platform/ratelimit"
 	"github.com/dujiao-next/internal/shared/passwordpolicy"
+	"github.com/dujiao-next/internal/telegramidentity"
 
 	userdomain "github.com/dujiao-next/internal/modules/identity/user/domain"
 
@@ -37,6 +39,7 @@ import (
 
 // Service 用户认证服务
 type Service struct {
+	verificationQuota     ratelimit.Reserver
 	cfg                   *config.Config
 	userRepo              usercontract.Store
 	userOAuthIdentityRepo externalidentitycontract.Store
@@ -95,6 +98,7 @@ func NewService(
 ) *Service {
 	return &Service{
 		cfg:                   cfg,
+		verificationQuota:     ratelimit.New(nil, cfg.Redis.Enabled),
 		userRepo:              userRepo,
 		userOAuthIdentityRepo: userOAuthIdentityRepo,
 		codeRepo:              codeRepo,
@@ -220,19 +224,6 @@ func (s *Service) SendVerifyCode(ctx context.Context, email, purpose, locale str
 	}
 
 	if purpose == constants.VerifyPurposeReset {
-		user, err := s.userRepo.GetByEmail(normalized)
-		if err != nil {
-			return err
-		}
-		if user == nil {
-			return ErrNotFound
-		}
-		if strings.TrimSpace(user.Locale) != "" {
-			locale = user.Locale
-		}
-	}
-
-	if purpose == constants.VerifyPurposeTelegramBind {
 		user, err := s.userRepo.GetByEmail(normalized)
 		if err != nil {
 			return err
@@ -500,13 +491,13 @@ func (s *Service) verifyCode(email, purpose, code string) (*emailverificationdom
 		return nil, ErrVerifyCodeAttemptsExceeded
 	}
 
-	if strings.TrimSpace(record.Code) != strings.TrimSpace(code) {
-		_ = s.codeRepo.IncrementAttempt(record.ID)
-		return nil, ErrVerifyCodeInvalid
-	}
-
-	if err := s.codeRepo.MarkVerified(record.ID, now); err != nil {
+	matches := subtle.ConstantTimeCompare([]byte(strings.TrimSpace(record.Code)), []byte(strings.TrimSpace(code))) == 1
+	accepted, err := s.codeRepo.ApplyVerificationAttempt(record.ID, matches, now, maxAttempts)
+	if err != nil {
 		return nil, err
+	}
+	if !accepted || !matches {
+		return nil, ErrVerifyCodeInvalid
 	}
 	return record, nil
 }
@@ -544,6 +535,9 @@ func (s *Service) sendVerifyCode(ctx context.Context, email, purpose, locale str
 		SentAt:    now,
 		CreatedAt: now,
 	}
+	if err := s.reserveVerificationMail(ctx, email); err != nil {
+		return err
+	}
 	if err := s.emailService.SendVerifyCode(email, code, purpose, locale, brand); err != nil {
 		return err
 	}
@@ -560,7 +554,8 @@ func normalizeEmail(email string) (string, error) {
 	if normalized == "" {
 		return "", ErrInvalidEmail
 	}
-	if _, err := mail.ParseAddress(normalized); err != nil {
+	address, err := mail.ParseAddress(normalized)
+	if err != nil || len(normalized) > 254 || address.Name != "" || address.Address != normalized {
 		return "", ErrInvalidEmail
 	}
 	return normalized, nil
@@ -586,7 +581,7 @@ func NormalizeEmail(email string) (string, error) {
 
 func isVerifyPurposeSupported(purpose string) bool {
 	switch strings.ToLower(strings.TrimSpace(purpose)) {
-	case constants.VerifyPurposeRegister, constants.VerifyPurposeReset, constants.VerifyPurposeTelegramBind, constants.VerifyPurposeChangeEmailOld, constants.VerifyPurposeChangeEmailNew:
+	case constants.VerifyPurposeRegister, constants.VerifyPurposeReset:
 		return true
 	default:
 		return false

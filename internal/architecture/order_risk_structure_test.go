@@ -21,7 +21,7 @@ func TestOrderRiskUsesCompleteVerticalLayout(t *testing.T) {
 	assertDirectoryGoFileBudget(t, applicationRoot, 2)
 	assertDirectoryGoFileBudget(t, contractRoot, 4)
 	assertDirectoryGoFileBudget(t, domainRoot, 1)
-	assertDirectoryGoFileBudget(t, limiterRoot, 1)
+	assertDirectoryGoFileBudget(t, limiterRoot, 2) // includes Redis-outage regression coverage
 
 	assertFileDeclaresTypes(t, filepath.Join(applicationRoot, "service.go"), []string{"Options", "Service"})
 	assertFileDeclaresFunctions(t, filepath.Join(applicationRoot, "service.go"), []string{"NewService"})

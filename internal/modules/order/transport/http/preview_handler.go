@@ -25,6 +25,7 @@ import (
 )
 
 var (
+	ErrRiskProtectionUnavailable = errors.New("risk: protection unavailable")
 	ErrProductSKURequired        = errors.New("product sku required")
 	ErrInvalidOrderAmount        = errors.New("invalid order amount")
 	ErrGuestEmailRequired        = errors.New("guest email required")
@@ -261,6 +262,11 @@ type mappedError struct {
 }
 
 func respondWithMappedError(c *gin.Context, err error, rules []mappedError, fallbackCode int, fallbackKey string) {
+	if errors.Is(err, ErrRiskProtectionUnavailable) {
+		c.Header("Retry-After", "5")
+		response.ErrorWithHTTPStatus(c, 503, response.CodeInternal, i18n.T(i18n.ResolveLocale(c), "error.order_create_failed"))
+		return
+	}
 	if retryAfter := retryAfterSeconds(err); retryAfter > 0 {
 		c.Header("Retry-After", strconv.FormatInt(retryAfter, 10))
 		locale := i18n.ResolveLocale(c)

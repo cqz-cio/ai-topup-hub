@@ -3,6 +3,8 @@ package userauthhttp
 import (
 	"context"
 	"errors"
+	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/dujiao-next/internal/constants"
@@ -16,9 +18,10 @@ import (
 )
 
 var (
-	ErrInvalidVerifyPurpose  = errors.New("invalid verify purpose")
-	ErrEmailExists           = errors.New("email exists")
-	ErrEmailDomainNotAllowed = errors.New("email domain not allowed")
+	ErrVerificationUnavailable = errors.New("verification protection unavailable")
+	ErrInvalidVerifyPurpose    = errors.New("invalid verify purpose")
+	ErrEmailExists             = errors.New("email exists")
+	ErrEmailDomainNotAllowed   = errors.New("email domain not allowed")
 )
 
 // CaptchaVerifier 是发送验证码所需的验证码端口。
@@ -70,6 +73,10 @@ func (h *UserVerifyHandler) SendUserVerifyCode(c *gin.Context) {
 	}
 
 	purpose := strings.ToLower(strings.TrimSpace(req.Purpose))
+	if purpose != constants.VerifyPurposeRegister && purpose != constants.VerifyPurposeReset {
+		ginutil.RespondError(c, response.CodeBadRequest, "error.verify_purpose_invalid", nil)
+		return
+	}
 
 	emailVerificationEnabled, err := h.settings.GetEmailVerificationEnabled(true)
 	if err != nil {
@@ -108,7 +115,7 @@ func (h *UserVerifyHandler) SendUserVerifyCode(c *gin.Context) {
 	}
 
 	locale := i18n.ResolveLocale(c)
-	if err := h.auth.SendVerifyCode(c.Request.Context(), req.Email, req.Purpose, locale); err != nil {
+	if err := h.auth.SendVerifyCode(c.Request.Context(), req.Email, purpose, locale); err != nil {
 		switch {
 		case errors.Is(err, ErrInvalidEmail):
 			ginutil.RespondError(c, response.CodeBadRequest, "error.email_invalid", nil)
@@ -120,8 +127,8 @@ func (h *UserVerifyHandler) SendUserVerifyCode(c *gin.Context) {
 			ginutil.RespondError(c, response.CodeBadRequest, "error.email_domain_not_allowed", nil)
 		case errors.Is(err, ErrUserNotFound):
 			ginutil.RespondError(c, response.CodeNotFound, "error.user_not_found", nil)
-		case errors.Is(err, ErrVerifyCodeTooFrequent):
-			ginutil.RespondError(c, response.CodeTooManyRequests, "error.verify_code_too_frequent", nil)
+		case errors.Is(err, ErrVerifyCodeTooFrequent), errors.Is(err, ErrVerificationUnavailable):
+			respondVerificationProtectionError(c, err)
 		case errors.Is(err, ErrEmailRecipientRejected):
 			ginutil.RespondError(c, response.CodeBadRequest, "error.email_recipient_not_found", nil)
 		case errors.Is(err, ErrEmailServiceDisabled),
@@ -147,4 +154,23 @@ func respondCaptchaError(c *gin.Context, err error) {
 	default:
 		ginutil.RespondError(c, response.CodeInternal, "error.captcha_verify_failed", err)
 	}
+}
+
+func respondVerificationProtectionError(c *gin.Context, err error) {
+	retry := 60
+	var rate interface{ RetryAfterSeconds() int }
+	if errors.As(err, &rate) {
+		retry = max(1, rate.RetryAfterSeconds())
+	}
+	status := http.StatusTooManyRequests
+	code := response.CodeTooManyRequests
+	message := i18n.Sprintf(i18n.ResolveLocale(c), "error.rate_limited", retry)
+	if errors.Is(err, ErrVerificationUnavailable) {
+		status = http.StatusServiceUnavailable
+		code = response.CodeInternal
+		retry = 5
+		message = i18n.T(i18n.ResolveLocale(c), "error.send_verify_code_failed")
+	}
+	c.Header("Retry-After", strconv.Itoa(retry))
+	response.ErrorWithHTTPStatus(c, status, code, message)
 }

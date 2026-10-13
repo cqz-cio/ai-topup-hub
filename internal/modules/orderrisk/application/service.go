@@ -83,7 +83,10 @@ func (s *Service) checkGuestOrder(input orderriskcontract.CheckInput, result ord
 	if err := checkProductQuantityLimit(input.Items, policy.MaxQuantityPerProductPerOrder); err != nil {
 		return result, err
 	}
-	if input.ConsumeRateLimit && policy.RateLimit.Enabled && s.rateLimiter != nil {
+	if input.ConsumeRateLimit && policy.RateLimit.Enabled {
+		if s.rateLimiter == nil {
+			return result, orderriskcontract.ErrProtectionUnavailable
+		}
 		input.RiskIP = result.RiskIP
 		if err := s.rateLimiter.Check(input, policy.RateLimit); err != nil {
 			return result, err
@@ -103,7 +106,10 @@ func (s *Service) checkMemberOrder(input orderriskcontract.CheckInput, result or
 	if err := checkProductQuantityLimit(input.Items, policy.MaxQuantityPerProductPerOrder); err != nil {
 		return result, err
 	}
-	if input.ConsumeRateLimit && policy.RateLimit.Enabled && s.rateLimiter != nil {
+	if input.ConsumeRateLimit && policy.RateLimit.Enabled {
+		if s.rateLimiter == nil {
+			return result, orderriskcontract.ErrProtectionUnavailable
+		}
 		input.RiskIP = result.RiskIP
 		if err := s.rateLimiter.Check(input, policy.RateLimit); err != nil {
 			return result, err

@@ -255,8 +255,9 @@ func DefaultCORSAllowedHeaders() []string {
 
 // SecurityConfig 安全配置
 type SecurityConfig struct {
-	LoginRateLimit LoginRateLimitConfig `mapstructure:"login_rate_limit"`
-	PasswordPolicy PasswordPolicyConfig `mapstructure:"password_policy"`
+	AbuseProtection AbuseProtectionConfig `mapstructure:"abuse_protection"`
+	LoginRateLimit  LoginRateLimitConfig  `mapstructure:"login_rate_limit"`
+	PasswordPolicy  PasswordPolicyConfig  `mapstructure:"password_policy"`
 }
 
 // LoginRateLimitConfig 登录限流配置
@@ -384,6 +385,14 @@ func Load() *Config {
 	viper.SetDefault("cors.allowed_headers", DefaultCORSAllowedHeaders())
 	viper.SetDefault("cors.allow_credentials", true)
 	viper.SetDefault("cors.max_age", 600)
+
+	for key, value := range map[string]int{
+		"public_per_minute": 240, "auth_per_minute": 30, "captcha_per_minute": 20,
+		"send_code_per_minute": 5, "mutation_per_minute": 30, "auth_max_concurrent": 16,
+		"recipient_per_hour": 10, "recipient_per_day": 30, "mail_per_hour": 300, "mail_per_day": 2000,
+	} {
+		viper.SetDefault("security.abuse_protection."+key, value)
+	}
 	viper.SetDefault("security.login_rate_limit.window_seconds", 300)
 	viper.SetDefault("security.login_rate_limit.max_attempts", 5)
 	viper.SetDefault("security.login_rate_limit.block_seconds", 900)

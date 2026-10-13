@@ -132,6 +132,18 @@ cors:
   max_age: 600
 
 security:
+  # 应用层防刷；<= 0 回退默认值。生产多实例必须共享 Redis。
+  abuse_protection:
+    public_per_minute: 240 # 商城所有接口按 IP 共享，回调/后台上传独立
+    auth_per_minute: 30
+    captcha_per_minute: 20
+    send_code_per_minute: 5 # 发码/注册/找回密码共享 IP 桶
+    mutation_per_minute: 30 # 登录用户写入操作按用户 ID
+    auth_max_concurrent: 16 # 单进程，超额立即 503
+    recipient_per_hour: 10 # 同一邮箱跨用途共享
+    recipient_per_day: 30
+    mail_per_hour: 300 # 全站验证码邮件；不含成交通知
+    mail_per_day: 2000
   login_rate_limit:
     window_seconds: 300
     max_attempts: 5

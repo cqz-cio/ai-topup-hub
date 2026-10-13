@@ -3,6 +3,7 @@ package contract
 import "errors"
 
 var (
+	ErrProtectionUnavailable       = errors.New("risk: protection unavailable")
 	ErrIPBlacklisted               = errors.New("risk: ip blacklisted")
 	ErrClientIPUnavailable         = errors.New("risk: client ip unavailable")
 	ErrTooManyPendingOrders        = errors.New("risk: too many pending orders")

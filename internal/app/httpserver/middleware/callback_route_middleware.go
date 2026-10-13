@@ -4,7 +4,8 @@ import (
 	"net/http"
 	"strings"
 
-	settingsapp "github.com/dujiao-next/internal/modules/settings/application"
+	settingsintegration "github.com/dujiao-next/internal/modules/settings/schema/integration"
+	"github.com/dujiao-next/internal/platform/http/response"
 
 	"github.com/dujiao-next/internal/constants"
 	paymenttransport "github.com/dujiao-next/internal/modules/payment/transport/http"
@@ -28,12 +29,22 @@ var defaultCallbackPaths = map[string]bool{
 //   - 匹配自定义路径 → 分发到对应 handler
 //   - 匹配默认回调路径 → 返回 404（隐藏默认路径）
 //   - 未配置自定义路由 → 放行，默认路由正常工作
+type callbackRouteSettings interface {
+	GetCallbackRoutesCached() *settingsintegration.CallbackRoutesSetting
+}
+
 func CallbackRouteMiddleware(
-	settingService *settingsapp.Service,
+	settingService callbackRouteSettings,
 	callbackHandler *paymentcallbacktransport.Handler,
 	webhookHandler *paymenttransport.WebhookHandler,
 	upstreamHandler *upstreamtransport.Handler,
+	rateLimit gin.HandlerFunc,
 ) gin.HandlerFunc {
+	if rateLimit == nil {
+		panic("callback rate guard is required")
+	}
+	bodyLimit := BodyLimit(4 << 20)
+	slots := make(chan struct{}, 16)
 	return func(c *gin.Context) {
 		path := strings.TrimRight(c.Request.URL.Path, "/")
 		method := c.Request.Method
@@ -57,36 +68,53 @@ func CallbackRouteMiddleware(
 			return
 		}
 
+		dispatch := func(handler gin.HandlerFunc) {
+			select {
+			case slots <- struct{}{}:
+				defer func() { <-slots }()
+			default:
+				c.Header("Retry-After", "1")
+				response.ErrorWithHTTPStatus(c, 503, response.CodeInternal, "Service busy; please retry later")
+				c.Abort()
+				return
+			}
+			rateLimit(c)
+			if c.IsAborted() {
+				return
+			}
+			bodyLimit(c)
+			if c.IsAborted() {
+				return
+			}
+			handler(c)
+			c.Abort()
+		}
+
 		// 匹配自定义回调路径
 		switch path {
 		case routes.PaymentCallback:
 			if routes.PaymentCallback != "" && (method == http.MethodPost || method == http.MethodGet) {
-				callbackHandler.PaymentCallback(c)
-				c.Abort()
+				dispatch(callbackHandler.PaymentCallback)
 				return
 			}
 		case routes.DujiaoPayWebhook:
 			if routes.DujiaoPayWebhook != "" && method == http.MethodPost && webhookHandler != nil {
-				webhookHandler.DujiaoPayWebhook(c)
-				c.Abort()
+				dispatch(webhookHandler.DujiaoPayWebhook)
 				return
 			}
 		case routes.PaypalWebhook:
 			if routes.PaypalWebhook != "" && method == http.MethodPost && webhookHandler != nil {
-				webhookHandler.PaypalWebhook(c)
-				c.Abort()
+				dispatch(webhookHandler.PaypalWebhook)
 				return
 			}
 		case routes.StripeWebhook:
 			if routes.StripeWebhook != "" && method == http.MethodPost && webhookHandler != nil {
-				webhookHandler.StripeWebhook(c)
-				c.Abort()
+				dispatch(webhookHandler.StripeWebhook)
 				return
 			}
 		case routes.UpstreamCallback:
 			if routes.UpstreamCallback != "" && method == http.MethodPost {
-				upstreamHandler.HandleCallback(c)
-				c.Abort()
+				dispatch(upstreamHandler.HandleCallback)
 				return
 			}
 		}

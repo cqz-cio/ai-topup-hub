@@ -34,14 +34,19 @@ func (store *Store) GetLatest(email, purpose string) (*emailverificationdomain.C
 	return &record, nil
 }
 
-func (store *Store) MarkVerified(id uint, verifiedAt time.Time) error {
-	return store.db.Model(&emailverificationdomain.Code{}).
-		Where("id = ? AND deleted_at IS NULL", id).
-		Update("verified_at", verifiedAt).Error
-}
-
-func (store *Store) IncrementAttempt(id uint) error {
-	return store.db.Model(&emailverificationdomain.Code{}).
-		Where("id = ? AND deleted_at IS NULL", id).
-		UpdateColumn("attempt_count", gorm.Expr("attempt_count + 1")).Error
+// ApplyVerificationAttempt performs the attempt budget check and optional
+// consumption in one conditional UPDATE, including concurrent callers.
+func (store *Store) ApplyVerificationAttempt(id uint, matches bool, now time.Time, maxAttempts int) (bool, error) {
+	updates := map[string]interface{}{"attempt_count": gorm.Expr("attempt_count + 1")}
+	if matches {
+		updates["verified_at"] = now
+	}
+	result := store.db.Model(&emailverificationdomain.Code{}).
+		Where("id = ? AND deleted_at IS NULL AND verified_at IS NULL AND expires_at > ? AND attempt_count < ?", id, now, maxAttempts).
+		Where(`NOT EXISTS (SELECT 1 FROM email_verify_codes AS newer
+            WHERE newer.email = email_verify_codes.email AND newer.purpose = email_verify_codes.purpose
+            AND newer.deleted_at IS NULL AND (newer.sent_at > email_verify_codes.sent_at
+            OR (newer.sent_at = email_verify_codes.sent_at AND newer.id > email_verify_codes.id)))`).
+		Updates(updates)
+	return result.RowsAffected == 1, result.Error
 }

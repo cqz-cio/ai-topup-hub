@@ -518,6 +518,7 @@ func mapOrderTransportError(err error) error {
 		{orderriskcontract.ErrProductQuantityLimit, ordertransport.ErrRiskProductQuantityLimit},
 		{orderriskcontract.ErrPendingProductQuantityLimit, ordertransport.ErrRiskPendingProductLimit},
 		{orderriskcontract.ErrOrderRateLimited, ordertransport.ErrRiskOrderRateLimited},
+		{orderriskcontract.ErrProtectionUnavailable, ordertransport.ErrRiskProtectionUnavailable},
 	} {
 		if errors.Is(err, mapping.source) {
 			return fmt.Errorf("%w: %v", mapping.target, err)

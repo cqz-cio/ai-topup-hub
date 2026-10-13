@@ -43,9 +43,11 @@ func InitRedis(cfg *config.RedisConfig) error {
 	}
 
 	redisClient = redis.NewClient(&redis.Options{
-		Addr:     fmt.Sprintf("%s:%d", addr, port),
-		Password: cfg.Password,
-		DB:       cfg.DB,
+		Addr:                  fmt.Sprintf("%s:%d", addr, port),
+		Password:              cfg.Password,
+		DB:                    cfg.DB,
+		ContextTimeoutEnabled: true,
+		DialTimeout:           time.Second,
 	})
 	redisEnabled = true
 	return nil

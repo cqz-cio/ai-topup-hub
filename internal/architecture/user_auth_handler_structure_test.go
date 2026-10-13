@@ -230,7 +230,8 @@ func TestUserProfileHTTPLivesInTransport(t *testing.T) {
 	assertFileDeclaresFunctions(t, filepath.Join(presenterRoot, "user.go"), []string{
 		"NewUserProfileResp", "NewTelegramBindingResp", "NewGoogleBindingResp", "NewUserAuthBriefResp",
 	})
-	assertDirectoryGoFileBudget(t, transportRoot, 13)
+	// Public verification purpose/HTTP status regression coverage.
+	assertDirectoryGoFileBudget(t, transportRoot, 14)
 	assertDirectoryGoFileBudget(t, presenterRoot, 2)
 
 	for _, legacy := range []string{

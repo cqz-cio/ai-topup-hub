@@ -13,6 +13,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -469,12 +470,17 @@ func TestUnknownKidsQueuedBehindSlowRefreshDoNotRetrySequentially(t *testing.T) 
 	attackerKey := generateGoogleTestKey(t)
 	var mu sync.Mutex
 	requests := 0
+	// Advance logical time for the slow fetch, not for unrelated CPU scheduling.
+	// A 20ms wall-clock cooldown made this test flaky under parallel package tests.
+	var logicalTime atomic.Int64
+	logicalTime.Store(time.Now().UnixNano())
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		mu.Lock()
 		requests++
 		currentRequest := requests
 		mu.Unlock()
 		if currentRequest > 1 {
+			logicalTime.Add(int64(50 * time.Millisecond))
 			time.Sleep(50 * time.Millisecond)
 		}
 		w.Header().Set("Cache-Control", "public, max-age=3600")
@@ -491,8 +497,9 @@ func TestUnknownKidsQueuedBehindSlowRefreshDoNotRetrySequentially(t *testing.T) 
 		WithJWKSURL(server.URL),
 		WithHTTPClient(server.Client()),
 	)
+	service.now = func() time.Time { return time.Unix(0, logicalTime.Load()) }
 	service.unknownKidCooldown = 20 * time.Millisecond
-	now := time.Now()
+	now := service.now()
 	if _, err := service.VerifyCredential(
 		context.Background(),
 		signGoogleTestCredential(t, trustedKey, "trusted-key", now, nil),

@@ -77,8 +77,8 @@ func (h *UserEmailHandler) SendChangeEmailCode(c *gin.Context) {
 			ginutil.RespondError(c, response.CodeBadRequest, "error.email_change_exists", nil)
 		case errors.Is(err, ErrUserNotFound):
 			ginutil.RespondError(c, response.CodeNotFound, "error.user_not_found", nil)
-		case errors.Is(err, ErrVerifyCodeTooFrequent):
-			ginutil.RespondError(c, response.CodeTooManyRequests, "error.verify_code_too_frequent", nil)
+		case errors.Is(err, ErrVerifyCodeTooFrequent), errors.Is(err, ErrVerificationUnavailable):
+			respondVerificationProtectionError(c, err)
 		case errors.Is(err, ErrEmailRecipientRejected):
 			ginutil.RespondError(c, response.CodeBadRequest, "error.email_recipient_not_found", nil)
 		case errors.Is(err, ErrEmailServiceDisabled),

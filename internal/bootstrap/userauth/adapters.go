@@ -639,6 +639,7 @@ func mapUserAuthTransportError(err error) error {
 		{userauthapp.ErrVerifyCodeInvalid, userauthtransport.ErrVerifyCodeInvalid},
 		{userauthapp.ErrVerifyCodeExpired, userauthtransport.ErrVerifyCodeExpired},
 		{userauthapp.ErrVerifyCodeTooFrequent, userauthtransport.ErrVerifyCodeTooFrequent},
+		{userauthapp.ErrVerificationUnavailable, userauthtransport.ErrVerificationUnavailable},
 		{userauthapp.ErrVerifyCodeAttemptsExceeded, userauthtransport.ErrVerifyCodeAttemptsExceeded},
 		{notificationcontract.ErrEmailServiceDisabled, userauthtransport.ErrEmailServiceDisabled},
 		{userauthapp.ErrEmailServiceNotConfigured, userauthtransport.ErrEmailServiceNotConfigured},
@@ -688,7 +689,7 @@ func mapUserAuthTransportError(err error) error {
 		{totpapplication.ErrTooManyAttempts, userauthtransport.ErrTOTPTooManyAttempts},
 	} {
 		if errors.Is(err, mapping.source) {
-			return fmt.Errorf("%w: %v", mapping.target, err)
+			return fmt.Errorf("%w: %w", mapping.target, err)
 		}
 	}
 	return err

@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/dujiao-next/internal/cache"
-	"github.com/dujiao-next/internal/logger"
 	orderriskcontract "github.com/dujiao-next/internal/modules/orderrisk/contract"
 	settingssecurity "github.com/dujiao-next/internal/modules/settings/schema/security"
 
@@ -35,7 +34,7 @@ func New() *Limiter { return &Limiter{} }
 func (l *Limiter) Check(input orderriskcontract.CheckInput, config settingssecurity.OrderRateLimitConfig) error {
 	client := cache.Client()
 	if client == nil {
-		return nil
+		return orderriskcontract.ErrProtectionUnavailable
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
@@ -56,15 +55,17 @@ func checkSingle(ctx context.Context, client *redis.Client, key string, config s
 		config.WindowSeconds, config.MaxRequests, config.BlockSeconds,
 	).Result()
 	if err != nil {
-		logger.Warnw("risk_control_rate_limit_script_error", "key", key, "error", err)
-		return nil
+		return orderriskcontract.ErrProtectionUnavailable
 	}
 	values, ok := result.([]interface{})
 	if !ok || len(values) < 2 {
-		return nil
+		return orderriskcontract.ErrProtectionUnavailable
 	}
-	current, _ := values[0].(int64)
-	ttl, _ := values[1].(int64)
+	current, countOK := values[0].(int64)
+	ttl, ttlOK := values[1].(int64)
+	if !countOK || !ttlOK {
+		return orderriskcontract.ErrProtectionUnavailable
+	}
 	if current <= int64(config.MaxRequests) {
 		return nil
 	}

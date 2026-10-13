@@ -28,6 +28,7 @@ import (
 	uploadapp "github.com/dujiao-next/internal/modules/upload/application"
 	uploadlocal "github.com/dujiao-next/internal/modules/upload/infrastructure/localstore"
 	"github.com/dujiao-next/internal/platform/database/gormdb"
+	"github.com/dujiao-next/internal/platform/ratelimit"
 )
 
 // initPolicyAndSettingServices 装配授权、动态设置、分销商基础能力与合规服务。
@@ -110,6 +111,7 @@ func (c *Container) initIdentityAndCatalogServices() {
 	c.TelegramAuthService = telegramauthapp.NewService(c.Config.TelegramAuth, telegramauthcache.Options()...)
 	c.GoogleAuthService = googleauthapp.NewService(c.Config.GoogleAuth)
 	c.UserAuthService = userauthapp.NewService(c.Config, c.UserStore, c.ExternalIdentityStore, c.EmailVerificationStore, c.SettingService, c.EmailSender, c.TelegramAuthService)
+	c.UserAuthService.SetVerificationQuota(ratelimit.New(cache.Client(), c.Config.Redis.Enabled))
 	c.UserAuthService.SetGoogleAuthService(c.GoogleAuthService)
 	c.UserAuthService.SetGoogleRedirectStore(userauthcachestore.NewGoogleRedirectStore())
 	c.UserAuthService.SetAuthUnitOfWork(userauthgormstore.New(gormdb.DB))

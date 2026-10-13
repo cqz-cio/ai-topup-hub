@@ -67,7 +67,17 @@ func registerStorefrontRoutes(
 	guestWriteRule middleware.RateLimitRule,
 	giftCardRedeemRule middleware.RateLimitRule,
 ) {
+
+	protection := cfg.Security.AbuseProtection.WithDefaults()
+	rule := func(name string, requests int) middleware.RateLimitRule {
+		return middleware.RateLimitRule{Prefix: cfg.Redis.Prefix + ":rate:" + name, WindowSeconds: 60, MaxRequests: requests, BlockSeconds: 60}
+	}
 	storefront := apiV1.Group("")
+	storefront.Use(
+		middleware.ConcurrencyLimit(64),
+		middleware.RateLimitMiddleware(redisClient, rule("storefront", protection.PublicPerMinute), middleware.KeyByIP),
+		middleware.BodyLimit(1<<20),
+	)
 	storefront.Use(middleware.ResellerTenantMiddleware(c.ResellerDomainResolver))
 	if c.AutoRechargeService != nil {
 		redemption := storefront.Group("/recharge/redemptions", middleware.RateLimitMiddleware(redisClient, middleware.RateLimitRule{Prefix: "recharge-redemption", WindowSeconds: 60, MaxRequests: 30, BlockSeconds: 60}, middleware.KeyByIP))
@@ -82,7 +92,7 @@ func registerStorefrontRoutes(
 		producthttp.RegisterPublicRoutes(public.Group("", middleware.OptionalUserJWTAuthMiddleware(cfg.UserJWT.SecretKey, c.UserStore)), publicCatalogHandler)
 		categoryhttp.RegisterPublicRoutes(public, publicCategoryHandler)
 		contenttransport.RegisterPublicRoutes(public, publicContentHandler)
-		captchatransport.RegisterPublicRoutes(public, captchatransport.NewPublicHandler(c.CaptchaService))
+		captchatransport.RegisterPublicRoutes(public.Group("", middleware.RateLimitMiddleware(redisClient, rule("captcha", protection.CaptchaPerMinute), middleware.KeyByIP)), captchatransport.NewPublicHandler(c.CaptchaService))
 		affiliatetransport.RegisterPublicRoutes(public, affiliateHandler)
 		memberleveltransport.RegisterPublicRoutes(public, publicMemberLevelHandler)
 	}
@@ -105,21 +115,39 @@ func registerStorefrontRoutes(
 	}
 
 	// 用户认证接口
-	auth := storefront.Group("/auth")
+	auth := storefront.Group("/auth",
+		middleware.ConcurrencyLimit(protection.AuthMaxConcurrent),
+		middleware.RateLimitMiddleware(redisClient, rule("auth-ip", protection.AuthPerMinute), middleware.KeyByIP),
+		middleware.BodyLimit(64<<10),
+	)
+	sensitiveAuth := auth.Group("", middleware.RateLimitMiddleware(redisClient, rule("verify-ip", protection.SendCodePerMinute), middleware.KeyByIP))
+	accountRule := loginRule
+	accountRule.Prefix += ":account"
+	if accountRule.WindowSeconds <= 0 {
+		accountRule.WindowSeconds = 300
+	}
+	if accountRule.MaxRequests <= 0 {
+		accountRule.MaxRequests = 5
+	}
+	if accountRule.BlockSeconds <= 0 {
+		accountRule.BlockSeconds = 900
+	}
+	login := auth.Group("", middleware.RateLimitMiddleware(redisClient, accountRule, middleware.KeyByJSONField("email")))
 	{
-		userauthtransport.RegisterUserVerifyAuthRoutes(auth, userVerifyHandler)
-		userauthtransport.RegisterUserRegisterAuthRoutes(auth, userLoginHandler)
-		userauthtransport.RegisterUserLoginAuthRoutes(auth, userLoginHandler, middleware.RateLimitMiddleware(redisClient, loginRule, middleware.KeyByIPAndJSONField("email")))
+		userauthtransport.RegisterUserVerifyAuthRoutes(sensitiveAuth, userVerifyHandler)
+		userauthtransport.RegisterUserRegisterAuthRoutes(sensitiveAuth, userLoginHandler)
+		userauthtransport.RegisterUserLoginAuthRoutes(login, userLoginHandler, middleware.RateLimitMiddleware(redisClient, loginRule, middleware.KeyByIPAndJSONField("email")))
 		userauthtransport.RegisterUser2FAAuthRoutes(auth, user2FAHandler, middleware.RateLimitMiddleware(redisClient, loginRule, middleware.KeyByIP))
 		userauthtransport.RegisterUserTelegramAuthRoutes(auth, userTelegramHandler, middleware.RateLimitMiddleware(redisClient, loginRule, middleware.KeyByIP))
 		userauthtransport.RegisterUserTelegramOIDCAuthRoutes(auth, userTelegramOIDCHandler, middleware.RateLimitMiddleware(redisClient, loginRule, middleware.KeyByIP))
 		userauthtransport.RegisterUserGoogleAuthRoutes(auth, userGoogleHandler, middleware.RateLimitMiddleware(redisClient, loginRule, middleware.KeyByIP))
-		userauthtransport.RegisterUserPasswordAuthRoutes(auth, userPasswordHandler)
+		userauthtransport.RegisterUserPasswordAuthRoutes(sensitiveAuth, userPasswordHandler)
 	}
 
 	// 用户接口（需鉴权）
 	user := storefront.Group("")
 	user.Use(middleware.UserJWTAuthMiddleware(cfg.UserJWT.SecretKey, c.UserStore))
+	user.Use(middleware.MutationsOnly(middleware.RateLimitMiddleware(redisClient, rule("user-write", protection.MutationPerMinute), middleware.KeyByUserID)))
 	if c.AutoRechargeService != nil {
 		rechargehttp.RegisterUserRoutes(user, rechargehttp.New(c.AutoRechargeService))
 	}
@@ -134,7 +162,7 @@ func registerStorefrontRoutes(
 			userGoogleHandler,
 			middleware.RateLimitMiddleware(redisClient, loginRule, middleware.KeyByUserIDAndIP),
 		)
-		userauthtransport.RegisterUserEmailRoutes(user, userEmailHandler)
+		userauthtransport.RegisterUserEmailRoutes(user.Group("", middleware.RateLimitMiddleware(redisClient, rule("user-email", protection.SendCodePerMinute), middleware.KeyByUserID)), userEmailHandler)
 		userauthtransport.RegisterUser2FARoutes(user, user2FAHandler)
 		carttransport.RegisterUserRoutes(user, userCartHandler)
 		ordertransport.RegisterUserCreateRoute(user, orderCreateHandler)
@@ -165,7 +193,7 @@ func registerStorefrontRoutes(
 }
 
 func registerPaymentCallbackRoutes(apiV1 *gin.RouterGroup, callbackHandler *paymentcallbacktransport.Handler, webhookHandler *paymenttransport.WebhookHandler, redisClient *redis.Client, callbackRule middleware.RateLimitRule) {
-	callbacks := apiV1.Group("", middleware.RateLimitMiddleware(redisClient, callbackRule, middleware.KeyByIP))
+	callbacks := apiV1.Group("", middleware.ConcurrencyLimit(16), middleware.RateLimitMiddleware(redisClient, callbackRule, middleware.KeyByIP), middleware.BodyLimit(4<<20))
 	paymentcallbacktransport.RegisterRoutes(callbacks, callbackHandler)
 	paymenttransport.RegisterWebhookRoutes(callbacks, webhookHandler)
 }

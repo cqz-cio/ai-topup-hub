@@ -88,9 +88,14 @@ func registerAdminRoutes(
 ) {
 	admin := apiV1.Group("/admin")
 
+	adminAdmission := middleware.RateLimitRule{Prefix: adminLoginRule.Prefix + ":admission", WindowSeconds: 60, MaxRequests: 30, BlockSeconds: 60}
+	adminAuth := admin.Group("", middleware.ConcurrencyLimit(8), middleware.RateLimitMiddleware(redisClient, adminAdmission, middleware.KeyByIP), middleware.BodyLimit(64<<10))
+	adminAccountRule := adminLoginRule
+	adminAccountRule.Prefix += ":account"
+	adminPassword := adminAuth.Group("", middleware.RateLimitMiddleware(redisClient, adminAccountRule, middleware.KeyByJSONField("username")))
 	// 登录接口（无需鉴权）
-	adminauthtransport.RegisterAdminLoginAuthRoutes(admin, adminLoginHandler, middleware.RateLimitMiddleware(redisClient, adminLoginRule, middleware.KeyByIP))
-	adminauthtransport.RegisterAdmin2FAAuthRoutes(admin, admin2FAHandler, middleware.RateLimitMiddleware(redisClient, adminLoginRule, middleware.KeyByIP))
+	adminauthtransport.RegisterAdminLoginAuthRoutes(adminPassword, adminLoginHandler, middleware.RateLimitMiddleware(redisClient, adminLoginRule, middleware.KeyByIP))
+	adminauthtransport.RegisterAdmin2FAAuthRoutes(adminAuth, admin2FAHandler, middleware.RateLimitMiddleware(redisClient, adminLoginRule, middleware.KeyByIP))
 
 	// 需要鉴权的接口
 	authorized := admin.Use(middleware.JWTAuthMiddleware(cfg.JWT.SecretKey, c.AdminStore), middleware.AdminRBACMiddleware(c.AuthzService))

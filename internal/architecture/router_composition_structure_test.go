@@ -37,7 +37,8 @@ func TestHTTPServerSeparatesRoutesFromMiddleware(t *testing.T) {
 		t.Fatalf("HTTP server route assembly file budget exceeded: got %d files: %v", len(productionFiles), productionFiles)
 	}
 	assertDirectoryGoFileBudget(t, httpServerRoot, 10)
-	assertDirectoryGoFileBudget(t, middlewareRoot, 16)
+	// Admission controls and their dedicated concurrency/body-limit regression tests.
+	assertDirectoryGoFileBudget(t, middlewareRoot, 17)
 }
 
 func TestBootstrapPackagesStayFocused(t *testing.T) {
