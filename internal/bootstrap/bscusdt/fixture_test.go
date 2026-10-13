@@ -12,6 +12,9 @@ import (
 	paymentdomain "github.com/dujiao-next/internal/modules/payment/domain"
 	"github.com/dujiao-next/internal/modules/payment/infrastructure/gateway/provider"
 	paymentstore "github.com/dujiao-next/internal/modules/payment/infrastructure/gormstore"
+	walletapp "github.com/dujiao-next/internal/modules/wallet/application"
+	walletdomain "github.com/dujiao-next/internal/modules/wallet/domain"
+	walletstore "github.com/dujiao-next/internal/modules/wallet/infrastructure/gormstore"
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
 	"path/filepath"
@@ -28,6 +31,10 @@ func setupPaymentService(t *testing.T) (*paymentapp.PaymentService, *gorm.DB, *p
 		t.Fatal(err)
 	}
 	registry := provider.NewRegistry()
-	svc := paymentapp.NewPaymentService(paymentapp.PaymentServiceOptions{OrderStore: orderstore.New(db, "test-guest-key"), PaymentStore: paymentstore.New(db, "test-guest-key"), ChannelStore: paymentstore.NewChannelStore(db), ProductRepo: productstore.NewProductStore(db), ProductSKURepo: productstore.NewSKUStore(db), UserStore: userstore.New(db), PaymentProviderRegistry: registry, ExpireMinutes: 15})
+	if err = db.AutoMigrate(&walletdomain.Account{}, &walletdomain.Transaction{}, &walletdomain.RechargeOrder{}); err != nil {
+		t.Fatal(err)
+	}
+	wallets := walletstore.New(db)
+	svc := paymentapp.NewPaymentService(paymentapp.PaymentServiceOptions{OrderStore: orderstore.New(db, "test-guest-key"), PaymentStore: paymentstore.New(db, "test-guest-key"), ChannelStore: paymentstore.NewChannelStore(db), ProductRepo: productstore.NewProductStore(db), ProductSKURepo: productstore.NewSKUStore(db), UserStore: userstore.New(db), PaymentProviderRegistry: registry, ExpireMinutes: 15, WalletRepo: wallets, WalletService: walletapp.NewService(walletapp.Options{Repository: wallets, Transactions: wallets})})
 	return svc, db, registry
 }

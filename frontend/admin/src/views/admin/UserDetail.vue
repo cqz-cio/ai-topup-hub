@@ -6,6 +6,8 @@ import { adminAPI, type AdminWalletAccount, type AdminWalletTransaction } from '
 import type { AdminUser, AdminOrder, AdminPayment, AdminMemberLevel, AdminUserOAuthIdentity } from '@/api/types'
 import IdCell from '@/components/IdCell.vue'
 import UserPricePanel from './components/UserPricePanel.vue'
+import ComplianceGuardWrapper from '@/components/ComplianceGuardWrapper.vue'
+import { useComplianceStore } from '@/stores/compliance'
 import { BadgeCheck, Copy, BadgeAlert } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
@@ -34,6 +36,7 @@ import { formatDate, formatMoney, getLocalizedText } from '@/utils/format'
 
 const { t } = useI18n()
 const route = useRoute()
+const compliance = useComplianceStore()
 const userId = computed(() => Number(route.params.id))
 
 interface UserDetailCouponUsage {
@@ -214,14 +217,26 @@ const fetchWalletTransactions = async (page = 1) => {
 const loadWalletData = async (page = walletPagination.value.page) => {
   walletError.value = ''
   try {
+    await compliance.fetchStatus()
+    if (!compliance.acknowledged) {
+      walletError.value = t('compliance.required.message')
+      return
+    }
     await Promise.all([
       fetchWalletAccount(),
       fetchWalletTransactions(page),
     ])
   } catch (err: any) {
     walletError.value = err?.message || t('admin.userDetail.wallet.errors.loadFailed')
+    if (String(err?.code || '').startsWith('compliance_required')) {
+      await compliance.fetchStatus(true).catch(() => {})
+    }
   }
 }
+
+watch(() => compliance.acknowledged, (acknowledged) => {
+  if (acknowledged && activeTab.value === 'wallet') void loadWalletData(1)
+})
 
 const changeOrdersPage = (page: number) => {
   if (page < 1 || page > ordersPagination.value.total_page) return
@@ -330,6 +345,7 @@ const walletTypeLabel = (type?: string) => {
 const walletBalanceDisplay = computed(() => formatMoney(walletAccount.value?.balance, siteCurrency.value))
 
 const submitWalletAdjust = async () => {
+  if (walletSubmitting.value || !compliance.acknowledged) return
   if (!Number.isFinite(userId.value) || userId.value <= 0) return
   walletError.value = ''
   walletSuccess.value = ''
@@ -361,6 +377,9 @@ const submitWalletAdjust = async () => {
     walletSuccess.value = t('admin.userDetail.wallet.adjustSuccess')
   } catch (err: any) {
     walletError.value = err?.message || t('admin.userDetail.wallet.errors.adjustFailed')
+    if (String(err?.code || '').startsWith('compliance_required')) {
+      await compliance.fetchStatus(true).catch(() => {})
+    }
   } finally {
     walletSubmitting.value = false
   }
@@ -920,7 +939,7 @@ watch(
       />
     </div>
 
-    <div v-if="activeTab === 'wallet'" class="space-y-4">
+    <ComplianceGuardWrapper v-if="activeTab === 'wallet'" class="space-y-4">
       <Card class="rounded-lg border-border bg-background shadow-none">
         <CardContent class="grid grid-cols-1 gap-4 p-4 md:grid-cols-2">
           <div>
@@ -960,7 +979,7 @@ watch(
             <Input v-model="walletAdjustForm.remark" required :placeholder="t('admin.userDetail.wallet.remarkPlaceholder')" />
           </div>
           <div class="flex items-end">
-            <Button type="submit" class="w-full md:w-auto" :disabled="walletSubmitting">
+            <Button type="submit" class="w-full md:w-auto" :disabled="walletSubmitting || !compliance.acknowledged">
               {{ walletSubmitting ? t('admin.userDetail.wallet.adjusting') : t('admin.userDetail.wallet.adjustSubmit') }}
             </Button>
           </div>
@@ -1020,6 +1039,6 @@ watch(
           @change-page-size="changeWalletPageSize"
         />
       </div>
-    </div>
+    </ComplianceGuardWrapper>
   </div>
 </template>

@@ -4478,6 +4478,7 @@ const messages = {
         success: '合规声明已确认，感谢您的合规承诺',
         mismatch: '确认文字输入有误，请检查后重试',
         superRequired: '该操作需超级管理员完成',
+        required: '请先完成支付合规声明确认，再重试此操作。',
         failed: '提交失败，请稍后重试',
       },
       review: {
@@ -8965,6 +8966,7 @@ const messages = {
         success: '合規聲明已確認，感謝您的合規承諾',
         mismatch: '確認文字輸入有誤，請檢查後重試',
         superRequired: '此操作需超級管理員完成',
+        required: '請先完成支付合規聲明確認，再重試此操作。',
         failed: '提交失敗，請稍後重試',
       },
       review: {
@@ -13452,6 +13454,7 @@ const messages = {
         success: 'Compliance acknowledged. Thank you for your commitment.',
         mismatch: 'Confirmation text does not match. Please check and retry.',
         superRequired: 'This action requires a super administrator',
+        required: 'Please acknowledge the payment compliance statement, then retry this action.',
         failed: 'Submission failed, please retry later',
       },
       review: {

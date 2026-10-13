@@ -62,7 +62,7 @@ func (s *Service) ValidateConfig(_ jsonmap.JSON, channel string) error {
 	return nil
 }
 func (s *Service) CreatePayment(ctx context.Context, _ jsonmap.JSON, in contract.GatewayCreateInput) (*contract.GatewayCreateResult, error) {
-	if in.OrderID == 0 || in.PaymentID == 0 || strings.ToUpper(in.Currency) != "CNY" || !in.Amount.Decimal.IsPositive() {
+	if in.PaymentID == 0 || strings.ToUpper(in.Currency) != "CNY" || !in.Amount.Decimal.IsPositive() {
 		return nil, contract.ErrGatewayConfigInvalid
 	}
 	if existing, err := s.store.Invoice(ctx, in.PaymentID); err == nil {
@@ -85,7 +85,12 @@ func (s *Service) CreatePayment(ctx context.Context, _ jsonmap.JSON, in contract
 	if err != nil || time.Since(time.Unix(int64(stamp), 0)) > 2*time.Minute || time.Unix(int64(stamp), 0).After(time.Now().Add(30*time.Second)) {
 		return nil, ErrRPC
 	}
-	expires, err := s.store.PayableUntil(ctx, in.OrderID)
+	var expires *time.Time
+	if in.OrderID == 0 {
+		expires, err = s.store.RechargePayableUntil(ctx, in.PaymentID)
+	} else {
+		expires, err = s.store.PayableUntil(ctx, in.OrderID)
+	}
 	if err != nil {
 		return nil, err
 	}

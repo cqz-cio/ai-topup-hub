@@ -107,6 +107,7 @@ func (s *PaymentService) CreateWalletRechargePayment(input CreateWalletRechargeP
 		currency = "CNY"
 	}
 	now := time.Now()
+	expiresAt := now.Add(time.Duration(s.resolveExpireMinutes()) * time.Minute)
 
 	var payment *paymentdomain.Payment
 	var recharge *walletdomain.RechargeOrder
@@ -126,6 +127,7 @@ func (s *PaymentService) CreateWalletRechargePayment(input CreateWalletRechargeP
 			FeePolicy:       feePolicy,
 			Currency:        currency,
 			Status:          constants.PaymentStatusInitiated,
+			ExpiredAt:       &expiresAt,
 			CreatedAt:       now,
 			UpdatedAt:       now,
 		}

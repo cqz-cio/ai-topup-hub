@@ -7,6 +7,7 @@ import (
 	orderdomain "github.com/dujiao-next/internal/modules/order/domain"
 	"github.com/dujiao-next/internal/modules/payment/contract/chain"
 	"github.com/dujiao-next/internal/modules/payment/domain"
+	walletdomain "github.com/dujiao-next/internal/modules/wallet/domain"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"time"
@@ -35,6 +36,26 @@ func (s *Store) PayableUntil(ctx context.Context, id uint) (*time.Time, error) {
 		return nil, chain.ErrNotFound
 	}
 	return order.ExpiresAt, nil
+}
+
+// RechargePayableUntil uses the persisted recharge/payment pair. A recharge has
+// no product order, and must never borrow another order's payment deadline.
+func (s *Store) RechargePayableUntil(ctx context.Context, paymentID uint) (*time.Time, error) {
+	var payment domain.Payment
+	if err := s.db.WithContext(ctx).First(&payment, paymentID).Error; err != nil {
+		return nil, mapError(err)
+	}
+	if payment.OrderID != 0 || (payment.Status != constants.PaymentStatusInitiated && payment.Status != constants.PaymentStatusPending) {
+		return nil, chain.ErrNotFound
+	}
+	var recharge walletdomain.RechargeOrder
+	if err := s.db.WithContext(ctx).Where("payment_id = ? AND status = ?", paymentID, constants.WalletRechargeStatusPending).First(&recharge).Error; err != nil {
+		return nil, mapError(err)
+	}
+	if recharge.UserID == 0 || recharge.ChannelID != payment.ChannelID || recharge.Currency != payment.Currency || !recharge.PayableAmount.Equal(payment.Amount.Decimal) {
+		return nil, chain.ErrNotFound
+	}
+	return payment.ExpiredAt, nil
 }
 func (s *Store) CreateInvoice(ctx context.Context, invoice *domain.ChainInvoice, cursor *domain.ChainCursor) (created bool, err error) {
 	err = s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {

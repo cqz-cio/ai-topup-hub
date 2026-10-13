@@ -95,7 +95,7 @@ func (c *Container) initChainUSDT(cfg config.BSCUSDTConfig, networkName string) 
 	}
 	if count == 0 {
 		managedKey := network.Name + "-usdt-default"
-		channel := domain.PaymentChannel{ManagedKey: &managedKey, Name: network.ChannelName, ProviderType: network.Provider, ChannelType: network.ChannelType, InteractionMode: constants.PaymentInteractionQR, IsActive: true, ConfigJSON: jsonmap.JSON{}, PaymentTypes: jsonslice.Strings{"order"}, CreatedAt: time.Now()}
+		channel := domain.PaymentChannel{ManagedKey: &managedKey, Name: network.ChannelName, ProviderType: network.Provider, ChannelType: network.ChannelType, InteractionMode: constants.PaymentInteractionQR, IsActive: true, ConfigJSON: jsonmap.JSON{}, PaymentTypes: jsonslice.Strings{constants.PaymentTypeOrder, constants.PaymentTypeWallet}, CreatedAt: time.Now()}
 		if err = gormdb.DB.Clauses(clause.OnConflict{DoNothing: true}).Create(&channel).Error; err != nil {
 			return nil, err
 		}

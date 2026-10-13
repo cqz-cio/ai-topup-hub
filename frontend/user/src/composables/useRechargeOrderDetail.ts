@@ -7,6 +7,7 @@ import { useTelegramMiniAppStore } from '../stores/telegramMiniApp'
 import { copyText } from '../utils/clipboard'
 import { isCustomerSurchargePayment, resolvePaymentLinkNavigationTarget, resolvePaymentPresentationMode, shouldAutoOpenPaymentLink } from '../utils/paymentResumePolicy'
 import type { BadgeTone } from '../utils/status'
+import { normalizeRechargePayment } from '../utils/rechargePayment'
 
 /**
  * 充值订单详情逻辑（classic + vault 共用，含二维码渲染与轮询）。
@@ -135,17 +136,7 @@ export function useRechargeOrderDetail() {
 
   const syncPayload = (payload: any) => {
     recharge.value = payload?.recharge || recharge.value
-    const paymentData = payload?.payment || (payload?.payment_id != null ? {
-      id: payload.payment_id,
-      provider_type: payload.provider_type,
-      channel_type: payload.channel_type,
-      interaction_mode: payload.interaction_mode,
-      pay_url: payload.pay_url,
-      qr_code: payload.qr_code,
-      expires_at: payload.expires_at,
-      status: payload.status,
-      fee_policy: payload.fee_policy,
-    } : undefined)
+    const paymentData = normalizeRechargePayment(payload)
     if (paymentData) {
       payment.value = paymentData
     }

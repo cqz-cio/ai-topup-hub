@@ -48,6 +48,7 @@ import (
 	"github.com/dujiao-next/internal/modules/payment/infrastructure/gateway/provider"
 	"github.com/dujiao-next/internal/platform/database/gormdb"
 	"github.com/dujiao-next/internal/shared/jsonmap"
+	"github.com/dujiao-next/internal/shared/jsonslice"
 	"github.com/dujiao-next/internal/shared/money"
 
 	"github.com/glebarez/sqlite"
@@ -120,6 +121,29 @@ func setupPaymentServiceWalletTest(t *testing.T) (*PaymentService, *gorm.DB) {
 	})
 
 	return paymentSvc, db
+}
+
+func TestWalletChannelListMatchesRechargeAllowlist(t *testing.T) {
+	svc, db := setupPaymentServiceWalletTest(t)
+	channels := []paymentdomain.PaymentChannel{
+		{Name: "allowed", ProviderType: "bscusdt", ChannelType: "usdt-bep20", IsActive: true, PaymentTypes: jsonslice.Strings{"order", "wallet"}},
+		{Name: "excluded", ProviderType: "plasmausdt", ChannelType: "usdt-plasma", IsActive: true, PaymentTypes: jsonslice.Strings{"order", "wallet"}},
+	}
+	if err := db.Create(&channels).Error; err != nil {
+		t.Fatal(err)
+	}
+	if _, err := settingsstore.New(db).Upsert(constants.SettingKeyWalletConfig, jsonmap.JSON{"recharge_channel_ids": []uint{channels[0].ID}}); err != nil {
+		t.Fatal(err)
+	}
+	user := &userdomain.User{ID: 1}
+	available, err := svc.GetAvailableChannels(AvailablePaymentChannelFilter{User: user, PaymentType: constants.PaymentTypeWallet})
+	if err != nil || len(available) != 1 || available[0]["id"] != channels[0].ID {
+		t.Fatalf("wallet allowlist ignored: %v %v", available, err)
+	}
+	orders, err := svc.GetAvailableChannels(AvailablePaymentChannelFilter{User: user, PaymentType: constants.PaymentTypeOrder})
+	if err != nil || len(orders) != 2 {
+		t.Fatalf("wallet setting restricted order channels: %v", err)
+	}
 }
 
 func TestCreatePaymentWalletFullAmountCreatesPaymentRecord(t *testing.T) {

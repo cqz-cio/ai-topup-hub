@@ -45,6 +45,11 @@ func TestChainUSDTStartupCreatesIndependentChannelsAndPreservesMerchantSettings(
 	if channels[0].ProviderType != "bscusdt" || channels[0].ChannelType != "usdt-bep20" || channels[1].ProviderType != "plasmausdt" || channels[1].ChannelType != "usdt-plasma" {
 		t.Fatal("incorrect network channel registration")
 	}
+	for _, channel := range channels {
+		if len(channel.PaymentTypes) != 2 || channel.PaymentTypes[0] != "order" || channel.PaymentTypes[1] != "wallet" {
+			t.Fatal("new chain channel must support both orders and wallet recharge")
+		}
+	}
 	if gateway, ok := c.PaymentProviderRegistry.Lookup("plasmausdt", "usdt-plasma"); !ok || gateway != c.PlasmaUSDTService {
 		t.Fatal("Plasma payment gateway not registered")
 	}

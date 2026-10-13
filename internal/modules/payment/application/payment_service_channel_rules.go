@@ -216,6 +216,9 @@ func (s *PaymentService) GetAvailableChannels(filter AvailablePaymentChannelFilt
 	customerFeeEnabled := s.settingService != nil && s.settingService.GetPaymentFeeConfig().CustomerFeeEnabled
 	available := make([]map[string]interface{}, 0, len(channels))
 	for _, channel := range channels {
+		if filter.PaymentType == constants.PaymentTypeWallet && s.validateWalletRechargeChannel(channel.ID) != nil {
+			continue
+		}
 		if !matchesChannelAmount(channel, filter.TargetAmount) ||
 			!matchesChannelRole(channel, filter.User) ||
 			!matchesChannelMemberLevel(channel, filter.User) ||

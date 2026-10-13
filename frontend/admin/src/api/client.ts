@@ -10,6 +10,7 @@ const t = (key: string, params?: Record<string, unknown>) =>
 
 interface NotifiedError extends Error {
   __notified?: boolean
+  code?: string
 }
 
 const createNotifiedError = (message: string): NotifiedError => {
@@ -181,6 +182,16 @@ async function request(method: string, path: string, bodyOrOptions?: any, option
   }
 
   // HTTP error with JSON body
+  // Both HTTP 403 and HTTP 200 business errors must retain a machine-readable
+  // code while showing the operator a useful message.
+  if (data?.msg === 'compliance_required' || data?.msg === 'compliance_required_by_super_admin') {
+    const error = createNotifiedError(t(data.msg === 'compliance_required'
+      ? 'compliance.toast.required'
+      : 'compliance.required.message'))
+    error.code = data.msg
+    return Promise.reject(error)
+  }
+
   if (!response.ok) {
     const status = response.status
     const message = data?.msg || getHttpErrorMessage(status)
@@ -198,10 +209,6 @@ async function request(method: string, path: string, bodyOrOptions?: any, option
     if (data.status_code === 401 && !isLoginEndpoint(path)) {
       notifyError(message)
       redirectToLogin()
-      return Promise.reject(createNotifiedError(message))
-    }
-    // 合规声明拦截：消息由路由守卫/页面 wrapper 处理，不展示通用 toast
-    if (message === 'compliance_required' || message === 'compliance_required_by_super_admin') {
       return Promise.reject(createNotifiedError(message))
     }
     notifyError(message)

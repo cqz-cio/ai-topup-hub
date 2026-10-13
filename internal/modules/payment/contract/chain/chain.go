@@ -50,6 +50,7 @@ type Reader interface {
 type Store interface {
 	Invoice(context.Context, uint) (*domain.ChainInvoice, error)
 	PayableUntil(context.Context, uint) (*time.Time, error)
+	RechargePayableUntil(context.Context, uint) (*time.Time, error)
 	CreateInvoice(context.Context, *domain.ChainInvoice, *domain.ChainCursor) (bool, error)
 	Cursor(context.Context, string) (*domain.ChainCursor, error)
 	ApplyScan(context.Context, domain.ChainCursor, uint64, string, []domain.ChainTransfer) error
