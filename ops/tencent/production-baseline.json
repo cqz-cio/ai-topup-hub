@@ -1,20 +1,20 @@
 {
-  "checked_at": "2026-10-13T08:24:01.618733+00:00",
+  "checked_at": "2026-10-13T16:29:54.650166+08:00",
   "production_url": "https://www.qzweb.cloud/",
-  "documented_release_id": "20261013-162050",
-  "verified_release_id": "20261013-162050",
-  "previous_release_id": "20261013-114011",
-  "source_commit": "2bbb4e0b802114dd3bda394b28cddcf83639228a",
+  "documented_release_id": "20261013-162754",
+  "verified_release_id": "20261013-162754",
+  "previous_release_id": "20261013-162050",
+  "source_commit": "6770a90ad543240e5c208f60f4916a9be8d7631b",
   "source_branch": "main",
   "server_git_commit_verified": true,
-  "source_tag": "production/sale-mail-20261013-162050",
+  "source_tag": "production/verification-email-20261013-162754",
   "production": {
-    "release_path": "/srv/zhixiang/releases/20261013-162050",
-    "running_executable": "/srv/zhixiang/releases/20261013-162050/zhixiang-shop",
+    "release_path": "/srv/zhixiang/releases/20261013-162754",
+    "running_executable": "/srv/zhixiang/releases/20261013-162754/zhixiang-shop",
     "binary_bytes": 90357922,
-    "binary_sha256": "98b2be670d483fff557f04b2d9b321e2e95bc32183873d42f925f5f874339185",
-    "running_binary_sha256": "98b2be670d483fff557f04b2d9b321e2e95bc32183873d42f925f5f874339185",
-    "manifest_binary_sha256": "98b2be670d483fff557f04b2d9b321e2e95bc32183873d42f925f5f874339185",
+    "binary_sha256": "f63c2aac81dc9eae36324cd51f61fbf86a9afe2e1bc85a8886e3a75639034249",
+    "running_binary_sha256": "f63c2aac81dc9eae36324cd51f61fbf86a9afe2e1bc85a8886e3a75639034249",
+    "manifest_binary_sha256": "f63c2aac81dc9eae36324cd51f61fbf86a9afe2e1bc85a8886e3a75639034249",
     "build_info": {
       "go_version": "go1.26.5",
       "build_settings": [
@@ -27,13 +27,11 @@
         "GOOS=linux",
         "GOAMD64=v1",
         "vcs=git",
-        "vcs.revision=2bbb4e0b802114dd3bda394b28cddcf83639228a",
-        "vcs.time=2026-10-13T08:19:18Z",
+        "vcs.revision=6770a90ad543240e5c208f60f4916a9be8d7631b",
+        "vcs.time=2026-10-13T08:20:07Z",
         "vcs.modified=false"
       ],
-      "git_metadata_pinned": true,
-      "vcs_revision": "2bbb4e0b802114dd3bda394b28cddcf83639228a",
-      "vcs_modified": false
+      "git_metadata_pinned": true
     },
     "runtime_mode": "storefront",
     "upstream_purchase_enabled": true,
@@ -44,16 +42,15 @@
       "stock_sync_timer": "active"
     },
     "redis_preserved_without_restart": true,
-    "backup": "/srv/zhixiang/backups/before-sale-mail-20261013-162050-retry",
+    "backup": "/srv/zhixiang/backups/before-verification-email-20261013-162754",
     "database_backup_quick_check": "ok",
-    "report_path": "/srv/zhixiang/shared/reports/sale-mail-release-20261013-162050.json",
-    "configuration_unchanged": false,
+    "report_path": "/srv/zhixiang/shared/reports/verification-email-release-20261013-162754.json",
+    "configuration_unchanged": true,
     "nginx_configuration_preserved": true,
     "source_dirty": false,
     "private_configuration_unchanged": true,
-    "configuration_changes": [
-      "notification_center_config: owner email, order-paid scene and combined template"
-    ]
+    "configuration_changes": [],
+    "source_commit": "6770a90ad543240e5c208f60f4916a9be8d7631b"
   },
   "payment": {
     "bep20": {
@@ -898,5 +895,34 @@
     ],
     "production_catalog_products_observed": 12,
     "qzweb_55_public_price_observed": "1200.00"
+  },
+  "verification_email": {
+    "checked_at": "2026-10-13T16:29:54.650166+08:00",
+    "release": "20261013-162754",
+    "source_commit": "6770a90ad543240e5c208f60f4916a9be8d7631b",
+    "feature_commit": "a2d746718bee73bf336630f5cbb43b7fd03280f7",
+    "source_tag": "production/verification-email-20261013-162754",
+    "main_site_url": "https://www.qzweb.cloud",
+    "expire_minutes": 10,
+    "expiry_tracks_runtime_smtp_config": true,
+    "locales": [
+      "zh-CN",
+      "zh-TW",
+      "en-US"
+    ],
+    "local_mock_smtp_messages": 3,
+    "go_tests_passed": 91,
+    "go_tests_skipped": 2,
+    "local_browser_checks": 2,
+    "production_browser_checks": 2,
+    "frontend_release_preserved": "20261013-160811",
+    "frontend_files_preserved": 2245,
+    "business_snapshot_groups_preserved": 17,
+    "private_configuration_preserved": true,
+    "redis_process_preserved": true,
+    "local_database_uploaded": false,
+    "production_test_email_sent": false,
+    "real_payment_or_purchase_submitted": false,
+    "verification_directory": "work/codex-runtime/verify-email-copy/"
   }
 }
