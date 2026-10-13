@@ -1170,6 +1170,14 @@
       "passwordLabel": "密碼",
       "passwordPlaceholder": "設定登入密碼",
       "imageCaptchaLabel": "圖形驗證碼",
+      "codeSent": {
+        "title": "驗證碼已發送",
+        "description": "驗證碼已發送至您的信箱，請注意查收。",
+        "spamHint": "如果長時間未收到，請檢查信箱中的{spam}或{promotions}資料夾。",
+        "spamFolder": "垃圾郵件",
+        "promotionsFolder": "廣告郵件",
+        "confirm": "我知道了"
+      },
       "codeLabel": "郵箱驗證碼",
       "codePlaceholder": "輸入信箱驗證碼",
       "sendCode": "發送驗證碼",

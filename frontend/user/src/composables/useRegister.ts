@@ -1,4 +1,4 @@
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserAuthStore } from '../stores/userAuth'
 import { useI18n } from 'vue-i18n'
@@ -6,6 +6,7 @@ import { debounceAsync } from '../utils/debounce'
 import { useAppStore } from '../stores/app'
 import type { CaptchaPayload } from '../api'
 import ImageCaptcha from '../components/captcha/ImageCaptcha.vue'
+import { Input } from '../components/ui/input'
 import TurnstileCaptcha from '../components/captcha/TurnstileCaptcha.vue'
 import { useFormValidation, getPasswordStrength } from './useFormValidation'
 
@@ -30,6 +31,9 @@ export function useRegister() {
   const password = ref('')
   const showPassword = ref(false)
   const code = ref('')
+  const codeSentDialogOpen = ref(false)
+  const codeInputRef = ref<InstanceType<typeof Input> | null>(null)
+  const focusCodeInput = () => codeInputRef.value?.$el.focus()
   const agreed = ref(false)
 
   const passwordStrength = computed(() => getPasswordStrength(password.value))
@@ -180,6 +184,7 @@ export function useRegister() {
         captcha_payload: getCaptchaPayload(),
       })
       startCountdown()
+      codeSentDialogOpen.value = true
       // A successful verification consumes the challenge; prepare a fresh one for resending.
       if (captchaProvider.value === 'image') {
         imageCaptchaRef.value?.refresh()
@@ -226,6 +231,12 @@ export function useRegister() {
   const handleSendCode = debounceAsync(performSendCode, 200)
   const handleRegister = debounceAsync(performRegister, 200)
 
+  onBeforeUnmount(() => {
+    if (timer) clearInterval(timer)
+    handleSendCode.cancel()
+    handleRegister.cancel()
+  })
+
   onMounted(async () => {
     await appStore.loadConfig(true)
   })
@@ -239,6 +250,9 @@ export function useRegister() {
     password,
     showPassword,
     code,
+    codeSentDialogOpen,
+    codeInputRef,
+    focusCodeInput,
     agreed,
     passwordStrength,
     error,

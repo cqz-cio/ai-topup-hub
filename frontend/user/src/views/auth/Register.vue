@@ -145,6 +145,7 @@
             </label>
             <div class="flex flex-col gap-2 sm:flex-row">
               <Input
+                ref="codeInputRef"
                 v-model="code"
                 type="text"
                 required
@@ -207,10 +208,12 @@
       </div>
     </div>
   </div>
+  <VerificationCodeSentDialog v-model:open="codeSentDialogOpen" @closed="focusCodeInput" />
 </template>
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
+import VerificationCodeSentDialog from '@/components/VerificationCodeSentDialog.vue'
 import ImageCaptcha from '../../components/captcha/ImageCaptcha.vue'
 import TurnstileCaptcha from '../../components/captcha/TurnstileCaptcha.vue'
 import { ArrowLeft, Mail, Lock, ShieldCheck, Eye, EyeOff, UserPlus } from 'lucide-vue-next'
@@ -228,6 +231,7 @@ const {
   userAuthStore, brandSiteName,
   email, emailLocalPart, selectedEmailDomain, password, showPassword, code, agreed,
   passwordStrength, error, sending, countdown,
+  codeSentDialogOpen, codeInputRef, focusCodeInput,
   captchaPayload, turnstileToken, imageCaptchaRef, turnstileRef,
   captchaProvider, sendCodeCaptchaEnabled, turnstileSiteKey,
   registrationEnabled, emailVerificationEnabled,
@@ -236,6 +240,7 @@ const {
 } = useRegister()
 
 // imageCaptchaRef / turnstileRef 仅通过字符串模板 ref 绑定，显式标记避免 noUnusedLocals 误报。
+void codeInputRef
 void imageCaptchaRef
 void turnstileRef
 </script>
