@@ -148,10 +148,10 @@ func (f *testFixture) run(t *testing.T) {
 	}
 }
 
-func TestInvoiceLocksRateAndSixDecimalAmount(t *testing.T) {
+func TestInvoiceLocksRateAndTwoDecimalAmount(t *testing.T) {
 	f := setup(t)
 	amount := decimal.RequireFromString(f.invoice.Amount)
-	if !amount.GreaterThan(decimal.NewFromInt(20)) || !amount.LessThan(decimal.RequireFromString("20.01")) || f.invoice.CNYPerUSDT != "6.66" || f.invoice.Units != amount.Shift(18).BigInt().String() {
+	if f.invoice.Amount != "20.00" || f.invoice.CNYPerUSDT != "6.66" || f.invoice.Units != amount.Shift(18).BigInt().String() {
 		t.Fatal("incorrect conversion or precision")
 	}
 	f.s.rate = decimal.NewFromInt(9)
