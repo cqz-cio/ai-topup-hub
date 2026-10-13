@@ -15,7 +15,7 @@
 | 本地后台 | http://127.0.0.1:5174/ |
 | 绿色源码基线 | `baseline/green-20261012`，提交 `419141e` |
 | 后端源码基准 | `20261013-162754`，构建源码 `6770a90ad543240e5c208f60f4916a9be8d7631b`，见 [验证码邮件网址与有效期](docs/verification-email.md) |
-| 商城注册验证码发布 | 上海静态 `20261013-160811`，商城源码 `c0d5e48c1407261e5d800969c228f03a644732d7`，见 [注册图形验证码](docs/registration-captcha.md) |
+| 商城注册验证码发布 | 上海静态 `20261013-165016`，商城源码 `e6c56be1a964d6c3ef98220c25e60775d7b997a6`，见 [注册图形验证码](docs/registration-captcha.md) 与 [发送成功提醒](docs/registration-email-reminder.md) |
 | 后台组件来源 | 保留 `20261013-153730` 的后台资源，源码 `471ded02e1b265520a53485288bdcc4f47dbece9` |
 
 源码标签、服务器发布号和数据库是三个独立对象。线上比对证据与核验范围在 [production-baseline.json](ops/tencent/production-baseline.json)。推送 GitHub 不会自动部署服务器，也不会同步数据库。2026-10-12 已将 `www` 解析切到上海；两套前端发布 `20261012-164700` 与新加坡后端的构建源码 `948c37f` 对齐，域名 HTTPS、管理端登录鉴权和证书自动续期已核验。旧新加坡 HTTP 入口保留兼容，日常使用上表 HTTPS 地址。正式支付宝仍未启用，代码和沙箱结果见 [支付宝接入记录](docs/alipay-web-payment.md)。
@@ -74,4 +74,4 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/local/stop.ps1
 
 本项目基于 Dujiao-Next v1.4.8 独立导入，沿用 Go 模块路径及底层程序名称以保持兼容；它们不表示存在另一套正式商城。来源及许可证见 [SOURCE_IMPORT.md](SOURCE_IMPORT.md) 和 [LICENSE](LICENSE)。[历史上游说明](docs/history/README.md)中的通用安装、升级命令不作为智享A社生产部署入口。
 
-经营者[成交与上游余额邮件](docs/sale-email.md)已启用：订单、采购金额、当前上游余额和查询时间合并通知。该功能首次发布于 `20261013-162050`；当前后端为 `20261013-162754`，并已补齐[验证码邮件网址与有效期](docs/verification-email.md)。上海前端保持 `20261013-160811`。
+经营者[成交与上游余额邮件](docs/sale-email.md)已启用：订单、采购金额、当前上游余额和查询时间合并通知。该功能首次发布于 `20261013-162050`；当前后端为 `20261013-162754`，并已补齐[验证码邮件网址与有效期](docs/verification-email.md)。上海商城现为 `20261013-165016`，已增加邮箱验证码发送成功提醒。
