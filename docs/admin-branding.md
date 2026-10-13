@@ -16,3 +16,7 @@
 - 品牌组件与运营说明：`frontend/admin/src/components/AdminBrand.vue`、`components/admin/DashboardOperations.vue`、`components/SystemInfoDialog.vue`。
 - 三语文案：`frontend/admin/src/i18n/adminBrand.ts` 与 `i18n/index.ts`。
 - 默认品牌素材：`frontend/admin/public/brand/patrick-logo.png`，复用商城已确认的 Logo。
+
+网关错误页（403、404、500、502、503、504）的标签页图标由 `ops/tencent/frontend-gateway/nginx-errors.conf` 独立提供，使用带版本的 `/favicon.ico` 地址；无需 Vue 或 API 加载成功。默认图标地址返回本站 PNG，禁止沿用旧缓存。各错误位置清空继承的扩展名 MIME 映射，确保缺失 `.js`、`.css`、`.png` 等资源时仍按 HTML 解析错误页和图标声明，同时保留原 HTTP 错误状态；已有 API JSON 错误响应不拦截。
+
+核验时同时检查错误页的 `Content-Type`、浏览器实际解析出的图标链接和图标文件内容，不能仅凭响应正文包含图标链接判断生效。5xx 可在本机复现，正式站用只读 403/404 路径检查，无需停止生产服务。
