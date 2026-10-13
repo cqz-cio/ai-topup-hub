@@ -69,7 +69,7 @@ func (s *Service) SetConfig(cfg *config.EmailConfig) {
 
 // SendVerifyCode 发送邮箱验证码
 func (s *Service) SendVerifyCode(toEmail, code, purpose, locale string, brand mailbrand.Brand) error {
-	subject, body := buildVerifyCodeContent(code, purpose, locale, brand)
+	subject, body := s.buildVerifyCodeContent(code, purpose, locale, brand)
 	return s.sendTextEmail(toEmail, subject, body, brand)
 }
 
@@ -273,7 +273,11 @@ func buildEmailMessageWithAttachment(from, to, subject, body, attachName, attach
 	return buf.String()
 }
 
-func buildVerifyCodeContent(code, purpose, locale string, brands ...mailbrand.Brand) (string, string) {
+func (s *Service) buildVerifyCodeContent(code, purpose, locale string, brands ...mailbrand.Brand) (string, string) {
+	expireMinutes := 10
+	if s != nil && s.cfg != nil && s.cfg.VerifyCode.ExpireMinutes > 0 {
+		expireMinutes = s.cfg.VerifyCode.ExpireMinutes
+	}
 	normalized := normalizeLocale(locale)
 	purposeKey := strings.ToLower(strings.TrimSpace(purpose))
 	brand := firstMailBrand(brands)
@@ -295,7 +299,7 @@ func buildVerifyCodeContent(code, purpose, locale string, brands ...mailbrand.Br
 			subject = "更換郵箱驗證碼"
 			purposeText = "更換郵箱"
 		}
-		body := fmt.Sprintf("您的驗證碼是：%s\n\n該驗證碼用於 %s，請勿洩露。", code, purposeText)
+		body := fmt.Sprintf("您的驗證碼是：%s\n\n有效期：%d 分鐘（自產生時起計算），逾期後請重新取得。\n\n該驗證碼用於 %s，請勿洩露。", code, expireMinutes, purposeText)
 		return applyVerifyCodeBrand(normalized, subject, body, brand)
 	case i18n.LocaleEN:
 		subject := "Email Verification Code"
@@ -314,7 +318,7 @@ func buildVerifyCodeContent(code, purpose, locale string, brands ...mailbrand.Br
 			subject = "Change Email Code"
 			purposeText = "change email"
 		}
-		body := fmt.Sprintf("Your verification code is: %s\n\nThis code is for %s. Do not share it.", code, purposeText)
+		body := fmt.Sprintf("Your verification code is: %s\n\nThis code expires %d minutes after it is generated. Request a new code after it expires.\n\nThis code is for %s. Do not share it.", code, expireMinutes, purposeText)
 		return applyVerifyCodeBrand(normalized, subject, body, brand)
 	default:
 		subject := "邮箱验证码"
@@ -333,7 +337,7 @@ func buildVerifyCodeContent(code, purpose, locale string, brands ...mailbrand.Br
 			subject = "更换邮箱验证码"
 			purposeText = "更换邮箱"
 		}
-		body := fmt.Sprintf("您的验证码是：%s\n\n该验证码用于 %s，请勿泄露。", code, purposeText)
+		body := fmt.Sprintf("您的验证码是：%s\n\n有效期：%d 分钟（自生成时起计算），过期后请重新获取。\n\n该验证码用于 %s，请勿泄露。", code, expireMinutes, purposeText)
 		return applyVerifyCodeBrand(normalized, subject, body, brand)
 	}
 }

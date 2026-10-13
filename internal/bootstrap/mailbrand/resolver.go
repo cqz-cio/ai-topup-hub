@@ -11,6 +11,9 @@ import (
 	"github.com/dujiao-next/internal/shared/mailbrand"
 )
 
+// Main-store mail must use the public domain even when an old preview URL remains in site settings.
+const mainStorefrontMailURL = "https://www.qzweb.cloud"
+
 type mainBrandReader interface {
 	GetSiteBrand() (settingsapp.SiteBrand, error)
 }
@@ -44,7 +47,7 @@ func (r *Resolver) ResolveEmailBrand(ctx context.Context, scope mailbrand.Scope)
 	}
 	return mailbrand.Brand{
 		SiteName: strings.TrimSpace(brand.SiteName),
-		SiteURL:  strings.TrimRight(strings.TrimSpace(brand.SiteURL), "/"),
+		SiteURL:  mainStorefrontMailURL,
 	}, nil
 }
 

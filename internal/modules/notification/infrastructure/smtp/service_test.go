@@ -254,7 +254,7 @@ func TestBuildOrderStatusContentFromTemplateIncludesSiteBrand(t *testing.T) {
 }
 
 func TestBuildVerifyCodeContentUsesResolvedWhiteLabelBrand(t *testing.T) {
-	subject, body := buildVerifyCodeContent("123456", "register", i18n.LocaleZH, mailbrand.Brand{
+	subject, body := New(nil).buildVerifyCodeContent("123456", "register", i18n.LocaleZH, mailbrand.Brand{
 		SiteName: "白标商店",
 		SiteURL:  "https://shop.example.test",
 	})
