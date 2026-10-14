@@ -1941,5 +1941,31 @@
       "local_reconstruction_identical": true,
       "server_installs_required": false
     }
+  },
+  "payment_network_copy": {
+    "passed": true,
+    "content_source_commit": "d7d1f94e36617e87cfff133a97190455f3f8a5ea",
+    "customer_surfaces": [
+      "purchase_notice_body",
+      "purchase_notice_summary",
+      "home_announcement",
+      "terms"
+    ],
+    "customer_surface_count": 4,
+    "announcement_version": "f2340cb5",
+    "post_id": 1,
+    "backend_release": "20261014-162234",
+    "backup": "/srv/zhixiang/backups/before-tron-network-copy-20261014-165251",
+    "local_browser_checks": 12,
+    "production_browser_checks": 12,
+    "existing_payment_tests_passed": 8,
+    "database_table_groups_verified": 66,
+    "program_deployed": false,
+    "services_restarted": false,
+    "payment_config_changed": false,
+    "local_database_uploaded": false,
+    "real_payment_or_procurement": false,
+    "evidence": "work/codex-runtime/tron-content-audit-20261014/",
+    "checked_at": "2026-10-14T08:55:23.970748+00:00"
   }
 }
