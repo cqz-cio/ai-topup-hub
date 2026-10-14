@@ -116,7 +116,7 @@ const router = createRouter({
         {
             path: '/redeem',
             name: 'redemption',
-            component: () => import('../views/Redeem.vue'),
+            component: () => import('../views/RedemptionEntry.vue'),
             meta: { standalone: true },
         },
         {

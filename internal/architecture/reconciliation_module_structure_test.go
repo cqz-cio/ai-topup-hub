@@ -28,7 +28,7 @@ func TestReconciliationUsesCompleteVerticalLayout(t *testing.T) {
 	assertDirectoryGoFileBudget(t, domainRoot, 4)
 	assertDirectoryGoFileBudget(t, storeRoot, 2)
 	assertDirectoryGoFileBudget(t, procurementRoot, 1)
-	assertDirectoryGoFileBudget(t, upstreamRoot, 1)
+	assertDirectoryGoFileBudget(t, upstreamRoot, 2) // Adapter and string-reference regression test.
 	assertDirectoryGoFileBudget(t, queueRoot, 1)
 	assertDirectoryGoFileBudget(t, notificationRoot, 1)
 	assertDirectoryGoFileBudget(t, transportRoot, 3)

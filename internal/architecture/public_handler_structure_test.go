@@ -32,7 +32,8 @@ func TestPublicConfigHTTPLivesInTransport(t *testing.T) {
 	assertFileDeclaresFunctions(t, filepath.Join(transportRoot, "handler.go"), []string{
 		"NewHandler", "GetConfig",
 	})
-	assertDirectoryGoFileBudget(t, transportRoot, 3)
+	// Two production files plus focused Google-auth and runtime-feature tests.
+	assertDirectoryGoFileBudget(t, transportRoot, 4)
 
 	legacy := filepath.Join(repositoryRoot, "internal", "http", "handlers", "public", "public_config.go")
 	if _, err := os.Stat(legacy); err == nil {

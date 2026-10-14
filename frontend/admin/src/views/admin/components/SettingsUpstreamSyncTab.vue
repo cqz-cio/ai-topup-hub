@@ -2,14 +2,18 @@
 import { onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { adminAPI } from '@/api/admin'
+import { useRuntimeFeatures } from '@/composables/useRuntimeFeatures'
+import FeatureAvailability from '@/components/FeatureAvailability.vue'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { notifyError, notifySuccess } from '@/utils/notify'
 
 const { t } = useI18n()
+const runtime = useRuntimeFeatures()
 
 const loading = ref(false)
+const configLoaded = ref(false)
 const submitting = ref(false)
 
 const form = reactive({
@@ -30,6 +34,7 @@ const clamp = (value: unknown, min: number, max: number, fallback: number) => {
 
 const loadConfig = async () => {
   loading.value = true
+  configLoaded.value = false
   try {
     const res = await adminAPI.getSettings({ key: 'upstream_sync_config' })
     const data = res.data?.data as Record<string, unknown> | undefined
@@ -40,14 +45,19 @@ const loadConfig = async () => {
       form.sync_max_pages = clamp(data.sync_max_pages, 10, 500, 200)
       form.sync_conn_concurrency = clamp(data.sync_conn_concurrency, 1, 10, 3)
     }
+    configLoaded.value = true
   } catch {
-    // ignore load error, use defaults
+    notifyError(t('featureAvailability.loadFailed'))
   } finally {
     loading.value = false
   }
 }
 
 const save = async () => {
+  if (!configLoaded.value || runtime.loading || runtime.error || submitting.value) {
+    notifyError(t('featureAvailability.loadFailed'))
+    return
+  }
   submitting.value = true
   try {
     const normalized = {
@@ -90,7 +100,8 @@ onMounted(() => {
       <p class="mt-1 text-xs text-muted-foreground">{{ t('admin.settings.upstreamSync.subtitle') }}</p>
     </div>
 
-    <div class="rounded-lg border p-6 space-y-4">
+    <FeatureAvailability :state="runtime" feature="stock_sync_settings" />
+    <div v-if="runtime.available('stock_sync_settings')" class="rounded-lg border p-6 space-y-4">
       <div>
         <h3 class="text-sm font-semibold">{{ t('admin.settings.upstreamSync.interval.title') }}</h3>
         <p class="mt-1 text-xs text-muted-foreground">{{ t('admin.settings.upstreamSync.interval.subtitle') }}</p>
@@ -117,7 +128,7 @@ onMounted(() => {
       <p class="text-xs text-muted-foreground">{{ t('admin.settings.upstreamSync.preOrderCheck.enabledHint') }}</p>
     </div>
 
-    <div class="rounded-lg border p-6 space-y-4">
+    <div v-if="runtime.available('stock_sync_settings')" class="rounded-lg border p-6 space-y-4">
       <div>
         <h3 class="text-sm font-semibold">{{ t('admin.settings.upstreamSync.pageSize.title') }}</h3>
         <p class="mt-1 text-xs text-muted-foreground">{{ t('admin.settings.upstreamSync.pageSize.subtitle') }}</p>
@@ -129,7 +140,7 @@ onMounted(() => {
       </div>
     </div>
 
-    <div class="rounded-lg border p-6 space-y-4">
+    <div v-if="runtime.available('stock_sync_settings')" class="rounded-lg border p-6 space-y-4">
       <div>
         <h3 class="text-sm font-semibold">{{ t('admin.settings.upstreamSync.maxPages.title') }}</h3>
         <p class="mt-1 text-xs text-muted-foreground">{{ t('admin.settings.upstreamSync.maxPages.subtitle') }}</p>
@@ -141,7 +152,7 @@ onMounted(() => {
       </div>
     </div>
 
-    <div class="rounded-lg border p-6 space-y-4">
+    <div v-if="runtime.available('stock_sync_settings')" class="rounded-lg border p-6 space-y-4">
       <div>
         <h3 class="text-sm font-semibold">{{ t('admin.settings.upstreamSync.concurrency.title') }}</h3>
         <p class="mt-1 text-xs text-muted-foreground">{{ t('admin.settings.upstreamSync.concurrency.subtitle') }}</p>

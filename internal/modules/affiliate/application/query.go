@@ -24,11 +24,17 @@ func (s *Service) GetUserDashboard(userID uint) (Dashboard, error) {
 	if userID == 0 || s.repo == nil {
 		return dashboard, nil
 	}
+	setting, err := s.settings.GetAffiliateSetting()
+	if err != nil {
+		return dashboard, err
+	}
+	dashboard.Enabled = setting.Enabled
 	profile, err := s.repo.GetProfileByUserID(userID)
 	if err != nil {
 		return dashboard, err
 	}
 	if profile == nil {
+		dashboard.CanOpen = setting.Enabled
 		return dashboard, nil
 	}
 
@@ -37,6 +43,8 @@ func (s *Service) GetUserDashboard(userID uint) (Dashboard, error) {
 		return dashboard, err
 	}
 	dashboard.Opened = true
+	dashboard.ProfileStatus = profile.Status
+	dashboard.CanWithdraw = setting.Enabled && strings.TrimSpace(profile.Status) == constants.AffiliateProfileStatusActive
 	dashboard.AffiliateCode = profile.AffiliateCode
 	dashboard.PromotionPath = "/?aff=" + profile.AffiliateCode
 	dashboard.ClickCount = stats.ClickCount

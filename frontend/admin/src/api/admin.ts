@@ -394,6 +394,7 @@ export const adminAPI = {
   getPublicConfig: () => api.get('/public/config'),
   getImageCaptcha: () => api.get('/public/captcha/image'),
   getSystemVersion: () => api.get('/admin/system/version'),
+  getRuntimeFeatures: () => api.get('/admin/system/features'),
   checkSystemUpdate: (params?: { owner?: string; repo?: string }) =>
     api.get('/admin/system/version/check', { params }),
   getUpdateCapability: () => api.get('/admin/system/update/capability'),

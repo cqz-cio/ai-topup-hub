@@ -181,7 +181,7 @@ func (c *Client) EnqueueDownstreamCallback(payload DownstreamCallbackPayload, op
 // EnqueueReconciliationRun 入队对账执行任务
 func (c *Client) EnqueueReconciliationRun(payload ReconciliationRunPayload, opts ...asynq.Option) error {
 	if !c.Enabled() {
-		return nil
+		return fmt.Errorf("reconciliation queue unavailable")
 	}
 	task, err := NewReconciliationRunTask(payload)
 	if err != nil {

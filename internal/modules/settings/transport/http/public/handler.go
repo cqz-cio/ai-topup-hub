@@ -88,6 +88,7 @@ type Handler struct {
 	google         GoogleAuthPublic
 	googleFallback GoogleAuthFallback
 	overlay        ResellerOverlay
+	features       func() map[string]bool
 }
 
 func NewHandler(
@@ -100,6 +101,7 @@ func NewHandler(
 	google GoogleAuthPublic,
 	googleFallback GoogleAuthFallback,
 	overlay ResellerOverlay,
+	features ...func() map[string]bool,
 ) *Handler {
 	if cache == nil {
 		panic("public config handler: cache is nil")
@@ -110,7 +112,7 @@ func NewHandler(
 	if payments == nil {
 		panic("public config handler: payments is nil")
 	}
-	return &Handler{
+	handler := &Handler{
 		cache:          cache,
 		settings:       settings,
 		payments:       payments,
@@ -121,6 +123,10 @@ func NewHandler(
 		googleFallback: googleFallback,
 		overlay:        overlay,
 	}
+	if len(features) > 0 {
+		handler.features = features[0]
+	}
+	return handler
 }
 
 // GetConfig 获取全局配置。
@@ -143,6 +149,7 @@ func (h *Handler) GetConfig(c *gin.Context) {
 	if hit, err := h.cache.GetJSON(c.Request.Context(), cacheKey, &cached); err == nil && hit {
 		cached["server_time"] = time.Now().UnixMilli()
 		cached["app_version"] = version.Version
+		h.applyFeatures(cached)
 		response.Success(c, cached)
 		return
 	}
@@ -240,7 +247,16 @@ func (h *Handler) GetConfig(c *gin.Context) {
 	_ = h.cache.SetJSON(c.Request.Context(), cacheKey, data, publicConfigCacheTTL)
 	data["server_time"] = time.Now().UnixMilli()
 	data["app_version"] = version.Version
+	h.applyFeatures(data)
 	response.Success(c, data)
+}
+
+func (h *Handler) applyFeatures(data map[string]interface{}) {
+	features := map[string]bool{"redemption": false}
+	if h.features != nil {
+		features = h.features()
+	}
+	data["features"] = features
 }
 
 func stringValue(value interface{}) string {
