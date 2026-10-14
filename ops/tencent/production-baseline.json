@@ -1,20 +1,20 @@
 {
-  "checked_at": "2026-10-14T00:58:54.773879+00:00",
+  "checked_at": "2026-10-14T03:03:14.037843+00:00",
   "production_url": "https://www.qzweb.cloud/",
-  "documented_release_id": "20261014-085600",
-  "verified_release_id": "20261014-085600",
-  "previous_release_id": "20261013-172211",
-  "source_commit": "993fe972efc8b359ca82e1c21f8272303baea751",
+  "documented_release_id": "20261014-105629",
+  "verified_release_id": "20261014-105629",
+  "previous_release_id": "20261014-085600",
+  "source_commit": "1be05e228bc34336cfc86e7c7c5558ac3dac5609",
   "source_branch": "main",
   "server_git_commit_verified": true,
-  "source_tag": "production/abuse-protection-20261014-085600",
+  "source_tag": "production/reseller-applications-20261014-105629",
   "production": {
-    "release_path": "/srv/zhixiang/releases/20261014-085600",
-    "running_executable": "/srv/zhixiang/releases/20261014-085600/zhixiang-shop",
-    "binary_bytes": 90480802,
-    "binary_sha256": "1d624247f1e1080b525a06111395ec4ccf35978c6eb3d3914ca61800f1fa463c",
-    "running_binary_sha256": "1d624247f1e1080b525a06111395ec4ccf35978c6eb3d3914ca61800f1fa463c",
-    "manifest_binary_sha256": "1d624247f1e1080b525a06111395ec4ccf35978c6eb3d3914ca61800f1fa463c",
+    "release_path": "/srv/zhixiang/releases/20261014-105629",
+    "running_executable": "/srv/zhixiang/releases/20261014-105629/zhixiang-shop",
+    "binary_bytes": 90493090,
+    "binary_sha256": "a898764f5250a2c711f9a673ff40589bb38f57ebd9f9c19ad42e68165f90b645",
+    "running_binary_sha256": "a898764f5250a2c711f9a673ff40589bb38f57ebd9f9c19ad42e68165f90b645",
+    "manifest_binary_sha256": "a898764f5250a2c711f9a673ff40589bb38f57ebd9f9c19ad42e68165f90b645",
     "build_info": {
       "go_version": "go1.26.5",
       "build_settings": [
@@ -27,12 +27,12 @@
         "GOOS=linux",
         "GOAMD64=v1",
         "vcs=git",
-        "vcs.revision=993fe972efc8b359ca82e1c21f8272303baea751",
-        "vcs.time=2026-10-13T10:00:06Z",
+        "vcs.revision=1be05e228bc34336cfc86e7c7c5558ac3dac5609",
+        "vcs.time=2026-10-14T02:50:03Z",
         "vcs.modified=false"
       ],
       "git_metadata_pinned": true,
-      "vcs_revision": "993fe972efc8b359ca82e1c21f8272303baea751",
+      "vcs_revision": "1be05e228bc34336cfc86e7c7c5558ac3dac5609",
       "vcs_modified": false
     },
     "runtime_mode": "storefront",
@@ -44,15 +44,21 @@
       "stock_sync_timer": "active"
     },
     "redis_preserved_without_restart": true,
-    "backup": "/srv/zhixiang/backups/before-abuse-protection-20261014-085600",
+    "backup": "/srv/zhixiang/backups/before-reseller-applications-20261014-105629",
     "database_backup_quick_check": "ok",
-    "report_path": "/srv/zhixiang/shared/reports/abuse-protection-release-20261014-085600.json",
-    "configuration_unchanged": true,
+    "report_path": "/srv/zhixiang/shared/reports/reseller-applications-release-20261014-105629.json",
+    "configuration_unchanged": false,
     "nginx_configuration_preserved": true,
     "source_dirty": false,
     "private_configuration_unchanged": true,
-    "configuration_changes": [],
-    "source_commit": "993fe972efc8b359ca82e1c21f8272303baea751"
+    "configuration_changes": [
+      "reseller.enabled=true",
+      "reseller.self_apply_enabled=true",
+      "reseller.main_hosts preserves main domains, IP and loopback entries",
+      "reseller.trusted_forwarded_host=false",
+      "reseller.subdomain_base remains empty"
+    ],
+    "source_commit": "1be05e228bc34336cfc86e7c7c5558ac3dac5609"
   },
   "payment": {
     "bep20": {
@@ -156,35 +162,53 @@
     }
   },
   "pages": [
-    "https://www.qzweb.cloud/auth/register",
-    "https://www.qzweb.cloud/auth/login",
-    "https://124.220.2.69:18888/payment-channels"
+    "https://www.qzweb.cloud/reseller/apply",
+    "https://www.qzweb.cloud/reseller",
+    "https://124.220.2.69:18888/resellers/operations",
+    "https://124.220.2.69:18888/resellers/profiles"
   ],
   "verified_asset_sha256": {
-    "user/index.html": "78bbc34f6b8e776c773a5da78edb761d36b2d019c5ac7fd5679971823fe49eed",
-    "admin/index.html": "a54d9a3e008bb46f26552894a7e6230ddeaae32635889e6e53a734da50550b61"
+    "user/index.html": "4fef6fbcbfaaf90b4620a67b60693c793e94d3818e2a2cee8b720983772e03ae",
+    "admin/index.html": "7e27d512dc2082117ebb8bda8191b50d5a15744f5d43ada75ec60d861e4fa756"
   },
   "public_verification": {
-    "checked_at": "2026-10-14T00:58:54.773879+00:00",
-    "http_checks_passed": 8,
-    "guard_checks_passed": 11,
+    "checked_at": "2026-10-14T03:03:14.037843+00:00",
+    "http_checks_passed": 10,
+    "backend_runtime_checks_passed": 9,
+    "frontend_server_checks_passed": 15,
     "browser_checks": {
-      "registration_captcha_loaded": true,
-      "captcha_width": 240,
-      "login_form_visible": true,
-      "admin_existing_session_valid": true,
-      "payment_channels_visible": [
-        "bscusdt",
-        "plasmausdt",
-        "xorpay"
+      "checked_at": "2026-10-14T03:03:14.037843+00:00",
+      "existing_authenticated_user_session": true,
+      "existing_authenticated_admin_session": true,
+      "initial_application_form_visible": true,
+      "initial_submit_button_enabled": true,
+      "original_permission_error_absent": true,
+      "admin_feature_enabled": true,
+      "admin_applications_open": true,
+      "user_dashboard_navigation_verified": true,
+      "observed_real_application_pending_then_approved": true,
+      "observed_application_created_at_local": "2026-10-14 11:01:10",
+      "observed_application_approved_at_local": "2026-10-14 11:01:44",
+      "agent_submitted_application": false,
+      "agent_approved_application": false,
+      "approved_application_form_absent": true,
+      "user_viewports": [
+        1920,
+        390,
+        320
       ],
-      "wechat_fee_visible": "1.60%",
-      "console_errors": 0,
-      "real_email_sent": false,
-      "real_registration_created": false,
-      "real_payment_or_purchase_performed": false
+      "admin_viewports": [
+        1920,
+        390,
+        320
+      ],
+      "horizontal_overflow": false,
+      "browser_error_logs": 0,
+      "viewport_restored": true,
+      "temporary_browser_tab_closed": true,
+      "evidence": "CUA snapshots and screenshots in this task transcript; local screenshots under this report directory"
     },
-    "verification_directory": "work/codex-runtime/security-release/",
+    "verification_directory": "work/codex-runtime/reseller-application-release/",
     "production_order_submitted": false,
     "browser_error_count": 0
   },
@@ -333,12 +357,12 @@
   "previous_build_verification_at": "2026-10-12T08:19:31.766441+00:00",
   "management_url": "https://124.220.2.69:18888/login",
   "frontend_gateway": {
-    "checked_at": "2026-10-13T09:57:21.384Z",
+    "checked_at": "2026-10-14T03:03:14.037843+00:00",
     "frontend_host": "124.220.2.69",
     "backend_host": "43.134.141.10",
-    "frontend_release": "20261013-174612",
-    "source_commit": "e249905d2e75d0d6e87c576367bc80ae62e25fe8",
-    "static_files_verified": 1010,
+    "frontend_release": "20261014-105629",
+    "source_commit": "1be05e228bc34336cfc86e7c7c5558ac3dac5609",
+    "static_files_verified": 442,
     "storefront_url": "https://www.qzweb.cloud/",
     "management_url": "https://124.220.2.69:18888/login",
     "www_dns_record": "www A 124.220.2.69",
@@ -354,8 +378,8 @@
     "certificate_renewal_verified": true,
     "certificate_timer": "qzweb-certificates.timer",
     "certificate_renewal_report": "/srv/zhixiang-front/shared/work/renew-final-20261012-1644/status.json",
-    "report_path": "work/codex-runtime/payment-return/final-frontend-verification.json",
-    "backend_report_path": "work/codex-runtime/payment-return/final-backend-verification.json",
+    "report_path": "/srv/zhixiang-front/shared/work/reseller-applications-20261014-105629.json",
+    "backend_report_path": "/srv/zhixiang/shared/reports/reseller-applications-release-20261014-105629.json",
     "formal_alipay_enabled": false,
     "database_uploaded": false,
     "legacy_singapore_http_entries_retained": true,
@@ -368,34 +392,33 @@
       "browser_current_frontend_confirmed": true,
       "report_path": "/srv/zhixiang-front/shared/work/entry-cache-report.json"
     },
-    "previous_frontend_release": "20261013-173020",
-    "storefront_source_commit": "e249905d2e75d0d6e87c576367bc80ae62e25fe8",
-    "admin_source_commit": "1f4584c19123f4c187403be7ce22db8cf3ed167c",
-    "backup": "/srv/zhixiang-front/backups/before-payment-return-20261013-174612",
-    "frontend_only_update": true,
+    "previous_frontend_release": "20261013-174612",
+    "storefront_source_commit": "1be05e228bc34336cfc86e7c7c5558ac3dac5609",
+    "admin_source_commit": "1be05e228bc34336cfc86e7c7c5558ac3dac5609",
+    "backup": "/srv/zhixiang-front/backups/before-reseller-applications-20261014-105629",
+    "frontend_only_update": false,
     "previous_hashed_assets_retained": true,
     "verified_services": {
       "nginx": "active",
-      "zhixiang-api-tunnel.service": "active",
+      "zhixiang-api-tunnel": "active",
       "qzweb-certificates.timer": "active"
     },
-    "release_scope": "storefront-payment-product-return",
-    "admin_files_verified": 687,
+    "release_scope": "Reseller application availability, explicit user states and live admin feature status",
+    "admin_files_verified": 119,
     "storefront_files_verified": 323,
-    "backend_program_preserved": true,
-    "backend_setting_changes": [],
-    "frontend_build_source_commit": "e249905d2e75d0d6e87c576367bc80ae62e25fe8",
-    "frontend_source_identical_to_backend": false,
+    "backend_program_preserved": false,
+    "backend_setting_changes": [
+      "reseller"
+    ],
+    "frontend_build_source_commit": "1be05e228bc34336cfc86e7c7c5558ac3dac5609",
+    "frontend_source_identical_to_backend": true,
     "admin_base": "/",
     "base_repair_backup": "/srv/zhixiang-front/backups/before-xorpay-admin-base-20261013-173020",
     "all_storefront_files": 2223,
     "last_backend_release_preservation_check": {
-      "checked_at": "2026-10-14T00:58:54.773879+00:00",
-      "backend_release": "20261014-085600",
-      "frontend_release": "20261013-174612",
-      "all_files_unchanged": 2910,
-      "nginx_files_unchanged": 54,
-      "report_directory": "work/codex-runtime/security-release/"
+      "checked_at": "2026-10-14T03:03:14.037843+00:00",
+      "release": "20261014-105629",
+      "scope": "Backend and both frontends updated from the same clean source; nginx unchanged"
     }
   },
   "alipay": {
@@ -1133,19 +1156,28 @@
     "database_uploaded": false
   },
   "previous_public_verification": {
-    "checked_at": "2026-10-13T09:34:39.455Z",
-    "browser_cases_passed": 6,
-    "scope": [
-      "admin channel list shows enabled WeChat QR at 1.60%",
-      "admin edit shows order and wallet, guest and member",
-      "admin customer fee ceil override enabled, secret masked",
-      "storefront product detail and checkout render",
-      "38.00 CNY selected WeChat previews 0.61 fee and 38.61 total",
-      "switching to BEP20 removes surcharge; switching back restores it"
-    ],
-    "browser_error_count": 0,
-    "verification_directory": "work/codex-runtime/xorpay/",
-    "production_order_submitted": false
+    "checked_at": "2026-10-14T00:58:54.773879+00:00",
+    "http_checks_passed": 8,
+    "guard_checks_passed": 11,
+    "browser_checks": {
+      "registration_captcha_loaded": true,
+      "captcha_width": 240,
+      "login_form_visible": true,
+      "admin_existing_session_valid": true,
+      "payment_channels_visible": [
+        "bscusdt",
+        "plasmausdt",
+        "xorpay"
+      ],
+      "wechat_fee_visible": "1.60%",
+      "console_errors": 0,
+      "real_email_sent": false,
+      "real_registration_created": false,
+      "real_payment_or_purchase_performed": false
+    },
+    "verification_directory": "work/codex-runtime/security-release/",
+    "production_order_submitted": false,
+    "browser_error_count": 0
   },
   "abuse_protection": {
     "release": "20261014-085600",
@@ -1205,5 +1237,115 @@
       "Application protections do not measure or guarantee volumetric DDoS capacity.",
       "Real SMTP sending and real-money payment/procurement acceptance were not performed."
     ]
+  },
+  "reseller_applications": {
+    "release": "20261014-105629",
+    "source_commit": "1be05e228bc34336cfc86e7c7c5558ac3dac5609",
+    "source_branch": "main",
+    "source_dirty": false,
+    "checked_at": "2026-10-14T03:03:14.037843+00:00",
+    "binary_sha256": "a898764f5250a2c711f9a673ff40589bb38f57ebd9f9c19ad42e68165f90b645",
+    "backend_backup": "/srv/zhixiang/backups/before-reseller-applications-20261014-105629",
+    "frontend_backup": "/srv/zhixiang-front/backups/before-reseller-applications-20261014-105629",
+    "local": {
+      "passed": true,
+      "checked_at_utc": "2026-10-14T02:49:05Z",
+      "temporary_accounts_and_application_removed": true,
+      "business_tables_unchanged": 65,
+      "natural_runtime_changes": [
+        "chain_payment_cursors"
+      ],
+      "browser_checks": 25,
+      "go_pass_including_subtests": 1853,
+      "go_skipped": 3,
+      "user_tests": 104,
+      "admin_tests": 58,
+      "frontend_type_builds": "both passed",
+      "local_entrypoints": [
+        8080,
+        5173,
+        5174
+      ],
+      "upstream_purchase_enabled": false,
+      "production_write": false,
+      "extra_full_suite_limitations": [
+        "Windows-specific logger/self-update behavior",
+        "CGO SQLite compliance tests unavailable in this environment",
+        "Go ./... includes ignored work tools",
+        "mock upstream tests blocked by local purchase-disabled environment"
+      ],
+      "specific_release_suite_passed": true
+    },
+    "production_browser": {
+      "checked_at": "2026-10-14T03:03:14.037843+00:00",
+      "existing_authenticated_user_session": true,
+      "existing_authenticated_admin_session": true,
+      "initial_application_form_visible": true,
+      "initial_submit_button_enabled": true,
+      "original_permission_error_absent": true,
+      "admin_feature_enabled": true,
+      "admin_applications_open": true,
+      "user_dashboard_navigation_verified": true,
+      "observed_real_application_pending_then_approved": true,
+      "observed_application_created_at_local": "2026-10-14 11:01:10",
+      "observed_application_approved_at_local": "2026-10-14 11:01:44",
+      "agent_submitted_application": false,
+      "agent_approved_application": false,
+      "approved_application_form_absent": true,
+      "user_viewports": [
+        1920,
+        390,
+        320
+      ],
+      "admin_viewports": [
+        1920,
+        390,
+        320
+      ],
+      "horizontal_overflow": false,
+      "browser_error_logs": 0,
+      "viewport_restored": true,
+      "temporary_browser_tab_closed": true,
+      "evidence": "CUA snapshots and screenshots in this task transcript; local screenshots under this report directory"
+    },
+    "public_http_checks": 10,
+    "backend_runtime_checks": 9,
+    "frontend_server_http_checks": 15,
+    "user_files_verified": 323,
+    "admin_files_verified": 119,
+    "previous_files_preserved": 2905,
+    "nginx_files_preserved": 54,
+    "business_snapshots_preserved_at_switch": 28,
+    "business_snapshot_ignored_columns": {
+      "site_connections": [
+        "last_ping_at",
+        "updated_at"
+      ]
+    },
+    "configuration_change": "reseller section only",
+    "reseller": {
+      "enabled": true,
+      "self_apply_enabled": true,
+      "main_hosts": [
+        "localhost",
+        "127.0.0.1",
+        "::1",
+        "www.qzweb.cloud",
+        "qzweb.cloud",
+        "43.134.141.10",
+        "124.220.2.69"
+      ],
+      "trusted_forwarded_host": false,
+      "subdomain_base": "",
+      "settlement_confirm_days": 7
+    },
+    "redis_not_restarted": true,
+    "runtime_mode": "storefront",
+    "upstream_purchase_enabled": true,
+    "auto_recharge_enabled": false,
+    "local_database_uploaded": false,
+    "agent_created_production_business_records": false,
+    "operator_application_created_after_release_preserved": true,
+    "real_payment_or_purchase_performed": false
   }
 }

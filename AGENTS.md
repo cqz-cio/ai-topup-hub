@@ -7,7 +7,7 @@
 
 - `main` 是唯一正式源码主线，维护当前绿色 Go + Vue 商城，包含已确认的 π星卡社名称、派大星 Logo 和水母背景。用户端为 `frontend/user`，后台为 `frontend/admin`；这些品牌改动属于同一项目主版本。
 - 支付、订单、数据库和采购后端部署在腾讯云新加坡 `43.134.141.10`，账号 `ubuntu`，目录 `/srv/zhixiang`。两套前端部署在上海 `124.220.2.69` 的 `/srv/zhixiang-front`：商城 `https://www.qzweb.cloud/`，管理端 `https://124.220.2.69:18888/login`。上海通过受限 SSH 通道连接新加坡回环 API；维护说明见 `ops/tencent/README.md`。
-- 当前新加坡后端发布为 `20261014-085600`，程序及内嵌资源源码为 `993fe972efc8b359ca82e1c21f8272303baea751`；上海静态发布为 `20261013-174612`，商城源码 `e249905d2e75d0d6e87c576367bc80ae62e25fe8`，后台资源沿用 `1f4584c19123f4c187403be7ce22db8cf3ed167c`。后端使用 `-mode storefront`、`UPSTREAM_PURCHASE_ENABLED=true`。BEP20、Plasma USDT 和 XorPay 微信扫码均已启用，支持商品订单与钱包充值；微信客户手续费为 1.6% 向上取分。精确核验范围以 `ops/tencent/production-baseline.json` 为准，不把后续文档提交自动当作线上程序的 Git 版本。
+- 当前新加坡后端与上海两套前端均为 `20261014-105629`，程序、内嵌资源和独立静态资源均来自干净源码 `1be05e228bc34336cfc86e7c7c5558ac3dac5609`。分销功能与用户申请已开启，提交后仍需后台审核；操作见 `docs/reseller-applications.md`。后端使用 `-mode storefront`、`UPSTREAM_PURCHASE_ENABLED=true`。BEP20、Plasma USDT 和 XorPay 微信扫码均已启用，支持商品订单与钱包充值；微信客户手续费为 1.6% 向上取分。精确核验范围以 `ops/tencent/production-baseline.json` 为准，不把后续文档提交自动当作线上程序的 Git 版本。
 - 本地使用 `scripts/local/start.ps1`、`status.ps1`、`stop.ps1`，运行库为 `work/codex-runtime/live/shop.db`，本地采购关闭。旧说明位于 `docs/history/`，不能按历史文档覆盖当前环境。
 - 用户要求固定执行“先本地验证，再推送和上线”：先在日常本地入口验证实际运行程序、配置、相关数据和页面，保存验证记录；通过后才推送已验证提交并部署所需改动。后端改动须重建并重启本地后端，支付渠道及商品说明不能只在临时测试入口核验。上线后对照核验本地与生产；环境私有配置、订单和实时库存独立维护，不互相覆盖。
 - 用户已授权真实客户确认付款后的自动采购发卡，仍禁止主动提交有效采购、转账，或将验收订单改为已付款进行扣款测试。测试使用模拟供应商和临时数据库。
@@ -138,3 +138,10 @@
 - 1951 项 Go 回归通过（含子测试），3 项外部 SMTP/PostgreSQL 测试跳过；商城 103 项、后台 58 项测试和两套类型构建通过。日常本机已重建重启，14 项接口与实际注册/登录/后台检查通过；正式 11 项隔离防护、8 项公网 HTTP 及实际浏览器检查通过，429/413 和匿名发信用途限制已实际生效。
 - 备份 `/srv/zhixiang/backups/before-abuse-protection-20261014-085600`，私有证据 `work/codex-runtime/security-release/verified-report.json`。切换前后 19 组业务数据及配置核对一致，供货连接仅排除自动心跳时间。上海静态保持 `20261013-174612`，2910 个前端文件及 54 个 Nginx 文件一致；三条支付渠道和微信 1.60% 手续费保留，Redis 未重启。
 - 保留 storefront、支付采购队列、已授权自动采购与每 300 秒库存 timer；自动充值关闭。没有上传本机库、创建正式验收用户、发送真实验收邮件或进行付款采购测试。应用限流不等同于带宽型 DDoS 清洗，未测定正式站极限 QPS。
+
+## 分销申请统一与开启（2026-10-14）
+
+- 后端、商城与后台发布 `20261014-105629`，干净源码 `1be05e228bc34336cfc86e7c7c5558ac3dac5609`。`reseller.enabled` 和 `reseller.self_apply_enabled` 均开启；后台分销概览读取实际状态，商城严格遵循 `can_apply`。申请仍须审核，待审核、已开通、停用、关闭和加载失败不显示可提交表单。见 `docs/reseller-applications.md`。
+- 主站域名、服务器 IP 与回环地址须保留在 `main_hosts`，保持 `trusted_forwarded_host=false`；`subdomain_base` 为空，不代表泛域名 DNS/TLS 或自定义域名接入已完成。
+- 本机 25 项接口与浏览器验证、1853 项相关 Go 回归（含子测试，3 项跳过）、商城 104 项、后台 58 项及两套类型构建通过。正式 10 项公网、9 项后端、15 项服务器页面资源检查，以及 1920、390、320px 实际页面通过；额外全库运行存在 Windows/CGO 等限制，不宣称全库全部通过。
+- 切换时 28 组业务快照一致，配置只新增 `reseller`；442 个新资源、2905 个保留文件与 54 个 Nginx 文件通过核验。上线后运营者自行提交并审核通过的新申请已保留，助手没有代提交或代审批。两地备份均为各自 `backups/before-reseller-applications-20261014-105629`，证据 `work/codex-runtime/reseller-application-release/verified-report.json`。Redis、支付采购队列及库存 timer 保留，未上传本地库或执行真实付款采购。
