@@ -180,6 +180,14 @@ onMounted(() => {
       {{ pageError }}
     </div>
 
+    <Card v-if="overview?.feature && !loadingOverview" class="rounded-lg p-4" role="status">
+      <div class="flex flex-wrap gap-x-8 gap-y-2 text-sm">
+        <p>{{ t('admin.resellerOperations.feature.name') }}：<strong>{{ t(overview.feature.enabled ? 'admin.resellerOperations.feature.enabled' : 'admin.resellerOperations.feature.disabled') }}</strong></p>
+        <p>{{ t('admin.resellerOperations.feature.applications') }}：<strong>{{ t(overview.feature.applications_open ? 'admin.resellerOperations.feature.open' : 'admin.resellerOperations.feature.closed') }}</strong></p>
+      </div>
+      <p class="mt-2 text-sm text-muted-foreground">{{ t(overview.feature.applications_open ? 'admin.resellerOperations.feature.openHint' : 'admin.resellerOperations.feature.closedHint') }}</p>
+    </Card>
+
     <section class="space-y-3">
       <div class="flex items-center justify-between">
         <h2 class="text-base font-semibold">{{ t('admin.resellerOperations.sections.lifecycle') }}</h2>

@@ -17,8 +17,18 @@
     "lookupAction": "查訂單 · 領卡密",
     "flowTitle": "從選購到領取，清楚每一步。",
     "flowDescription": "不必來回找入口，在本站完成整個購買流程。",
-    "steps": { "cart": "選擇商品", "checkout": "確認訂單", "payment": "完成付款", "delivery": "領取卡密" },
-    "stepHints": { "cart": "確認規格與使用期限", "checkout": "保存信箱和查詢密碼", "payment": "按訂單指引完成付款", "delivery": "到帳後在訂單中領取" },
+    "steps": {
+      "cart": "選擇商品",
+      "checkout": "確認訂單",
+      "payment": "完成付款",
+      "delivery": "領取卡密"
+    },
+    "stepHints": {
+      "cart": "確認規格與使用期限",
+      "checkout": "保存信箱和查詢密碼",
+      "payment": "按訂單指引完成付款",
+      "delivery": "到帳後在訂單中領取"
+    },
     "categories": "商品分類",
     "helpTitle": "購買前需要協助？",
     "helpDescription": "不確定規格、使用方式或售後範圍，可以聯絡客服。",
@@ -1513,7 +1523,34 @@
       "stepReview": "平台審核",
       "stepActive": "已啟用",
       "stepRejected": "已駁回",
-      "benefitsTitle": "開通後你將獲得"
+      "benefitsTitle": "開通後你將獲得",
+      "loadFailedTitle": "暫時無法取得申請狀態",
+      "loadFailedDescription": "請重新載入，狀態恢復後再提交申請。",
+      "retry": "重新載入",
+      "submitted": "申請已提交，請等待平台審核。",
+      "viewStatus": "查看申請狀態",
+      "states": {
+        "closed": {
+          "title": "分銷申請暫未開放",
+          "description": "平台目前不接受新的分銷申請，請稍後再試或聯絡客服。"
+        },
+        "pending_review": {
+          "title": "申請審核中",
+          "description": "申請已提交，平台審核後將更新開通狀態，無需重複提交。"
+        },
+        "active": {
+          "title": "分銷商已開通",
+          "description": "可前往工作台，繼續設定網域和店鋪。"
+        },
+        "disabled": {
+          "title": "分銷商資格已停用",
+          "description": "目前無法提交申請，如需恢復請聯絡平台客服。"
+        },
+        "unknown": {
+          "title": "申請狀態暫不可用",
+          "description": "請重新載入頁面或聯絡客服確認。"
+        }
+      }
     },
     "domains": {
       "title": "域名管理",

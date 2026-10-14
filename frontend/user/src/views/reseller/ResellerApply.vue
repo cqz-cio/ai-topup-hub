@@ -20,6 +20,14 @@
       :description="t('resellerConsole.common.loadingDescription')"
     />
 
+    <ResellerPageState
+      v-else-if="error"
+      :title="t('resellerConsole.apply.loadFailedTitle')"
+      :description="t('resellerConsole.apply.loadFailedDescription')"
+    >
+      <Button variant="outline" @click="load">{{ t('resellerConsole.apply.retry') }}</Button>
+    </ResellerPageState>
+
     <template v-else>
       <!-- 状态 stepper -->
       <Card class="p-5">
@@ -75,8 +83,8 @@
             <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
               <BadgeCheck class="h-6 w-6" />
             </span>
-            <h3 class="mt-3 text-base font-bold text-foreground">{{ t('resellerConsole.apply.unavailableTitle') }}</h3>
-            <p class="mx-auto mt-2 max-w-md text-sm text-muted-foreground">{{ t('resellerConsole.apply.unavailableDescription') }}</p>
+            <h3 class="mt-3 text-base font-bold text-foreground">{{ t(`resellerConsole.apply.states.${unavailableState}.title`) }}</h3>
+            <p class="mx-auto mt-2 max-w-md text-sm text-muted-foreground">{{ t(`resellerConsole.apply.states.${unavailableState}.description`) }}</p>
             <Button as-child class="mt-5">
               <RouterLink to="/reseller">{{ t('resellerConsole.nav.dashboard') }}</RouterLink>
             </Button>
@@ -104,10 +112,16 @@ import { type PageAlert } from '../../utils/alerts'
 import { getResellerProfileStatusKey } from '../../utils/resellerManagement'
 
 const { t } = useI18n()
-const { loading, snapshot, state, load } = useResellerProfile()
+const { loading, snapshot, state, error, load } = useResellerProfile()
 const submitting = ref(false)
 const reason = ref('')
 const alert = ref<PageAlert | null>(null)
+
+const unavailableState = computed(() => {
+  const status = state.value.profileStatus
+  if (status === 'not_opened' || status === 'rejected') return 'closed'
+  return status
+})
 
 const statusText = computed(() => {
   const status = snapshot.value?.profile?.status
@@ -146,17 +160,19 @@ const nodeClass = (s: StepState) => {
 }
 
 const submit = async () => {
+  if (loading.value || error.value || submitting.value || !state.value.canApply) return
   alert.value = null
   submitting.value = true
   try {
     await resellerAPI.apply({ reason: reason.value })
     reason.value = ''
     await load()
-    alert.value = { level: 'success', message: t('personalCenter.common.saveSuccess') }
+    alert.value = { level: 'success', message: t('resellerConsole.apply.submitted') }
   } catch (err) {
     // 透传后端细分错误（申请已关闭 / 账号被禁用等），失败兜底通用文案。
     const message = err instanceof Error && err.message ? err.message : t('personalCenter.common.saveFailed')
     alert.value = { level: 'error', message }
+    await load()
   } finally {
     submitting.value = false
   }

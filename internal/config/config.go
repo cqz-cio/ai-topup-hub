@@ -306,6 +306,11 @@ type ResellerConfig struct {
 	SettlementConfirmDays int `mapstructure:"settlement_confirm_days"`
 }
 
+// ApplicationsOpen is shared by application admission and the admin status display.
+func (c ResellerConfig) ApplicationsOpen() bool {
+	return c.Enabled && c.SelfApplyEnabled
+}
+
 // Load 从 config.yml 加载配置
 func Load() *Config {
 	viper.SetConfigName("config")

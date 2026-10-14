@@ -20,7 +20,7 @@ type mappedError struct {
 
 var userManagementErrorRules = []mappedError{
 	{target: resellermodule.ErrNotOpened, code: response.CodeBadRequest, key: "error.bad_request"},
-	{target: resellermodule.ErrApplyDisabled, code: response.CodeForbidden, key: "error.forbidden"},
+	{target: resellermodule.ErrApplyDisabled, code: response.CodeForbidden, key: "error.reseller_apply_disabled"},
 	{target: resellermodule.ErrProfileInactive, code: response.CodeBadRequest, key: "error.forbidden"},
 	{target: resellermodule.ErrDomainInvalid, code: response.CodeBadRequest, key: "error.reseller_domain_invalid"},
 	{target: resellermodule.ErrDomainMainHostNotAllowed, code: response.CodeBadRequest, key: "error.reseller_domain_main_host_not_allowed"},

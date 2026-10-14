@@ -17,8 +17,18 @@
     "lookupAction": "查订单 · 领卡密",
     "flowTitle": "从选购到领取，清楚每一步。",
     "flowDescription": "不必来回找入口，在本站完成整个购买流程。",
-    "steps": { "cart": "选择商品", "checkout": "确认订单", "payment": "完成付款", "delivery": "领取卡密" },
-    "stepHints": { "cart": "确认规格与使用期限", "checkout": "保存邮箱和查询密码", "payment": "按订单指引完成付款", "delivery": "到账后在订单中领取" },
+    "steps": {
+      "cart": "选择商品",
+      "checkout": "确认订单",
+      "payment": "完成付款",
+      "delivery": "领取卡密"
+    },
+    "stepHints": {
+      "cart": "确认规格与使用期限",
+      "checkout": "保存邮箱和查询密码",
+      "payment": "按订单指引完成付款",
+      "delivery": "到账后在订单中领取"
+    },
     "categories": "商品分类",
     "helpTitle": "购买前需要帮助？",
     "helpDescription": "不确定规格、使用方式或售后范围，可以联系在线客服。",
@@ -1466,7 +1476,34 @@
       "stepReview": "平台审核",
       "stepActive": "已启用",
       "stepRejected": "已驳回",
-      "benefitsTitle": "开通后你将获得"
+      "benefitsTitle": "开通后你将获得",
+      "loadFailedTitle": "暂时无法获取申请状态",
+      "loadFailedDescription": "请刷新重试，状态恢复后再提交申请。",
+      "retry": "重新加载",
+      "submitted": "申请已提交，请等待平台审核。",
+      "viewStatus": "查看申请状态",
+      "states": {
+        "closed": {
+          "title": "分销申请暂未开放",
+          "description": "平台当前不接受新的分销申请，请稍后再试或联系客服。"
+        },
+        "pending_review": {
+          "title": "申请审核中",
+          "description": "申请已提交，平台审核后将更新开通状态，无需重复提交。"
+        },
+        "active": {
+          "title": "分销商已开通",
+          "description": "可前往工作台，继续配置域名和店铺。"
+        },
+        "disabled": {
+          "title": "分销商资格已停用",
+          "description": "当前无法提交申请，如需恢复请联系平台客服。"
+        },
+        "unknown": {
+          "title": "申请状态暂不可用",
+          "description": "请刷新页面或联系客服确认。"
+        }
+      }
     },
     "domains": {
       "title": "域名管理",

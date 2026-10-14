@@ -1147,6 +1147,10 @@ export interface AdminResellerOperationsAlert {
 }
 
 export interface AdminResellerOperationsOverview {
+  feature: {
+    enabled: boolean
+    applications_open: boolean
+  }
   range: string
   from: string
   to: string

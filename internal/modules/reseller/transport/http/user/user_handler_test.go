@@ -103,6 +103,26 @@ func TestUserHandlerApplyAndSnapshot(t *testing.T) {
 	}
 }
 
+func TestUserHandlerClosedApplicationsExplainWhy(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	h := NewUserHandler(managementStub{err: resellercontract.ErrApplyDisabled}, siteConfigStub{}, uploadStub{})
+	for _, locale := range []string{"zh-CN", "zh-TW", "en-US"} {
+		c, recorder := newUserHandlerTestContext(http.MethodPost, "/api/v1/user/reseller/apply", []byte(`{"reason":"operate"}`), 7)
+		c.Request.Header.Set("Accept-Language", locale)
+		h.ApplyProfile(c)
+		var body struct {
+			Code    int    `json:"status_code"`
+			Message string `json:"msg"`
+		}
+		if err := json.Unmarshal(recorder.Body.Bytes(), &body); err != nil {
+			t.Fatal(err)
+		}
+		if body.Code != response.CodeForbidden || body.Message == "" || body.Message == "无权限访问" || body.Message == "Access denied" || strings.HasPrefix(body.Message, "error.") {
+			t.Fatalf("missing specific closure message for %s: %s", locale, recorder.Body.String())
+		}
+	}
+}
+
 func TestUserHandlerSubmitCustomDomainMapsInactiveProfile(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	h := NewUserHandler(managementStub{err: resellercontract.ErrProfileInactive}, siteConfigStub{}, uploadStub{})

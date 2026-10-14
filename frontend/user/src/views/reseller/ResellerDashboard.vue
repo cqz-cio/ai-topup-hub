@@ -20,6 +20,10 @@
 
     <ResellerPageState v-if="profileLoading || dashboardLoading || ordersLoading || setupLoading" loading :title="t('resellerConsole.common.loading')" />
 
+    <ResellerPageState v-else-if="profileError" :title="t('resellerConsole.apply.loadFailedTitle')" :description="t('resellerConsole.apply.loadFailedDescription')">
+      <Button variant="outline" @click="initialize">{{ t('resellerConsole.apply.retry') }}</Button>
+    </ResellerPageState>
+
     <template v-else-if="profileState.profileStatus !== 'active'">
       <Card class="overflow-hidden p-6 sm:p-8">
         <div class="mx-auto max-w-xl text-center">
@@ -35,7 +39,7 @@
             </li>
           </ul>
           <Button as-child class="mt-6">
-            <RouterLink to="/reseller/apply">{{ t('resellerConsole.nav.apply') }}</RouterLink>
+            <RouterLink to="/reseller/apply">{{ t(profileState.canApply ? 'resellerConsole.nav.apply' : 'resellerConsole.apply.viewStatus') }}</RouterLink>
           </Button>
         </div>
       </Card>
@@ -264,7 +268,7 @@ import {
 import { pickPrimaryResellerBalance } from '../../utils/resellerFinance'
 
 const { t, te } = useI18n()
-const { loading: profileLoading, snapshot: profileSnapshot, state: profileState, load: loadProfile } = useResellerProfile()
+const { loading: profileLoading, snapshot: profileSnapshot, state: profileState, error: profileError, load: loadProfile } = useResellerProfile()
 const finance = useResellerFinance()
 const { dashboardLoading, dashboard, balances, loadDashboard, loadBalances } = finance
 const { loading: ordersLoading, rows: recentOrders, stats, load: loadOrders, loadStats } = useResellerOrders()

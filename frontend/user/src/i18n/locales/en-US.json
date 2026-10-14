@@ -17,8 +17,18 @@
     "lookupAction": "Track order · Collect keys",
     "flowTitle": "A clear path from purchase to delivery.",
     "flowDescription": "Complete your purchase in one place, with a clear next step.",
-    "steps": { "cart": "Choose", "checkout": "Confirm", "payment": "Pay", "delivery": "Collect" },
-    "stepHints": { "cart": "Check the plan and duration", "checkout": "Keep your email and order password", "payment": "Follow the payment instructions", "delivery": "Collect from your order" },
+    "steps": {
+      "cart": "Choose",
+      "checkout": "Confirm",
+      "payment": "Pay",
+      "delivery": "Collect"
+    },
+    "stepHints": {
+      "cart": "Check the plan and duration",
+      "checkout": "Keep your email and order password",
+      "payment": "Follow the payment instructions",
+      "delivery": "Collect from your order"
+    },
     "categories": "Categories",
     "helpTitle": "Need help choosing?",
     "helpDescription": "Contact support for questions about plans, usage or after-sales service.",
@@ -1513,7 +1523,34 @@
       "stepReview": "Review",
       "stepActive": "Active",
       "stepRejected": "Rejected",
-      "benefitsTitle": "After activation you get"
+      "benefitsTitle": "After activation you get",
+      "loadFailedTitle": "Application status unavailable",
+      "loadFailedDescription": "Reload and wait for your status before submitting an application.",
+      "retry": "Reload",
+      "submitted": "Application submitted. Please wait for platform review.",
+      "viewStatus": "View application status",
+      "states": {
+        "closed": {
+          "title": "Applications are currently closed",
+          "description": "The platform is not accepting new reseller applications. Try again later or contact support."
+        },
+        "pending_review": {
+          "title": "Application under review",
+          "description": "Your application has been submitted. Your status will update after review; no further submission is needed."
+        },
+        "active": {
+          "title": "Reseller account activated",
+          "description": "Go to your dashboard to set up your domain and store."
+        },
+        "disabled": {
+          "title": "Reseller account disabled",
+          "description": "You cannot apply while your reseller account is disabled. Contact support to restore access."
+        },
+        "unknown": {
+          "title": "Application status unavailable",
+          "description": "Reload this page or contact support to confirm your status."
+        }
+      }
     },
     "domains": {
       "title": "Domain Management",

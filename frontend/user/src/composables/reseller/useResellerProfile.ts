@@ -3,7 +3,7 @@ import { resellerAPI, type ResellerManagementSnapshotData } from '../../api'
 import { getResellerConsoleState } from '../../utils/resellerConsole'
 
 export const useResellerProfile = () => {
-  const loading = ref(false)
+  const loading = ref(true)
   const snapshot = ref<ResellerManagementSnapshotData | null>(null)
   const error = ref<unknown>(null)
   const state = computed(() => getResellerConsoleState(snapshot.value))

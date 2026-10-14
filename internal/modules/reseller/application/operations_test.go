@@ -2,6 +2,8 @@ package application
 
 import (
 	"context"
+
+	"github.com/dujiao-next/internal/config"
 	"strings"
 	"testing"
 	"time"
@@ -40,7 +42,7 @@ func TestResellerOperationsServiceOverviewBuildsAlertsAndFormatsAverage(t *testi
 				SelfDealingBlockedOrders:  1,
 			},
 		},
-	})
+	}, config.ResellerConfig{})
 	resp, err := svc.GetOverview(context.Background(), reportingdomain.Query{Range: "today", Timezone: "Asia/Shanghai"})
 	if err != nil {
 		t.Fatalf("GetOverview failed: %v", err)
@@ -72,7 +74,7 @@ func TestResellerOperationsServiceFinanceFormatsCurrencyRows(t *testing.T) {
 				PendingWithdrawCount:  1,
 			}},
 		},
-	})
+	}, config.ResellerConfig{})
 	resp, err := svc.GetFinance(context.Background(), reportingdomain.Query{Range: "today", Timezone: "Asia/Shanghai"})
 	if err != nil {
 		t.Fatalf("GetFinance failed: %v", err)

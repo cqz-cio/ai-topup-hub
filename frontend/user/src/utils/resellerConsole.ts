@@ -52,7 +52,7 @@ export const getResellerConsoleState = (snapshot?: ResellerManagementSnapshotDat
   const canApply = snapshot?.can_apply === true
   const modules = {} as Record<ResellerModuleKey, ResellerConsoleModuleState>
 
-  modules.apply = { visible: true, enabled: canApply || profileStatus !== 'active' }
+  modules.apply = { visible: true, enabled: canApply }
   for (const key of activeModules) {
     modules[key] = {
       visible: true,

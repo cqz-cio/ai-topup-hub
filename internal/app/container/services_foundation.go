@@ -58,7 +58,7 @@ func (c *Container) initPolicyAndSettingServices() {
 		c.Config.Reseller.SettlementConfirmDays,
 	)
 	c.ResellerOrderService = reseller.NewOrderQueryService(c.ResellerStore)
-	c.ResellerOperationsService = reseller.NewOperationsService(c.ResellerStore)
+	c.ResellerOperationsService = reseller.NewOperationsService(c.ResellerStore, c.Config.Reseller)
 	c.ComplianceService = complianceapp.NewService(c.SettingRepo)
 }
 

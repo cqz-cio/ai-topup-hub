@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -131,9 +132,11 @@ func adminResellerSiteConfigHTTP(h *adminResellerFixture) *resellerhttp.AdminSit
 	return resellerhttp.NewAdminSiteConfigHandler(h.ResellerSiteConfigService, h.ResellerStore, h.AuthzAuditService)
 }
 
+var resellerManagementUserSequence atomic.Uint64
+
 func seedAdminResellerManagementProfile(t *testing.T, db *gorm.DB, status string) resellerdomain.Profile {
 	t.Helper()
-	user := userdomain.User{Email: fmt.Sprintf("reseller-management-%d@example.test", time.Now().UnixNano()), PasswordHash: "hash", DisplayName: "Reseller Management"}
+	user := userdomain.User{Email: fmt.Sprintf("reseller-management-%d-%d@example.test", time.Now().UnixNano(), resellerManagementUserSequence.Add(1)), PasswordHash: "hash", DisplayName: "Reseller Management"}
 	if err := db.Create(&user).Error; err != nil {
 		t.Fatalf("create user failed: %v", err)
 	}

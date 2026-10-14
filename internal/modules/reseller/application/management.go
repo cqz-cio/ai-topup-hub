@@ -60,13 +60,13 @@ func (s *ManagementService) GetUserManagementSnapshot(userID uint) (*resellerdom
 		return nil, nil, false, err
 	}
 	if profile == nil {
-		return nil, []resellerdomain.Domain{}, s.cfg.Enabled && s.cfg.SelfApplyEnabled, nil
+		return nil, []resellerdomain.Domain{}, s.cfg.ApplicationsOpen(), nil
 	}
 	domains, err := s.store.ListDomainsByResellerID(profile.ID)
 	if err != nil {
 		return nil, nil, false, err
 	}
-	canApply := profile.Status == resellerdomain.ProfileStatusRejected && s.cfg.Enabled && s.cfg.SelfApplyEnabled
+	canApply := profile.Status == resellerdomain.ProfileStatusRejected && s.cfg.ApplicationsOpen()
 	return profile, domains, canApply, nil
 }
 
@@ -74,7 +74,7 @@ func (s *ManagementService) ApplyUserReseller(userID uint, input ResellerApplyIn
 	if s == nil || s.store == nil || userID == 0 {
 		return nil, productcontract.ErrNotFound
 	}
-	if !s.cfg.Enabled || !s.cfg.SelfApplyEnabled {
+	if !s.cfg.ApplicationsOpen() {
 		return nil, resellercontract.ErrApplyDisabled
 	}
 	reason := strings.TrimSpace(input.Reason)

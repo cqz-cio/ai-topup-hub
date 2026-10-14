@@ -5,6 +5,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/dujiao-next/internal/config"
+
 	resellercontract "github.com/dujiao-next/internal/modules/reseller/contract"
 
 	reportingapp "github.com/dujiao-next/internal/modules/reporting/application"
@@ -14,13 +16,20 @@ import (
 
 type OperationsService struct {
 	store resellercontract.OperationsStore
+	cfg   config.ResellerConfig
 }
 
-func NewOperationsService(store resellercontract.OperationsStore) *OperationsService {
-	return &OperationsService{store: store}
+func NewOperationsService(store resellercontract.OperationsStore, cfg config.ResellerConfig) *OperationsService {
+	return &OperationsService{store: store, cfg: cfg}
+}
+
+type OperationsFeatureStatus struct {
+	Enabled          bool `json:"enabled"`
+	ApplicationsOpen bool `json:"applications_open"`
 }
 
 type OperationsOverviewResponse struct {
+	Feature      OperationsFeatureStatus         `json:"feature"`
 	Range        string                          `json:"range"`
 	From         string                          `json:"from"`
 	To           string                          `json:"to"`
@@ -114,6 +123,9 @@ func (s *OperationsService) GetOverview(_ context.Context, input reportingdomain
 		return nil, err
 	}
 	resp := emptyOperationsOverviewResponse(window)
+	if s != nil {
+		resp.Feature = OperationsFeatureStatus{Enabled: s.cfg.Enabled, ApplicationsOpen: s.cfg.ApplicationsOpen()}
+	}
 	if s == nil || s.store == nil {
 		return resp, nil
 	}

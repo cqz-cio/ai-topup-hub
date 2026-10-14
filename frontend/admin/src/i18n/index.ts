@@ -3959,6 +3959,16 @@ const messages = {
         empty: '暂无分销商品配置',
       },
       resellerOperations: {
+        feature: {
+          name: "分销功能",
+          applications: "用户申请",
+          enabled: "已启用",
+          disabled: "未启用",
+          open: "已开放",
+          closed: "已关闭",
+          openHint: "用户可提交分销申请，经管理员审核通过后开通。",
+          closedHint: "当前不接受用户申请；已有分销商和审核记录仍可在后台查看。",
+        },
         title: '分销概览',
         subtitle: '聚合分销商审核、域名、站点配置、订单表现与财务待处理状态',
         filters: {
@@ -8421,6 +8431,16 @@ const messages = {
         empty: '暫無分銷商品配置',
       },
       resellerOperations: {
+        feature: {
+          name: "分銷功能",
+          applications: "使用者申請",
+          enabled: "已啟用",
+          disabled: "未啟用",
+          open: "已開放",
+          closed: "已關閉",
+          openHint: "使用者可提交分銷申請，經管理員審核通過後開通。",
+          closedHint: "目前不接受使用者申請；既有分銷商和審核記錄仍可在後台查看。",
+        },
         title: '分銷概覽',
         subtitle: '聚合分銷商審核、域名、站點配置、訂單表現與財務待處理狀態',
         filters: {
@@ -12883,6 +12903,16 @@ const messages = {
         empty: 'No reseller product configurations',
       },
       resellerOperations: {
+        feature: {
+          name: "Reseller feature",
+          applications: "User applications",
+          enabled: "Enabled",
+          disabled: "Disabled",
+          open: "Open",
+          closed: "Closed",
+          openHint: "Users can apply for reseller access. An administrator must approve each application.",
+          closedHint: "Applications are closed. Existing resellers and review records remain available in the admin console.",
+        },
         title: 'Reseller Overview',
         subtitle: 'Monitor reseller reviews, domains, site setup, order performance, and finance queues',
         filters: {
