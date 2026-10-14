@@ -7,7 +7,7 @@
 
 - `main` 是唯一正式源码主线，维护当前绿色 Go + Vue 商城，包含已确认的 π星卡社名称、派大星 Logo 和水母背景。用户端为 `frontend/user`，后台为 `frontend/admin`；这些品牌改动属于同一项目主版本。
 - 支付、订单、数据库和采购后端部署在腾讯云新加坡 `43.134.141.10`，账号 `ubuntu`，目录 `/srv/zhixiang`。两套前端部署在上海 `124.220.2.69` 的 `/srv/zhixiang-front`：商城 `https://www.qzweb.cloud/`，管理端 `https://124.220.2.69:18888/login`。上海通过受限 SSH 通道连接新加坡回环 API；维护说明见 `ops/tencent/README.md`。
-- 当前新加坡后端为 `20261014-150947`，源码 `08cc45c4ab9b14561d48dcc350428cebc338c5d7`；上海静态为 `20261014-160123`，商城源码 `14e28d402b205ef9fb94a94ba7c1f30a0a76a147`，后台保留 `08cc45c` 来源。商城新增商品页及已付款订单开票提示，见 `docs/invoicing.md`。TRON USDT 已启用，见 `docs/tron-usdt-payment.md`；分销申请、功能状态修复、U 到账提醒及兑换返回修复保留。后端保持 `-mode storefront`、`UPSTREAM_PURCHASE_ENABLED=true`。BEP20、Plasma、TRON USDT 和 XorPay 微信支持订单与充值，微信手续费 1.6% 向上取分。实际来源以 `ops/tencent/production-baseline.json` 为准，后续文档提交不代表程序重建。
+- 当前新加坡后端为 `20261014-155607`，程序源码 `6331d68873009d366994b5a1f1012368eee939c2`；上海静态为 `20261014-160123`，商城源码 `14e28d402b205ef9fb94a94ba7c1f30a0a76a147`，后台保留 `08cc45c4ab9b14561d48dcc350428cebc338c5d7` 来源。上游原订单金额对账已补齐，见 `docs/amount-reconciliation.md`；商城开票提示见 `docs/invoicing.md`。保留 TRON/BEP20/Plasma USDT、XorPay 微信（1.6% 向上取分）、分销申请和结算、功能状态、U 到账提醒及兑换返回修复。四条支付渠道继续支持订单与充值；继续使用 `-mode storefront`、`UPSTREAM_PURCHASE_ENABLED=true`。实际来源以 `ops/tencent/production-baseline.json` 为准，后续文档提交不代表程序重建。
 - 本地使用 `scripts/local/start.ps1`、`status.ps1`、`stop.ps1`，运行库为 `work/codex-runtime/live/shop.db`，本地采购关闭。旧说明位于 `docs/history/`，不能按历史文档覆盖当前环境。
 - 用户要求固定执行“先本地验证，再推送和上线”：先在日常本地入口验证实际运行程序、配置、相关数据和页面，保存验证记录；通过后才推送已验证提交并部署所需改动。后端改动须重建并重启本地后端，支付渠道及商品说明不能只在临时测试入口核验。上线后对照核验本地与生产；环境私有配置、订单和实时库存独立维护，不互相覆盖。
 - 用户已授权真实客户确认付款后的自动采购发卡，仍禁止主动提交有效采购、转账，或将验收订单改为已付款进行扣款测试。测试使用模拟供应商和临时数据库。
@@ -181,3 +181,12 @@
 正式 445 个发布文件、4233 个保留文件、54 个 Nginx 文件、15 项服务器 HTTPS 检查及 1920/390/320px 结算页面通过，无脚本错误或横向溢出。两个 TRON 只读监控接口验证成功；尚无正式 TRON 支付单，正式游标未初始化。Redis 未重启，storefront、采购队列、库存 timer 和原三条渠道保留。并行的手续费提醒及兑换返回修复已包含。本地财务声明未代签，未上传本机库、提交正式验收订单、转账或有效采购；真实资金验收仍未完成。
 
 后端备份 `/srv/zhixiang/backups/before-tron-usdt-20261014-150947-retry2`（首次启用前备份无 `-retry2` 后缀），前端备份 `/srv/zhixiang-front/backups/before-tron-usdt-20261014-150947`，商品渠道范围备份 `/srv/zhixiang/backups/before-tron-product-channels-20261014-1525`。私有报告与截图 `work/codex-runtime/tron-usdt/verified-report.json` 及同目录文件。首次发布因权限快照和公开配置旧缓存触发回退；最终按权限语义比对并只刷新主站公开配置缓存后通过。
+
+
+## 上游成交金额对账（2026-10-14）
+
+2026-10-14 已上线 [上游成交金额对账](docs/amount-reconciliation.md)。新加坡后端 `20261014-155607`，干净源码 `6331d68873009d366994b5a1f1012368eee939c2`；上海静态保留并行开票任务发布的 `20261014-160123`，商城来源 `14e28d402b205ef9fb94a94ba7c1f30a0a76a147`，后台来源 `08cc45c4ab9b14561d48dcc350428cebc338c5d7`。先通过商户签名验证原订单归属，再从同站订单状态接口读取成交金额；金额、全量对账均已对 3 笔原有采购单完成核验，均为 3 笔一致、0 差异。查询失败、编号/状态/币种不符或金额非法仍不计为匹配成功，发卡查询不依赖金额接口。
+
+903 项相关 Go 回归（含子测试）及两套类型构建通过，日常 8080 后端已重建，8 项本机接口检查与实际后台页面核验通过。原有本地财务声明未确认，未代签；完整流程在临时 SQLite 库和模拟上游验证。上线切换时 35 组业务数据与全部配置一致，Redis 未重启；四条支付渠道、售价、采购队列及库存 timer 保留。正式新增 2 条对账审计任务，未创建订单、采购、付款或上传本地库。核验保留 3552 个旧商城资源、969 个后台文件及 54 个 Nginx 文件；商城首页和新增资源与并行开票任务的 328 个发布文件清单一致，本次未发布上海资源。
+
+备份 `/srv/zhixiang/backups/before-amount-reconciliation-20261014-155607`；私有证据 `work/codex-runtime/amount-reconciliation/verified-report.json`。直连 SSH 中断期间使用已授权上海 SSH 跳转、原凭据和固定指纹维护，未改变安全策略。因链路低速使用 BSDIFF40 增量传输，本机及服务器还原后的完整程序 SHA256 均与干净构建一致。退款净额和人工余额调整仍需上游账单，本次核验的是原订单成交总额。

@@ -1,20 +1,20 @@
 {
-  "checked_at": "2026-10-14T08:15:40.756244+00:00",
+  "checked_at": "2026-10-14T08:24:55.274863+00:00",
   "production_url": "https://www.qzweb.cloud/",
-  "documented_release_id": "20261014-150947",
-  "verified_release_id": "20261014-150947",
-  "previous_release_id": "20261014-145155",
-  "source_commit": "08cc45c4ab9b14561d48dcc350428cebc338c5d7",
+  "documented_release_id": "20261014-155607",
+  "verified_release_id": "20261014-155607",
+  "previous_release_id": "20261014-150947",
+  "source_commit": "6331d68873009d366994b5a1f1012368eee939c2",
   "source_branch": "main",
   "server_git_commit_verified": true,
-  "source_tag": null,
+  "source_tag": "production/amount-reconciliation-20261014-155607",
   "production": {
-    "release_path": "/srv/zhixiang/releases/20261014-150947",
-    "running_executable": "/srv/zhixiang/releases/20261014-150947/zhixiang-shop",
-    "binary_bytes": 90587298,
-    "binary_sha256": "de065ce7fa451636b0991736e85adb64de7df11f0f3110a75ea8ffbe9821e630",
-    "running_binary_sha256": "de065ce7fa451636b0991736e85adb64de7df11f0f3110a75ea8ffbe9821e630",
-    "manifest_binary_sha256": "de065ce7fa451636b0991736e85adb64de7df11f0f3110a75ea8ffbe9821e630",
+    "release_path": "/srv/zhixiang/releases/20261014-155607",
+    "running_executable": "/srv/zhixiang/releases/20261014-155607/zhixiang-shop",
+    "binary_bytes": 90591394,
+    "binary_sha256": "45e839708657edee1acebfa349f68092310acb2331819238560334209f8ab783",
+    "running_binary_sha256": "45e839708657edee1acebfa349f68092310acb2331819238560334209f8ab783",
+    "manifest_binary_sha256": "45e839708657edee1acebfa349f68092310acb2331819238560334209f8ab783",
     "build_info": {
       "go_version": "go1.26.5",
       "build_settings": [
@@ -27,13 +27,14 @@
         "GOOS=linux",
         "GOAMD64=v1",
         "vcs=git",
-        "vcs.revision=08cc45c4ab9b14561d48dcc350428cebc338c5d7",
-        "vcs.time=2026-10-14T07:07:49Z",
+        "vcs.revision=6331d68873009d366994b5a1f1012368eee939c2",
+        "vcs.time=2026-10-14T07:54:15Z",
         "vcs.modified=false"
       ],
       "git_metadata_pinned": true,
-      "vcs_revision": "08cc45c4ab9b14561d48dcc350428cebc338c5d7",
-      "vcs_modified": false
+      "vcs_revision": "6331d68873009d366994b5a1f1012368eee939c2",
+      "vcs_modified": false,
+      "source_commit": "6331d68873009d366994b5a1f1012368eee939c2"
     },
     "runtime_mode": "storefront",
     "upstream_purchase_enabled": true,
@@ -44,17 +45,15 @@
       "stock_sync_timer": "active"
     },
     "redis_preserved_without_restart": true,
-    "backup": "/srv/zhixiang/backups/before-tron-usdt-20261014-150947-retry2",
+    "backup": "/srv/zhixiang/backups/before-amount-reconciliation-20261014-155607",
     "database_backup_quick_check": "ok",
-    "report_path": "/srv/zhixiang/shared/reports/tron-usdt-release-20261014-150947.json",
-    "configuration_unchanged": false,
+    "report_path": "/srv/zhixiang/shared/reports/amount-reconciliation-release-20261014-155607.json",
+    "configuration_unchanged": true,
     "nginx_configuration_preserved": true,
     "source_dirty": false,
     "private_configuration_unchanged": true,
-    "configuration_changes": [
-      "Added enabled tron_usdt section; all pre-existing configuration values preserved."
-    ],
-    "source_commit": "08cc45c4ab9b14561d48dcc350428cebc338c5d7",
+    "configuration_changes": [],
+    "source_commit": "6331d68873009d366994b5a1f1012368eee939c2",
     "configuration_except_tron_preserved": true
   },
   "payment": {
@@ -148,7 +147,7 @@
     "monitor_access_requires_existing_compliance_acknowledgement": true,
     "compliance_acknowledgement_preserved": true,
     "previous_detailed_verification_recorded_at": "2026-10-12T05:45:38.041686+00:00",
-    "current_release_verification_scope": "Original three channels and business data preserved; TRON channel 4 added. Ten existing USDT product allowlists append 4 only. Admin status/transfers GET and public checkout verified; no production TRON invoice or transfer created.",
+    "current_release_verification_scope": "All four payment channels and configuration preserved; no payment or purchase submitted.",
     "new_invoice_amount_decimals": 2,
     "xorpay": {
       "id": 3,
@@ -202,22 +201,13 @@
     "admin/index.html": "d1f11b5d53b912655d79df0e2bc9847d468d060f8a593f454eb3392b7b08f6f0"
   },
   "public_verification": {
-    "checked_at": "2026-10-14T07:48:49.614986+00:00",
-    "frontend_server_checks_passed": 15,
-    "browser_checks_passed": true,
-    "viewports": [
-      1920,
-      390,
-      320
-    ],
-    "verification_directory": "work/codex-runtime/tron-usdt/",
-    "production_order_submitted": false,
+    "checked_at": "2026-10-14T08:24:55.274863+00:00",
+    "public_http_checks_passed": 4,
+    "browser_checks_passed": 3,
     "browser_error_count": 0,
-    "verified_interactions": [
-      "TRON selection on guest checkout",
-      "existing three channel options retained"
-    ],
-    "public_http_extra_script": "Not executed after automatic approval review timed out twice; actual public browser checks and server HTTPS checks passed."
+    "production_order_submitted": false,
+    "production_reconciliation_jobs_created": 2,
+    "verification_directory": "work/codex-runtime/amount-reconciliation/"
   },
   "catalog": {
     "prices_unchanged": true,
@@ -252,7 +242,7 @@
     "paid_upstream_orders_missing_procurement": 0,
     "real_money_acceptance_performed": false,
     "historical_verification_recorded_at": "2026-10-12T05:45:38.041686+00:00",
-    "current_release_verification_scope": "Historical mock and read-only preflight evidence; no new real-money procurement acceptance performed."
+    "current_release_verification_scope": "Three original supplier orders reconciled in amount and full modes, original procurement rows unchanged."
   },
   "payment_option_ui": {
     "change": "Approved unified green USDT radio cards in checkout and payment selector",
@@ -305,16 +295,17 @@
     "content_preserved_by_release": "20261012-153531"
   },
   "source_identity_verification": {
-    "source_commit": "08cc45c4ab9b14561d48dcc350428cebc338c5d7",
+    "source_commit": "6331d68873009d366994b5a1f1012368eee939c2",
     "source_branch": "main",
     "source_dirty": false,
     "binary_build_info_commit_matches": true,
     "running_binary_sha256_matches": true,
-    "frontend_files_sha256_verified": 445
+    "frontend_files_sha256_verified": 1297,
+    "frontend_verification_scope": "328 invoice storefront manifest files and 969 unchanged admin files; separate frontend source identity retained."
   },
   "previous_release": {
-    "release": "20261014-145155",
-    "source_commit": "b6dcc7d1a99b3ed91b1cfeb9b468642984bcd042",
+    "release": "20261014-150947",
+    "source_commit": "08cc45c4ab9b14561d48dcc350428cebc338c5d7",
     "retained": true
   },
   "domain_verification": {
@@ -364,7 +355,7 @@
   "previous_build_verification_at": "2026-10-12T08:19:31.766441+00:00",
   "management_url": "https://124.220.2.69:18888/login",
   "frontend_gateway": {
-    "checked_at": "2026-10-14T08:15:40.756244+00:00",
+    "checked_at": "2026-10-14T08:24:55.274863+00:00",
     "frontend_host": "124.220.2.69",
     "backend_host": "43.134.141.10",
     "frontend_release": "20261014-160123",
@@ -410,10 +401,10 @@
       "zhixiang-api-tunnel": "active",
       "qzweb-certificates.timer": "active"
     },
-    "release_scope": "Product and paid-order invoice support notices; storefront only",
+    "release_scope": "Invoice storefront release retained; amount reconciliation changed Singapore backend only",
     "admin_files_verified": 969,
     "storefront_files_verified": 328,
-    "backend_program_preserved": true,
+    "backend_program_preserved": false,
     "backend_setting_changes": [],
     "frontend_build_source_commit": "14e28d402b205ef9fb94a94ba7c1f30a0a76a147",
     "frontend_source_identical_to_backend": false,
@@ -1155,19 +1146,22 @@
     "database_uploaded": false
   },
   "previous_public_verification": {
-    "checked_at": "2026-10-14T07:14:48.065208+00:00",
-    "http_checks_passed": 10,
+    "checked_at": "2026-10-14T07:48:49.614986+00:00",
     "frontend_server_checks_passed": 15,
-    "browser_checks_passed": 22,
+    "browser_checks_passed": true,
     "viewports": [
       1920,
       390,
       320
     ],
-    "verification_directory": "work/codex-runtime/feature-availability/",
+    "verification_directory": "work/codex-runtime/tron-usdt/",
     "production_order_submitted": false,
-    "price_rules_saved": false,
-    "browser_error_count": 0
+    "browser_error_count": 0,
+    "verified_interactions": [
+      "TRON selection on guest checkout",
+      "existing three channel options retained"
+    ],
+    "public_http_extra_script": "Not executed after automatic approval review timed out twice; actual public browser checks and server HTTPS checks passed."
   },
   "abuse_protection": {
     "release": "20261014-085600",
@@ -1806,5 +1800,80 @@
     "frontend_backup": "/srv/zhixiang-front/backups/before-invoice-notices-20261014-160123",
     "evidence": "work/codex-runtime/invoice-preview-20261014/",
     "real_payment_or_procurement_performed": false
+  },
+  "amount_reconciliation": {
+    "passed": true,
+    "release": "20261014-155607",
+    "source_commit": "6331d68873009d366994b5a1f1012368eee939c2",
+    "binary_sha256": "45e839708657edee1acebfa349f68092310acb2331819238560334209f8ab783",
+    "backup": "/srv/zhixiang/backups/before-amount-reconciliation-20261014-155607",
+    "production_reconciliation": {
+      "passed": true,
+      "release": "20261014-155607",
+      "jobs": [
+        {
+          "id": 1,
+          "type": "amount",
+          "status": "completed",
+          "total_count": 3,
+          "matched_count": 3,
+          "mismatched_count": 0,
+          "result": {
+            "errors": 0,
+            "matched": 3,
+            "mismatched": 0,
+            "skipped": 0,
+            "total": 3,
+            "unchecked_amount": 0
+          }
+        },
+        {
+          "id": 2,
+          "type": "full",
+          "status": "completed",
+          "total_count": 3,
+          "matched_count": 3,
+          "mismatched_count": 0,
+          "result": {
+            "errors": 0,
+            "matched": 3,
+            "mismatched": 0,
+            "skipped": 0,
+            "total": 3,
+            "unchecked_amount": 0
+          }
+        }
+      ],
+      "historical_orders": 3,
+      "independent_supplier_amounts_verified": true,
+      "original_procurements_preserved": true,
+      "prices_settings_payment_channels_preserved": true,
+      "created_reconciliation_jobs": 2,
+      "created_business_orders": 0,
+      "purchase_requests": 0,
+      "real_payment_or_purchase": false,
+      "payment_providers": [
+        "bscusdt",
+        "plasmausdt",
+        "tronusdt",
+        "xorpay"
+      ],
+      "checked_at": "2026-10-14T08:20:30.054194+00:00"
+    },
+    "business_snapshot_groups": 35,
+    "real_payment_or_purchase": false,
+    "local_database_uploaded": false,
+    "checked_at": "2026-10-14T08:24:55.274863+00:00",
+    "local_go_tests_passed": 903,
+    "frontend_static_deployed": false,
+    "concurrent_frontend_release": {
+      "release": "20261014-160123",
+      "source_commit": "14e28d402b205ef9fb94a94ba7c1f30a0a76a147",
+      "feature": "invoice notices",
+      "verified_manifest_files": 328,
+      "new_files": 194,
+      "prior_assets_preserved": 3552
+    },
+    "private_report": "work/codex-runtime/amount-reconciliation/verified-report.json"
   }
 }
