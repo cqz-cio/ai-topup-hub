@@ -1,4 +1,15 @@
 {
+  "invoiceSupport": {
+    "available": "支持开票",
+    "afterPayment": "，付款完成后可联系客服申请。",
+    "title": "联系客服开票",
+    "description": "如需开票，请联系微信客服，提供订单号及开票信息。",
+    "copyWechat": "复制微信号",
+    "copyOrder": "复制订单号",
+    "wechatCopied": "已复制微信号",
+    "orderCopied": "已复制订单号",
+    "copyFailed": "复制失败，请手动复制微信号或订单号。"
+  },
   "featureAvailability": {
     "affiliateClosed": "推广返利暂未开放，当前不能开通或申请提现。已有记录可继续查看。",
     "affiliateSuspended": "当前返利账户已停用，暂不能申请提现。已有记录可继续查看。",
