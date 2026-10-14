@@ -1,5 +1,9 @@
 <template>
-  <div class="mx-auto w-full max-w-[840px] px-6 pb-10 pt-2">
+  <StoreAbout v-if="appStore.config && !appStore.isResellerTenant"
+    :hero-title="heroTitle" :hero-subtitle="heroSubtitle" :introduction-text="introductionText"
+    :services-title="servicesTitle" :service-items="serviceItems" :contact-title="contactTitle"
+    :contact-text="contactText" :contact-config="contactConfig" />
+  <div v-else class="mx-auto w-full max-w-[840px] px-6 pb-10 pt-2">
     <header class="my-8 text-center">
       <h1 class="mb-2.5 text-4xl font-extrabold">{{ heroTitle }}</h1>
       <p class="text-muted-foreground">{{ heroSubtitle }}</p>
@@ -43,9 +47,13 @@
 </template>
 
 <script setup lang="ts">
+import StoreAbout from '../../components/StoreAbout.vue'
+import { useAppStore } from '../../stores/app'
 import { Check } from 'lucide-vue-next'
 import { Card } from '@/components/ui/card'
 import { useAbout } from '../../composables/useAbout'
+
+const appStore = useAppStore()
 
 const {
   contactConfig, heroTitle, heroSubtitle, introductionText, servicesTitle, contactTitle, contactText,
