@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { adminAPI } from '@/api/admin'
+import { useRuntimeFeatures } from '@/composables/useRuntimeFeatures'
+import FeatureAvailability from '@/components/FeatureAvailability.vue'
 import type { AdminReconciliationJob, AdminReconciliationItem, AdminSiteConnection } from '@/api/types'
 import IdCell from '@/components/IdCell.vue'
 import { Button } from '@/components/ui/button'
@@ -17,6 +19,14 @@ import { notifyError, notifySuccess } from '@/utils/notify'
 import ComplianceGuardWrapper from '@/components/ComplianceGuardWrapper.vue'
 
 const { t } = useI18n()
+const runtime = useRuntimeFeatures()
+const incompleteResult = computed(() => {
+  try {
+    const result = JSON.parse(detailJob.value?.result_json || '{}')
+    const counts = { skipped: Number(result.skipped) || 0, errors: Number(result.errors) || 0, amount: Number(result.unchecked_amount) || 0 }
+    return counts.skipped + counts.errors + counts.amount > 0 ? counts : null
+  } catch { return null }
+})
 const loading = ref(true)
 const { refreshing, refreshList } = useListRefresh()
 const jobs = ref<(AdminReconciliationJob & Record<string, unknown>)[]>([])
@@ -74,6 +84,7 @@ const newJobForm = reactive({
 })
 
 const openNewJob = () => {
+  if (!runtime.available('reconciliation')) return
   if (connections.value.length === 0) fetchConnections()
   showNewJob.value = true
 }
@@ -134,6 +145,7 @@ const refresh = () => {
 }
 
 const handleNewJob = async () => {
+  if (!runtime.available('reconciliation') || submitting.value) return
   if (!newJobForm.connection_id || !newJobForm.time_range_start || !newJobForm.time_range_end) return
   submitting.value = true
   try {
@@ -261,9 +273,10 @@ onMounted(() => {
   <div class="space-y-6">
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <h1 class="text-2xl font-semibold">{{ t('reconciliation.title') }}</h1>
-      <Button size="sm" class="w-full sm:w-auto" @click="openNewJob">{{ t('reconciliation.newJob') }}</Button>
+      <Button size="sm" class="w-full sm:w-auto" :disabled="!runtime.available('reconciliation')" @click="openNewJob">{{ t('reconciliation.newJob') }}</Button>
     </div>
 
+    <FeatureAvailability :state="runtime" feature="reconciliation" />
     <!-- Filters -->
     <div class="flex flex-wrap items-end gap-3">
       <div class="w-full sm:w-auto">
@@ -433,7 +446,7 @@ onMounted(() => {
           </div>
           <div class="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
             <Button variant="outline" class="w-full sm:w-auto" @click="showNewJob = false">{{ t('admin.common.cancel') }}</Button>
-            <Button class="w-full sm:w-auto" :disabled="submitting || !newJobForm.connection_id || !newJobForm.time_range_start || !newJobForm.time_range_end" @click="handleNewJob">
+            <Button class="w-full sm:w-auto" :disabled="submitting || !runtime.available('reconciliation') || !newJobForm.connection_id || !newJobForm.time_range_start || !newJobForm.time_range_end" @click="handleNewJob">
               {{ t('reconciliation.form.submit') }}
             </Button>
           </div>
@@ -449,6 +462,7 @@ onMounted(() => {
         </DialogHeader>
 
         <div v-if="detailJob" class="space-y-4">
+          <p v-if="incompleteResult" role="status" class="rounded-lg border border-border bg-muted/30 p-4 text-sm leading-6">{{ t('featureAvailability.reconciliationIncomplete', incompleteResult) }}</p>
           <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
             <div>
               <label class="mb-1 block text-xs font-medium text-muted-foreground">{{ t('reconciliation.columns.id') }}</label>

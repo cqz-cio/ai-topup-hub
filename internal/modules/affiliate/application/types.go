@@ -26,6 +26,10 @@ type WithdrawApplyInput struct {
 
 // Dashboard 推广用户中心数据。
 type Dashboard struct {
+	Enabled             bool         `json:"enabled"`
+	CanOpen             bool         `json:"can_open"`
+	CanWithdraw         bool         `json:"can_withdraw"`
+	ProfileStatus       string       `json:"profile_status"`
 	Opened              bool         `json:"opened"`
 	AffiliateCode       string       `json:"affiliate_code"`
 	PromotionPath       string       `json:"promotion_path"`

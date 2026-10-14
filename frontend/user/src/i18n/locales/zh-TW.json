@@ -1,4 +1,13 @@
 {
+  "featureAvailability": {
+    "affiliateClosed": "推廣返利暫未開放，目前不能開通或申請提現。已有紀錄可繼續查看。",
+    "affiliateSuspended": "目前返利帳戶已停用，暫不能申請提現。已有紀錄可繼續查看。",
+    "redemptionTitle": "站內自助兌換",
+    "redemptionClosed": "站內自助兌換暫未開放。請依訂單交付說明中的兌換連結操作；已購買的商品可在訂單詳情查看兌換指引。",
+    "backToStore": "返回商城",
+    "loading": "正在確認功能狀態…",
+    "loadFailed": "暫時無法確認功能狀態，請重新整理後重試。"
+  },
   "shopUi": {
     "brandLine": "數位商品 · 自助交付",
     "brandDescription": "讓好用的數位服務觸手可及。選購、付款、查單與領取，都在這裡完成。",

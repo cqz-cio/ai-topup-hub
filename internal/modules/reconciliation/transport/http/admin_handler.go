@@ -2,6 +2,7 @@ package reconciliationhttp
 
 import (
 	"errors"
+	"github.com/dujiao-next/internal/constants"
 	"strings"
 
 	reconciliationcontract "github.com/dujiao-next/internal/modules/reconciliation/contract"
@@ -21,24 +22,41 @@ type Service interface {
 }
 
 type AdminHandler struct {
-	service Service
+	service   Service
+	available func() bool
 }
 
-func NewAdminHandler(service Service) *AdminHandler {
+func NewAdminHandler(service Service, available ...func() bool) *AdminHandler {
 	if service == nil {
 		panic("reconciliation admin handler: required dependency is nil")
 	}
-	return &AdminHandler{service: service}
+	handler := &AdminHandler{service: service}
+	if len(available) > 0 {
+		handler.available = available[0]
+	}
+	return handler
 }
 
 func (h *AdminHandler) Run(c *gin.Context) {
+	if h.available != nil && !h.available() {
+		ginutil.RespondError(c, response.CodeBadRequest, "error.feature_unavailable", nil)
+		return
+	}
 	var input reconciliationcontract.RunInput
 	if err := c.ShouldBindJSON(&input); err != nil {
 		ginutil.RespondError(c, response.CodeBadRequest, "error.bad_request", err)
 		return
 	}
+	if !input.TimeRangeEnd.After(input.TimeRangeStart) || (input.Type != constants.ReconciliationTypeFull && input.Type != constants.ReconciliationTypeStatus && input.Type != constants.ReconciliationTypeAmount) {
+		ginutil.RespondError(c, response.CodeBadRequest, "error.bad_request", nil)
+		return
+	}
 	job, err := h.service.CreateAndEnqueue(input)
 	if err != nil {
+		if errors.Is(err, reconciliationcontract.ErrQueueUnavailable) {
+			ginutil.RespondError(c, response.CodeBadRequest, "error.feature_unavailable", nil)
+			return
+		}
 		ginutil.RespondError(c, response.CodeInternal, "error.reconciliation_create_failed", err)
 		return
 	}

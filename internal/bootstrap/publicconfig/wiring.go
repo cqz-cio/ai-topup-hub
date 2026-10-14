@@ -45,5 +45,6 @@ func NewHandler(c *container.Container) *publicconfigtransport.Handler {
 		google,
 		googleFallback,
 		overlay,
+		func() map[string]bool { return map[string]bool{"redemption": c.RuntimeFeatures().Redemption.Available} },
 	)
 }

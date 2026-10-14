@@ -3,6 +3,8 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { adminAPI } from '@/api/admin'
+import { useRuntimeFeatures } from '@/composables/useRuntimeFeatures'
+import FeatureAvailability from '@/components/FeatureAvailability.vue'
 import type { AdminResellerDomain, AdminResellerProfileDetail } from '@/api/types'
 import {
   RESELLER_DOMAIN_STATUS_ACTIVE,
@@ -32,6 +34,7 @@ import { getResellerProfileStatusKey } from '@/utils/resellerManagement'
 import { adminUrl } from '@/utils/adminBase'
 
 const { t } = useI18n()
+const runtime = useRuntimeFeatures()
 const route = useRoute()
 const router = useRouter()
 
@@ -130,6 +133,7 @@ const submitEditProfile = async () => {
 }
 
 const submitSystemDomain = async () => {
+  if (!runtime.available('system_subdomain') || savingSystemDomain.value) return
   if (!profile.value) return
   const raw = systemDomainForm.subdomain.trim()
   if (!raw) {
@@ -351,6 +355,7 @@ onMounted(fetchDetail)
                   {{ systemDomain ? t('admin.resellerProfileDetail.systemDomain.assigned') : t('admin.resellerProfileDetail.systemDomain.unassigned') }}
                 </span>
               </div>
+              <FeatureAvailability class="mt-4" :state="runtime" feature="system_subdomain" />
               <form class="mt-4 grid gap-3 md:grid-cols-[minmax(0,1fr)_auto]" @submit.prevent="submitSystemDomain">
                 <div class="grid gap-2">
                   <Label for="system-domain">{{ t('admin.resellerProfileDetail.systemDomain.inputLabel') }}</Label>
@@ -358,7 +363,7 @@ onMounted(fetchDetail)
                     id="system-domain"
                     v-model.trim="systemDomainForm.subdomain"
                     :placeholder="t('admin.resellerProfileDetail.systemDomain.inputPlaceholder')"
-                    :disabled="savingSystemDomain"
+                    :disabled="savingSystemDomain || !runtime.available('system_subdomain')"
                   />
                 </div>
                 <div class="flex items-end">

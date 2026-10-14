@@ -14,8 +14,14 @@
       <div v-if="loading" class="space-y-3">
         <div v-for="idx in 3" :key="idx" class="h-16 animate-pulse rounded-xl border bg-muted"></div>
       </div>
+      <div v-else-if="!dashboard" class="rounded-xl border border-dashed p-5">
+        <p class="text-sm text-muted-foreground">{{ t('personalCenter.affiliate.errors.loadFailed') }}</p>
+        <Button type="button" variant="outline" class="mt-3" @click="initialize">{{ t('orders.filters.refresh') }}</Button>
+      </div>
+      <Alert v-else-if="!dashboard.enabled" class="mb-4"><AlertDescription>{{ t('featureAvailability.affiliateClosed') }}</AlertDescription></Alert>
+      <Alert v-else-if="dashboard.opened && !dashboard.can_withdraw" class="mb-4"><AlertDescription>{{ t('featureAvailability.affiliateSuspended') }}</AlertDescription></Alert>
 
-      <template v-else-if="dashboard?.opened">
+      <template v-if="!loading && dashboard?.opened">
         <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
           <div class="rounded-xl border p-4 md:col-span-2">
             <div class="text-xs text-muted-foreground">{{ t('personalCenter.affiliate.affiliateCode') }}</div>
@@ -49,7 +55,7 @@
         </div>
       </template>
 
-      <div v-else class="rounded-xl border border-dashed p-5">
+      <div v-else-if="!loading && dashboard?.can_open" class="rounded-xl border border-dashed p-5">
         <p class="text-sm text-muted-foreground">{{ t('personalCenter.affiliate.notOpened') }}</p>
         <Button type="button" :disabled="opening" class="mt-4 font-bold" @click="openAffiliate">
           {{ opening ? t('personalCenter.affiliate.opening') : t('personalCenter.affiliate.openButton') }}
@@ -57,7 +63,7 @@
       </div>
     </div>
 
-    <div v-if="dashboard?.opened" class="rounded-2xl border bg-card p-7 shadow-sm">
+    <div v-if="dashboard?.can_withdraw" class="rounded-2xl border bg-card p-7 shadow-sm">
       <h3 class="text-lg font-bold text-foreground">{{ t('personalCenter.affiliate.withdrawTitle') }}</h3>
       <p class="mt-1 text-sm text-muted-foreground">{{ t('personalCenter.affiliate.withdrawSubtitle') }}</p>
       <form class="mt-5 grid grid-cols-1 gap-4 md:grid-cols-4" @submit.prevent="handleApplyWithdraw">
@@ -294,6 +300,7 @@ const loadDashboard = async () => {
     const response = await affiliateAPI.dashboard()
     dashboard.value = response.data.data || null
   } catch (err: any) {
+    dashboard.value = null
     panelAlert.value = {
       level: 'error',
       message: err?.message || t('personalCenter.affiliate.errors.loadFailed'),
@@ -348,6 +355,7 @@ const initialize = async () => {
 }
 
 const openAffiliate = async () => {
+  if (!dashboard.value?.can_open || opening.value) return
   opening.value = true
   panelAlert.value = null
   try {
@@ -369,6 +377,7 @@ const openAffiliate = async () => {
 }
 
 const handleApplyWithdraw = async () => {
+  if (!dashboard.value?.can_withdraw || submittingWithdraw.value) return
   panelAlert.value = null
   if (!withdrawForm.amount.trim()) {
     panelAlert.value = {

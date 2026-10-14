@@ -2,6 +2,8 @@
 import { onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { adminAPI } from '@/api/admin'
+import { useRuntimeFeatures } from '@/composables/useRuntimeFeatures'
+import FeatureAvailability from '@/components/FeatureAvailability.vue'
 import type { AdminTelegramBroadcast } from '@/api/types'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -14,6 +16,7 @@ import { notifyError, notifySuccess } from '@/utils/notify'
 import { Eye, Loader2, Send, Trash2 } from 'lucide-vue-next'
 
 const { t } = useI18n()
+const runtime = useRuntimeFeatures()
 
 const loading = ref(false)
 const items = ref<AdminTelegramBroadcast[]>([])
@@ -123,7 +126,7 @@ onMounted(() => {
         <h2 class="text-2xl font-bold tracking-tight">{{ t('telegramBot.broadcasts.title') }}</h2>
         <p class="text-muted-foreground">{{ t('telegramBot.broadcasts.subtitle') }}</p>
       </div>
-      <Button class="w-full sm:w-auto" as-child>
+      <Button v-if="runtime.available('telegram_broadcast')" class="w-full sm:w-auto" as-child>
         <RouterLink to="/telegram-bot/broadcasts/create">
           <Send class="h-4 w-4 mr-2" />
           {{ t('telegramBot.broadcasts.create') }}
@@ -131,6 +134,7 @@ onMounted(() => {
       </Button>
     </div>
 
+    <FeatureAvailability :state="runtime" feature="telegram_broadcast" />
     <Card>
       <CardContent class="space-y-4 p-4">
         <div class="flex flex-wrap items-center gap-3">

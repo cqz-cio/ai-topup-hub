@@ -58,6 +58,7 @@ func newService(cfg *config.QueueConfig, consumer *jobconsumer.Consumer, profile
 		consumer.RegisterStorefront(mux)
 		scheduler := asynq.NewScheduler(opt, nil)
 		registerProcurementRecovery(scheduler, consumer)
+		registerSettlementTasks(scheduler, consumer)
 		return &Service{name: "storefront-worker", server: server, mux: mux, scheduler: scheduler, consumer: consumer}, nil
 	}
 	consumer.Register(mux)
@@ -89,9 +90,16 @@ func registerPeriodicTasks(scheduler *asynq.Scheduler, consumer *jobconsumer.Con
 	if scheduler == nil || consumer == nil {
 		return
 	}
+	registerSettlementTasks(scheduler, consumer)
+	registerOperationalTasks(scheduler, consumer, cfg)
+}
+
+// Settlement is independent of stock synchronization and does not purchase,
+// send broadcasts, or enable optional notification scenes.
+func registerSettlementTasks(scheduler *asynq.Scheduler, consumer *jobconsumer.Consumer) {
 	if consumer.AffiliateService != nil {
 		task := queue.NewAffiliateConfirmCommissionsTask()
-		entryID, err := scheduler.Register("@every 1m", task, asynq.Queue(queue.DefaultQueue))
+		entryID, err := scheduler.Register("@every 1m", task, asynq.Queue(queue.DefaultQueue), asynq.Unique(50*time.Second))
 		if err != nil {
 			logger.Warnw("scheduler_register_affiliate_confirm_failed", "error", err)
 		} else {
@@ -100,13 +108,16 @@ func registerPeriodicTasks(scheduler *asynq.Scheduler, consumer *jobconsumer.Con
 	}
 	if consumer.ResellerAccountingLedger != nil {
 		task := queue.NewResellerConfirmLedgerTask()
-		entryID, err := scheduler.Register("@every 1m", task, asynq.Queue(queue.DefaultQueue))
+		entryID, err := scheduler.Register("@every 1m", task, asynq.Queue(queue.DefaultQueue), asynq.Unique(50*time.Second))
 		if err != nil {
 			logger.Warnw("scheduler_register_reseller_confirm_ledger_failed", "error", err)
 		} else {
 			logger.Infow("scheduler_register_reseller_confirm_ledger_ok", "entry_id", entryID)
 		}
 	}
+}
+
+func registerOperationalTasks(scheduler *asynq.Scheduler, consumer *jobconsumer.Consumer, cfg *config.QueueConfig) {
 	if consumer.ProductMappingService != nil {
 		fallbackInterval := "5m"
 		if cfg != nil && cfg.UpstreamSyncInterval != "" {

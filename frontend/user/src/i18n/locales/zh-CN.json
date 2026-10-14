@@ -1,4 +1,13 @@
 {
+  "featureAvailability": {
+    "affiliateClosed": "推广返利暂未开放，当前不能开通或申请提现。已有记录可继续查看。",
+    "affiliateSuspended": "当前返利账户已停用，暂不能申请提现。已有记录可继续查看。",
+    "redemptionTitle": "站内自助兑换",
+    "redemptionClosed": "站内自助兑换暂未开放。请按订单交付说明中的兑换链接操作；已购买的商品可在订单详情查看兑换指引。",
+    "backToStore": "返回商城",
+    "loading": "正在确认功能状态…",
+    "loadFailed": "暂时无法确认功能状态，请刷新后重试。"
+  },
   "shopUi": {
     "brandLine": "数字商品 · 自助交付",
     "brandDescription": "让好用的数字服务触手可及。选购、付款、查单与领取，都在这里完成。",
