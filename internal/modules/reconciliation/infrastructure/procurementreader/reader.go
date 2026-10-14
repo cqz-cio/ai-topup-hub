@@ -35,6 +35,7 @@ func (r *Reader) ListByConnectionAndTimeRange(connectionID uint, start, end time
 			ID: order.ID, UpstreamOrderID: order.UpstreamOrderID,
 			LocalOrderNo: order.LocalOrderNo, UpstreamOrderNo: order.UpstreamOrderNo,
 			Status: order.Status, UpstreamAmount: order.UpstreamAmount,
+			Currency: order.UpstreamCurrency,
 		})
 	}
 	return result, nil

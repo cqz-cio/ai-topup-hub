@@ -62,5 +62,19 @@ func (s *session) Get(ctx context.Context, upstreamOrderID uint, upstreamOrderNo
 	if detail == nil {
 		return nil, fmt.Errorf("supplier returned no order detail")
 	}
-	return &reconciliationcontract.UpstreamOrder{Status: detail.Status, Amount: detail.Amount}, nil
+	return &reconciliationcontract.UpstreamOrder{Status: detail.Status, Amount: detail.Amount, Currency: detail.Currency}, nil
+}
+
+func (s *session) GetWithAmount(ctx context.Context, upstreamOrderID uint, upstreamOrderNo string) (*reconciliationcontract.UpstreamOrder, error) {
+	if adapter, ok := s.adapter.(upstream.ReferenceOrderAmountAdapter); ok && strings.TrimSpace(upstreamOrderNo) != "" {
+		detail, err := adapter.GetOrderWithAmountByReference(ctx, upstreamOrderNo)
+		if err != nil {
+			return nil, err
+		}
+		if detail == nil {
+			return nil, fmt.Errorf("supplier returned no financial order detail")
+		}
+		return &reconciliationcontract.UpstreamOrder{Status: detail.Status, Amount: detail.Amount, Currency: detail.Currency}, nil
+	}
+	return s.Get(ctx, upstreamOrderID, upstreamOrderNo)
 }

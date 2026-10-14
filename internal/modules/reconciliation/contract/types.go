@@ -29,10 +29,12 @@ type ProcurementOrder struct {
 	UpstreamOrderNo string
 	Status          string
 	UpstreamAmount  money.Amount
+	Currency        string
 }
 
 // UpstreamOrder 是上游订单查询返回的最小快照。
 type UpstreamOrder struct {
-	Status string
-	Amount string
+	Status   string
+	Amount   string
+	Currency string
 }

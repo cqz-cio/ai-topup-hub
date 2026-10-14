@@ -33,6 +33,11 @@ type UpstreamOrderReader interface {
 	Get(ctx context.Context, upstreamOrderID uint, upstreamOrderNo string) (*UpstreamOrder, error)
 }
 
+// UpstreamOrderAmountReader optionally uses an independent financial endpoint.
+type UpstreamOrderAmountReader interface {
+	GetWithAmount(ctx context.Context, upstreamOrderID uint, upstreamOrderNo string) (*UpstreamOrder, error)
+}
+
 type Enqueuer interface {
 	Enqueue(jobID uint) error
 }

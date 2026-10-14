@@ -27,13 +27,18 @@ func (s *Service) execute(ctx context.Context, job *reconciliationdomain.Job) er
 
 	mismatches := make([]reconciliationdomain.Item, 0)
 	skippedCount, errorCount, uncheckedAmountCount, matchedCount := 0, 0, 0, 0
+	checkAmount := job.Type == constants.ReconciliationTypeAmount || job.Type == constants.ReconciliationTypeFull
+	getOrder := upstreamOrders.Get
+	if reader, ok := upstreamOrders.(reconciliationcontract.UpstreamOrderAmountReader); ok && checkAmount {
+		getOrder = reader.GetWithAmount
+	}
 	for index := range orders {
 		order := &orders[index]
 		if order.UpstreamOrderID == 0 && strings.TrimSpace(order.UpstreamOrderNo) == "" {
 			skippedCount++
 			continue
 		}
-		detail, err := upstreamOrders.Get(ctx, order.UpstreamOrderID, order.UpstreamOrderNo)
+		detail, err := getOrder(ctx, order.UpstreamOrderID, order.UpstreamOrderNo)
 		if err != nil || detail == nil || strings.TrimSpace(detail.Status) == "" {
 			logger.Warnw("reconciliation_get_upstream_order_failed", "job_id", job.ID,
 				"procurement_id", order.ID, "upstream_order_id", order.UpstreamOrderID, "error", err)
@@ -41,7 +46,7 @@ func (s *Service) execute(ctx context.Context, job *reconciliationdomain.Job) er
 			continue
 		}
 		amount, amountErr := decimal.NewFromString(strings.TrimSpace(detail.Amount))
-		uncheckedAmount := (job.Type == constants.ReconciliationTypeAmount || job.Type == constants.ReconciliationTypeFull) && (amountErr != nil || amount.IsNegative())
+		uncheckedAmount := checkAmount && (amountErr != nil || amount.IsNegative() || !sameCurrency(order, detail))
 		if uncheckedAmount {
 			uncheckedAmountCount++
 		}
@@ -77,7 +82,7 @@ func compareOrder(job *reconciliationdomain.Job, order *reconciliationcontract.P
 
 	amountMismatch := false
 	var upstreamAmount money.Amount
-	if checkAmount && detail.Amount != "" {
+	if checkAmount && detail.Amount != "" && sameCurrency(order, detail) {
 		value, err := decimal.NewFromString(strings.TrimSpace(detail.Amount))
 		if err == nil && !value.IsNegative() {
 			upstreamAmount = money.FromDecimal(value)
@@ -103,6 +108,11 @@ func compareOrder(job *reconciliationdomain.Job, order *reconciliationcontract.P
 		LocalStatus: order.Status, UpstreamStatus: detail.Status,
 		LocalAmount: order.UpstreamAmount, UpstreamAmount: upstreamAmount, MismatchType: mismatchType,
 	}
+}
+
+func sameCurrency(order *reconciliationcontract.ProcurementOrder, detail *reconciliationcontract.UpstreamOrder) bool {
+	// Older native-protocol records may not have stored a currency.
+	return strings.TrimSpace(order.Currency) == "" || strings.EqualFold(strings.TrimSpace(order.Currency), strings.TrimSpace(detail.Currency))
 }
 
 func marshalResult(value any) string {
