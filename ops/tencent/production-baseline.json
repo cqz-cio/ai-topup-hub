@@ -1,40 +1,27 @@
 {
-  "checked_at": "2026-10-14T08:24:55.274863+00:00",
+  "checked_at": "2026-10-14T08:52:12.595045+00:00",
   "production_url": "https://www.qzweb.cloud/",
-  "documented_release_id": "20261014-155607",
-  "verified_release_id": "20261014-155607",
-  "previous_release_id": "20261014-150947",
-  "source_commit": "6331d68873009d366994b5a1f1012368eee939c2",
+  "documented_release_id": "20261014-162234",
+  "verified_release_id": "20261014-162234",
+  "previous_release_id": "20261014-155607",
+  "source_commit": "506c523bcec9a1cd9c656c0fe62b6d33e47afbcb",
   "source_branch": "main",
   "server_git_commit_verified": true,
   "source_tag": "production/amount-reconciliation-20261014-155607",
   "production": {
-    "release_path": "/srv/zhixiang/releases/20261014-155607",
-    "running_executable": "/srv/zhixiang/releases/20261014-155607/zhixiang-shop",
-    "binary_bytes": 90591394,
-    "binary_sha256": "45e839708657edee1acebfa349f68092310acb2331819238560334209f8ab783",
-    "running_binary_sha256": "45e839708657edee1acebfa349f68092310acb2331819238560334209f8ab783",
-    "manifest_binary_sha256": "45e839708657edee1acebfa349f68092310acb2331819238560334209f8ab783",
+    "release_path": "/srv/zhixiang/releases/20261014-162234",
+    "running_executable": "/srv/zhixiang/releases/20261014-162234/zhixiang-shop",
+    "binary_bytes": 90628258,
+    "binary_sha256": "431e7a2798dc54dfddcb126eca3b212a780f11aac211eed9e472dfdb0e6c4671",
+    "running_binary_sha256": "431e7a2798dc54dfddcb126eca3b212a780f11aac211eed9e472dfdb0e6c4671",
+    "manifest_binary_sha256": "431e7a2798dc54dfddcb126eca3b212a780f11aac211eed9e472dfdb0e6c4671",
     "build_info": {
       "go_version": "go1.26.5",
-      "build_settings": [
-        "-buildmode=exe",
-        "-compiler=gc",
-        "-tags=release,fullstack",
-        "-trimpath=true",
-        "CGO_ENABLED=0",
-        "GOARCH=amd64",
-        "GOOS=linux",
-        "GOAMD64=v1",
-        "vcs=git",
-        "vcs.revision=6331d68873009d366994b5a1f1012368eee939c2",
-        "vcs.time=2026-10-14T07:54:15Z",
-        "vcs.modified=false"
-      ],
-      "git_metadata_pinned": true,
-      "vcs_revision": "6331d68873009d366994b5a1f1012368eee939c2",
+      "source_commit": "506c523bcec9a1cd9c656c0fe62b6d33e47afbcb",
+      "vcs_revision": "506c523bcec9a1cd9c656c0fe62b6d33e47afbcb",
       "vcs_modified": false,
-      "source_commit": "6331d68873009d366994b5a1f1012368eee939c2"
+      "git_metadata_pinned": true,
+      "tags": "release,fullstack"
     },
     "runtime_mode": "storefront",
     "upstream_purchase_enabled": true,
@@ -45,16 +32,19 @@
       "stock_sync_timer": "active"
     },
     "redis_preserved_without_restart": true,
-    "backup": "/srv/zhixiang/backups/before-amount-reconciliation-20261014-155607",
+    "backup": "/srv/zhixiang/backups/before-about-settings-20261014-162234",
     "database_backup_quick_check": "ok",
-    "report_path": "/srv/zhixiang/shared/reports/amount-reconciliation-release-20261014-155607.json",
+    "report_path": "/srv/zhixiang/shared/reports/about-settings-release-20261014-162234.json",
     "configuration_unchanged": true,
     "nginx_configuration_preserved": true,
     "source_dirty": false,
     "private_configuration_unchanged": true,
     "configuration_changes": [],
-    "source_commit": "6331d68873009d366994b5a1f1012368eee939c2",
-    "configuration_except_tron_preserved": true
+    "source_commit": "506c523bcec9a1cd9c656c0fe62b6d33e47afbcb",
+    "configuration_except_tron_preserved": true,
+    "settings_changes": [
+      "about_page_config"
+    ]
   },
   "payment": {
     "bep20": {
@@ -192,22 +182,26 @@
     }
   },
   "pages": [
-    "https://www.qzweb.cloud/me/affiliate",
-    "https://www.qzweb.cloud/redeem",
-    "https://124.220.2.69:18888/reconciliation"
+    "https://www.qzweb.cloud/about",
+    "https://www.qzweb.cloud/privacy",
+    "https://www.qzweb.cloud/terms",
+    "https://www.qzweb.cloud/products",
+    "https://124.220.2.69:18888/settings",
+    "https://124.220.2.69:18888/login"
   ],
   "verified_asset_sha256": {
-    "user/index.html": "51fc85755eba8b8680fd89d069ce57a145faf08c9fe96b4ea9c92ba693c5c9f9",
-    "admin/index.html": "d1f11b5d53b912655d79df0e2bc9847d468d060f8a593f454eb3392b7b08f6f0"
+    "user/index.html": "e8d8b893966b8f4854f66ef4467e0c6ac2f96fd660179350636413d83ff2c871",
+    "admin/index.html": "11f531b4ef094ab677b8e9165d8fc07e51437c35abf16a8da4bac8a131ea2128"
   },
   "public_verification": {
-    "checked_at": "2026-10-14T08:24:55.274863+00:00",
-    "public_http_checks_passed": 4,
-    "browser_checks_passed": 3,
+    "checked_at": "2026-10-14T08:52:12.595045+00:00",
+    "public_http_checks_passed": 6,
+    "browser_checks_passed": 14,
     "browser_error_count": 0,
     "production_order_submitted": false,
-    "production_reconciliation_jobs_created": 2,
-    "verification_directory": "work/codex-runtime/amount-reconciliation/"
+    "production_reconciliation_jobs_created": 0,
+    "verification_directory": "work/codex-runtime/about-settings-20261014/",
+    "about_configuration_saved": true
   },
   "catalog": {
     "prices_unchanged": true,
@@ -295,17 +289,17 @@
     "content_preserved_by_release": "20261012-153531"
   },
   "source_identity_verification": {
-    "source_commit": "6331d68873009d366994b5a1f1012368eee939c2",
+    "source_commit": "506c523bcec9a1cd9c656c0fe62b6d33e47afbcb",
     "source_branch": "main",
     "source_dirty": false,
     "binary_build_info_commit_matches": true,
     "running_binary_sha256_matches": true,
-    "frontend_files_sha256_verified": 1297,
-    "frontend_verification_scope": "328 invoice storefront manifest files and 969 unchanged admin files; separate frontend source identity retained."
+    "frontend_files_sha256_verified": 448,
+    "frontend_verification_scope": "Both frontend builds from the backend source; previous hashed assets and images retained."
   },
   "previous_release": {
-    "release": "20261014-150947",
-    "source_commit": "08cc45c4ab9b14561d48dcc350428cebc338c5d7",
+    "release": "20261014-155607",
+    "source_commit": "6331d68873009d366994b5a1f1012368eee939c2",
     "retained": true
   },
   "domain_verification": {
@@ -355,12 +349,12 @@
   "previous_build_verification_at": "2026-10-12T08:19:31.766441+00:00",
   "management_url": "https://124.220.2.69:18888/login",
   "frontend_gateway": {
-    "checked_at": "2026-10-14T08:24:55.274863+00:00",
+    "checked_at": "2026-10-14T08:52:12.595045+00:00",
     "frontend_host": "124.220.2.69",
     "backend_host": "43.134.141.10",
-    "frontend_release": "20261014-160123",
-    "source_commit": "14e28d402b205ef9fb94a94ba7c1f30a0a76a147",
-    "static_files_verified": 1297,
+    "frontend_release": "20261014-162234",
+    "source_commit": "506c523bcec9a1cd9c656c0fe62b6d33e47afbcb",
+    "static_files_verified": 448,
     "storefront_url": "https://www.qzweb.cloud/",
     "management_url": "https://124.220.2.69:18888/login",
     "www_dns_record": "www A 124.220.2.69",
@@ -376,8 +370,8 @@
     "certificate_renewal_verified": true,
     "certificate_timer": "qzweb-certificates.timer",
     "certificate_renewal_report": "/srv/zhixiang-front/shared/work/renew-final-20261012-1644/status.json",
-    "report_path": "/srv/zhixiang-front/shared/work/invoice-notices-20261014-160123.json",
-    "backend_report_path": "/srv/zhixiang/backups/before-invoice-notices-20261014-160123/metadata.json",
+    "report_path": "/srv/zhixiang-front/shared/work/about-settings-20261014-162234.json",
+    "backend_report_path": "/srv/zhixiang/shared/reports/about-settings-release-20261014-162234.json",
     "formal_alipay_enabled": false,
     "database_uploaded": false,
     "legacy_singapore_http_entries_retained": true,
@@ -390,24 +384,26 @@
       "browser_current_frontend_confirmed": true,
       "report_path": "/srv/zhixiang-front/shared/work/entry-cache-report.json"
     },
-    "previous_frontend_release": "20261014-150947",
-    "storefront_source_commit": "14e28d402b205ef9fb94a94ba7c1f30a0a76a147",
-    "admin_source_commit": "08cc45c4ab9b14561d48dcc350428cebc338c5d7",
-    "backup": "/srv/zhixiang-front/backups/before-invoice-notices-20261014-160123",
-    "frontend_only_update": true,
+    "previous_frontend_release": "20261014-160123",
+    "storefront_source_commit": "506c523bcec9a1cd9c656c0fe62b6d33e47afbcb",
+    "admin_source_commit": "506c523bcec9a1cd9c656c0fe62b6d33e47afbcb",
+    "backup": "/srv/zhixiang-front/backups/before-about-settings-20261014-162234",
+    "frontend_only_update": false,
     "previous_hashed_assets_retained": true,
     "verified_services": {
       "nginx": "active",
       "zhixiang-api-tunnel": "active",
       "qzweb-certificates.timer": "active"
     },
-    "release_scope": "Invoice storefront release retained; amount reconciliation changed Singapore backend only",
-    "admin_files_verified": 969,
+    "release_scope": "About page content settings, storefront and admin editor",
+    "admin_files_verified": 120,
     "storefront_files_verified": 328,
     "backend_program_preserved": false,
-    "backend_setting_changes": [],
-    "frontend_build_source_commit": "14e28d402b205ef9fb94a94ba7c1f30a0a76a147",
-    "frontend_source_identical_to_backend": false,
+    "backend_setting_changes": [
+      "about_page_config"
+    ],
+    "frontend_build_source_commit": "506c523bcec9a1cd9c656c0fe62b6d33e47afbcb",
+    "frontend_source_identical_to_backend": true,
     "admin_base": "/",
     "base_repair_backup": "/srv/zhixiang-front/backups/before-xorpay-admin-base-20261013-173020"
   },
@@ -1893,5 +1889,57 @@
     "evidence": "work/codex-runtime/invoice-announcement-20261014/",
     "real_payment_or_procurement": false,
     "checked_at": "2026-10-14T08:37:56.450352+00:00"
+  },
+  "about_page_settings": {
+    "release": "20261014-162234",
+    "source_commit": "506c523bcec9a1cd9c656c0fe62b6d33e47afbcb",
+    "checked_at": "2026-10-14T08:52:12.595045+00:00",
+    "local_checks": {
+      "passed": true,
+      "source_commit": "506c523bcec9a1cd9c656c0fe62b6d33e47afbcb",
+      "checked_at": "2026-10-14T08:19:54.306486+00:00",
+      "browser_checks": 18,
+      "editable_fields": 42,
+      "data_groups_preserved": 9,
+      "go_tests": 847,
+      "user_tests": 114,
+      "admin_tests": 60,
+      "local_backend_rebuilt": true,
+      "real_funds_test": false,
+      "product_descriptions_unchanged": true
+    },
+    "production_browser_checks": 14,
+    "public_http_checks": 6,
+    "cutover_data_groups": 35,
+    "after_save_groups_preserved": 6,
+    "frontend_files_verified": 448,
+    "preserved_frontend_files": 4711,
+    "backend_backup": "/srv/zhixiang/backups/before-about-settings-20261014-162234",
+    "frontend_backup": "/srv/zhixiang-front/backups/before-about-settings-20261014-162234",
+    "only_setting_added": "about_page_config",
+    "product_descriptions_preserved": true,
+    "original_content_preserved": true,
+    "style_css_identical": true,
+    "visual_comparison": {
+      "same_dimensions": true,
+      "size": [
+        1910,
+        2618
+      ],
+      "changed_pixel_ratio_over_10": 0.0007639419404125286,
+      "exact_pixels_equal": false,
+      "content_unchanged_verified_in_browser": true
+    },
+    "real_funds_test": false,
+    "local_database_uploaded": false,
+    "transfer": {
+      "format": "BSDIFF40",
+      "old_sha256": "45e839708657edee1acebfa349f68092310acb2331819238560334209f8ab783",
+      "new_sha256": "431e7a2798dc54dfddcb126eca3b212a780f11aac211eed9e472dfdb0e6c4671",
+      "archive_bytes": 793832,
+      "patch_bytes": 796289,
+      "local_reconstruction_identical": true,
+      "server_installs_required": false
+    }
   }
 }
