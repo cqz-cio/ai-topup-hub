@@ -1528,7 +1528,17 @@
     "payment_data_source": "Browser-isolated fixtures with actual public payment channel configuration",
     "real_orders_payments_or_purchases": false,
     "local_database_uploaded": false,
-    "initial_attempt": "20261014-144103 was rolled back after production-only i18n error; final build uses ordinary localized Vue text and was verified as built artifacts before publication"
+    "initial_attempt": "20261014-144103 was rolled back after production-only i18n error; final build uses ordinary localized Vue text and was verified as built artifacts before publication",
+    "subsequent_release_verification": {
+      "checked_at": "2026-10-14T07:17:50.415524+00:00",
+      "release": "20261014-151124",
+      "source_commit": "d2cbc34162744f6fb061524041464c4ec6718903",
+      "reminder_source_identical": true,
+      "browser_smoke_checks": 2,
+      "browser_errors": 0,
+      "files_verified": 445,
+      "new_release_by_parallel_feature_task": true
+    }
   },
   "feature_availability": {
     "checked_at": "2026-10-14T07:14:48.065208+00:00",
