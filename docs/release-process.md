@@ -35,3 +35,9 @@ GitHub CI 在 `main`、`dev` 推送及 PR 上验证；`v*` 标签触发 GoReleas
 不要用上游通用安装器覆盖智享A社环境，不要将本机库上传覆盖生产库。恢复程序版本和恢复业务数据是不同操作。
 
 上海独立静态后台以 `/` 为资源根路径。若复用 `VITE_FULLSTACK=1` 的嵌入式构建，打包阶段须将后台 HTML 中的 `__DJ_ADMIN_BASE__` 渲染为空字符串，使 `<base href="/">` 生效，并重新计算 HTML 清单哈希；Go 内嵌资源保留占位符供后端渲染。部署前后检查入口引用的 JS/CSS 实际返回正确文件与 MIME，并在真实浏览器打开后台路由。仅首页 HTTP 200 或文件哈希一致不能证明页面可用。
+
+## 已撤下的历史资源
+
+保留历史散列资源时，排除 [旧资源撤下清单](../ops/tencent/frontend-gateway/nginx-retired-assets.conf) 中的 6 个文件。它们含有旧个人联系方式，当前商城已不再引用。清单安装到上海 `/etc/nginx/snippets/qzweb-retired-assets.conf`，由商城 HTTPS 配置引用，对旧地址返回 `410` 与 `Cache-Control: no-store`。后续部署或回滚均保留此规则，不将隔离备份复制回公开目录。更新 Nginx 配置前先安装该清单并通过 `nginx -t`。
+
+私有备份与当前公开目录分别保留；浏览器或第三方已经下载的历史副本无法由服务器撤回。
