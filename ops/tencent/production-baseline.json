@@ -1,20 +1,20 @@
 {
-  "checked_at": "2026-10-14T07:14:48.065208+00:00",
+  "checked_at": "2026-10-14T07:48:49.614986+00:00",
   "production_url": "https://www.qzweb.cloud/",
-  "documented_release_id": "20261014-145155",
-  "verified_release_id": "20261014-145155",
+  "documented_release_id": "20261014-150947",
+  "verified_release_id": "20261014-150947",
   "previous_release_id": "20261014-145155",
-  "source_commit": "b6dcc7d1a99b3ed91b1cfeb9b468642984bcd042",
+  "source_commit": "08cc45c4ab9b14561d48dcc350428cebc338c5d7",
   "source_branch": "main",
   "server_git_commit_verified": true,
-  "source_tag": "production/feature-availability-20261014-145155",
+  "source_tag": null,
   "production": {
-    "release_path": "/srv/zhixiang/releases/20261014-145155",
-    "running_executable": "/srv/zhixiang/releases/20261014-145155/zhixiang-shop",
-    "binary_bytes": 90554530,
-    "binary_sha256": "cf1e9f93857bdbd1fd9572d04f41a67834c4a5804c19a9af830deff9c9e86f66",
-    "running_binary_sha256": "cf1e9f93857bdbd1fd9572d04f41a67834c4a5804c19a9af830deff9c9e86f66",
-    "manifest_binary_sha256": "cf1e9f93857bdbd1fd9572d04f41a67834c4a5804c19a9af830deff9c9e86f66",
+    "release_path": "/srv/zhixiang/releases/20261014-150947",
+    "running_executable": "/srv/zhixiang/releases/20261014-150947/zhixiang-shop",
+    "binary_bytes": 90587298,
+    "binary_sha256": "de065ce7fa451636b0991736e85adb64de7df11f0f3110a75ea8ffbe9821e630",
+    "running_binary_sha256": "de065ce7fa451636b0991736e85adb64de7df11f0f3110a75ea8ffbe9821e630",
+    "manifest_binary_sha256": "de065ce7fa451636b0991736e85adb64de7df11f0f3110a75ea8ffbe9821e630",
     "build_info": {
       "go_version": "go1.26.5",
       "build_settings": [
@@ -27,12 +27,12 @@
         "GOOS=linux",
         "GOAMD64=v1",
         "vcs=git",
-        "vcs.revision=b6dcc7d1a99b3ed91b1cfeb9b468642984bcd042",
-        "vcs.time=2026-10-14T06:43:44Z",
+        "vcs.revision=08cc45c4ab9b14561d48dcc350428cebc338c5d7",
+        "vcs.time=2026-10-14T07:07:49Z",
         "vcs.modified=false"
       ],
       "git_metadata_pinned": true,
-      "vcs_revision": "b6dcc7d1a99b3ed91b1cfeb9b468642984bcd042",
+      "vcs_revision": "08cc45c4ab9b14561d48dcc350428cebc338c5d7",
       "vcs_modified": false
     },
     "runtime_mode": "storefront",
@@ -44,15 +44,18 @@
       "stock_sync_timer": "active"
     },
     "redis_preserved_without_restart": true,
-    "backup": "/srv/zhixiang/backups/before-feature-availability-20261014-145155",
+    "backup": "/srv/zhixiang/backups/before-tron-usdt-20261014-150947-retry2",
     "database_backup_quick_check": "ok",
-    "report_path": "/srv/zhixiang/shared/reports/feature-availability-release-20261014-145155.json",
-    "configuration_unchanged": true,
+    "report_path": "/srv/zhixiang/shared/reports/tron-usdt-release-20261014-150947.json",
+    "configuration_unchanged": false,
     "nginx_configuration_preserved": true,
     "source_dirty": false,
     "private_configuration_unchanged": true,
-    "configuration_changes": [],
-    "source_commit": "b6dcc7d1a99b3ed91b1cfeb9b468642984bcd042"
+    "configuration_changes": [
+      "Added enabled tron_usdt section; all pre-existing configuration values preserved."
+    ],
+    "source_commit": "08cc45c4ab9b14561d48dcc350428cebc338c5d7",
+    "configuration_except_tron_preserved": true
   },
   "payment": {
     "bep20": {
@@ -83,19 +86,28 @@
     "confirmations": 15,
     "public_channels": [
       {
+        "id": 1,
         "name": "USDT · BNB Smart Chain (BEP-20)",
         "provider_type": "bscusdt",
         "channel_type": "usdt-bep20"
       },
       {
+        "id": 2,
         "name": "USDT · Plasma",
         "provider_type": "plasmausdt",
         "channel_type": "usdt-plasma"
       },
       {
+        "id": 3,
         "name": "微信支付",
         "provider_type": "xorpay",
         "channel_type": "wechat"
+      },
+      {
+        "id": 4,
+        "name": "USDT · TRON (TRC20)",
+        "provider_type": "tronusdt",
+        "channel_type": "usdt-trc20"
       }
     ],
     "rpc_read_only_verified": [
@@ -122,13 +134,21 @@
       {
         "path": "/admin/chain-payments/plasma-usdt/transfers",
         "method": "GET"
+      },
+      {
+        "path": "/admin/chain-payments/tron-usdt/status",
+        "method": "GET"
+      },
+      {
+        "path": "/admin/chain-payments/tron-usdt/transfers",
+        "method": "GET"
       }
     ],
     "finance_permissions_verified_through_live_api": true,
     "monitor_access_requires_existing_compliance_acknowledgement": true,
     "compliance_acknowledgement_preserved": true,
     "previous_detailed_verification_recorded_at": "2026-10-12T05:45:38.041686+00:00",
-    "current_release_verification_scope": "All three payment channel records, payment configuration and financial data match the immediate pre-release backup. Public API and actual admin channel list show BEP20, Plasma and XorPay enabled, with XorPay fee 1.60%. No payment or procurement acceptance transaction was performed.",
+    "current_release_verification_scope": "Original three channels and business data preserved; TRON channel 4 added. Ten existing USDT product allowlists append 4 only. Admin status/transfers GET and public checkout verified; no production TRON invoice or transfer created.",
     "new_invoice_amount_decimals": 2,
     "xorpay": {
       "id": 3,
@@ -153,6 +173,23 @@
       "notify_url": "https://www.qzweb.cloud/api/v1/payments/callback",
       "actual_gateway_qr_verified": true,
       "actual_payment_verified": false
+    },
+    "tron": {
+      "id": 4,
+      "enabled": true,
+      "provider_type": "tronusdt",
+      "channel_type": "usdt-trc20",
+      "recipient": "TQmtYPYUySY1ABLTdtcGMFEyTtzFjAFUpn",
+      "token_contract": "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
+      "chain_id": 728126428,
+      "decimals": 6,
+      "payment_types": [
+        "order",
+        "wallet"
+      ],
+      "confirmations": 15,
+      "cny_per_usdt": "6.649820455",
+      "real_money_acceptance": false
     }
   },
   "pages": [
@@ -161,23 +198,26 @@
     "https://124.220.2.69:18888/reconciliation"
   ],
   "verified_asset_sha256": {
-    "user/index.html": "320000e3f295545941fa6f7626ffb3aebcccd6e3db7ed7ab316e51fdc9cf3983",
-    "admin/index.html": "31fc385b6068454e58d15b55cf56ccdfa5af6da4f327d0c15db9a84317ebe5a0"
+    "user/index.html": "51fc85755eba8b8680fd89d069ce57a145faf08c9fe96b4ea9c92ba693c5c9f9",
+    "admin/index.html": "d1f11b5d53b912655d79df0e2bc9847d468d060f8a593f454eb3392b7b08f6f0"
   },
   "public_verification": {
-    "checked_at": "2026-10-14T07:14:48.065208+00:00",
-    "http_checks_passed": 10,
+    "checked_at": "2026-10-14T07:48:49.614986+00:00",
     "frontend_server_checks_passed": 15,
-    "browser_checks_passed": 22,
+    "browser_checks_passed": true,
     "viewports": [
       1920,
       390,
       320
     ],
-    "verification_directory": "work/codex-runtime/feature-availability/",
+    "verification_directory": "work/codex-runtime/tron-usdt/",
     "production_order_submitted": false,
-    "price_rules_saved": false,
-    "browser_error_count": 0
+    "browser_error_count": 0,
+    "verified_interactions": [
+      "TRON selection on guest checkout",
+      "existing three channel options retained"
+    ],
+    "public_http_extra_script": "Not executed after automatic approval review timed out twice; actual public browser checks and server HTTPS checks passed."
   },
   "catalog": {
     "prices_unchanged": true,
@@ -265,16 +305,16 @@
     "content_preserved_by_release": "20261012-153531"
   },
   "source_identity_verification": {
-    "source_commit": "b6dcc7d1a99b3ed91b1cfeb9b468642984bcd042",
+    "source_commit": "08cc45c4ab9b14561d48dcc350428cebc338c5d7",
     "source_branch": "main",
     "source_dirty": false,
     "binary_build_info_commit_matches": true,
     "running_binary_sha256_matches": true,
-    "frontend_files_sha256_verified": 1200
+    "frontend_files_sha256_verified": 445
   },
   "previous_release": {
-    "release": "20261013-172211",
-    "source_commit": "9020d261d49e3b7a706125708beafa3c2e4823af",
+    "release": "20261014-145155",
+    "source_commit": "b6dcc7d1a99b3ed91b1cfeb9b468642984bcd042",
     "retained": true
   },
   "domain_verification": {
@@ -324,11 +364,11 @@
   "previous_build_verification_at": "2026-10-12T08:19:31.766441+00:00",
   "management_url": "https://124.220.2.69:18888/login",
   "frontend_gateway": {
-    "checked_at": "2026-10-14T07:14:48.065208+00:00",
+    "checked_at": "2026-10-14T07:48:49.614986+00:00",
     "frontend_host": "124.220.2.69",
     "backend_host": "43.134.141.10",
-    "frontend_release": "20261014-151124",
-    "source_commit": "d2cbc34162744f6fb061524041464c4ec6718903",
+    "frontend_release": "20261014-150947",
+    "source_commit": "08cc45c4ab9b14561d48dcc350428cebc338c5d7",
     "static_files_verified": 445,
     "storefront_url": "https://www.qzweb.cloud/",
     "management_url": "https://124.220.2.69:18888/login",
@@ -345,8 +385,8 @@
     "certificate_renewal_verified": true,
     "certificate_timer": "qzweb-certificates.timer",
     "certificate_renewal_report": "/srv/zhixiang-front/shared/work/renew-final-20261012-1644/status.json",
-    "report_path": "/srv/zhixiang-front/shared/work/feature-availability-20261014-151124.json",
-    "backend_report_path": "/srv/zhixiang/shared/reports/feature-availability-release-20261014-145155.json",
+    "report_path": "/srv/zhixiang-front/shared/work/tron-usdt-20261014-150947.json",
+    "backend_report_path": "/srv/zhixiang/shared/reports/tron-usdt-release-20261014-150947.json",
     "formal_alipay_enabled": false,
     "database_uploaded": false,
     "legacy_singapore_http_entries_retained": true,
@@ -359,10 +399,10 @@
       "browser_current_frontend_confirmed": true,
       "report_path": "/srv/zhixiang-front/shared/work/entry-cache-report.json"
     },
-    "previous_frontend_release": "20261014-150333",
-    "storefront_source_commit": "d2cbc34162744f6fb061524041464c4ec6718903",
-    "admin_source_commit": "b6dcc7d1a99b3ed91b1cfeb9b468642984bcd042",
-    "backup": "/srv/zhixiang-front/backups/before-feature-availability-return-20261014-151124",
+    "previous_frontend_release": "20261014-151124",
+    "storefront_source_commit": "08cc45c4ab9b14561d48dcc350428cebc338c5d7",
+    "admin_source_commit": "08cc45c4ab9b14561d48dcc350428cebc338c5d7",
+    "backup": "/srv/zhixiang-front/backups/before-tron-usdt-20261014-150947",
     "frontend_only_update": false,
     "previous_hashed_assets_retained": true,
     "verified_services": {
@@ -370,13 +410,15 @@
       "zhixiang-api-tunnel": "active",
       "qzweb-certificates.timer": "active"
     },
-    "release_scope": "Runtime feature availability, settlement and reconciliation; storefront return-link correction",
+    "release_scope": "TRON USDT support with existing feature-availability, fee notice and redemption navigation retained",
     "admin_files_verified": 120,
     "storefront_files_verified": 325,
     "backend_program_preserved": false,
-    "backend_setting_changes": [],
-    "frontend_build_source_commit": "d2cbc34162744f6fb061524041464c4ec6718903",
-    "frontend_source_identical_to_backend": false,
+    "backend_setting_changes": [
+      "tron_usdt section only"
+    ],
+    "frontend_build_source_commit": "08cc45c4ab9b14561d48dcc350428cebc338c5d7",
+    "frontend_source_identical_to_backend": true,
     "admin_base": "/",
     "base_repair_backup": "/srv/zhixiang-front/backups/before-xorpay-admin-base-20261013-173020"
   },
@@ -1115,19 +1157,19 @@
     "database_uploaded": false
   },
   "previous_public_verification": {
-    "checked_at": "2026-10-14T07:12:16.873815+00:00",
-    "http_checks_passed": 15,
-    "frontend_server_checks_passed": 6,
-    "browser_checks_passed": 37,
+    "checked_at": "2026-10-14T07:14:48.065208+00:00",
+    "http_checks_passed": 10,
+    "frontend_server_checks_passed": 15,
+    "browser_checks_passed": 22,
     "viewports": [
       1920,
       390,
       320
     ],
-    "verification_directory": "work/codex-runtime/usdt-fee-notice/",
+    "verification_directory": "work/codex-runtime/feature-availability/",
     "production_order_submitted": false,
-    "browser_error_count": 0,
-    "payment_and_order_data_simulated_in_browser": true
+    "price_rules_saved": false,
+    "browser_error_count": 0
   },
   "abuse_protection": {
     "release": "20261014-085600",
@@ -1675,5 +1717,59 @@
       "Current supplier supports status reconciliation but does not expose independently verifiable amounts; amount/full results report incomplete.",
       "Daily database has no user/reseller and financial acknowledgement remains unconfirmed; related integration cases use temporary databases."
     ]
+  },
+  "tron_usdt": {
+    "release": "20261014-150947",
+    "source_commit": "08cc45c4ab9b14561d48dcc350428cebc338c5d7",
+    "checked_at": "2026-10-14T07:48:49.614986+00:00",
+    "backend_backup": "/srv/zhixiang/backups/before-tron-usdt-20261014-150947-retry2",
+    "frontend_backup": "/srv/zhixiang-front/backups/before-tron-usdt-20261014-150947",
+    "product_channels_backup": "/srv/zhixiang/backups/before-tron-product-channels-20261014-1525",
+    "business_data_groups_preserved_at_switch": 28,
+    "snapshot_ignored_columns": {
+      "site_connections": [
+        "last_ping_at",
+        "updated_at"
+      ],
+      "casbin_rule": [
+        "id"
+      ]
+    },
+    "product_allowlists_extended": 10,
+    "product_ids": [
+      29,
+      30,
+      31,
+      32,
+      33,
+      35,
+      36,
+      37,
+      38,
+      39
+    ],
+    "go_tests_including_subtests_passed": 1659,
+    "go_tests_skipped": 1,
+    "storefront_tests_passed": 108,
+    "admin_tests_passed": 60,
+    "typechecked_builds_passed": 2,
+    "local_unpaid_invoices_verified": 9,
+    "local_daily_runtime_rebuilt": true,
+    "local_fixtures_removed": true,
+    "local_mainnet_scanner_progress_verified": true,
+    "production_monitor_endpoints_verified": 2,
+    "production_tron_invoices_created_by_agent": 0,
+    "production_cursor_initialized": false,
+    "real_money_acceptance": false,
+    "local_database_uploaded": false,
+    "source_dirty": false,
+    "viewports": [
+      1920,
+      390,
+      320
+    ],
+    "script_errors": 0,
+    "horizontal_overflow": false,
+    "report_directory": "work/codex-runtime/tron-usdt/"
   }
 }
