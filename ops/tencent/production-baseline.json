@@ -1,20 +1,20 @@
 {
-  "checked_at": "2026-10-13T09:33:42.619968+00:00",
+  "checked_at": "2026-10-14T00:58:54.773879+00:00",
   "production_url": "https://www.qzweb.cloud/",
-  "documented_release_id": "20261013-172211",
-  "verified_release_id": "20261013-172211",
-  "previous_release_id": "20261013-171054",
-  "source_commit": "9020d261d49e3b7a706125708beafa3c2e4823af",
-  "source_branch": "codex/xorpay-wechat",
+  "documented_release_id": "20261014-085600",
+  "verified_release_id": "20261014-085600",
+  "previous_release_id": "20261013-172211",
+  "source_commit": "993fe972efc8b359ca82e1c21f8272303baea751",
+  "source_branch": "main",
   "server_git_commit_verified": true,
-  "source_tag": "production/xorpay-wechat-20261013-172211",
+  "source_tag": "production/abuse-protection-20261014-085600",
   "production": {
-    "release_path": "/srv/zhixiang/releases/20261013-172211",
-    "running_executable": "/srv/zhixiang/releases/20261013-172211/zhixiang-shop",
-    "binary_bytes": 90398882,
-    "binary_sha256": "8640e3d7829b7885c875c18a37459f2f8b39b4cbd92f5901d504cd0bd7c1feda",
-    "running_binary_sha256": "8640e3d7829b7885c875c18a37459f2f8b39b4cbd92f5901d504cd0bd7c1feda",
-    "manifest_binary_sha256": "8640e3d7829b7885c875c18a37459f2f8b39b4cbd92f5901d504cd0bd7c1feda",
+    "release_path": "/srv/zhixiang/releases/20261014-085600",
+    "running_executable": "/srv/zhixiang/releases/20261014-085600/zhixiang-shop",
+    "binary_bytes": 90480802,
+    "binary_sha256": "1d624247f1e1080b525a06111395ec4ccf35978c6eb3d3914ca61800f1fa463c",
+    "running_binary_sha256": "1d624247f1e1080b525a06111395ec4ccf35978c6eb3d3914ca61800f1fa463c",
+    "manifest_binary_sha256": "1d624247f1e1080b525a06111395ec4ccf35978c6eb3d3914ca61800f1fa463c",
     "build_info": {
       "go_version": "go1.26.5",
       "build_settings": [
@@ -27,12 +27,12 @@
         "GOOS=linux",
         "GOAMD64=v1",
         "vcs=git",
-        "vcs.revision=9020d261d49e3b7a706125708beafa3c2e4823af",
-        "vcs.time=2026-10-13T09:15:02Z",
+        "vcs.revision=993fe972efc8b359ca82e1c21f8272303baea751",
+        "vcs.time=2026-10-13T10:00:06Z",
         "vcs.modified=false"
       ],
       "git_metadata_pinned": true,
-      "vcs_revision": "9020d261d49e3b7a706125708beafa3c2e4823af",
+      "vcs_revision": "993fe972efc8b359ca82e1c21f8272303baea751",
       "vcs_modified": false
     },
     "runtime_mode": "storefront",
@@ -44,17 +44,15 @@
       "stock_sync_timer": "active"
     },
     "redis_preserved_without_restart": true,
-    "backup": "/srv/zhixiang/backups/before-xorpay-20261013-172211",
+    "backup": "/srv/zhixiang/backups/before-abuse-protection-20261014-085600",
     "database_backup_quick_check": "ok",
-    "report_path": "/srv/zhixiang/shared/reports/xorpay-release-20261013-172211.json",
-    "configuration_unchanged": false,
+    "report_path": "/srv/zhixiang/shared/reports/abuse-protection-release-20261014-085600.json",
+    "configuration_unchanged": true,
     "nginx_configuration_preserved": true,
     "source_dirty": false,
     "private_configuration_unchanged": true,
-    "configuration_changes": [
-      "Added payment channel 3: XorPay WeChat native, 1.60% customer surcharge, ceil cents, order and wallet"
-    ],
-    "source_commit": "9020d261d49e3b7a706125708beafa3c2e4823af"
+    "configuration_changes": [],
+    "source_commit": "993fe972efc8b359ca82e1c21f8272303baea751"
   },
   "payment": {
     "bep20": {
@@ -130,7 +128,7 @@
     "monitor_access_requires_existing_compliance_acknowledgement": true,
     "compliance_acknowledgement_preserved": true,
     "previous_detailed_verification_recorded_at": "2026-10-12T05:45:38.041686+00:00",
-    "current_release_verification_scope": "XorPay channel 3 added and customer fee ceil verified in production checkout. Existing BEP20/Plasma channel records, settings and financial data match immediate pre-release backup. Actual XorPay unpaid QR request passed; no real payment or procurement performed.",
+    "current_release_verification_scope": "All three payment channel records, payment configuration and financial data match the immediate pre-release backup. Public API and actual admin channel list show BEP20, Plasma and XorPay enabled, with XorPay fee 1.60%. No payment or procurement acceptance transaction was performed.",
     "new_invoice_amount_decimals": 2,
     "xorpay": {
       "id": 3,
@@ -158,7 +156,8 @@
     }
   },
   "pages": [
-    "https://www.qzweb.cloud/checkout?mode=buynow",
+    "https://www.qzweb.cloud/auth/register",
+    "https://www.qzweb.cloud/auth/login",
     "https://124.220.2.69:18888/payment-channels"
   ],
   "verified_asset_sha256": {
@@ -166,19 +165,28 @@
     "admin/index.html": "a54d9a3e008bb46f26552894a7e6230ddeaae32635889e6e53a734da50550b61"
   },
   "public_verification": {
-    "checked_at": "2026-10-13T09:34:39.455Z",
-    "browser_cases_passed": 6,
-    "scope": [
-      "admin channel list shows enabled WeChat QR at 1.60%",
-      "admin edit shows order and wallet, guest and member",
-      "admin customer fee ceil override enabled, secret masked",
-      "storefront product detail and checkout render",
-      "38.00 CNY selected WeChat previews 0.61 fee and 38.61 total",
-      "switching to BEP20 removes surcharge; switching back restores it"
-    ],
-    "browser_error_count": 0,
-    "verification_directory": "work/codex-runtime/xorpay/",
-    "production_order_submitted": false
+    "checked_at": "2026-10-14T00:58:54.773879+00:00",
+    "http_checks_passed": 8,
+    "guard_checks_passed": 11,
+    "browser_checks": {
+      "registration_captcha_loaded": true,
+      "captcha_width": 240,
+      "login_form_visible": true,
+      "admin_existing_session_valid": true,
+      "payment_channels_visible": [
+        "bscusdt",
+        "plasmausdt",
+        "xorpay"
+      ],
+      "wechat_fee_visible": "1.60%",
+      "console_errors": 0,
+      "real_email_sent": false,
+      "real_registration_created": false,
+      "real_payment_or_purchase_performed": false
+    },
+    "verification_directory": "work/codex-runtime/security-release/",
+    "production_order_submitted": false,
+    "browser_error_count": 0
   },
   "catalog": {
     "prices_unchanged": true,
@@ -266,16 +274,16 @@
     "content_preserved_by_release": "20261012-153531"
   },
   "source_identity_verification": {
-    "source_commit": "414a1fe84ba56adea03c00e3af97bb03d96cd23e",
+    "source_commit": "993fe972efc8b359ca82e1c21f8272303baea751",
     "source_branch": "main",
     "source_dirty": false,
     "binary_build_info_commit_matches": true,
     "running_binary_sha256_matches": true,
-    "frontend_files_sha256_verified": 2437
+    "frontend_files_sha256_verified": 2910
   },
   "previous_release": {
-    "release": "20261013-162754",
-    "source_commit": "6770a90ad543240e5c208f60f4916a9be8d7631b",
+    "release": "20261013-172211",
+    "source_commit": "9020d261d49e3b7a706125708beafa3c2e4823af",
     "retained": true
   },
   "domain_verification": {
@@ -380,7 +388,15 @@
     "frontend_source_identical_to_backend": false,
     "admin_base": "/",
     "base_repair_backup": "/srv/zhixiang-front/backups/before-xorpay-admin-base-20261013-173020",
-    "all_storefront_files": 2223
+    "all_storefront_files": 2223,
+    "last_backend_release_preservation_check": {
+      "checked_at": "2026-10-14T00:58:54.773879+00:00",
+      "backend_release": "20261014-085600",
+      "frontend_release": "20261013-174612",
+      "all_files_unchanged": 2910,
+      "nginx_files_unchanged": 54,
+      "report_directory": "work/codex-runtime/security-release/"
+    }
   },
   "alipay": {
     "code_and_official_sandbox_query_verified": true,
@@ -875,7 +891,7 @@
     "real_payment_or_purchase_submitted": false,
     "verification_directory": "work/codex-runtime/register-captcha-preview-20261013/"
   },
-  "previous_verification_checked_at": "2026-10-13T16:29:54.650166+08:00",
+  "previous_verification_checked_at": "2026-10-13T09:33:42.619968+00:00",
   "sale_email": {
     "release": "20261013-162050",
     "source_commit": "2bbb4e0b802114dd3bda394b28cddcf83639228a",
@@ -1115,5 +1131,79 @@
     "report_directory": "work/codex-runtime/payment-return/",
     "real_payment_or_purchase_performed": false,
     "database_uploaded": false
+  },
+  "previous_public_verification": {
+    "checked_at": "2026-10-13T09:34:39.455Z",
+    "browser_cases_passed": 6,
+    "scope": [
+      "admin channel list shows enabled WeChat QR at 1.60%",
+      "admin edit shows order and wallet, guest and member",
+      "admin customer fee ceil override enabled, secret masked",
+      "storefront product detail and checkout render",
+      "38.00 CNY selected WeChat previews 0.61 fee and 38.61 total",
+      "switching to BEP20 removes surcharge; switching back restores it"
+    ],
+    "browser_error_count": 0,
+    "verification_directory": "work/codex-runtime/xorpay/",
+    "production_order_submitted": false
+  },
+  "abuse_protection": {
+    "release": "20261014-085600",
+    "source_commit": "993fe972efc8b359ca82e1c21f8272303baea751",
+    "source_branch": "main",
+    "source_dirty": false,
+    "checked_at": "2026-10-14T00:58:54.773879+00:00",
+    "binary_sha256": "1d624247f1e1080b525a06111395ec4ccf35978c6eb3d3914ca61800f1fa463c",
+    "backup": "/srv/zhixiang/backups/before-abuse-protection-20261014-085600",
+    "go_tests_including_subtests_passed": 1951,
+    "go_tests_skipped": 3,
+    "storefront_tests_passed": 103,
+    "admin_tests_passed": 58,
+    "typechecked_frontend_builds": 2,
+    "linux_fullstack_build_verified": true,
+    "local_http_checks_passed": 14,
+    "production_guard_checks_passed": 11,
+    "public_http_checks_passed": 8,
+    "business_snapshots_preserved": 19,
+    "business_snapshot_ignored_columns": {
+      "site_connections": [
+        "last_ping_at",
+        "updated_at"
+      ]
+    },
+    "frontend_release_preserved": "20261013-174612",
+    "frontend_files_unchanged": 2910,
+    "nginx_files_unchanged": 54,
+    "redis_preserved_without_restart": true,
+    "runtime_mode": "storefront",
+    "upstream_purchase_enabled": true,
+    "auto_recharge_enabled": false,
+    "settings_and_payment_configuration_unchanged": true,
+    "local_database_uploaded": false,
+    "real_email_sent": false,
+    "production_test_user_created": false,
+    "real_payment_or_purchase_performed": false,
+    "production_browser": {
+      "registration_captcha_loaded": true,
+      "captcha_width": 240,
+      "login_form_visible": true,
+      "admin_existing_session_valid": true,
+      "payment_channels_visible": [
+        "bscusdt",
+        "plasmausdt",
+        "xorpay"
+      ],
+      "wechat_fee_visible": "1.60%",
+      "console_errors": 0,
+      "real_email_sent": false,
+      "real_registration_created": false,
+      "real_payment_or_purchase_performed": false
+    },
+    "report_directory": "work/codex-runtime/security-release/",
+    "report_path": "/srv/zhixiang/shared/reports/abuse-protection-release-20261014-085600.json",
+    "limitations": [
+      "Application protections do not measure or guarantee volumetric DDoS capacity.",
+      "Real SMTP sending and real-money payment/procurement acceptance were not performed."
+    ]
   }
 }
