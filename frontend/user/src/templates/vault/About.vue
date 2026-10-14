@@ -1,8 +1,5 @@
 <template>
-  <StoreAbout v-if="appStore.config && !appStore.isResellerTenant"
-    :hero-title="heroTitle" :hero-subtitle="heroSubtitle" :introduction-text="introductionText"
-    :services-title="servicesTitle" :service-items="serviceItems" :contact-title="contactTitle"
-    :contact-text="contactText" :contact-config="contactConfig" />
+  <StoreAbout v-if="appStore.config && !appStore.isResellerTenant" />
   <div v-else class="mx-auto w-full max-w-[840px] px-6 pb-10 pt-2">
     <header class="my-8 text-center">
       <h1 class="mb-2.5 text-4xl font-extrabold">{{ heroTitle }}</h1>

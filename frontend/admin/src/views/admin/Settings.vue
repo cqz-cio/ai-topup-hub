@@ -21,6 +21,7 @@ import SettingsCaptchaTab from './components/SettingsCaptchaTab.vue'
 import SettingsOrderEmailTemplateTab from './components/SettingsOrderEmailTemplateTab.vue'
 import SettingsNavigationTab from './components/SettingsNavigationTab.vue'
 import SettingsHomeAnnouncementTab from './components/SettingsHomeAnnouncementTab.vue'
+import SettingsAboutTab from './components/SettingsAboutTab.vue'
 import SettingsUpstreamSyncTab from './components/SettingsUpstreamSyncTab.vue'
 
 const { t } = useI18n()
@@ -30,6 +31,7 @@ const captchaTabRef = ref<InstanceType<typeof SettingsCaptchaTab>>()
 const orderEmailTemplateTabRef = ref<InstanceType<typeof SettingsOrderEmailTemplateTab>>()
 const navigationTabRef = ref<InstanceType<typeof SettingsNavigationTab>>()
 const homeAnnouncementTabRef = ref<InstanceType<typeof SettingsHomeAnnouncementTab>>()
+const aboutTabRef = ref<InstanceType<typeof SettingsAboutTab>>()
 const upstreamSyncTabRef = ref<InstanceType<typeof SettingsUpstreamSyncTab>>()
 const siteIconPickerRef = ref<InstanceType<typeof MediaPicker> | null>(null)
 const siteLogoPickerRef = ref<InstanceType<typeof MediaPicker> | null>(null)
@@ -654,18 +656,6 @@ const saveOrderSettings = async () => {
   })
 }
 
-const addAboutServiceItem = () => {
-  if (form.about.services.items.length >= 12) {
-    notifyError(t('admin.settings.about.maxServicesHint'))
-    return
-  }
-  form.about.services.items.push(createLocalizedField())
-}
-
-const removeAboutServiceItem = (index: number) => {
-  form.about.services.items.splice(index, 1)
-}
-
 const addSiteScriptItem = () => {
   if (form.scripts.length >= siteScriptsMaxCount) {
     notifyError(t('admin.settings.scripts.maxScriptsHint', { max: siteScriptsMaxCount }))
@@ -760,6 +750,10 @@ const saveDashboardSettings = async () => {
 }
 
 const saveSettings = async () => {
+  if (currentTab.value === 'about') {
+    await aboutTabRef.value?.save()
+    return
+  }
   if (currentTab.value === 'smtp') {
     await smtpTabRef.value?.save()
     return
@@ -1260,89 +1254,7 @@ onMounted(() => {
       </TabsContent>
 
       <TabsContent value="about" :forceMount="true" v-show="currentTab === 'about'" class="space-y-6 mt-0">
-      <div class="rounded-xl border border-border bg-card">
-        <div class="flex flex-col gap-3 border-b border-border bg-muted/40 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 class="text-lg font-semibold">{{ t('admin.settings.about.title') }}</h2>
-            <p class="mt-1 text-xs text-muted-foreground">{{ t('admin.settings.about.subtitle', { lang: getCurrentLangName() }) }}</p>
-          </div>
-          <span class="rounded bg-muted px-2 py-1 text-xs text-muted-foreground">{{ currentLang }}</span>
-        </div>
-
-        <div class="space-y-6 p-6">
-          <div class="rounded-xl border border-border">
-            <div class="border-b border-border bg-muted/30 px-4 py-3">
-              <h3 class="text-sm font-semibold">{{ t('admin.settings.about.heroTitle') }}</h3>
-            </div>
-            <div class="grid grid-cols-1 gap-4 p-4 md:grid-cols-2">
-              <div class="space-y-2">
-                <label class="text-xs font-medium text-muted-foreground">{{ t('admin.settings.about.heroMainTitle') }}</label>
-                <Input v-model="form.about.hero.title[currentLang]" :placeholder="t('admin.settings.about.heroMainTitlePlaceholder')" />
-              </div>
-              <div class="space-y-2">
-                <label class="text-xs font-medium text-muted-foreground">{{ t('admin.settings.about.heroSubtitle') }}</label>
-                <Input v-model="form.about.hero.subtitle[currentLang]" :placeholder="t('admin.settings.about.heroSubtitlePlaceholder')" />
-              </div>
-            </div>
-          </div>
-
-          <div class="rounded-xl border border-border">
-            <div class="border-b border-border bg-muted/30 px-4 py-3">
-              <h3 class="text-sm font-semibold">{{ t('admin.settings.about.introductionTitle') }}</h3>
-              <p class="mt-1 text-xs text-muted-foreground">{{ t('admin.settings.about.introductionSubtitle') }}</p>
-            </div>
-            <div class="p-4">
-              <Textarea v-model="form.about.introduction[currentLang]" rows="5" :placeholder="t('admin.settings.about.introductionPlaceholder')" />
-            </div>
-          </div>
-
-          <div class="rounded-xl border border-border">
-            <div class="flex flex-col gap-3 border-b border-border bg-muted/30 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-              <h3 class="text-sm font-semibold">{{ t('admin.settings.about.servicesTitle') }}</h3>
-              <Button type="button" size="sm" variant="outline" class="w-full sm:w-auto" @click="addAboutServiceItem">
-                {{ t('admin.settings.about.addServiceItem') }}
-              </Button>
-            </div>
-            <div class="space-y-4 p-4">
-              <div class="space-y-2">
-                <label class="text-xs font-medium text-muted-foreground">{{ t('admin.settings.about.servicesBlockTitle') }}</label>
-                <Input v-model="form.about.services.title[currentLang]" :placeholder="t('admin.settings.about.servicesBlockTitlePlaceholder')" />
-              </div>
-
-              <div v-if="form.about.services.items.length === 0" class="rounded-lg border border-dashed border-border bg-muted/10 px-3 py-4 text-xs text-muted-foreground">
-                {{ t('admin.settings.about.servicesEmpty') }}
-              </div>
-
-              <div v-for="(item, index) in form.about.services.items" :key="`about-service-${index}`" class="rounded-lg border border-border bg-muted/10 p-3">
-                <div class="mb-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <label class="text-xs font-medium text-muted-foreground">{{ t('admin.settings.about.serviceItem', { index: index + 1 }) }}</label>
-                  <Button type="button" size="sm" variant="destructive" class="w-full sm:w-auto" @click="removeAboutServiceItem(index)">
-                    {{ t('admin.common.delete') }}
-                  </Button>
-                </div>
-                <Input v-model="item[currentLang]" :placeholder="t('admin.settings.about.serviceItemPlaceholder')" />
-              </div>
-            </div>
-          </div>
-
-          <div class="rounded-xl border border-border">
-            <div class="border-b border-border bg-muted/30 px-4 py-3">
-              <h3 class="text-sm font-semibold">{{ t('admin.settings.about.contactTitle') }}</h3>
-              <p class="mt-1 text-xs text-muted-foreground">{{ t('admin.settings.about.contactSubtitle') }}</p>
-            </div>
-            <div class="space-y-4 p-4">
-              <div class="space-y-2">
-                <label class="text-xs font-medium text-muted-foreground">{{ t('admin.settings.about.contactBlockTitle') }}</label>
-                <Input v-model="form.about.contact.title[currentLang]" :placeholder="t('admin.settings.about.contactBlockTitlePlaceholder')" />
-              </div>
-              <div class="space-y-2">
-                <label class="text-xs font-medium text-muted-foreground">{{ t('admin.settings.about.contactText') }}</label>
-                <Textarea v-model="form.about.contact.text[currentLang]" rows="4" :placeholder="t('admin.settings.about.contactTextPlaceholder')" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+        <SettingsAboutTab ref="aboutTabRef" :current-lang="currentLang" />
       </TabsContent>
 
       <TabsContent value="legal" :forceMount="true" v-show="currentTab === 'legal'" class="space-y-6 mt-0">

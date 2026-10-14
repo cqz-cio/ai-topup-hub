@@ -10,6 +10,7 @@ import (
 
 func TestDefaultSettingRegistryCoversLegacyNormalizedKeys(t *testing.T) {
 	want := []string{
+		constants.SettingKeyAboutPageConfig,
 		constants.SettingKeyAffiliateConfig,
 		constants.SettingKeyCallbackRoutesConfig,
 		constants.SettingKeyDashboardConfig,
@@ -136,5 +137,55 @@ func TestPaymentFeeConfigDefaultsSafeAndNormalizesSwitches(t *testing.T) {
 	}
 	if got := service.GetPaymentFeeConfig(); got != (PaymentFeeConfig{CustomerFeeEnabled: true, ReuseLegacyOrderFeePayment: true}) {
 		t.Fatalf("payment fee config mismatch: %#v", got)
+	}
+}
+
+func TestAboutPageSavePreservesOtherSettingsAndInvalidatesPublicCache(t *testing.T) {
+	repo := newMockSettingRepo()
+	service := NewService(repo)
+	site := jsonmap.JSON{"brand": map[string]interface{}{"site_name": "unchanged"}, "private_extension": "preserve"}
+	order := jsonmap.JSON{"payment_expire_minutes": 17}
+	repo.Upsert(constants.SettingKeySiteConfig, site)
+	repo.Upsert(constants.SettingKeyOrderConfig, order)
+	result, err := service.UpdateWithEffects(constants.SettingKeyAboutPageConfig, map[string]interface{}{
+		"title":         map[string]interface{}{"zh-CN": " 关于 π星卡社 ", "en-US": "About us"},
+		"supportWechat": "Cqz0924ttxk",
+		"recharge": []interface{}{map[string]interface{}{
+			"title": map[string]interface{}{"zh-CN": "iOS 续充"},
+			"text":  map[string]interface{}{"zh-CN": "到期后联系客服\n手动充值", "en-US": "Contact support"},
+		}},
+		"cooperationNote": map[string]interface{}{"zh-CN": ""},
+		"services":        []interface{}{},
+		"links":           []interface{}{map[string]interface{}{"title": map[string]interface{}{"zh-CN": "条款"}, "to": "/terms"}},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !result.HasEffect(EffectInvalidatePublicConfigCache) {
+		t.Fatal("public config was not invalidated")
+	}
+	stored, err := service.GetByKey(constants.SettingKeyAboutPageConfig)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(stored, result.Value) {
+		t.Fatal("save did not persist")
+	}
+	if got, _ := service.GetByKey(constants.SettingKeySiteConfig); !reflect.DeepEqual(got, site) {
+		t.Fatal("site config changed")
+	}
+	if got, _ := service.GetByKey(constants.SettingKeyOrderConfig); !reflect.DeepEqual(got, order) {
+		t.Fatal("order config changed")
+	}
+	recharge := stored["recharge"].([]interface{})[0].(map[string]interface{})
+	text := recharge["text"].(map[string]interface{})
+	if text["zh-CN"] != "到期后联系客服\n手动充值" || text["en-US"] != "Contact support" {
+		t.Fatalf("multilingual text lost: %#v", text)
+	}
+	if len(stored["services"].([]interface{})) != 0 {
+		t.Fatal("deleted list was repopulated")
+	}
+	if stored["cooperationNote"].(map[string]interface{})["zh-CN"] != "" {
+		t.Fatal("blank paragraph was repopulated")
 	}
 }

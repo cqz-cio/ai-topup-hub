@@ -244,6 +244,17 @@ func (h *Handler) GetConfig(c *gin.Context) {
 		data["tenant"] = map[string]interface{}{"mode": "main", "host": tenant.Host}
 	}
 
+	// Only the main store uses this editorial content and support contact.
+	// The independent key avoids writes to registration, order and site settings.
+	if tenant.ResellerID == nil {
+		pageRaw, pageErr := h.settings.GetByKey(constants.SettingKeyAboutPageConfig)
+		if pageErr != nil {
+			ginutil.RespondError(c, response.CodeInternal, "error.config_fetch_failed", pageErr)
+			return
+		}
+		applyMainAboutPage(data, pageRaw)
+	}
+
 	_ = h.cache.SetJSON(c.Request.Context(), cacheKey, data, publicConfigCacheTTL)
 	data["server_time"] = time.Now().UnixMilli()
 	data["app_version"] = version.Version
@@ -276,4 +287,33 @@ func resolveGoogleAuthPublicConfig(source GoogleAuthPublic, fallback GoogleAuthF
 		"enabled":   enabled && clientID != "",
 		"client_id": clientID,
 	}
+}
+
+func aboutObject(raw interface{}) map[string]interface{} {
+	switch value := raw.(type) {
+	case jsonmap.JSON:
+		return value
+	case map[string]interface{}:
+		return value
+	default:
+		return nil
+	}
+}
+
+func applyMainAboutPage(data map[string]interface{}, raw interface{}) {
+	page := aboutObject(raw)
+	if page == nil || page["version"] == nil {
+		return
+	}
+	data["about_page"] = page
+	wechat, _ := page["supportWechat"].(string)
+	if wechat == "" {
+		return
+	}
+	contact := make(map[string]interface{})
+	for key, value := range aboutObject(data["contact"]) {
+		contact[key] = value
+	}
+	contact["wechat"] = wechat
+	data["contact"] = contact
 }

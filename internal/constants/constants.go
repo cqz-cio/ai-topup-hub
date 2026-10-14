@@ -468,6 +468,7 @@ const (
 // 设置键常量
 const (
 	SettingKeySiteConfig               = "site_config"
+	SettingKeyAboutPageConfig          = "about_page_config"
 	SettingKeyOrderConfig              = "order_config"
 	SettingKeySMTPConfig               = "smtp_config"
 	SettingKeyCaptchaConfig            = "captcha_config"

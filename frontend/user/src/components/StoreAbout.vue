@@ -3,20 +3,20 @@
     <div class="about-container">
       <header class="about-hero">
         <p class="about-eyebrow">{{ copy.eyebrow }}</p>
-        <h1>{{ heroTitle || copy.title }}</h1>
-        <p class="about-subtitle">{{ heroSubtitle || copy.subtitle }}</p>
+        <h1>{{ copy.title }}</h1>
+        <p class="about-subtitle">{{ copy.subtitle }}</p>
       </header>
 
       <article class="about-card">
         <section class="about-introduction" aria-labelledby="about-intro-title">
           <h2 id="about-intro-title">{{ copy.introductionTitle }}</h2>
-          <p>{{ introductionText || copy.introduction }}</p>
+          <p>{{ copy.introduction }}</p>
         </section>
 
-        <section class="about-section" aria-labelledby="about-services-title">
-          <h2 id="about-services-title">{{ servicesTitle || copy.servicesTitle }}</h2>
+        <section v-if="copy.servicesTitle || copy.services.length" class="about-section" aria-labelledby="about-services-title">
+          <h2 id="about-services-title">{{ copy.servicesTitle }}</h2>
           <div class="about-services">
-            <div v-for="(service, index) in services" :key="index" class="about-service">
+            <div v-for="(service, index) in copy.services" :key="index" class="about-service">
               <span class="about-icon" aria-hidden="true"><component :is="serviceIcons[index] || Check" /></span>
               <div>
                 <h3 v-if="service.title">{{ service.title }}</h3>
@@ -26,10 +26,10 @@
           </div>
         </section>
 
-        <section class="about-section" aria-labelledby="about-recharge-title">
+        <section v-if="copy.rechargeTitle || copy.recharge.length || copy.rechargeNote" class="about-section" aria-labelledby="about-recharge-title">
           <h2 id="about-recharge-title">{{ copy.rechargeTitle }}</h2>
           <ol class="about-recharge">
-            <li v-for="(item, index) in copy.recharge" :key="item.title">
+            <li v-for="(item, index) in copy.recharge" :key="index">
               <span class="about-number" aria-hidden="true">{{ String(index + 1).padStart(2, '0') }}</span>
               <div><h3>{{ item.title }}</h3><p>{{ item.text }}</p></div>
             </li>
@@ -47,26 +47,29 @@
         </section>
 
         <section class="about-contact" aria-labelledby="about-contact-title">
-          <h2 id="about-contact-title">{{ contactTitle || copy.contactTitle }}</h2>
-          <p>{{ contactText || copy.contactSubtitle }}</p>
+          <h2 id="about-contact-title">{{ copy.contactTitle }}</h2>
+          <p>{{ copy.contactSubtitle }}</p>
           <div class="about-wechat">
-            <div><span class="about-wechat-label">客服微信</span><strong>{{ supportWechat }}</strong></div>
+            <div><span class="about-wechat-label">{{ copy.wechatLabel }}</span><strong>{{ copy.supportWechat }}</strong></div>
             <button type="button" class="about-copy" @click="copyWechat">
               <Check v-if="copied" :size="18" aria-hidden="true" /><Copy v-else :size="18" aria-hidden="true" />
-              {{ copied ? '已复制微信号' : '复制微信号' }}
+              {{ copied ? copy.copiedLabel : copy.copyLabel }}
             </button>
           </div>
-          <p class="sr-only" role="status" aria-live="polite">{{ copied ? t('shopUi.wechatCopied') : '' }}</p>
+          <p class="sr-only" role="status" aria-live="polite">{{ copied ? copy.copiedLabel : '' }}</p>
           <p class="about-contact-note">{{ copy.contactNote }}</p>
           <p class="about-contact-note">{{ copy.contactTip }}</p>
           <div v-if="contactConfig?.telegram || contactConfig?.whatsapp" class="about-extra-contact">
-            <a v-if="contactConfig?.telegram" :href="contactConfig.telegram" target="_blank" rel="noopener noreferrer">Telegram <ArrowUpRight :size="16" /></a>
-            <a v-if="contactConfig?.whatsapp" :href="contactConfig.whatsapp" target="_blank" rel="noopener noreferrer">WhatsApp <ArrowUpRight :size="16" /></a>
+            <a v-if="contactConfig?.telegram" :href="contactConfig.telegram" target="_blank" rel="noopener noreferrer">{{ copy.telegramLabel }} <ArrowUpRight :size="16" /></a>
+            <a v-if="contactConfig?.whatsapp" :href="contactConfig.whatsapp" target="_blank" rel="noopener noreferrer">{{ copy.whatsappLabel }} <ArrowUpRight :size="16" /></a>
           </div>
         </section>
 
-        <nav class="about-links" aria-label="购买与服务说明">
-          <RouterLink v-for="link in copy.links" :key="link.to" :to="link.to">{{ link.title }}<ArrowRight :size="19" aria-hidden="true" /></RouterLink>
+        <nav v-if="copy.links.length" class="about-links" :aria-label="copy.linksLabel">
+          <template v-for="(link, index) in copy.links" :key="index">
+            <a v-if="!link.to.startsWith('/')" :href="link.to" target="_blank" rel="noopener noreferrer">{{ link.title }}<ArrowRight :size="19" aria-hidden="true" /></a>
+            <RouterLink v-else :to="link.to">{{ link.title }}<ArrowRight :size="19" aria-hidden="true" /></RouterLink>
+          </template>
         </nav>
       </article>
     </div>
@@ -74,38 +77,27 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ArrowRight, ArrowUpRight, Check, ClipboardList, Copy, Handshake, KeyRound, ShieldCheck, ShoppingCart } from 'lucide-vue-next'
-import { aboutCopy as copy } from '../content/about'
+import { resolveAboutPage } from '../../../shared/aboutPage'
+import { useAppStore } from '../stores/app'
 import { copyText } from '../utils/clipboard'
 import { toast } from '../composables/useToast'
 
-const props = defineProps<{
-  heroTitle: string
-  heroSubtitle: string
-  introductionText: string
-  servicesTitle: string
-  serviceItems: string[]
-  contactTitle: string
-  contactText: string
-  contactConfig?: { telegram?: string; whatsapp?: string } | null
-}>()
-const { t } = useI18n()
-const supportWechat = 'Cqz0924ttxk'
+const { t, locale } = useI18n()
+const appStore = useAppStore()
+const copy = computed(() => resolveAboutPage(appStore.config?.about_page, appStore.config?.about, locale.value, appStore.config?.contact))
+const contactConfig = computed(() => appStore.config?.contact)
 const copied = ref(false)
 const serviceIcons = [ShoppingCart, ClipboardList, KeyRound, ShieldCheck]
-// Existing site settings remain usable; a first line can serve as a custom card title.
-const services = computed(() => props.serviceItems.length ? props.serviceItems.map(text => {
-  const [first, ...rest] = text.split('\n')
-  return rest.length ? { title: first, text: rest.join('\n') } : { title: '', text }
-}) : copy.services)
+watch(() => copy.value.supportWechat, () => { copied.value = false })
 
 const copyWechat = async () => {
   try {
-    await copyText(supportWechat)
+    await copyText(copy.value.supportWechat)
     copied.value = true
-    toast.success(t('shopUi.wechatCopied'))
+    toast.success(copy.value.copiedLabel || t('shopUi.wechatCopied'))
   } catch {
     copied.value = false
     toast.error(t('shopUi.wechatCopyFailed'))
