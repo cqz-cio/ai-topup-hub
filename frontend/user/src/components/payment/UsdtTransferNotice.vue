@@ -6,9 +6,9 @@ import { resolveUsdtTransfer, type UsdtPaymentSource } from '../../utils/usdtTra
 
 const props = defineProps<{ payment?: UsdtPaymentSource | null }>()
 const transfer = computed(() => resolveUsdtTransfer(props.payment))
-const { t } = useI18n({
-  useScope: 'local',
-  messages: {
+const { locale } = useI18n()
+// Plain Vue text keeps these fixed messages compatible with the runtime-only i18n build.
+const messages = {
     'zh-CN': {
       title: '手续费另付，到账须一致',
       amountLead: '我方钱包须实际到账',
@@ -33,22 +33,22 @@ const { t } = useI18n({
       fees: 'You are responsible for transfer / withdrawal fees. If your platform deducts the fee from the transfer amount, add enough to cover it so the amount received is neither more nor less than the amount due.',
       check: 'Before confirming the transfer, check the amount your platform says the recipient will receive.',
     },
-  },
-})
+} as const
+const copy = computed(() => messages[locale.value as keyof typeof messages] || messages['zh-CN'])
 </script>
 
 <template>
   <aside v-if="transfer" class="usdt-transfer-notice" role="note" data-usdt-transfer-notice>
     <div class="usdt-transfer-heading">
       <TriangleAlert aria-hidden="true" />
-      <strong>{{ t('title') }}</strong>
+      <strong>{{ copy.title }}</strong>
     </div>
     <p v-if="transfer.amount">
-      {{ t('amountLead') }} <strong>{{ transfer.amount }} {{ transfer.token }}</strong>{{ t('amountTail') }}
+      {{ copy.amountLead }} <strong>{{ transfer.amount }} {{ transfer.token }}</strong>{{ copy.amountTail }}
     </p>
-    <p v-else>{{ t('exactAmount') }}</p>
-    <p>{{ t('fees') }}</p>
-    <p class="usdt-transfer-check">{{ t('check') }}</p>
+    <p v-else>{{ copy.exactAmount }}</p>
+    <p>{{ copy.fees }}</p>
+    <p class="usdt-transfer-check">{{ copy.check }}</p>
   </aside>
 </template>
 
