@@ -1,4 +1,15 @@
 {
+  "invoiceSupport": {
+    "available": "Invoices available",
+    "afterPayment": ". Contact support after payment to request an invoice.",
+    "title": "Contact support for an invoice",
+    "description": "To request an invoice, contact us on WeChat with your order number and invoice details.",
+    "copyWechat": "Copy WeChat ID",
+    "copyOrder": "Copy order number",
+    "wechatCopied": "WeChat ID copied",
+    "orderCopied": "Order number copied",
+    "copyFailed": "Copy failed. Please copy the WeChat ID or order number manually."
+  },
   "featureAvailability": {
     "affiliateClosed": "Affiliate rebates are currently unavailable. Enrollment and withdrawal requests are closed. Existing records remain accessible.",
     "affiliateSuspended": "This affiliate account is disabled. Withdrawals are unavailable. Existing records remain accessible.",

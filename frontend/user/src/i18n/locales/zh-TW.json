@@ -1,4 +1,15 @@
 {
+  "invoiceSupport": {
+    "available": "支援開立發票",
+    "afterPayment": "，付款完成後可聯絡客服申請。",
+    "title": "聯絡客服開立發票",
+    "description": "如需開立發票，請聯絡微信客服，提供訂單編號及開票資訊。",
+    "copyWechat": "複製微信號",
+    "copyOrder": "複製訂單編號",
+    "wechatCopied": "已複製微信號",
+    "orderCopied": "已複製訂單編號",
+    "copyFailed": "複製失敗，請手動複製微信號或訂單編號。"
+  },
   "featureAvailability": {
     "affiliateClosed": "推廣返利暫未開放，目前不能開通或申請提現。已有紀錄可繼續查看。",
     "affiliateSuspended": "目前返利帳戶已停用，暫不能申請提現。已有紀錄可繼續查看。",

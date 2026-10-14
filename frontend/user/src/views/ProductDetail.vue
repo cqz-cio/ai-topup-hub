@@ -314,6 +314,7 @@
                 </div>
 
               </div>
+              <ProductInvoiceNotice />
             </div>
           </div>
         </div>
@@ -413,6 +414,7 @@
 </template>
 
 <script setup lang="ts">
+import ProductInvoiceNotice from '../components/commerce/ProductInvoiceNotice.vue'
 import CheckoutSteps from '../components/checkout/CheckoutSteps.vue'
 import { ref, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'

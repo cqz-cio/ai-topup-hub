@@ -1,0 +1,18 @@
+# 付款后联系客服开票
+
+商城在两处说明开票方式：
+
+- 商品详情的购买按钮下方显示「支持开票，付款完成后可联系客服申请。」
+- 已付款订单的摘要下方显示「联系客服开票」，提示提供订单号及开票信息，并提供「复制微信号」「复制订单号」按钮。
+
+客服微信固定为 `Cqz0924ttxk`，不使用电话号码作为回退值。开票由客服受理；页面不会自动开具发票，也不收集或保存开票资料。
+
+会员与游客订单共用同一组件，经典和 Vault 模板均支持简体中文、繁体中文、英文。订单为 `paid`、`fulfilling`、`partially_delivered`、`delivered`、`completed`、`partially_refunded` 时显示；待付款、取消、过期和全额退款订单不显示。付款确认后即可联系，无需等待发货完成。
+
+复制成功后，按钮短暂显示成功提示，并向读屏工具播报；复制失败时提示手动复制。微信号始终以可选择的文字展示，订单号使用当前订单的实际编号。
+
+组件位置：`frontend/user/src/components/commerce/ProductInvoiceNotice.vue` 和 `OrderInvoiceSupport.vue`。对应文案保存在三种语言的 `invoiceSupport` 节点中。
+
+本次不修改购买须知文章及首页公告弹窗，待第一版公告定稿后另行统一文案。也不修改支付、订单、采购或退款处理逻辑。
+
+验证记录保存在本机忽略目录 `work/codex-runtime/invoice-preview-20261014/`。已付款展示使用模拟订单验证，不代表真实付款、采购或开票验收；生产发布状态以 `ops/tencent/production-baseline.json` 为准。

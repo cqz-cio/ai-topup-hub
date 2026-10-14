@@ -54,6 +54,8 @@
         </div>
       </div>
 
+      <OrderInvoiceSupport :order="order" class="mb-[18px]" />
+
       <VaultOrderBody
         :order="order"
         variant="guest"
@@ -65,6 +67,7 @@
 </template>
 
 <script setup lang="ts">
+import OrderInvoiceSupport from '../../components/commerce/OrderInvoiceSupport.vue'
 import { useI18n } from 'vue-i18n'
 import { AlertCircle } from 'lucide-vue-next'
 import { Badge } from '@/components/ui/badge'

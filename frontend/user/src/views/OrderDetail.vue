@@ -77,6 +77,7 @@
           </div>
         </div>
 
+        <OrderInvoiceSupport :order="order" />
         <OrderDelivery :order="order" :downloading="fulfillmentDownloading" @download="handleDownloadFulfillment" />
 
         <div v-if="order.children && order.children.length > 0"
@@ -329,6 +330,7 @@
 </template>
 
 <script setup lang="ts">
+import OrderInvoiceSupport from '../components/commerce/OrderInvoiceSupport.vue'
 import { computed } from 'vue'
 import CommerceHeading from '../components/commerce/CommerceHeading.vue'
 import OrderDelivery from '../components/commerce/OrderDelivery.vue'
