@@ -58,7 +58,7 @@ func (s procurementReaderStub) ListByConnectionAndTimeRange(uint, time.Time, tim
 
 type upstreamProviderStub struct {
 	openCalls int
-	reader    *upstreamReaderStub
+	reader    reconciliationcontract.UpstreamOrderReader
 }
 
 func (s *upstreamProviderStub) Open(uint) (reconciliationcontract.UpstreamOrderReader, error) {
@@ -219,5 +219,82 @@ func TestCompareOrderTrimsUpstreamAmount(t *testing.T) {
 	item := compareOrder(job, order, &reconciliationcontract.UpstreamOrder{Amount: " 12.00 "})
 	if item == nil || item.MismatchType != constants.MismatchTypeAmount {
 		t.Fatal("upstream amount with whitespace was incorrectly treated as matched")
+	}
+}
+
+type financialReaderStub struct {
+	upstreamReaderStub
+	amountCalls int
+	amount      string
+	currency    string
+	amountErr   error
+}
+
+func (s *financialReaderStub) GetWithAmount(context.Context, uint, string) (*reconciliationcontract.UpstreamOrder, error) {
+	s.amountCalls++
+	return &reconciliationcontract.UpstreamOrder{Status: "delivered", Amount: s.amount, Currency: s.currency}, s.amountErr
+}
+
+func TestFinancialLookupCompletesOrRecordsExactAmountMismatch(t *testing.T) {
+	for _, tc := range []struct {
+		name, kind, amount, currency string
+		queryErr                     error
+		incomplete, mismatch         bool
+	}{
+		{"amount match", constants.ReconciliationTypeAmount, "107.50", "CNY", nil, false, false},
+		{"full match", constants.ReconciliationTypeFull, "107.50", "CNY", nil, false, false},
+		{"one cent discrepancy", constants.ReconciliationTypeAmount, "107.51", "CNY", nil, false, true},
+		{"paid zero amount", constants.ReconciliationTypeAmount, "0.00", "CNY", nil, false, true},
+		{"query failure", constants.ReconciliationTypeFull, "", "", errors.New("unavailable"), true, false},
+		{"missing amount", constants.ReconciliationTypeFull, "", "CNY", nil, true, false},
+		{"currency mismatch", constants.ReconciliationTypeAmount, "107.50", "USD", nil, true, false},
+		{"missing currency", constants.ReconciliationTypeAmount, "107.50", "", nil, true, false},
+		{"status independent", constants.ReconciliationTypeStatus, "", "", errors.New("amount offline"), false, false},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			jobs := &jobRepositoryStub{job: &reconciliationdomain.Job{ID: 1, Type: tc.kind, Status: constants.ReconciliationJobStatusPending}}
+			items := &itemRepositoryStub{}
+			reader := &financialReaderStub{upstreamReaderStub: upstreamReaderStub{details: map[uint]reconciliationcontract.UpstreamOrder{0: {Status: "delivered"}}}, amount: tc.amount, currency: tc.currency, amountErr: tc.queryErr}
+			order := reconciliationcontract.ProcurementOrder{ID: 7, UpstreamOrderNo: "00123", Status: constants.ProcurementStatusFulfilled, UpstreamAmount: money.FromDecimal(decimal.RequireFromString("107.50")), Currency: "CNY"}
+			svc := NewService(Options{Jobs: jobs, Items: items, Upstream: &upstreamProviderStub{reader: reader}, Procurements: procurementReaderStub{orders: []reconciliationcontract.ProcurementOrder{order}}})
+			err := svc.Execute(context.Background(), 1)
+			if errors.Is(err, reconciliationcontract.ErrIncompleteResults) != tc.incomplete {
+				t.Fatalf("unexpected result: %+v %v", jobs.job, err)
+			}
+			if tc.kind == constants.ReconciliationTypeStatus {
+				if reader.amountCalls != 0 || reader.calls != 1 {
+					t.Fatal("status query used financial endpoint")
+				}
+			} else if reader.amountCalls != 1 || reader.calls != 0 {
+				t.Fatal("amount query did not use financial endpoint")
+			}
+			if tc.mismatch {
+				if len(items.created) != 1 || items.created[0].MismatchType != constants.MismatchTypeAmount || !items.created[0].UpstreamAmount.Equal(decimal.RequireFromString(tc.amount)) || jobs.job.MatchedCount != 0 {
+					t.Fatalf("exact discrepancy lost: %+v %+v", items.created, jobs.job)
+				}
+			} else if len(items.created) != 0 {
+				t.Fatal("unchecked amount was recorded as discrepancy")
+			}
+			if tc.incomplete {
+				if jobs.job.Status != constants.ReconciliationJobStatusFailed || jobs.job.MatchedCount != 0 {
+					t.Fatalf("unchecked job reported success: %+v", jobs.job)
+				}
+			} else if jobs.job.Status != constants.ReconciliationJobStatusCompleted {
+				t.Fatalf("job not completed: %+v", jobs.job)
+			}
+			if !tc.incomplete && !tc.mismatch && jobs.job.MatchedCount != 1 {
+				t.Fatalf("valid match not counted: %+v", jobs.job)
+			}
+			// Completed jobs are idempotent and never change the recorded procurement cost.
+			if !tc.incomplete {
+				calls := reader.amountCalls
+				if err := svc.Execute(context.Background(), 1); err != nil || reader.amountCalls != calls {
+					t.Fatal("completed job queried twice")
+				}
+			}
+			if !order.UpstreamAmount.Equal(decimal.RequireFromString("107.50")) {
+				t.Fatal("reconciliation changed purchase cost")
+			}
+		})
 	}
 }

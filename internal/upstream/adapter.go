@@ -132,6 +132,12 @@ type ReferenceOrderAdapter interface {
 	GetOrderByReference(context.Context, string) (*UpstreamOrderDetail, error)
 }
 
+// ReferenceOrderAmountAdapter adds an independent amount lookup for reconciliation.
+// Delivery polling continues to use ReferenceOrderAdapter and does not depend on it.
+type ReferenceOrderAmountAdapter interface {
+	GetOrderWithAmountByReference(context.Context, string) (*UpstreamOrderDetail, error)
+}
+
 // SingleSubmissionAdapter requires a durable claim before any balance purchase.
 type SingleSubmissionAdapter interface {
 	RequiresSingleSubmission() bool

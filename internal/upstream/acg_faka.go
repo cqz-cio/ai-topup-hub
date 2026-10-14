@@ -20,6 +20,7 @@ import (
 	siteconnectiondomain "github.com/dujiao-next/internal/modules/siteconnection/domain"
 	"github.com/dujiao-next/internal/shared/jsonmap"
 	"github.com/shopspring/decimal"
+	"golang.org/x/time/rate"
 )
 
 // ACGFakaAdapter implements the signed Shared API used by ELLAIXSHOP.
@@ -28,9 +29,15 @@ import (
 type ACGFakaAdapter struct {
 	baseURL, merchantID, secret, uploadsDir string
 	client                                  *http.Client
+	amountLimiter                           *rate.Limiter
 }
 
 var _ Adapter = (*ACGFakaAdapter)(nil)
+var _ ReferenceOrderAmountAdapter = (*ACGFakaAdapter)(nil)
+
+// The supplier's state endpoint allows 120 requests per IP per 600 seconds.
+// Share a conservative budget across adapters/jobs in this process.
+var acgAmountLimiter = rate.NewLimiter(rate.Every(6*time.Second), 5)
 
 func NewACGFakaAdapter(conn *siteconnectiondomain.Connection, uploadsDir string) (*ACGFakaAdapter, error) {
 	base, err := url.Parse(strings.TrimRight(conn.BaseURL, "/"))
@@ -42,7 +49,8 @@ func NewACGFakaAdapter(conn *siteconnectiondomain.Connection, uploadsDir string)
 	}
 	return &ACGFakaAdapter{
 		baseURL: base.String(), merchantID: conn.ApiKey, secret: conn.ApiSecret, uploadsDir: uploadsDir,
-		client: &http.Client{Timeout: 30 * time.Second, CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }},
+		client:        &http.Client{Timeout: 30 * time.Second, CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }},
+		amountLimiter: acgAmountLimiter,
 	}, nil
 }
 
@@ -73,6 +81,10 @@ func (a *ACGFakaAdapter) post(ctx context.Context, endpoint string, values url.V
 	// The merchant secret stays local; the supplier authenticates app_id and sign.
 	values.Del("app_key")
 	values.Set("sign", signACGFaka(values, a.secret))
+	return a.postForm(ctx, endpoint, values, target)
+}
+
+func (a *ACGFakaAdapter) postForm(ctx context.Context, endpoint string, values url.Values, target any) error {
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, a.baseURL+endpoint, strings.NewReader(values.Encode()))
 	if err != nil {
 		return errors.New("invalid acg-faka request")
@@ -455,22 +467,74 @@ func (a *ACGFakaAdapter) CreateOrder(ctx context.Context, request CreateUpstream
 	return result, nil
 }
 
-func (a *ACGFakaAdapter) GetOrderByReference(ctx context.Context, orderNo string) (*UpstreamOrderDetail, error) {
+type acgOrderQuery struct {
+	Secret acgString `json:"secret"`
+	Status *int      `json:"status"`
+}
+
+func (a *ACGFakaAdapter) queryOrder(ctx context.Context, orderNo string) (*UpstreamOrderDetail, *acgOrderQuery, error) {
 	if strings.TrimSpace(orderNo) == "" {
-		return nil, errors.New("supplier order number is required")
+		return nil, nil, errors.New("supplier order number is required")
 	}
-	var data struct {
-		Secret acgString `json:"secret"`
-		Status int       `json:"status"`
-	}
+	var data acgOrderQuery
 	if err := a.post(ctx, "/shared/commodity/query?tradeNo="+url.QueryEscape(orderNo), url.Values{"tradeNo": {orderNo}}, &data); err != nil {
-		return nil, err
+		return nil, nil, err
+	}
+	if data.Status == nil || (*data.Status != 0 && *data.Status != 1) {
+		return nil, nil, errors.New("acg-faka returned invalid order status")
 	}
 	result := &UpstreamOrderDetail{OrderNo: orderNo, Status: "accepted", Currency: "CNY"}
-	if data.Status == 1 && strings.TrimSpace(string(data.Secret)) != "" {
+	if *data.Status == 1 && strings.TrimSpace(string(data.Secret)) != "" {
 		result.Status = "delivered"
 		result.Fulfillment = &UpstreamFulfillment{Type: constants.FulfillmentTypeAuto, Status: "delivered", Payload: string(data.Secret)}
 	}
+	return result, &data, nil
+}
+
+func (a *ACGFakaAdapter) GetOrderByReference(ctx context.Context, orderNo string) (*UpstreamOrderDetail, error) {
+	result, _, err := a.queryOrder(ctx, orderNo)
+	return result, err
+}
+
+var acgCNYAmount = regexp.MustCompile(`^[0-9]{1,16}(\.[0-9]{1,2})?$`)
+
+func (a *ACGFakaAdapter) GetOrderWithAmountByReference(ctx context.Context, orderNo string) (*UpstreamOrderDetail, error) {
+	// Authenticate ownership before querying the public payment-state endpoint.
+	result, query, err := a.queryOrder(ctx, orderNo)
+	if err != nil {
+		return nil, err
+	}
+	if err := a.amountLimiter.Wait(ctx); err != nil {
+		return nil, errors.New("acg-faka amount query canceled or deadline exceeded")
+	}
+	var state struct {
+		OrderNo      acgString `json:"trade_no"`
+		Amount       acgString `json:"amount"`
+		Status       *int      `json:"status"`
+		Currency     string    `json:"currency"`
+		CurrencyCode string    `json:"currency_code"`
+	}
+	// This endpoint needs only the reference. Never send merchant credentials here.
+	if err := a.postForm(ctx, "/user/api/order/state", url.Values{"tradeNo": {orderNo}}, &state); err != nil {
+		return nil, err
+	}
+	if string(state.OrderNo) != orderNo || state.Status == nil || *state.Status != 1 || *query.Status != *state.Status {
+		return nil, errors.New("acg-faka amount response does not identify the same paid order")
+	}
+	// This adapter only purchases CNY. Reject an explicit conflicting currency.
+	for _, currency := range []string{state.Currency, state.CurrencyCode} {
+		if currency != "" && currency != "CNY" {
+			return nil, errors.New("acg-faka amount response has an unsupported currency")
+		}
+	}
+	if !acgCNYAmount.MatchString(string(state.Amount)) {
+		return nil, errors.New("acg-faka amount response is missing or invalid")
+	}
+	amount, err := decimal.NewFromString(string(state.Amount))
+	if err != nil {
+		return nil, errors.New("acg-faka amount response is invalid")
+	}
+	result.Amount = amount.StringFixed(2)
 	return result, nil
 }
 func (a *ACGFakaAdapter) GetOrder(ctx context.Context, id uint) (*UpstreamOrderDetail, error) {
