@@ -1875,5 +1875,23 @@
       "prior_assets_preserved": 3552
     },
     "private_report": "work/codex-runtime/amount-reconciliation/verified-report.json"
+  },
+  "invoice_announcements": {
+    "passed": true,
+    "content_source_commit": "e1106718de2f7b98cee5dae22b033190e840ad02",
+    "post_id": 1,
+    "slug": "purchase-and-agent-guide",
+    "home_announcement_version": "12351b2e",
+    "backend_release": "20261014-155607",
+    "program_deployed": false,
+    "services_restarted": false,
+    "backup": "/srv/zhixiang/backups/before-invoice-announcement-20261014-163548",
+    "local_browser_checks": 8,
+    "production_browser_checks": 9,
+    "database_table_groups_verified": 66,
+    "other_data_and_settings_preserved": true,
+    "evidence": "work/codex-runtime/invoice-announcement-20261014/",
+    "real_payment_or_procurement": false,
+    "checked_at": "2026-10-14T08:37:56.450352+00:00"
   }
 }
