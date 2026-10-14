@@ -60,16 +60,19 @@
               v-if="hasCryptoPaymentDetails"
               class="mt-4 w-full"
               :details="cryptoPaymentDetails"
+                  :usdt-payment="usdtPayment"
               :amount-copied="cryptoAmountCopied"
               :address-copied="walletAddressCopied"
               @copy-amount="handleCopyCryptoAmount"
               @copy-address="handleCopyWalletAddress"
             />
+            <UsdtTransferNotice v-if="!hasCryptoPaymentDetails" :payment="usdtPayment" class="w-full" />
           </div>
 
           <!-- 跳转链接 -->
           <div v-else class="rounded-xl border bg-secondary p-[22px]">
             <div class="mb-2.5 text-[13px] text-muted-foreground">{{ t('payment.openPayLink') }}</div>
+            <UsdtTransferNotice :payment="usdtPayment" />
             <Button size="sm" class="rounded-full" @click="handleOpenPayLink">{{ t('payment.openPayLink') }}</Button>
             <div v-if="openedPayWindow" class="mt-2.5 text-xs text-[color:var(--teal-strong)]">{{ payLinkOpenedTip }}</div>
             <div v-if="showTelegramPayHint" class="mt-2.5 text-xs text-muted-foreground">{{ t('payment.telegramExternalHint') }}</div>
@@ -256,6 +259,7 @@ import { Input } from '@/components/ui/input'
 import PaymentAmountBreakdown from '../../components/payment/PaymentAmountBreakdown.vue'
 import PaymentChannelSelector from '../../components/payment/PaymentChannelSelector.vue'
 import CryptoPaymentDetails from '../../components/payment/CryptoPaymentDetails.vue'
+import UsdtTransferNotice from '../../components/payment/UsdtTransferNotice.vue'
 import VaultCheckoutSteps from './components/VaultCheckoutSteps.vue'
 import { usePayment } from '../../composables/usePayment'
 
@@ -267,7 +271,7 @@ const {
   backLink, showGuestAuthForm, walletOnlyPayment, showBalanceOption, configReady, channels,
   selectedChannel, selectedChannelName, cachedChannelName, resultChannelName, interactionLabel,
   paymentResultTitle, paymentGuideTitle, paymentGuideTip, showPayLink, showTelegramPayHint, payLinkOpenedTip,
-  cryptoPaymentDetails, hasCryptoPaymentDetails, qrUsingPayLinkFallback, showQRCode, qrImageUrl,
+  usdtPayment, cryptoPaymentDetails, hasCryptoPaymentDetails, qrUsingPayLinkFallback, showQRCode, qrImageUrl,
   orderExpired, orderCanceled, paymentAlert, countdownExpired, countdownText, showCountdown, showResultView, pollingActive, orderItems,
   customerFeeApplied, customerFeeAmountDisplay, payableAmountDisplay, walletBalanceDisplay,
   expectedWalletPaidDisplay, expectedOnlinePayDisplay, expectedOnlinePayCents, requiresOnlineChannel,

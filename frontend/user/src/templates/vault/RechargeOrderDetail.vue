@@ -92,15 +92,19 @@
           </div>
           <div class="rounded-xl border p-[18px]">
             <div v-if="hasCryptoPaymentDetails" class="grid gap-2 rounded-md border p-3">
-              <div v-for="item in cryptoPaymentDetails" :key="item.key" class="flex justify-between gap-3 border-b pb-1.5 last:border-b-0 last:pb-0">
-                <span class="flex-none text-xs text-muted-foreground">{{ item.label }}</span>
-                <span class="break-all text-right text-[13px] font-semibold text-foreground">{{ item.value }}<span v-if="item.detail" class="text-muted-foreground"> ({{ item.detail }})</span></span>
-              </div>
+              <template v-for="item in cryptoPaymentDetails" :key="item.key">
+                <div class="flex justify-between gap-3 border-b pb-1.5 last:border-b-0 last:pb-0">
+                  <span class="flex-none text-xs text-muted-foreground">{{ item.label }}</span>
+                  <span class="break-all text-right text-[13px] font-semibold text-foreground">{{ item.value }}<span v-if="item.detail" class="text-muted-foreground"> ({{ item.detail }})</span></span>
+                </div>
+                <UsdtTransferNotice v-if="item.key === 'amount'" :payment="payment" />
+              </template>
               <div v-if="cryptoWalletAddress" class="flex items-center justify-end gap-2 pt-1.5">
                 <Button type="button" variant="outline" size="sm" class="rounded-full" @click="handleCopyWalletAddress">{{ t('payment.copyWalletAddress') }}</Button>
                 <span v-if="walletAddressCopied" class="text-xs text-[color:var(--teal-strong)]">{{ t('payment.copied') }}</span>
               </div>
             </div>
+            <UsdtTransferNotice v-if="!cryptoPaymentDetails.some(item => item.key === 'amount')" :payment="payment" />
             <div class="mt-3.5 flex flex-wrap gap-2.5">
               <Button v-if="payLink" type="button" variant="outline" size="sm" class="rounded-full" @click="handleOpenPayLink">{{ t('payment.openPayLink') }}</Button>
               <Button type="button" size="sm" class="rounded-full" :disabled="checkingPayment" @click="checkPayment">
@@ -126,6 +130,7 @@ import { useI18n } from 'vue-i18n'
 import { AlertCircle, CheckCircle2 } from 'lucide-vue-next'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import UsdtTransferNotice from '../../components/payment/UsdtTransferNotice.vue'
 import { useRechargeOrderDetail } from '../../composables/useRechargeOrderDetail'
 
 const { t } = useI18n()

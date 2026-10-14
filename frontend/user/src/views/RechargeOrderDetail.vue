@@ -102,17 +102,18 @@
             </div>
             <div class="rounded-xl border p-4">
               <div v-if="hasCryptoPaymentDetails" class="space-y-2 rounded-xl border bg-muted/40 p-3 text-sm">
-                <div
-                  v-for="item in cryptoPaymentDetails"
-                  :key="item.key"
-                  class="flex flex-col gap-1 border-b pb-2 last:border-b-0 last:pb-0"
-                >
-                  <span class="text-xs text-muted-foreground">{{ item.label }}</span>
-                  <span class="min-w-0 font-semibold text-foreground break-all">
-                    {{ item.value }}
-                    <span v-if="item.detail" class="ml-1 font-normal text-muted-foreground">({{ item.detail }})</span>
-                  </span>
-                </div>
+                <template v-for="item in cryptoPaymentDetails" :key="item.key">
+                  <div
+                    class="flex flex-col gap-1 border-b pb-2 last:border-b-0 last:pb-0"
+                  >
+                    <span class="text-xs text-muted-foreground">{{ item.label }}</span>
+                    <span class="min-w-0 font-semibold text-foreground break-all">
+                      {{ item.value }}
+                      <span v-if="item.detail" class="ml-1 font-normal text-muted-foreground">({{ item.detail }})</span>
+                    </span>
+                  </div>
+                  <UsdtTransferNotice v-if="item.key === 'amount'" :payment="payment" />
+                </template>
                 <div v-if="cryptoWalletAddress" class="flex flex-wrap items-center gap-2 pt-1">
                   <Button type="button" variant="outline" size="sm" @click="handleCopyWalletAddress">
                     {{ t('payment.copyWalletAddress') }}
@@ -120,6 +121,7 @@
                   <span v-if="walletAddressCopied" class="text-xs text-emerald-500">{{ t('payment.copied') }}</span>
                 </div>
               </div>
+              <UsdtTransferNotice v-if="!cryptoPaymentDetails.some(item => item.key === 'amount')" :payment="payment" />
               <div class="mt-4 flex flex-wrap items-center gap-3">
                 <Button v-if="payLink" type="button" variant="default" size="sm" class="font-bold" @click="handleOpenPayLink">
                   <ExternalLink class="h-4 w-4" aria-hidden="true" />
@@ -151,6 +153,7 @@ import { ExternalLink } from 'lucide-vue-next'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import EmptyState from '../components/EmptyState.vue'
+import UsdtTransferNotice from '../components/payment/UsdtTransferNotice.vue'
 import { useRechargeOrderDetail } from '../composables/useRechargeOrderDetail'
 
 const { t } = useI18n()

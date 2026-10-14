@@ -94,15 +94,18 @@
                   v-if="hasCryptoPaymentDetails"
                   class="mt-4 w-full max-w-xl"
                   :details="cryptoPaymentDetails"
+                  :usdt-payment="usdtPayment"
                   :amount-copied="cryptoAmountCopied"
                   :address-copied="walletAddressCopied"
                   @copy-amount="handleCopyCryptoAmount"
                   @copy-address="handleCopyWalletAddress"
                 />
+                <UsdtTransferNotice v-if="!hasCryptoPaymentDetails" :payment="usdtPayment" class="w-full max-w-xl" />
               </div>
 
               <div v-else class="bg-secondary border rounded-2xl p-6">
                 <div class="text-sm text-muted-foreground mb-3">{{ t('payment.openPayLink') }}</div>
+                <UsdtTransferNotice :payment="usdtPayment" />
                 <Button type="button" variant="default" class="font-bold" @click="handleOpenPayLink">
                   <ExternalLink class="h-4 w-4" aria-hidden="true" />
                   {{ t('payment.openPayLink') }}
@@ -374,12 +377,14 @@
               <div class="text-sm text-muted-foreground space-y-3">
                 <div class="text-foreground font-semibold">{{ paymentGuideTitle }}</div>
                 <div>{{ paymentGuideTip }}</div>
+                <UsdtTransferNotice v-if="!hasCryptoPaymentDetails" :payment="usdtPayment" />
                 <div v-if="qrUsingPayLinkFallback" class="text-xs text-muted-foreground">
                   {{ t('payment.qrFallbackHint') }}
                 </div>
                 <CryptoPaymentDetails
                   v-if="hasCryptoPaymentDetails"
                   :details="cryptoPaymentDetails"
+                  :usdt-payment="usdtPayment"
                   :amount-copied="cryptoAmountCopied"
                   :address-copied="walletAddressCopied"
                   @copy-amount="handleCopyCryptoAmount"
@@ -395,6 +400,7 @@
               </div>
             </div>
 
+            <UsdtTransferNotice v-if="showPayLink && !showQRCode" :payment="usdtPayment" />
             <div v-if="showPayLink" class="mt-6 flex flex-col md:flex-row md:items-center gap-3">
               <Button type="button" variant="default" class="font-bold" @click="handleOpenPayLink">
                 <ExternalLink class="h-4 w-4" aria-hidden="true" />
@@ -471,6 +477,7 @@ import { pageAlertVariant, pageAlertToneClass } from '../utils/alerts'
 import PaymentAmountBreakdown from '../components/payment/PaymentAmountBreakdown.vue'
 import PaymentChannelSelector from '../components/payment/PaymentChannelSelector.vue'
 import CryptoPaymentDetails from '../components/payment/CryptoPaymentDetails.vue'
+import UsdtTransferNotice from '../components/payment/UsdtTransferNotice.vue'
 import EmptyState from '../components/EmptyState.vue'
 import CheckoutSteps from '../components/checkout/CheckoutSteps.vue'
 import { Input } from '@/components/ui/input'
@@ -487,7 +494,7 @@ const {
   backLink, showGuestAuthForm, walletOnlyPayment, showBalanceOption, configReady, channels,
   selectedChannel, selectedChannelName, cachedChannelName, resultChannelName, interactionLabel,
   paymentResultTitle, paymentGuideTitle, paymentGuideTip, showPayLink, showTelegramPayHint, payLinkOpenedTip,
-  cryptoPaymentDetails, hasCryptoPaymentDetails, qrUsingPayLinkFallback, showQRCode, qrImageUrl,
+  usdtPayment, cryptoPaymentDetails, hasCryptoPaymentDetails, qrUsingPayLinkFallback, showQRCode, qrImageUrl,
   orderExpired, orderCanceled, paymentAlert, countdownExpired, countdownText, showCountdown, showResultView, pollingActive, orderItems,
   customerFeeApplied, customerFeeAmountDisplay, payableAmountDisplay, walletBalanceDisplay,
   expectedWalletPaidDisplay, expectedOnlinePayDisplay, expectedOnlinePayCents, requiresOnlineChannel,

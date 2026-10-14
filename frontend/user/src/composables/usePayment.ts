@@ -201,6 +201,11 @@ export function usePayment() {
   })
 
   const paymentResultTitle = computed(() => t(resolvePaymentResultTitleKey(interactionMode.value)))
+  const usdtPayment = computed(() => ({
+    ...paymentResult.value,
+    provider_type: paymentProviderType.value,
+    channel_type: paymentChannelType.value,
+  }))
   const directUSDTPayment = computed(() => directUSDTPaymentInfo(paymentProviderType.value))
   const paymentGuideTitle = computed(() => directUSDTPayment.value?.title ?? (paymentPresentationMode.value === 'redirect' ? t('payment.redirectTitle') : t('payment.qrTitle')))
   const paymentGuideTip = computed(() => directUSDTPayment.value?.tip ?? (paymentPresentationMode.value === 'redirect' ? t('payment.redirectTip') : t('payment.qrTip')))
@@ -1403,6 +1408,7 @@ export function usePayment() {
     showTelegramPayHint,
     payLinkOpenedTip,
     // crypto / qr
+    usdtPayment,
     cryptoWalletAddress,
     cryptoPaymentDetails,
     hasCryptoPaymentDetails,
