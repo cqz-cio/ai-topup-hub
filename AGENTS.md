@@ -7,7 +7,7 @@
 
 - `main` 是唯一正式源码主线，维护当前绿色 Go + Vue 商城，包含已确认的 π星卡社名称、派大星 Logo 和水母背景。用户端为 `frontend/user`，后台为 `frontend/admin`；这些品牌改动属于同一项目主版本。
 - 支付、订单、数据库和采购后端部署在腾讯云新加坡 `43.134.141.10`，账号 `ubuntu`，目录 `/srv/zhixiang`。两套前端部署在上海 `124.220.2.69` 的 `/srv/zhixiang-front`：商城 `https://www.qzweb.cloud/`，管理端 `https://124.220.2.69:18888/login`。上海通过受限 SSH 通道连接新加坡回环 API；维护说明见 `ops/tencent/README.md`。
-- 当前新加坡后端为 `20261014-145155`，程序及后台源码 `b6dcc7d1a99b3ed91b1cfeb9b468642984bcd042`；上海静态发布 `20261014-151124`，商城源码 `d2cbc34162744f6fb061524041464c4ec6718903`，后台资源保留上述来源。分销申请保持开启，已修复分销到期结算、对账及未开放功能状态，操作见 `docs/feature-availability.md`。后端使用 `-mode storefront`、`UPSTREAM_PURCHASE_ENABLED=true`。BEP20、Plasma USDT 和 XorPay 微信扫码均已启用，支持商品订单与钱包充值；微信客户手续费为 1.6% 向上取分。精确核验范围以 `ops/tencent/production-baseline.json` 为准，不把后续文档提交自动当作线上程序的 Git 版本。
+- 当前新加坡后端与上海商城、后台均为 `20261014-150947`，实际构建源码 `08cc45c4ab9b14561d48dcc350428cebc338c5d7`。TRON USDT 已启用，见 `docs/tron-usdt-payment.md`；分销申请、功能状态修复、U 到账提醒及兑换返回修复保留。后端保持 `-mode storefront`、`UPSTREAM_PURCHASE_ENABLED=true`。BEP20、Plasma、TRON USDT 和 XorPay 微信支持订单与充值，微信手续费 1.6% 向上取分。实际来源以 `ops/tencent/production-baseline.json` 为准，后续文档提交不代表程序重建。
 - 本地使用 `scripts/local/start.ps1`、`status.ps1`、`stop.ps1`，运行库为 `work/codex-runtime/live/shop.db`，本地采购关闭。旧说明位于 `docs/history/`，不能按历史文档覆盖当前环境。
 - 用户要求固定执行“先本地验证，再推送和上线”：先在日常本地入口验证实际运行程序、配置、相关数据和页面，保存验证记录；通过后才推送已验证提交并部署所需改动。后端改动须重建并重启本地后端，支付渠道及商品说明不能只在临时测试入口核验。上线后对照核验本地与生产；环境私有配置、订单和实时库存独立维护，不互相覆盖。
 - 用户已授权真实客户确认付款后的自动采购发卡，仍禁止主动提交有效采购、转账，或将验收订单改为已付款进行扣款测试。测试使用模拟供应商和临时数据库。
@@ -171,3 +171,13 @@
 1992 项 Go 回归通过（含子测试，3 项外部测试跳过），合并主线后商城 107 项、后台 60 项及两套类型构建通过。日常本地后端重建，9 项接口、14 项页面检查通过；现有本地库没有用户及分销商，财务声明未确认，相关场景使用临时数据库回归，不代签声明或新增管理员。正式站 22 项浏览器、10 项公网、9 项后端检查通过，覆盖 1920、390、320px；原定价下拉框导航也已复查。
 
 切换时 35 组业务数据和全部私有配置与备份一致，Redis 未重启，支付渠道、售价、采购队列和库存 timer 保留。核验 445 个前端文件、4045 个保留文件及 54 个 Nginx 文件。备份 `/srv/zhixiang/backups/before-feature-availability-20261014-145155`、`/srv/zhixiang-front/backups/before-feature-availability-return-20261014-151124`，首次前端备份 `/srv/zhixiang-front/backups/before-feature-availability-20261014-145155`；私有报告 `work/codex-runtime/feature-availability/verified-report.json`。未上传本机库、提交正式验收订单、付款采购、提现或发送通知。
+
+## TRON USDT 支付（2026-10-14）
+
+2026-10-14 已上线 TRON（TRC20）USDT，正式渠道 ID 4，支持游客/会员商品付款及钱包充值。收款地址 `TQmtYPYUySY1ABLTdtcGMFEyTtzFjAFUpn`，仅识别官方 USDT 合约 `TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t`，精度 6，汇率 `6.649820455`、确认数 15。十款已支持 USDT 且显式限制渠道的商品在原列表追加 TRON，原微信选择范围、售价、成本及其他商品字段保留。
+
+新加坡后端及上海两套前端发布均为 `20261014-150947`，干净构建源码 `08cc45c4ab9b14561d48dcc350428cebc338c5d7`。1659 项相关 Go 回归（含子测试，1 项跳过）、商城 108 项、后台 60 项及两套类型构建通过；日常本机验证 9 笔未付款订单/充值单、二维码、金额复制、刷新与扫描游标，临时记录已清理。完整 Go 测试仍有 Windows 文件锁、CGO SQLite 与 Linux 自更新测试环境限制，不声称全库全部通过。
+
+正式 445 个发布文件、4233 个保留文件、54 个 Nginx 文件、15 项服务器 HTTPS 检查及 1920/390/320px 结算页面通过，无脚本错误或横向溢出。两个 TRON 只读监控接口验证成功；尚无正式 TRON 支付单，正式游标未初始化。Redis 未重启，storefront、采购队列、库存 timer 和原三条渠道保留。并行的手续费提醒及兑换返回修复已包含。本地财务声明未代签，未上传本机库、提交正式验收订单、转账或有效采购；真实资金验收仍未完成。
+
+后端备份 `/srv/zhixiang/backups/before-tron-usdt-20261014-150947-retry2`（首次启用前备份无 `-retry2` 后缀），前端备份 `/srv/zhixiang-front/backups/before-tron-usdt-20261014-150947`，商品渠道范围备份 `/srv/zhixiang/backups/before-tron-product-channels-20261014-1525`。私有报告与截图 `work/codex-runtime/tron-usdt/verified-report.json` 及同目录文件。首次发布因权限快照和公开配置旧缓存触发回退；最终按权限语义比对并只刷新主站公开配置缓存后通过。

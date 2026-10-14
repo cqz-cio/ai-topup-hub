@@ -28,3 +28,15 @@
 模拟联调与公共回执查询不代表经营者收款地址已完成真实资金验收。发布信息与本地、线上核验结果以发布记录为准。
 
 依据：[Tether 官方合约](https://tether.to/en/supported-protocols/)、[TRON 钱包接入](https://developers.tron.network/docs/exchangewallet-integrate-with-the-tron-network)、[PublicNode TRON](https://tron.publicnode.com/)。
+
+## 正式启用（2026-10-14）
+
+2026-10-14 已上线 TRON（TRC20）USDT，正式渠道 ID 4，支持游客/会员商品付款及钱包充值。收款地址 `TQmtYPYUySY1ABLTdtcGMFEyTtzFjAFUpn`，仅识别官方 USDT 合约 `TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t`，精度 6，汇率 `6.649820455`、确认数 15。十款已支持 USDT 且显式限制渠道的商品在原列表追加 TRON，原微信选择范围、售价、成本及其他商品字段保留。
+
+新加坡后端及上海两套前端发布均为 `20261014-150947`，干净构建源码 `08cc45c4ab9b14561d48dcc350428cebc338c5d7`。1659 项相关 Go 回归（含子测试，1 项跳过）、商城 108 项、后台 60 项及两套类型构建通过；日常本机验证 9 笔未付款订单/充值单、二维码、金额复制、刷新与扫描游标，临时记录已清理。完整 Go 测试仍有 Windows 文件锁、CGO SQLite 与 Linux 自更新测试环境限制，不声称全库全部通过。
+
+正式 445 个发布文件、4233 个保留文件、54 个 Nginx 文件、15 项服务器 HTTPS 检查及 1920/390/320px 结算页面通过，无脚本错误或横向溢出。两个 TRON 只读监控接口验证成功；尚无正式 TRON 支付单，正式游标未初始化。Redis 未重启，storefront、采购队列、库存 timer 和原三条渠道保留。并行的手续费提醒及兑换返回修复已包含。本地财务声明未代签，未上传本机库、提交正式验收订单、转账或有效采购；真实资金验收仍未完成。
+
+后端备份 `/srv/zhixiang/backups/before-tron-usdt-20261014-150947-retry2`（首次启用前备份无 `-retry2` 后缀），前端备份 `/srv/zhixiang-front/backups/before-tron-usdt-20261014-150947`，商品渠道范围备份 `/srv/zhixiang/backups/before-tron-product-channels-20261014-1525`。私有报告与截图 `work/codex-runtime/tron-usdt/verified-report.json` 及同目录文件。首次发布因权限快照和公开配置旧缓存触发回退；最终按权限语义比对并只刷新主站公开配置缓存后通过。
+
+商品限制在后台商品编辑处维护；仅创建渠道不一定使受限商品可用。本地与生产渠道编号独立，不能直接复制编号。重启不会重新启用运营者主动关闭的渠道。
