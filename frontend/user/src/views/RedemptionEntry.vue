@@ -28,7 +28,7 @@ onMounted(reload)
       <h1 class="text-2xl font-bold">{{ t('featureAvailability.redemptionTitle') }}</h1>
       <p class="mt-4 text-sm leading-7 text-muted-foreground">{{ t(loading ? 'featureAvailability.loading' : enabled === false ? 'featureAvailability.redemptionClosed' : 'featureAvailability.loadFailed') }}</p>
       <div class="mt-6 flex flex-wrap gap-3">
-        <Button as-child><RouterLink to="/">{{ t('featureAvailability.backToStore') }}</RouterLink></Button>
+        <Button as-child><a href="/">{{ t('featureAvailability.backToStore') }}</a></Button>
         <Button v-if="enabled === null" variant="outline" :disabled="loading" @click="reload">{{ t('orders.filters.refresh') }}</Button>
       </div>
     </section>
