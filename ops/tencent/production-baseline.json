@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-14T03:03:14.037843+00:00",
+  "checked_at": "2026-10-14T03:28:37.653607+00:00",
   "production_url": "https://www.qzweb.cloud/",
   "documented_release_id": "20261014-105629",
   "verified_release_id": "20261014-105629",
@@ -162,54 +162,27 @@
     }
   },
   "pages": [
-    "https://www.qzweb.cloud/reseller/apply",
-    "https://www.qzweb.cloud/reseller",
-    "https://124.220.2.69:18888/resellers/operations",
-    "https://124.220.2.69:18888/resellers/profiles"
+    "https://www.qzweb.cloud/reseller/products",
+    "https://www.qzweb.cloud/products",
+    "https://124.220.2.69:18888/login"
   ],
   "verified_asset_sha256": {
-    "user/index.html": "4fef6fbcbfaaf90b4620a67b60693c793e94d3818e2a2cee8b720983772e03ae",
+    "user/index.html": "6b36824bd7462230e6f3717fd398d7fea2f9c08c5f5bc02b7cc9fb4b83bac100",
     "admin/index.html": "7e27d512dc2082117ebb8bda8191b50d5a15744f5d43ada75ec60d861e4fa756"
   },
   "public_verification": {
-    "checked_at": "2026-10-14T03:03:14.037843+00:00",
-    "http_checks_passed": 10,
-    "backend_runtime_checks_passed": 9,
-    "frontend_server_checks_passed": 15,
-    "browser_checks": {
-      "checked_at": "2026-10-14T03:03:14.037843+00:00",
-      "existing_authenticated_user_session": true,
-      "existing_authenticated_admin_session": true,
-      "initial_application_form_visible": true,
-      "initial_submit_button_enabled": true,
-      "original_permission_error_absent": true,
-      "admin_feature_enabled": true,
-      "admin_applications_open": true,
-      "user_dashboard_navigation_verified": true,
-      "observed_real_application_pending_then_approved": true,
-      "observed_application_created_at_local": "2026-10-14 11:01:10",
-      "observed_application_approved_at_local": "2026-10-14 11:01:44",
-      "agent_submitted_application": false,
-      "agent_approved_application": false,
-      "approved_application_form_absent": true,
-      "user_viewports": [
-        1920,
-        390,
-        320
-      ],
-      "admin_viewports": [
-        1920,
-        390,
-        320
-      ],
-      "horizontal_overflow": false,
-      "browser_error_logs": 0,
-      "viewport_restored": true,
-      "temporary_browser_tab_closed": true,
-      "evidence": "CUA snapshots and screenshots in this task transcript; local screenshots under this report directory"
-    },
-    "verification_directory": "work/codex-runtime/reseller-application-release/",
+    "checked_at": "2026-10-14T03:28:37.653607+00:00",
+    "http_checks_passed": 14,
+    "frontend_server_checks_passed": 6,
+    "browser_checks_passed": 8,
+    "viewports": [
+      1920,
+      390,
+      320
+    ],
+    "verification_directory": "work/codex-runtime/dropdown-scroll/",
     "production_order_submitted": false,
+    "price_rules_saved": false,
     "browser_error_count": 0
   },
   "catalog": {
@@ -357,12 +330,12 @@
   "previous_build_verification_at": "2026-10-12T08:19:31.766441+00:00",
   "management_url": "https://124.220.2.69:18888/login",
   "frontend_gateway": {
-    "checked_at": "2026-10-14T03:03:14.037843+00:00",
+    "checked_at": "2026-10-14T03:28:37.653607+00:00",
     "frontend_host": "124.220.2.69",
     "backend_host": "43.134.141.10",
-    "frontend_release": "20261014-105629",
-    "source_commit": "1be05e228bc34336cfc86e7c7c5558ac3dac5609",
-    "static_files_verified": 442,
+    "frontend_release": "20261014-112316",
+    "source_commit": "cad9c4020d7a70240ffa3c9ec853349c28c27971",
+    "static_files_verified": 1104,
     "storefront_url": "https://www.qzweb.cloud/",
     "management_url": "https://124.220.2.69:18888/login",
     "www_dns_record": "www A 124.220.2.69",
@@ -378,7 +351,7 @@
     "certificate_renewal_verified": true,
     "certificate_timer": "qzweb-certificates.timer",
     "certificate_renewal_report": "/srv/zhixiang-front/shared/work/renew-final-20261012-1644/status.json",
-    "report_path": "/srv/zhixiang-front/shared/work/reseller-applications-20261014-105629.json",
+    "report_path": "/srv/zhixiang-front/shared/work/dropdown-scroll-20261014-112316.json",
     "backend_report_path": "/srv/zhixiang/shared/reports/reseller-applications-release-20261014-105629.json",
     "formal_alipay_enabled": false,
     "database_uploaded": false,
@@ -392,33 +365,32 @@
       "browser_current_frontend_confirmed": true,
       "report_path": "/srv/zhixiang-front/shared/work/entry-cache-report.json"
     },
-    "previous_frontend_release": "20261013-174612",
-    "storefront_source_commit": "1be05e228bc34336cfc86e7c7c5558ac3dac5609",
+    "previous_frontend_release": "20261014-105629",
+    "storefront_source_commit": "cad9c4020d7a70240ffa3c9ec853349c28c27971",
     "admin_source_commit": "1be05e228bc34336cfc86e7c7c5558ac3dac5609",
-    "backup": "/srv/zhixiang-front/backups/before-reseller-applications-20261014-105629",
-    "frontend_only_update": false,
+    "backup": "/srv/zhixiang-front/backups/before-dropdown-scroll-20261014-112316",
+    "frontend_only_update": true,
     "previous_hashed_assets_retained": true,
     "verified_services": {
       "nginx": "active",
       "zhixiang-api-tunnel": "active",
       "qzweb-certificates.timer": "active"
     },
-    "release_scope": "Reseller application availability, explicit user states and live admin feature status",
-    "admin_files_verified": 119,
+    "release_scope": "Storefront dropdown scroll locking preserves sticky topbar and sidebar",
+    "admin_files_verified": 781,
     "storefront_files_verified": 323,
-    "backend_program_preserved": false,
-    "backend_setting_changes": [
-      "reseller"
-    ],
-    "frontend_build_source_commit": "1be05e228bc34336cfc86e7c7c5558ac3dac5609",
-    "frontend_source_identical_to_backend": true,
+    "backend_program_preserved": true,
+    "backend_setting_changes": [],
+    "frontend_build_source_commit": "cad9c4020d7a70240ffa3c9ec853349c28c27971",
+    "frontend_source_identical_to_backend": false,
     "admin_base": "/",
     "base_repair_backup": "/srv/zhixiang-front/backups/before-xorpay-admin-base-20261013-173020",
-    "all_storefront_files": 2223,
+    "all_storefront_files": 2605,
     "last_backend_release_preservation_check": {
-      "checked_at": "2026-10-14T03:03:14.037843+00:00",
+      "checked_at": "2026-10-14T03:28:37.653607+00:00",
       "release": "20261014-105629",
-      "scope": "Backend and both frontends updated from the same clean source; nginx unchanged"
+      "binary_sha256": "a898764f5250a2c711f9a673ff40589bb38f57ebd9f9c19ad42e68165f90b645",
+      "scope": "Backend/Redis processes, full config and 28 business snapshots unchanged; frontend only"
     }
   },
   "alipay": {
@@ -1156,26 +1128,43 @@
     "database_uploaded": false
   },
   "previous_public_verification": {
-    "checked_at": "2026-10-14T00:58:54.773879+00:00",
-    "http_checks_passed": 8,
-    "guard_checks_passed": 11,
+    "checked_at": "2026-10-14T03:03:14.037843+00:00",
+    "http_checks_passed": 10,
+    "backend_runtime_checks_passed": 9,
+    "frontend_server_checks_passed": 15,
     "browser_checks": {
-      "registration_captcha_loaded": true,
-      "captcha_width": 240,
-      "login_form_visible": true,
-      "admin_existing_session_valid": true,
-      "payment_channels_visible": [
-        "bscusdt",
-        "plasmausdt",
-        "xorpay"
+      "checked_at": "2026-10-14T03:03:14.037843+00:00",
+      "existing_authenticated_user_session": true,
+      "existing_authenticated_admin_session": true,
+      "initial_application_form_visible": true,
+      "initial_submit_button_enabled": true,
+      "original_permission_error_absent": true,
+      "admin_feature_enabled": true,
+      "admin_applications_open": true,
+      "user_dashboard_navigation_verified": true,
+      "observed_real_application_pending_then_approved": true,
+      "observed_application_created_at_local": "2026-10-14 11:01:10",
+      "observed_application_approved_at_local": "2026-10-14 11:01:44",
+      "agent_submitted_application": false,
+      "agent_approved_application": false,
+      "approved_application_form_absent": true,
+      "user_viewports": [
+        1920,
+        390,
+        320
       ],
-      "wechat_fee_visible": "1.60%",
-      "console_errors": 0,
-      "real_email_sent": false,
-      "real_registration_created": false,
-      "real_payment_or_purchase_performed": false
+      "admin_viewports": [
+        1920,
+        390,
+        320
+      ],
+      "horizontal_overflow": false,
+      "browser_error_logs": 0,
+      "viewport_restored": true,
+      "temporary_browser_tab_closed": true,
+      "evidence": "CUA snapshots and screenshots in this task transcript; local screenshots under this report directory"
     },
-    "verification_directory": "work/codex-runtime/security-release/",
+    "verification_directory": "work/codex-runtime/reseller-application-release/",
     "production_order_submitted": false,
     "browser_error_count": 0
   },
@@ -1346,6 +1335,73 @@
     "local_database_uploaded": false,
     "agent_created_production_business_records": false,
     "operator_application_created_after_release_preserved": true,
+    "real_payment_or_purchase_performed": false
+  },
+  "dropdown_scroll": {
+    "checked_at": "2026-10-14T03:28:37.653607+00:00",
+    "release": "20261014-112316",
+    "scope": "storefront only: dropdown scroll lock and sticky navigation",
+    "source_commit": "cad9c4020d7a70240ffa3c9ec853349c28c27971",
+    "source_dirty": false,
+    "backend_release": "20261014-105629",
+    "admin_source_commit": "1be05e228bc34336cfc86e7c7c5558ac3dac5609",
+    "backend_backup": "/srv/zhixiang/backups/before-dropdown-scroll-20261014-112316",
+    "frontend_backup": "/srv/zhixiang-front/backups/before-dropdown-scroll-20261014-112316",
+    "local": {
+      "checked_at": "2026-10-14T03:22:51.110803+00:00",
+      "source_commit": "cad9c4020d7a70240ffa3c9ec853349c28c27971",
+      "daily_entries": [
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:8080"
+      ],
+      "user_tests": 104,
+      "typecheck_and_build_passed": true,
+      "browser_checks": 11,
+      "browser_errors": 0,
+      "viewports": [
+        1920,
+        390,
+        320
+      ],
+      "cleanup": {
+        "temporary_records_removed": true,
+        "unchanged_tables": 65,
+        "natural_runtime_changes": [
+          "chain_payment_cursors"
+        ],
+        "price_rules_saved": false,
+        "order_created": false
+      },
+      "logs": {
+        "dropdown-tests": "work\\codex-logs\\reseller-dropdown-tests-20261014-111642.log",
+        "dropdown-build": "work\\codex-logs\\reseller-dropdown-build-20261014-111651.log"
+      }
+    },
+    "production_browser_checks": 8,
+    "viewports": [
+      1920,
+      390,
+      320
+    ],
+    "browser_error_count": 0,
+    "public_http_checks": 14,
+    "frontend_server_http_checks": 6,
+    "new_storefront_files_verified": 323,
+    "admin_files_preserved": 781,
+    "nginx_files_preserved": 54,
+    "business_groups_unchanged": 28,
+    "snapshot_ignored_columns": {
+      "site_connections": [
+        "last_ping_at",
+        "updated_at"
+      ]
+    },
+    "backend_and_redis_pids_preserved": true,
+    "configuration_preserved": true,
+    "reseller_applications_enabled": true,
+    "price_rules_saved": false,
+    "production_business_writes": false,
+    "local_database_uploaded": false,
     "real_payment_or_purchase_performed": false
   }
 }

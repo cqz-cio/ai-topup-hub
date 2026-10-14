@@ -7,7 +7,7 @@
 
 - `main` 是唯一正式源码主线，维护当前绿色 Go + Vue 商城，包含已确认的 π星卡社名称、派大星 Logo 和水母背景。用户端为 `frontend/user`，后台为 `frontend/admin`；这些品牌改动属于同一项目主版本。
 - 支付、订单、数据库和采购后端部署在腾讯云新加坡 `43.134.141.10`，账号 `ubuntu`，目录 `/srv/zhixiang`。两套前端部署在上海 `124.220.2.69` 的 `/srv/zhixiang-front`：商城 `https://www.qzweb.cloud/`，管理端 `https://124.220.2.69:18888/login`。上海通过受限 SSH 通道连接新加坡回环 API；维护说明见 `ops/tencent/README.md`。
-- 当前新加坡后端与上海两套前端均为 `20261014-105629`，程序、内嵌资源和独立静态资源均来自干净源码 `1be05e228bc34336cfc86e7c7c5558ac3dac5609`。分销功能与用户申请已开启，提交后仍需后台审核；操作见 `docs/reseller-applications.md`。后端使用 `-mode storefront`、`UPSTREAM_PURCHASE_ENABLED=true`。BEP20、Plasma USDT 和 XorPay 微信扫码均已启用，支持商品订单与钱包充值；微信客户手续费为 1.6% 向上取分。精确核验范围以 `ops/tencent/production-baseline.json` 为准，不把后续文档提交自动当作线上程序的 Git 版本。
+- 当前新加坡后端为 `20261014-105629`，程序及内嵌资源源码 `1be05e228bc34336cfc86e7c7c5558ac3dac5609`；上海静态发布 `20261014-112316`，商城源码 `cad9c4020d7a70240ffa3c9ec853349c28c27971`，后台资源保留上述 `1be05e2` 来源。分销功能与用户申请已开启，提交后仍需后台审核；操作见 `docs/reseller-applications.md`。后端使用 `-mode storefront`、`UPSTREAM_PURCHASE_ENABLED=true`。BEP20、Plasma USDT 和 XorPay 微信扫码均已启用，支持商品订单与钱包充值；微信客户手续费为 1.6% 向上取分。精确核验范围以 `ops/tencent/production-baseline.json` 为准，不把后续文档提交自动当作线上程序的 Git 版本。
 - 本地使用 `scripts/local/start.ps1`、`status.ps1`、`stop.ps1`，运行库为 `work/codex-runtime/live/shop.db`，本地采购关闭。旧说明位于 `docs/history/`，不能按历史文档覆盖当前环境。
 - 用户要求固定执行“先本地验证，再推送和上线”：先在日常本地入口验证实际运行程序、配置、相关数据和页面，保存验证记录；通过后才推送已验证提交并部署所需改动。后端改动须重建并重启本地后端，支付渠道及商品说明不能只在临时测试入口核验。上线后对照核验本地与生产；环境私有配置、订单和实时库存独立维护，不互相覆盖。
 - 用户已授权真实客户确认付款后的自动采购发卡，仍禁止主动提交有效采购、转账，或将验收订单改为已付款进行扣款测试。测试使用模拟供应商和临时数据库。
@@ -145,3 +145,9 @@
 - 主站域名、服务器 IP 与回环地址须保留在 `main_hosts`，保持 `trusted_forwarded_host=false`；`subdomain_base` 为空，不代表泛域名 DNS/TLS 或自定义域名接入已完成。
 - 本机 25 项接口与浏览器验证、1853 项相关 Go 回归（含子测试，3 项跳过）、商城 104 项、后台 58 项及两套类型构建通过。正式 10 项公网、9 项后端、15 项服务器页面资源检查，以及 1920、390、320px 实际页面通过；额外全库运行存在 Windows/CGO 等限制，不宣称全库全部通过。
 - 切换时 28 组业务快照一致，配置只新增 `reseller`；442 个新资源、2905 个保留文件与 54 个 Nginx 文件通过核验。上线后运营者自行提交并审核通过的新申请已保留，助手没有代提交或代审批。两地备份均为各自 `backups/before-reseller-applications-20261014-105629`，证据 `work/codex-runtime/reseller-application-release/verified-report.json`。Redis、支付采购队列及库存 timer 保留，未上传本地库或执行真实付款采购。
+
+## 分销定价下拉框导航修复（2026-10-14）
+
+- 上海商城发布 `20261014-112316`，干净源码 `cad9c4020d7a70240ffa3c9ec853349c28c27971`。根元素保留 `scrollbar-gutter: stable`，移除强制 `overflow-y: scroll`；Reka `ConfigProvider` 关闭重复的滚动条 padding/margin 补偿，保持组件原有滚动锁定与焦点行为。长页面展开商品级/SKU 下拉框时，顶栏、侧栏与页面位置保持稳定。见 `docs/dropdown-scroll.md`。
+- 先完成日常本机 11 项浏览器检查、104 项商城测试及类型构建，再推送部署。正式 8 项浏览器、14 项公网和 6 项服务器页面检查通过，覆盖 1920、390、320px；无脚本错误。323 个商城文件、781 个保留后台文件和 54 个 Nginx 文件核验通过。
+- 新加坡后端保持 `20261014-105629`，后端与 Redis 进程未变，分销申请继续开启；28 组业务数据和配置与备份一致。两地备份均为各自 `backups/before-dropdown-scroll-20261014-112316`，证据 `work/codex-runtime/dropdown-scroll/verified-report.json`。临时本地账号已清理，未保存验收定价规则、上传本地库或执行付款采购。
