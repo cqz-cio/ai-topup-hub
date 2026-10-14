@@ -206,7 +206,7 @@
 }
 
 html {
-  overflow-y: scroll;
+  /* Let body scroll locks apply to the viewport so sticky navigation stays anchored. */
   scrollbar-gutter: stable;
 }
 

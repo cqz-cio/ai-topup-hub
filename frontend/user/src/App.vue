@@ -1,22 +1,11 @@
 <template>
-  <div id="app" class="min-h-screen bg-background text-foreground flex flex-col"
-    :class="{ 'brand-scene': !isStandalone && !isVault && !isResellerConsole && !appStore.isResellerTenant }">
-    <ErrorBoundary v-if="isStandalone"><RouterView /></ErrorBoundary>
-    <!-- vault 模板：自带顶栏/页脚的外壳包裹页面（控制台仍走下方分支） -->
-    <VaultLayout v-else-if="isVault && !isResellerConsole">
-      <ErrorBoundary>
-        <RouterView v-slot="{ Component }">
-          <Transition name="page-fade" mode="out-in">
-            <component :is="Component" />
-          </Transition>
-        </RouterView>
-      </ErrorBoundary>
-    </VaultLayout>
-
-    <!-- classic 模板 / 分销控制台（保持原有结构不变） -->
-    <template v-else>
-      <Navbar v-if="!isResellerConsole" />
-      <main class="flex-1" :class="isResellerConsole ? '' : 'pb-14 xl:pb-0'">
+  <!-- The root's stable scrollbar gutter already reserves space during body scroll locks. -->
+  <ConfigProvider :scroll-body="{ padding: 0, margin: 0 }">
+    <div id="app" class="min-h-screen bg-background text-foreground flex flex-col"
+      :class="{ 'brand-scene': !isStandalone && !isVault && !isResellerConsole && !appStore.isResellerTenant }">
+      <ErrorBoundary v-if="isStandalone"><RouterView /></ErrorBoundary>
+      <!-- vault 模板：自带顶栏/页脚的外壳包裹页面（控制台仍走下方分支） -->
+      <VaultLayout v-else-if="isVault && !isResellerConsole">
         <ErrorBoundary>
           <RouterView v-slot="{ Component }">
             <Transition name="page-fade" mode="out-in">
@@ -24,20 +13,35 @@
             </Transition>
           </RouterView>
         </ErrorBoundary>
-      </main>
-      <Footer v-if="!isResellerConsole" />
-      <BackToTop v-if="!isResellerConsole" />
-      <MobileBottomNav v-if="!isResellerConsole" />
-    </template>
+      </VaultLayout>
 
-    <Loading :loading="appStore.loading" />
-    <Toast />
-    <ConfirmDialog />
-  </div>
+      <!-- classic 模板 / 分销控制台（保持原有结构不变） -->
+      <template v-else>
+        <Navbar v-if="!isResellerConsole" />
+        <main class="flex-1" :class="isResellerConsole ? '' : 'pb-14 xl:pb-0'">
+          <ErrorBoundary>
+            <RouterView v-slot="{ Component }">
+              <Transition name="page-fade" mode="out-in">
+                <component :is="Component" />
+              </Transition>
+            </RouterView>
+          </ErrorBoundary>
+        </main>
+        <Footer v-if="!isResellerConsole" />
+        <BackToTop v-if="!isResellerConsole" />
+        <MobileBottomNav v-if="!isResellerConsole" />
+      </template>
+
+      <Loading :loading="appStore.loading" />
+      <Toast />
+      <ConfirmDialog />
+    </div>
+  </ConfigProvider>
 </template>
 
 <script setup lang="ts">
 import { computed, defineAsyncComponent } from 'vue'
+import { ConfigProvider } from 'reka-ui'
 import { useRoute } from 'vue-router'
 import { useAppStore } from './stores/app'
 import { getActiveTemplate } from './templates/registry'
