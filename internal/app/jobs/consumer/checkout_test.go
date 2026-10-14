@@ -28,13 +28,13 @@ func TestCheckoutWorkerCannotConsumeProcurement(t *testing.T) {
 func TestStorefrontWorkerConsumesPaidOrderProcurementWithoutStockTasks(t *testing.T) {
 	mux := asynq.NewServeMux()
 	New(&container.Container{}).RegisterStorefront(mux)
-	for _, taskType := range []string{queue.TaskOrderTimeoutCancel, queue.TaskProcurementSubmit, queue.TaskProcurementPollStatus, queue.TaskProcurementRecover, queue.TaskDownstreamCallback} {
+	for _, taskType := range []string{queue.TaskOrderTimeoutCancel, queue.TaskProcurementSubmit, queue.TaskProcurementPollStatus, queue.TaskProcurementRecover, queue.TaskDownstreamCallback, queue.TaskResellerConfirmLedger, queue.TaskAffiliateConfirmCommissions, queue.TaskReconciliationRun} {
 		_, pattern := mux.Handler(asynq.NewTask(taskType, nil))
 		if pattern != taskType {
 			t.Fatalf("storefront task %q is not registered", taskType)
 		}
 	}
-	for _, taskType := range []string{queue.TaskUpstreamSyncStock, queue.TaskReconciliationRun, queue.TaskTelegramBroadcast} {
+	for _, taskType := range []string{queue.TaskUpstreamSyncStock, queue.TaskTelegramBroadcast} {
 		_, pattern := mux.Handler(asynq.NewTask(taskType, nil))
 		if pattern != "" {
 			t.Fatalf("storefront consumed unrelated task %q", taskType)

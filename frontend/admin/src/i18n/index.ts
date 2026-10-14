@@ -1,4 +1,5 @@
 import { createI18n } from 'vue-i18n'
+import { featureAvailability } from './featureAvailability'
 import { adminBrandMessages } from './adminBrand'
 
 const messages = {
@@ -13436,6 +13437,10 @@ const sanitizeLinkedMessage = <T>(value: T): T => {
     return next as T
   }
   return value
+}
+
+for (const locale of ['zh-CN', 'zh-TW', 'en-US'] as const) {
+  Object.assign(messages[locale], { featureAvailability: featureAvailability[locale] })
 }
 
 const i18n = createI18n({

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/dujiao-next/internal/constants"
 	"github.com/dujiao-next/internal/logger"
@@ -25,22 +26,29 @@ func (s *Service) execute(ctx context.Context, job *reconciliationdomain.Job) er
 	}
 
 	mismatches := make([]reconciliationdomain.Item, 0)
-	skippedCount, errorCount := 0, 0
+	skippedCount, errorCount, uncheckedAmountCount, matchedCount := 0, 0, 0, 0
 	for index := range orders {
 		order := &orders[index]
-		if order.UpstreamOrderID == 0 {
+		if order.UpstreamOrderID == 0 && strings.TrimSpace(order.UpstreamOrderNo) == "" {
 			skippedCount++
 			continue
 		}
-		detail, err := upstreamOrders.Get(ctx, order.UpstreamOrderID)
-		if err != nil {
+		detail, err := upstreamOrders.Get(ctx, order.UpstreamOrderID, order.UpstreamOrderNo)
+		if err != nil || detail == nil || strings.TrimSpace(detail.Status) == "" {
 			logger.Warnw("reconciliation_get_upstream_order_failed", "job_id", job.ID,
 				"procurement_id", order.ID, "upstream_order_id", order.UpstreamOrderID, "error", err)
 			errorCount++
 			continue
 		}
+		amount, amountErr := decimal.NewFromString(strings.TrimSpace(detail.Amount))
+		uncheckedAmount := (job.Type == constants.ReconciliationTypeAmount || job.Type == constants.ReconciliationTypeFull) && (amountErr != nil || amount.IsNegative())
+		if uncheckedAmount {
+			uncheckedAmountCount++
+		}
 		if item := compareOrder(job, order, detail); item != nil {
 			mismatches = append(mismatches, *item)
+		} else if !uncheckedAmount {
+			matchedCount++
 		}
 	}
 	if len(mismatches) > 0 {
@@ -49,14 +57,16 @@ func (s *Service) execute(ctx context.Context, job *reconciliationdomain.Job) er
 		}
 	}
 
-	comparedCount := len(orders) - skippedCount - errorCount
-	job.TotalCount = comparedCount
+	job.TotalCount = len(orders)
 	job.MismatchedCount = len(mismatches)
-	job.MatchedCount = comparedCount - job.MismatchedCount
+	job.MatchedCount = matchedCount
 	job.ResultJSON = marshalResult(map[string]any{
 		"total": job.TotalCount, "matched": job.MatchedCount, "mismatched": job.MismatchedCount,
-		"skipped": skippedCount, "errors": errorCount,
+		"skipped": skippedCount, "errors": errorCount, "unchecked_amount": uncheckedAmountCount,
 	})
+	if skippedCount+errorCount+uncheckedAmountCount > 0 {
+		return reconciliationcontract.ErrIncompleteResults
+	}
 	return nil
 }
 
@@ -68,8 +78,8 @@ func compareOrder(job *reconciliationdomain.Job, order *reconciliationcontract.P
 	amountMismatch := false
 	var upstreamAmount money.Amount
 	if checkAmount && detail.Amount != "" {
-		value, err := decimal.NewFromString(detail.Amount)
-		if err == nil && value.IsPositive() && order.UpstreamAmount.IsPositive() {
+		value, err := decimal.NewFromString(strings.TrimSpace(detail.Amount))
+		if err == nil && !value.IsNegative() {
 			upstreamAmount = money.FromDecimal(value)
 			amountMismatch = !order.UpstreamAmount.Equal(value)
 		}

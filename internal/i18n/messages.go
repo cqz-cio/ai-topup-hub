@@ -16,6 +16,7 @@ const (
 
 var messages = map[string]map[string]string{
 	LocaleZH: {
+		"error.feature_unavailable":                      "此功能暂未开放，请联系平台管理员。",
 		"error.jwt_secret_missing":                       "JWT secret 未配置",
 		"error.auth_header_missing":                      "缺少 Authorization header",
 		"error.auth_header_invalid":                      "Authorization header 格式错误",
@@ -375,6 +376,7 @@ var messages = map[string]map[string]string{
 		"error.invalid_product_status":           "无效的商品状态参数",
 	},
 	LocaleTW: {
+		"error.feature_unavailable":                      "此功能暫未開放，請聯絡平台管理員。",
 		"error.jwt_secret_missing":                       "JWT secret 未配置",
 		"error.auth_header_missing":                      "缺少 Authorization header",
 		"error.auth_header_invalid":                      "Authorization header 格式錯誤",
@@ -734,6 +736,7 @@ var messages = map[string]map[string]string{
 		"error.invalid_product_status":           "無效的商品狀態參數",
 	},
 	LocaleEN: {
+		"error.feature_unavailable":                      "This feature is not available. Please contact the administrator.",
 		"error.jwt_secret_missing":                       "JWT secret is not configured",
 		"error.auth_header_missing":                      "Missing Authorization header",
 		"error.auth_header_invalid":                      "Invalid Authorization header format",

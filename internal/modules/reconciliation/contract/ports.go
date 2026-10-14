@@ -30,7 +30,7 @@ type UpstreamOrderProvider interface {
 }
 
 type UpstreamOrderReader interface {
-	Get(ctx context.Context, upstreamOrderID uint) (*UpstreamOrder, error)
+	Get(ctx context.Context, upstreamOrderID uint, upstreamOrderNo string) (*UpstreamOrder, error)
 }
 
 type Enqueuer interface {

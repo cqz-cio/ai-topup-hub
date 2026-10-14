@@ -2,6 +2,8 @@
 import { reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { adminAPI } from '@/api/admin'
+import { useRuntimeFeatures } from '@/composables/useRuntimeFeatures'
+import FeatureAvailability from '@/components/FeatureAvailability.vue'
 import type { AdminProduct } from '@/api/types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -13,6 +15,7 @@ import { getLocalizedText } from '@/utils/format'
 import { notifyError, notifySuccess } from '@/utils/notify'
 
 const { t } = useI18n()
+const runtime = useRuntimeFeatures()
 
 const supportedLanguages = ['zh-CN', 'zh-TW', 'en-US'] as const
 type SupportedLanguage = (typeof supportedLanguages)[number]
@@ -341,7 +344,8 @@ defineExpose({ save, submitting })
 
         <div class="rounded-xl border border-border bg-muted/20 p-4">
           <h3 class="text-sm font-semibold">{{ t('admin.settings.notification.inventory.title') }}</h3>
-          <div class="mt-4 grid grid-cols-1 gap-6 md:grid-cols-2">
+          <FeatureAvailability class="mt-4" :state="runtime" feature="inventory_alerts" />
+          <div v-if="runtime.available('inventory_alerts')" class="mt-4 grid grid-cols-1 gap-6 md:grid-cols-2">
             <div class="space-y-2">
               <label class="text-xs font-medium text-muted-foreground">{{ t('admin.settings.notification.inventory.intervalSeconds') }}</label>
               <Input v-model.number="form.inventory_alert_interval_seconds" type="number" min="60" max="604800" />
@@ -396,7 +400,7 @@ defineExpose({ save, submitting })
           </div>
         </div>
 
-        <div class="rounded-xl border border-border bg-muted/20 p-4">
+        <div v-if="runtime.available('inventory_alerts')" class="rounded-xl border border-border bg-muted/20 p-4">
           <h3 class="text-sm font-semibold">{{ t('admin.settings.notification.paymentOrder.title') }}</h3>
           <div class="mt-4 grid grid-cols-1 gap-6 md:grid-cols-2">
             <div class="space-y-2">
@@ -537,7 +541,7 @@ defineExpose({ save, submitting })
               <Label class="text-sm">{{ t('admin.settings.notification.scenes.exceptionAlert') }}</Label>
             </div>
           </div>
-          <p class="mt-3 text-xs text-muted-foreground">{{ t('admin.settings.notification.scenes.exceptionThresholdHint') }}</p>
+          <p v-if="runtime.available('inventory_alerts')" class="mt-3 text-xs text-muted-foreground">{{ t('admin.settings.notification.scenes.exceptionThresholdHint') }}</p>
         </div>
 
         <div class="rounded-xl border border-border">

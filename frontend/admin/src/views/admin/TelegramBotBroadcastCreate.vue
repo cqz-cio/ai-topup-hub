@@ -3,6 +3,8 @@ import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { adminAPI } from '@/api/admin'
+import { useRuntimeFeatures } from '@/composables/useRuntimeFeatures'
+import FeatureAvailability from '@/components/FeatureAvailability.vue'
 import type { AdminTelegramBroadcastUser } from '@/api/types'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -18,6 +20,7 @@ import MediaPicker from '@/components/admin/MediaPicker.vue'
 import FileInput from '@/components/FileInput.vue'
 
 const { t } = useI18n()
+const runtime = useRuntimeFeatures()
 const router = useRouter()
 
 const submitting = ref(false)
@@ -153,6 +156,7 @@ const handleAttachmentChange = async (files: FileList | null) => {
 }
 
 const handleSubmit = async () => {
+  if (!runtime.available('telegram_broadcast') || submitting.value) return
   if (!form.title.trim() || !form.message_html.trim()) {
     notifyError(t('telegramBot.broadcasts.formInvalid'))
     return
@@ -223,6 +227,8 @@ onMounted(() => {
       </Button>
     </div>
 
+    <FeatureAvailability :state="runtime" feature="telegram_broadcast" />
+    <template v-if="runtime.available('telegram_broadcast')">
     <Card>
       <CardHeader>
         <CardTitle>{{ t('telegramBot.broadcasts.basicInfo') }}</CardTitle>
@@ -398,5 +404,6 @@ onMounted(() => {
         {{ submitting ? t('admin.common.loading') : t('telegramBot.broadcasts.submit') }}
       </Button>
     </div>
+    </template>
   </div>
 </template>

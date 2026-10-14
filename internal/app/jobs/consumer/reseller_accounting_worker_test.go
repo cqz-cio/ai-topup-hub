@@ -44,7 +44,9 @@ func TestResellerConfirmLedgerWorkerMarksDueEntriesAvailable(t *testing.T) {
 	c := New(&container.Container{
 		ResellerAccountingLedger: resellerapplication.NewAccountingLedgerService(repo, 0),
 	})
-	if err := c.handleResellerConfirmLedger(context.Background(), queue.NewResellerConfirmLedgerTask()); err != nil {
+	mux := asynq.NewServeMux()
+	c.RegisterStorefront(mux)
+	if err := mux.ProcessTask(context.Background(), queue.NewResellerConfirmLedgerTask()); err != nil {
 		t.Fatalf("worker handler failed: %v", err)
 	}
 	var got resellerdomain.LedgerEntry
@@ -53,6 +55,17 @@ func TestResellerConfirmLedgerWorkerMarksDueEntriesAvailable(t *testing.T) {
 	}
 	if got.Status != resellerdomain.LedgerStatusAvailable {
 		t.Fatalf("expected available, got %s", got.Status)
+	}
+	// A repeated scheduled delivery must not credit the same profit twice.
+	if err := mux.ProcessTask(context.Background(), queue.NewResellerConfirmLedgerTask()); err != nil {
+		t.Fatal(err)
+	}
+	var account resellerdomain.BalanceAccount
+	if err := db.Where("reseller_id = ?", 1).First(&account).Error; err != nil {
+		t.Fatal(err)
+	}
+	if !account.AvailableAmountCache.Decimal.Equal(decimal.NewFromInt(10)) {
+		t.Fatalf("duplicate settlement changed balance: %+v", account)
 	}
 }
 

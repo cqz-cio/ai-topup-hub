@@ -11,3 +11,9 @@ func RegisterAdminRoutes(admin gin.IRoutes, handler *AdminHandler) {
 	admin.POST("/system/update/rollback", handler.RollbackUpdate)
 	admin.POST("/system/restart", handler.RestartService)
 }
+
+// RegisterFeatureRoutes exposes only non-sensitive availability flags to signed-in
+// administrators, including custom roles. Business endpoints retain their RBAC.
+func RegisterFeatureRoutes(authenticated gin.IRoutes, handler *AdminHandler) {
+	authenticated.GET("/system/features", handler.GetFeatures)
+}

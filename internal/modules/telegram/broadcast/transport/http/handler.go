@@ -35,13 +35,18 @@ type createBroadcastRequest struct {
 // AdminHandler handles administrative Telegram broadcast requests.
 type AdminHandler struct {
 	broadcasts AdminService
+	available  func() bool
 }
 
-func NewAdminHandler(broadcasts AdminService) *AdminHandler {
+func NewAdminHandler(broadcasts AdminService, available ...func() bool) *AdminHandler {
 	if broadcasts == nil {
 		panic("telegram broadcast handler: broadcasts is nil")
 	}
-	return &AdminHandler{broadcasts: broadcasts}
+	handler := &AdminHandler{broadcasts: broadcasts}
+	if len(available) > 0 {
+		handler.available = available[0]
+	}
+	return handler
 }
 
 // List returns Telegram broadcast jobs.
@@ -61,6 +66,10 @@ func (h *AdminHandler) List(c *gin.Context) {
 
 // Create persists and dispatches a Telegram broadcast job.
 func (h *AdminHandler) Create(c *gin.Context) {
+	if h.available != nil && !h.available() {
+		ginutil.RespondError(c, response.CodeBadRequest, "error.feature_unavailable", nil)
+		return
+	}
 	var req createBroadcastRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		ginutil.RespondBindError(c, err)

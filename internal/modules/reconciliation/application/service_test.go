@@ -2,6 +2,8 @@ package application
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"testing"
 	"time"
 
@@ -65,21 +67,27 @@ func (s *upstreamProviderStub) Open(uint) (reconciliationcontract.UpstreamOrderR
 }
 
 type upstreamReaderStub struct {
-	calls   int
-	details map[uint]reconciliationcontract.UpstreamOrder
+	calls      int
+	err        error
+	references []string
+	details    map[uint]reconciliationcontract.UpstreamOrder
 }
 
-func (s *upstreamReaderStub) Get(_ context.Context, orderID uint) (*reconciliationcontract.UpstreamOrder, error) {
+func (s *upstreamReaderStub) Get(_ context.Context, orderID uint, orderNo string) (*reconciliationcontract.UpstreamOrder, error) {
 	s.calls++
+	s.references = append(s.references, orderNo)
 	detail := s.details[orderID]
-	return &detail, nil
+	return &detail, s.err
 }
 
-type enqueuerStub struct{ jobIDs []uint }
+type enqueuerStub struct {
+	jobIDs []uint
+	err    error
+}
 
 func (s *enqueuerStub) Enqueue(jobID uint) error {
 	s.jobIDs = append(s.jobIDs, jobID)
-	return nil
+	return s.err
 }
 
 type notifierStub struct{ calls int }
@@ -103,6 +111,29 @@ func TestCreateAndEnqueueUsesCreatedJobIdentity(t *testing.T) {
 	}
 	if job.ID != 99 || len(queue.jobIDs) != 1 || queue.jobIDs[0] != 99 {
 		t.Fatalf("expected persisted job id to be queued, job=%+v queued=%v", job, queue.jobIDs)
+	}
+}
+
+func TestCreateAndEnqueueReportsUnavailableQueue(t *testing.T) {
+	for _, absent := range []bool{true, false} {
+		t.Run(fmt.Sprintf("absent_%v", absent), func(t *testing.T) {
+			jobs := &jobRepositoryStub{}
+			var queue reconciliationcontract.Enqueuer
+			if !absent {
+				queue = &enqueuerStub{err: errors.New("unavailable")}
+			}
+			svc := NewService(Options{Jobs: jobs, Items: &itemRepositoryStub{}, Procurements: procurementReaderStub{}, Upstream: &upstreamProviderStub{}, Queue: queue})
+			job, err := svc.CreateAndEnqueue(reconciliationcontract.RunInput{ConnectionID: 1})
+			if !errors.Is(err, reconciliationcontract.ErrQueueUnavailable) || job != nil {
+				t.Fatalf("job=%+v err=%v", job, err)
+			}
+			if absent && jobs.job != nil {
+				t.Fatal("missing queue created an unserviceable job")
+			}
+			if !absent && (jobs.job.Status != constants.ReconciliationJobStatusFailed || jobs.job.FinishedAt == nil) {
+				t.Fatalf("enqueue failure left a pending job: %+v", jobs.job)
+			}
+		})
 	}
 }
 
@@ -145,5 +176,48 @@ func TestExecuteOpensUpstreamOnceAndPersistsMismatch(t *testing.T) {
 	}
 	if notifier.calls != 1 {
 		t.Fatalf("expected one mismatch notification, got %d", notifier.calls)
+	}
+}
+
+func TestExecuteStringReferencesAndIncompleteResults(t *testing.T) {
+	for _, tc := range []struct {
+		name, kind, amount string
+		queryErr           error
+		incomplete         bool
+	}{
+		{"string reference", constants.ReconciliationTypeFull, "10.00", nil, false},
+		{"status only without amount", constants.ReconciliationTypeStatus, "", nil, false},
+		{"missing amount", constants.ReconciliationTypeFull, "", nil, true},
+		{"invalid amount", constants.ReconciliationTypeAmount, "unknown", nil, true},
+		{"query failed", constants.ReconciliationTypeFull, "", errors.New("offline"), true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			jobs := &jobRepositoryStub{job: &reconciliationdomain.Job{ID: 1, ConnectionID: 7, Type: tc.kind, Status: constants.ReconciliationJobStatusPending}}
+			reader := &upstreamReaderStub{err: tc.queryErr, details: map[uint]reconciliationcontract.UpstreamOrder{0: {Status: "delivered", Amount: tc.amount}}}
+			svc := NewService(Options{Jobs: jobs, Items: &itemRepositoryStub{}, Upstream: &upstreamProviderStub{reader: reader}, Procurements: procurementReaderStub{orders: []reconciliationcontract.ProcurementOrder{{ID: 1, UpstreamOrderNo: "supplier-string-123", Status: constants.ProcurementStatusCompleted, UpstreamAmount: money.FromDecimal(decimal.NewFromInt(10))}}}})
+			err := svc.Execute(context.Background(), 1)
+			if errors.Is(err, reconciliationcontract.ErrIncompleteResults) != tc.incomplete {
+				t.Fatalf("unexpected result: %v", err)
+			}
+			if len(reader.references) != 1 || reader.references[0] != "supplier-string-123" {
+				t.Fatalf("string supplier order skipped: %+v", reader.references)
+			}
+			if tc.incomplete {
+				if jobs.job.Status != constants.ReconciliationJobStatusFailed || jobs.job.MatchedCount != 0 {
+					t.Fatalf("unchecked order marked matched: %+v", jobs.job)
+				}
+			} else if jobs.job.Status != constants.ReconciliationJobStatusCompleted || jobs.job.MatchedCount != 1 {
+				t.Fatalf("valid order did not reconcile: %+v", jobs.job)
+			}
+		})
+	}
+}
+
+func TestCompareOrderTrimsUpstreamAmount(t *testing.T) {
+	job := &reconciliationdomain.Job{Type: constants.ReconciliationTypeAmount}
+	order := &reconciliationcontract.ProcurementOrder{UpstreamAmount: money.FromDecimal(decimal.NewFromInt(10))}
+	item := compareOrder(job, order, &reconciliationcontract.UpstreamOrder{Amount: " 12.00 "})
+	if item == nil || item.MismatchType != constants.MismatchTypeAmount {
+		t.Fatal("upstream amount with whitespace was incorrectly treated as matched")
 	}
 }

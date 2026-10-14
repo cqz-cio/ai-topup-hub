@@ -1,4 +1,13 @@
 {
+  "featureAvailability": {
+    "affiliateClosed": "Affiliate rebates are currently unavailable. Enrollment and withdrawal requests are closed. Existing records remain accessible.",
+    "affiliateSuspended": "This affiliate account is disabled. Withdrawals are unavailable. Existing records remain accessible.",
+    "redemptionTitle": "Self-service redemption",
+    "redemptionClosed": "On-site redemption is currently unavailable. Follow the redemption link in your order delivery instructions. You can find these instructions in your order details.",
+    "backToStore": "Back to store",
+    "loading": "Checking availability…",
+    "loadFailed": "Unable to confirm availability. Please refresh and try again."
+  },
   "shopUi": {
     "brandLine": "DIGITAL GOODS · SELF SERVICE",
     "brandDescription": "Digital services within reach. Shop, pay, track your order and collect your delivery in one place.",

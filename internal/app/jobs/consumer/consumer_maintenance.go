@@ -10,6 +10,7 @@ import (
 	"github.com/dujiao-next/internal/constants"
 	"github.com/dujiao-next/internal/logger"
 	notificationcontract "github.com/dujiao-next/internal/modules/notification/contract"
+	reconciliationcontract "github.com/dujiao-next/internal/modules/reconciliation/contract"
 	"github.com/dujiao-next/internal/queue"
 
 	"github.com/hibiken/asynq"
@@ -107,6 +108,9 @@ func (c *Consumer) handleReconciliationRun(ctx context.Context, task *asynq.Task
 		return nil
 	}
 	if err := c.ReconciliationService.Execute(ctx, payload.JobID); err != nil {
+		if errors.Is(err, reconciliationcontract.ErrIncompleteResults) {
+			return errors.Join(err, asynq.SkipRetry)
+		}
 		logger.Warnw("worker_reconciliation_run_failed",
 			"job_id", payload.JobID,
 			"error", err,
