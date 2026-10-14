@@ -1,13 +1,13 @@
 {
-  "checked_at": "2026-10-14T07:12:16.873815+00:00",
+  "checked_at": "2026-10-14T07:14:48.065208+00:00",
   "production_url": "https://www.qzweb.cloud/",
   "documented_release_id": "20261014-145155",
   "verified_release_id": "20261014-145155",
-  "previous_release_id": "20261014-085600",
+  "previous_release_id": "20261014-145155",
   "source_commit": "b6dcc7d1a99b3ed91b1cfeb9b468642984bcd042",
   "source_branch": "main",
   "server_git_commit_verified": true,
-  "source_tag": null,
+  "source_tag": "production/feature-availability-20261014-145155",
   "production": {
     "release_path": "/srv/zhixiang/releases/20261014-145155",
     "running_executable": "/srv/zhixiang/releases/20261014-145155/zhixiang-shop",
@@ -156,29 +156,28 @@
     }
   },
   "pages": [
-    "https://www.qzweb.cloud/about",
-    "https://www.qzweb.cloud/reseller/products",
-    "https://www.qzweb.cloud/products",
-    "https://124.220.2.69:18888/login"
+    "https://www.qzweb.cloud/me/affiliate",
+    "https://www.qzweb.cloud/redeem",
+    "https://124.220.2.69:18888/reconciliation"
   ],
   "verified_asset_sha256": {
-    "user/index.html": "b18f137ada4297585a2b5f83c842df1b03507968bcbf444e85c0e761cc5f96d4",
+    "user/index.html": "320000e3f295545941fa6f7626ffb3aebcccd6e3db7ed7ab316e51fdc9cf3983",
     "admin/index.html": "31fc385b6068454e58d15b55cf56ccdfa5af6da4f327d0c15db9a84317ebe5a0"
   },
   "public_verification": {
-    "checked_at": "2026-10-14T07:12:16.873815+00:00",
-    "http_checks_passed": 15,
-    "frontend_server_checks_passed": 6,
-    "browser_checks_passed": 37,
+    "checked_at": "2026-10-14T07:14:48.065208+00:00",
+    "http_checks_passed": 10,
+    "frontend_server_checks_passed": 15,
+    "browser_checks_passed": 22,
     "viewports": [
       1920,
       390,
       320
     ],
-    "verification_directory": "work/codex-runtime/usdt-fee-notice/",
+    "verification_directory": "work/codex-runtime/feature-availability/",
     "production_order_submitted": false,
-    "browser_error_count": 0,
-    "payment_and_order_data_simulated_in_browser": true
+    "price_rules_saved": false,
+    "browser_error_count": 0
   },
   "catalog": {
     "prices_unchanged": true,
@@ -325,12 +324,12 @@
   "previous_build_verification_at": "2026-10-12T08:19:31.766441+00:00",
   "management_url": "https://124.220.2.69:18888/login",
   "frontend_gateway": {
-    "checked_at": "2026-10-14T07:12:16.873815+00:00",
+    "checked_at": "2026-10-14T07:14:48.065208+00:00",
     "frontend_host": "124.220.2.69",
     "backend_host": "43.134.141.10",
-    "frontend_release": "20261014-150333",
-    "source_commit": "e10040f8ae2835ab1487502ad8d5edb5831dffea",
-    "static_files_verified": 1200,
+    "frontend_release": "20261014-151124",
+    "source_commit": "d2cbc34162744f6fb061524041464c4ec6718903",
+    "static_files_verified": 445,
     "storefront_url": "https://www.qzweb.cloud/",
     "management_url": "https://124.220.2.69:18888/login",
     "www_dns_record": "www A 124.220.2.69",
@@ -346,8 +345,8 @@
     "certificate_renewal_verified": true,
     "certificate_timer": "qzweb-certificates.timer",
     "certificate_renewal_report": "/srv/zhixiang-front/shared/work/renew-final-20261012-1644/status.json",
-    "report_path": "/srv/zhixiang-front/shared/work/usdt-fee-notice-20261014-150333.json",
-    "backend_report_path": "/srv/zhixiang/shared/reports/reseller-applications-release-20261014-105629.json",
+    "report_path": "/srv/zhixiang-front/shared/work/feature-availability-20261014-151124.json",
+    "backend_report_path": "/srv/zhixiang/shared/reports/feature-availability-release-20261014-145155.json",
     "formal_alipay_enabled": false,
     "database_uploaded": false,
     "legacy_singapore_http_entries_retained": true,
@@ -360,34 +359,26 @@
       "browser_current_frontend_confirmed": true,
       "report_path": "/srv/zhixiang-front/shared/work/entry-cache-report.json"
     },
-    "previous_frontend_release": "20261014-145155",
-    "storefront_source_commit": "e10040f8ae2835ab1487502ad8d5edb5831dffea",
+    "previous_frontend_release": "20261014-150333",
+    "storefront_source_commit": "d2cbc34162744f6fb061524041464c4ec6718903",
     "admin_source_commit": "b6dcc7d1a99b3ed91b1cfeb9b468642984bcd042",
-    "backup": "/srv/zhixiang-front/backups/before-usdt-fee-notice-20261014-150333",
-    "frontend_only_update": true,
+    "backup": "/srv/zhixiang-front/backups/before-feature-availability-return-20261014-151124",
+    "frontend_only_update": false,
     "previous_hashed_assets_retained": true,
     "verified_services": {
       "nginx": "active",
       "zhixiang-api-tunnel": "active",
       "qzweb-certificates.timer": "active"
     },
-    "release_scope": "U payment and wallet recharge net-receipt reminder",
-    "admin_files_verified": 875,
+    "release_scope": "Runtime feature availability, settlement and reconciliation; storefront return-link correction",
+    "admin_files_verified": 120,
     "storefront_files_verified": 325,
-    "backend_program_preserved": true,
+    "backend_program_preserved": false,
     "backend_setting_changes": [],
-    "frontend_build_source_commit": "e10040f8ae2835ab1487502ad8d5edb5831dffea",
+    "frontend_build_source_commit": "d2cbc34162744f6fb061524041464c4ec6718903",
     "frontend_source_identical_to_backend": false,
     "admin_base": "/",
-    "base_repair_backup": "/srv/zhixiang-front/backups/before-xorpay-admin-base-20261013-173020",
-    "all_storefront_files": 3175,
-    "last_backend_release_preservation_check": {
-      "checked_at": "2026-10-14T07:12:16.873815+00:00",
-      "release": "20261014-145155",
-      "source_commit": "b6dcc7d1a99b3ed91b1cfeb9b468642984bcd042",
-      "binary_sha256": "cf1e9f93857bdbd1fd9572d04f41a67834c4a5804c19a9af830deff9c9e86f66",
-      "scope": "Backend/Redis processes, configuration and 28 business snapshots unchanged"
-    }
+    "base_repair_backup": "/srv/zhixiang-front/backups/before-xorpay-admin-base-20261013-173020"
   },
   "alipay": {
     "code_and_official_sandbox_query_verified": true,
@@ -882,7 +873,7 @@
     "real_payment_or_purchase_submitted": false,
     "verification_directory": "work/codex-runtime/register-captcha-preview-20261013/"
   },
-  "previous_verification_checked_at": "2026-10-13T09:33:42.619968+00:00",
+  "previous_verification_checked_at": "2026-10-14T07:12:16.873815+00:00",
   "sale_email": {
     "release": "20261013-162050",
     "source_commit": "2bbb4e0b802114dd3bda394b28cddcf83639228a",
@@ -1124,26 +1115,19 @@
     "database_uploaded": false
   },
   "previous_public_verification": {
-    "checked_at": "2026-10-14T06:43:52.421381+00:00",
-    "http_checks_passed": 16,
-    "frontend_server_checks_passed": 7,
-    "browser_checks_passed": true,
+    "checked_at": "2026-10-14T07:12:16.873815+00:00",
+    "http_checks_passed": 15,
+    "frontend_server_checks_passed": 6,
+    "browser_checks_passed": 37,
     "viewports": [
       1920,
       390,
       320
     ],
-    "verification_directory": "work/codex-runtime/about-page-release/",
+    "verification_directory": "work/codex-runtime/usdt-fee-notice/",
     "production_order_submitted": false,
     "browser_error_count": 0,
-    "verified_interactions": [
-      "copy feedback",
-      "purchase guide",
-      "privacy",
-      "terms",
-      "back navigation",
-      "refresh"
-    ]
+    "payment_and_order_data_simulated_in_browser": true
   },
   "abuse_protection": {
     "release": "20261014-085600",
@@ -1545,5 +1529,141 @@
     "real_orders_payments_or_purchases": false,
     "local_database_uploaded": false,
     "initial_attempt": "20261014-144103 was rolled back after production-only i18n error; final build uses ordinary localized Vue text and was verified as built artifacts before publication"
+  },
+  "feature_availability": {
+    "checked_at": "2026-10-14T07:14:48.065208+00:00",
+    "backend_release": "20261014-145155",
+    "frontend_release": "20261014-151124",
+    "backend_source_commit": "b6dcc7d1a99b3ed91b1cfeb9b468642984bcd042",
+    "storefront_source_commit": "d2cbc34162744f6fb061524041464c4ec6718903",
+    "admin_source_commit": "b6dcc7d1a99b3ed91b1cfeb9b468642984bcd042",
+    "binary_sha256": "cf1e9f93857bdbd1fd9572d04f41a67834c4a5804c19a9af830deff9c9e86f66",
+    "backend_backup": "/srv/zhixiang/backups/before-feature-availability-20261014-145155",
+    "frontend_backup": "/srv/zhixiang-front/backups/before-feature-availability-return-20261014-151124",
+    "initial_frontend_backup": "/srv/zhixiang-front/backups/before-feature-availability-20261014-145155",
+    "local": {
+      "passed": true,
+      "checked_at": "2026-10-14T06:41:17.298289+00:00",
+      "go_tests_including_subtests": {
+        "pass": 1992,
+        "fail": 0,
+        "skip": 3
+      },
+      "go_logs": [
+        "reseller-regression-20261014-142017.log",
+        "reseller-architecture-final-20261014-142255.log",
+        "reseller-recon-final-20261014-143837.log"
+      ],
+      "frontend_tests": {
+        "user": 104,
+        "admin": 60
+      },
+      "type_builds_passed": [
+        "user",
+        "admin"
+      ],
+      "daily_ports": [
+        8080,
+        5173,
+        5174
+      ],
+      "daily_backend_rebuilt": true,
+      "local_api_checks": 9,
+      "browser_checks": 14,
+      "browser_errors": 0,
+      "viewports": [
+        1920,
+        390,
+        320
+      ],
+      "scheduler_tasks": [
+        "affiliate:confirm_commissions",
+        "procurement:recover_paid",
+        "reseller:confirm_ledger"
+      ],
+      "worker_count": 1,
+      "upstream_purchase_enabled": false,
+      "created_accounts": 0,
+      "business_writes": 0,
+      "compliance_acknowledgement_changed": false,
+      "real_funds_test": false,
+      "limits": [
+        "Daily database has no existing user/reseller; those integration cases use temporary databases.",
+        "Existing unconfirmed local financial-compliance gate retained; not acknowledged.",
+        "Current supplier does not return independently verifiable amount; status reconciliation supported, amount/full clearly reports incomplete."
+      ],
+      "source_commit": "b6dcc7d1a99b3ed91b1cfeb9b468642984bcd042",
+      "integration_commit": "4621b2ee5e40cec0cc5bfe11f27959e9dee5d98c",
+      "merged_frontend_tests": {
+        "user": 107,
+        "admin": 60
+      },
+      "clean_frontend_builds_passed": true
+    },
+    "production_browser_checks": 22,
+    "browser_errors": 0,
+    "viewports": [
+      1920,
+      390,
+      320
+    ],
+    "public_http_checks": 10,
+    "backend_runtime_checks": 9,
+    "server_page_checks": 15,
+    "new_frontend_files_verified": 445,
+    "user_files_verified": 325,
+    "admin_files_verified": 120,
+    "previous_frontend_files_preserved": 4045,
+    "nginx_files_preserved": 54,
+    "business_snapshots_preserved": 35,
+    "business_data_preserved": true,
+    "configuration_preserved": true,
+    "redis_not_restarted": true,
+    "runtime_mode": "storefront",
+    "scheduled_tasks": [
+      "affiliate:confirm_commissions",
+      "procurement:recover_paid",
+      "reseller:confirm_ledger"
+    ],
+    "capabilities": {
+      "reseller_settlement": {
+        "available": true
+      },
+      "reconciliation": {
+        "available": true
+      },
+      "system_subdomain": {
+        "available": false,
+        "reason": "not_configured"
+      },
+      "stock_sync_settings": {
+        "available": false,
+        "reason": "managed_externally"
+      },
+      "telegram_broadcast": {
+        "available": false,
+        "reason": "not_available"
+      },
+      "inventory_alerts": {
+        "available": false,
+        "reason": "not_available"
+      },
+      "redemption": {
+        "available": false,
+        "reason": "not_enabled"
+      }
+    },
+    "affiliate_enabled": false,
+    "auto_recharge_enabled": false,
+    "stock_sync_seconds": 300,
+    "local_database_uploaded": false,
+    "production_business_writes": false,
+    "real_payment_or_purchase_performed": false,
+    "return_button_local_and_production_verified": true,
+    "report_directory": "work/codex-runtime/feature-availability/",
+    "limits": [
+      "Current supplier supports status reconciliation but does not expose independently verifiable amounts; amount/full results report incomplete.",
+      "Daily database has no user/reseller and financial acknowledgement remains unconfirmed; related integration cases use temporary databases."
+    ]
   }
 }

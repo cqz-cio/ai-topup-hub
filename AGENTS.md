@@ -7,7 +7,7 @@
 
 - `main` 是唯一正式源码主线，维护当前绿色 Go + Vue 商城，包含已确认的 π星卡社名称、派大星 Logo 和水母背景。用户端为 `frontend/user`，后台为 `frontend/admin`；这些品牌改动属于同一项目主版本。
 - 支付、订单、数据库和采购后端部署在腾讯云新加坡 `43.134.141.10`，账号 `ubuntu`，目录 `/srv/zhixiang`。两套前端部署在上海 `124.220.2.69` 的 `/srv/zhixiang-front`：商城 `https://www.qzweb.cloud/`，管理端 `https://124.220.2.69:18888/login`。上海通过受限 SSH 通道连接新加坡回环 API；维护说明见 `ops/tencent/README.md`。
-- 当前新加坡后端为 `20261014-145155`，程序及后台源码 `b6dcc7d1a99b3ed91b1cfeb9b468642984bcd042`；上海静态发布 `20261014-150333`，商城源码 `e10040f8ae2835ab1487502ad8d5edb5831dffea`，后台资源保留上述来源。分销申请保持开启，功能状态见 `docs/feature-availability.md`；U 支付和充值提醒见 `docs/usdt-transfer-notice.md`。后端使用 `-mode storefront`、`UPSTREAM_PURCHASE_ENABLED=true`。BEP20、Plasma USDT 和 XorPay 微信扫码均已启用，支持商品订单与钱包充值；微信客户手续费为 1.6% 向上取分。精确核验范围以 `ops/tencent/production-baseline.json` 为准，不把后续文档提交自动当作线上程序的 Git 版本。
+- 当前新加坡后端为 `20261014-145155`，程序及后台源码 `b6dcc7d1a99b3ed91b1cfeb9b468642984bcd042`；上海静态发布 `20261014-151124`，商城源码 `d2cbc34162744f6fb061524041464c4ec6718903`，后台资源保留上述来源。分销申请保持开启，已修复分销到期结算、对账及未开放功能状态，操作见 `docs/feature-availability.md`。后端使用 `-mode storefront`、`UPSTREAM_PURCHASE_ENABLED=true`。BEP20、Plasma USDT 和 XorPay 微信扫码均已启用，支持商品订单与钱包充值；微信客户手续费为 1.6% 向上取分。精确核验范围以 `ops/tencent/production-baseline.json` 为准，不把后续文档提交自动当作线上程序的 Git 版本。
 - 本地使用 `scripts/local/start.ps1`、`status.ps1`、`stop.ps1`，运行库为 `work/codex-runtime/live/shop.db`，本地采购关闭。旧说明位于 `docs/history/`，不能按历史文档覆盖当前环境。
 - 用户要求固定执行“先本地验证，再推送和上线”：先在日常本地入口验证实际运行程序、配置、相关数据和页面，保存验证记录；通过后才推送已验证提交并部署所需改动。后端改动须重建并重启本地后端，支付渠道及商品说明不能只在临时测试入口核验。上线后对照核验本地与生产；环境私有配置、订单和实时库存独立维护，不互相覆盖。
 - 用户已授权真实客户确认付款后的自动采购发卡，仍禁止主动提交有效采购、转账，或将验收订单改为已付款进行扣款测试。测试使用模拟供应商和临时数据库。
@@ -163,3 +163,11 @@
 - 已按批准预览在所有 U 商品付款与钱包充值收银页增加提醒，经典/Vault 模板及三语共用。实际到账须与支付单 U 数量完全一致（含小数尾数），转账或提现手续费另付；平台扣费时须补足并核对实际到账。提醒保留支付原始金额，不改变金额、汇率、地址或收款规则。见 `docs/usdt-transfer-notice.md`。
 - 上海商城发布 `20261014-150333`，干净构建源码 `e10040f8ae2835ab1487502ad8d5edb5831dffea`；107 项商城测试、类型构建通过，日常本机、构建产物及正式站各 37 项浏览器检查通过，覆盖 1920、390、320px 和金额复制、刷新、历史六位金额及非 U 排除。325 个商城文件、875 个保留后台文件及 54 个 Nginx 文件核对一致，28 组业务数据及配置与备份一致。
 - 本次保留并行任务已部署的新加坡后端 `20261014-145155` 与后台源码 `b6dcc7d1a99b3ed91b1cfeb9b468642984bcd042`，后端及 Redis 未重启。两地备份为各自 `backups/before-usdt-fee-notice-20261014-150333`，证据 `work/codex-runtime/usdt-fee-notice/verified-report.json`。首次静态尝试因运行时语言编译错误已回退；最终改为普通多语言文本，并补充实际构建产物验收。未上传本机库、创建正式验收订单或执行真实付款采购。
+
+## 功能状态与结算对账统一（2026-10-14）
+
+2026-10-14 已上线[功能状态与任务修复](docs/feature-availability.md)。新加坡后端发布 `20261014-145155`，后台及程序干净源码 `b6dcc7d1a99b3ed91b1cfeb9b468642984bcd042`；上海静态最终发布 `20261014-151124`，商城源码 `d2cbc34162744f6fb061524041464c4ec6718903`，后台资源保持上述来源。分销到期结算、推广佣金确认和对账由 storefront 消费；未开放的返利、兑换、群发、系统二级域名与定时巡检按实际状态展示，库存继续由独立 300 秒 timer 管理。供货商未返回金额时，对账明确标记未完整核验，可单独核对状态。兑换关闭页使用完整页面跳转返回商城。
+
+1992 项 Go 回归通过（含子测试，3 项外部测试跳过），合并主线后商城 107 项、后台 60 项及两套类型构建通过。日常本地后端重建，9 项接口、14 项页面检查通过；现有本地库没有用户及分销商，财务声明未确认，相关场景使用临时数据库回归，不代签声明或新增管理员。正式站 22 项浏览器、10 项公网、9 项后端检查通过，覆盖 1920、390、320px；原定价下拉框导航也已复查。
+
+切换时 35 组业务数据和全部私有配置与备份一致，Redis 未重启，支付渠道、售价、采购队列和库存 timer 保留。核验 445 个前端文件、4045 个保留文件及 54 个 Nginx 文件。备份 `/srv/zhixiang/backups/before-feature-availability-20261014-145155`、`/srv/zhixiang-front/backups/before-feature-availability-return-20261014-151124`，首次前端备份 `/srv/zhixiang-front/backups/before-feature-availability-20261014-145155`；私有报告 `work/codex-runtime/feature-availability/verified-report.json`。未上传本机库、提交正式验收订单、付款采购、提现或发送通知。
