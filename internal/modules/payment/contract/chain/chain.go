@@ -80,4 +80,16 @@ func IsHex(v string, n int) bool {
 	_, err := hex.DecodeString(v[2:])
 	return err == nil
 }
-func AddressTopic(v string) string { return "0x" + strings.Repeat("0", 24) + strings.ToLower(v[2:]) }
+func AddressTopic(v string) string {
+	if strings.HasPrefix(v, "T") {
+		var err error
+		v, err = TronAddressHex(v)
+		if err != nil {
+			return ""
+		}
+	}
+	if !IsHex(v, 20) {
+		return ""
+	}
+	return "0x" + strings.Repeat("0", 24) + strings.ToLower(v[2:])
+}

@@ -45,9 +45,12 @@ func New(store chaincontract.Store, chain chaincontract.Reader, cfg Config, sett
 		return nil, contract.ErrGatewayConfigInvalid
 	}
 	cfg.Network = network.Name
-	cfg.Recipient = strings.ToLower(strings.TrimSpace(cfg.Recipient))
+	cfg.Recipient, err = network.NormalizeRecipient(cfg.Recipient)
+	if err != nil {
+		return nil, contract.ErrGatewayConfigInvalid
+	}
 	rate, err := decimal.NewFromString(cfg.CNYPerUSDT)
-	if store == nil || chain == nil || err != nil || !rate.IsPositive() || rate.GreaterThan(decimal.NewFromInt(1000000)) || !isHex(cfg.Recipient, 20) || cfg.Recipient == "0x"+strings.Repeat("0", 40) {
+	if store == nil || chain == nil || err != nil || !rate.IsPositive() || rate.GreaterThan(decimal.NewFromInt(1000000)) {
 		return nil, contract.ErrGatewayConfigInvalid
 	}
 	if cfg.Confirmations == 0 {
@@ -142,5 +145,5 @@ func (s *Service) resumeInvoice(v *domain.ChainInvoice, in contract.GatewayCreat
 }
 
 func (s *Service) invoiceResult(v *domain.ChainInvoice) *contract.GatewayCreateResult {
-	return &contract.GatewayCreateResult{ExpiresAt: &v.ExpiresAt, ProviderRef: fmt.Sprintf("%s-invoice-%d", s.network.Name, v.PaymentID), QRCodeURL: v.Recipient, DisplayChannelType: s.network.ChannelType, Payload: jsonmap.JSON{"wallet_address": v.Recipient, "chain_amount": v.Amount, "chain": s.network.Name, "token_id": s.network.TokenID, "token_contract": s.network.Token, "chain_id": s.network.ChainID, "cny_per_usdt": v.CNYPerUSDT, "invoice_expires_at": v.ExpiresAt.UTC().Format(time.RFC3339)}}
+	return &contract.GatewayCreateResult{ExpiresAt: &v.ExpiresAt, ProviderRef: fmt.Sprintf("%s-invoice-%d", s.network.Name, v.PaymentID), QRCodeURL: v.Recipient, DisplayChannelType: s.network.ChannelType, Payload: jsonmap.JSON{"wallet_address": v.Recipient, "chain_amount": v.Amount, "chain": s.network.Name, "token_id": s.network.TokenID, "token_contract": s.network.TokenAddress(), "chain_id": s.network.ChainID, "cny_per_usdt": v.CNYPerUSDT, "invoice_expires_at": v.ExpiresAt.UTC().Format(time.RFC3339)}}
 }

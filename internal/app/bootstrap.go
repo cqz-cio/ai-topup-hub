@@ -33,6 +33,9 @@ func BuildRunner(cfg *config.Config, mode string) (*Runner, error) {
 	if dependencies.PlasmaUSDTService != nil && (mode == ModeAll || mode == ModeWorker || mode == ModeCheckout || mode == ModeStorefront) {
 		services = append(services, &bscUSDTWorker{service: dependencies.PlasmaUSDTService, network: "plasma"})
 	}
+	if dependencies.TronUSDTService != nil && (mode == ModeAll || mode == ModeWorker || mode == ModeCheckout || mode == ModeStorefront) {
+		services = append(services, &bscUSDTWorker{service: dependencies.TronUSDTService, network: "tron"})
+	}
 	if dependencies.AutoRechargeService != nil && (mode == ModeAll || mode == ModeWorker) {
 		services = append(services, &autoRechargeWorker{service: dependencies.AutoRechargeService})
 	}

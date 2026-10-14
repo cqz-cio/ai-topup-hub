@@ -54,6 +54,10 @@ func (c *bscTestChain) Receipt(context.Context, string) (*chaincontract.Receipt,
 	return &chaincontract.Receipt{Status: "0x1", TransactionHash: c.event.TransactionHash, BlockNumber: c.event.BlockNumber, BlockHash: c.event.BlockHash, Logs: []chaincontract.Log{*c.event}}, nil
 }
 
+func TestTronConfirmedTransferPaysGuestOrderAndDeliversOneBoundCode(t *testing.T) {
+	testConfirmedTransferPaysGuestOrderAndDeliversOneBoundCode(t, "tron")
+}
+
 func TestBSCConfirmedTransferPaysGuestOrderAndDeliversOneBoundCode(t *testing.T) {
 	testConfirmedTransferPaysGuestOrderAndDeliversOneBoundCode(t, "bsc")
 }
@@ -83,7 +87,7 @@ func testConfirmedTransferPaysGuestOrderAndDeliversOneBoundCode(t *testing.T, ne
 	svc.SetAutoRechargeService(recharge)
 	chain := &bscTestChain{head: 100, timestamp: time.Now().UTC().Truncate(time.Second)}
 	settlements := 0
-	gateway, err := bscusdt.New(chainstore.New(db), chain, bscusdt.Config{Network: networkName, Recipient: "0x66a8bab15067eab1efc948ac03684f0397c8416f", CNYPerUSDT: "6.66"}, func(_ context.Context, i paymentdomain.ChainInvoice, transfer paymentdomain.ChainTransfer) error {
+	gateway, err := bscusdt.New(chainstore.New(db), chain, bscusdt.Config{Network: networkName, Recipient: network.DisplayAddress("0x66a8bab15067eab1efc948ac03684f0397c8416f"), CNYPerUSDT: "6.66"}, func(_ context.Context, i paymentdomain.ChainInvoice, transfer paymentdomain.ChainTransfer) error {
 		settlements++
 		_, e := svc.HandleCallback(paymentapp.PaymentCallbackInput{PaymentID: i.PaymentID, Status: constants.PaymentStatusSuccess, Amount: money.FromDecimal(decimal.RequireFromString(i.FiatAmount)), Currency: i.Currency, PaidAt: &transfer.PaidAt, ProviderRef: transfer.TxHash})
 		return e
@@ -118,7 +122,7 @@ func testConfirmedTransferPaysGuestOrderAndDeliversOneBoundCode(t *testing.T, ne
 	if tasks != 0 {
 		t.Fatal("unpaid order issued a code")
 	}
-	chain.event = &chaincontract.Log{Address: network.Token, Topics: []string{bscusdt.TransferTopic, "0x" + strings.Repeat("0", 24) + strings.Repeat("1", 40), "0x" + strings.Repeat("0", 24) + invoice.Recipient[2:]}, Data: fmt.Sprintf("0x%064x", decimal.RequireFromString(invoice.Units).BigInt()), BlockNumber: "0x65", BlockHash: fmt.Sprintf("0x%064x", 101), TransactionHash: "0x" + strings.Repeat("a", 64), LogIndex: "0x0"}
+	chain.event = &chaincontract.Log{Address: network.Token, Topics: []string{bscusdt.TransferTopic, "0x" + strings.Repeat("0", 24) + strings.Repeat("1", 40), chaincontract.AddressTopic(invoice.Recipient)}, Data: fmt.Sprintf("0x%064x", decimal.RequireFromString(invoice.Units).BigInt()), BlockNumber: "0x65", BlockHash: fmt.Sprintf("0x%064x", 101), TransactionHash: "0x" + strings.Repeat("a", 64), LogIndex: "0x0"}
 	chain.head = 120
 	for i := 0; i < 2; i++ {
 		if err = gateway.RunOnce(context.Background()); err != nil {

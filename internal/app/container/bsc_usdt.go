@@ -15,6 +15,7 @@ import (
 	"github.com/dujiao-next/internal/modules/payment/domain"
 	bscrpc "github.com/dujiao-next/internal/modules/payment/infrastructure/bscusdt"
 	chainstore "github.com/dujiao-next/internal/modules/payment/infrastructure/gormstore/chain"
+	tronrpc "github.com/dujiao-next/internal/modules/payment/infrastructure/tronusdt"
 	"github.com/dujiao-next/internal/platform/database/gormdb"
 	"github.com/dujiao-next/internal/shared/jsonmap"
 	"github.com/dujiao-next/internal/shared/jsonslice"
@@ -35,6 +36,12 @@ func (c *Container) initPlasmaUSDT() error {
 	return err
 }
 
+func (c *Container) initTronUSDT() error {
+	svc, err := c.initChainUSDT(c.Config.TronUSDT, "tron")
+	c.TronUSDTService = svc
+	return err
+}
+
 func (c *Container) initChainUSDT(cfg config.BSCUSDTConfig, networkName string) (*bscusdt.Service, error) {
 	if !cfg.Enabled {
 		return nil, nil
@@ -52,11 +59,18 @@ func (c *Container) initChainUSDT(cfg config.BSCUSDTConfig, networkName string) 
 			if receiptEndpoint == "" {
 				receiptEndpoint = "https://bsc-dataseed.bnbchain.org"
 			}
+		} else if network.Name == "tron" {
+			endpoint = tronrpc.DefaultEndpoint
 		} else {
 			endpoint = "https://rpc.plasma.to"
 		}
 	}
-	rpc, err := bscrpc.NewRPCForNetwork(endpoint, receiptEndpoint, network.Name)
+	var rpc chaincontract.Reader
+	if network.Name == "tron" {
+		rpc, err = tronrpc.NewRPC(endpoint, os.Getenv("TRON_API_KEY"))
+	} else {
+		rpc, err = bscrpc.NewRPCForNetwork(endpoint, receiptEndpoint, network.Name)
+	}
 	if err != nil {
 		return nil, err
 	}

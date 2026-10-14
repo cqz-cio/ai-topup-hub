@@ -16,6 +16,7 @@ import (
 type Config struct {
 	BSCUSDT      BSCUSDTConfig      `mapstructure:"bsc_usdt"`
 	PlasmaUSDT   BSCUSDTConfig      `mapstructure:"plasma_usdt"`
+	TronUSDT     BSCUSDTConfig      `mapstructure:"tron_usdt"`
 	AutoRecharge AutoRechargeConfig `mapstructure:"auto_recharge"`
 	App          AppConfig          `mapstructure:"app"`
 	Server       ServerConfig       `mapstructure:"server"`

@@ -23,7 +23,7 @@ import (
 )
 
 func TestChainWalletRechargeCreditsExactlyOnceAfterConfirmation(t *testing.T) {
-	for _, name := range []string{"bsc", "plasma"} {
+	for _, name := range []string{"bsc", "plasma", "tron"} {
 		t.Run(name, func(t *testing.T) {
 			svc, db, registry := setupPaymentService(t)
 			sql, _ := db.DB()
@@ -35,7 +35,7 @@ func TestChainWalletRechargeCreditsExactlyOnceAfterConfirmation(t *testing.T) {
 			network, _ := chaincontract.ResolveNetwork(name)
 			chain := &bscTestChain{head: 100, timestamp: time.Now().UTC().Truncate(time.Second)}
 			var callback paymentapp.PaymentCallbackInput
-			gateway, err := bscusdt.New(chainstore.New(db), chain, bscusdt.Config{Network: name, Recipient: "0x" + strings.Repeat("6", 40), CNYPerUSDT: "6.66"}, func(_ context.Context, invoice paymentdomain.ChainInvoice, transfer paymentdomain.ChainTransfer) error {
+			gateway, err := bscusdt.New(chainstore.New(db), chain, bscusdt.Config{Network: name, Recipient: network.DisplayAddress("0x" + strings.Repeat("6", 40)), CNYPerUSDT: "6.66"}, func(_ context.Context, invoice paymentdomain.ChainInvoice, transfer paymentdomain.ChainTransfer) error {
 				callback = paymentapp.PaymentCallbackInput{PaymentID: invoice.PaymentID, Status: constants.PaymentStatusSuccess, Amount: money.FromDecimal(decimal.RequireFromString(invoice.FiatAmount)), Currency: invoice.Currency, PaidAt: &transfer.PaidAt, ProviderRef: transfer.TxHash}
 				_, err := svc.HandleCallback(callback)
 				return err
@@ -76,7 +76,7 @@ func TestChainWalletRechargeCreditsExactlyOnceAfterConfirmation(t *testing.T) {
 			if txnCount != 0 {
 				t.Fatal("unpaid recharge credited")
 			}
-			chain.event = &chaincontract.Log{Address: network.Token, Topics: []string{bscusdt.TransferTopic, "0x" + strings.Repeat("0", 24) + strings.Repeat("1", 40), "0x" + strings.Repeat("0", 24) + invoice.Recipient[2:]}, Data: fmt.Sprintf("0x%064x", decimal.RequireFromString(invoice.Units).BigInt()), BlockNumber: "0x65", BlockHash: fmt.Sprintf("0x%064x", 101), TransactionHash: "0x" + strings.Repeat("a", 64), LogIndex: "0x0"}
+			chain.event = &chaincontract.Log{Address: network.Token, Topics: []string{bscusdt.TransferTopic, "0x" + strings.Repeat("0", 24) + strings.Repeat("1", 40), chaincontract.AddressTopic(invoice.Recipient)}, Data: fmt.Sprintf("0x%064x", decimal.RequireFromString(invoice.Units).BigInt()), BlockNumber: "0x65", BlockHash: fmt.Sprintf("0x%064x", 101), TransactionHash: "0x" + strings.Repeat("a", 64), LogIndex: "0x0"}
 			chain.head = 114
 			if err := gateway.RunOnce(context.Background()); err != nil {
 				t.Fatal(err)

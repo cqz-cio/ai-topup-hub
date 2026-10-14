@@ -221,6 +221,14 @@ plasma_usdt:
 # PLASMA_RPC_URL / PLASMA_RECEIPT_RPC_URL 仅在服务端配置；默认 https://rpc.plasma.to。
 # 主网 chain_id=9745；USDT0 合约 0xb8ce59fc3717ada4c02eadf9682a9e934f625ebb。
 
+# TRON native USDT (TRC20). Configure a public Base58Check recipient, never wallet keys.
+# TRON_RPC_URL selects a HTTPS node; TRON_API_KEY stays in the server environment.
+tron_usdt:
+  enabled: false
+  recipient: ""
+  cny_per_usdt: "6.649820455"
+  confirmations: 15 # Also requires a solidified block and successful receipt.
+
 auto_recharge:
   enabled: false
   redeem_url: "" # 启用前填写实际 HTTPS 兑换页面地址

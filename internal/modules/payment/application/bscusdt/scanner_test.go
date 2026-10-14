@@ -114,7 +114,9 @@ func setupNetwork(t *testing.T, network string) *testFixture {
 		t.Fatal(err)
 	}
 	f := &testFixture{db: db, chain: &testChain{head: 100, final: 100, timestamp: time.Now().UTC().Truncate(time.Second)}}
-	f.s, err = New(chainstore.New(db), f.chain, Config{Network: network, Recipient: testRecipient, CNYPerUSDT: "6.66", Confirmations: 15}, func(_ context.Context, i domain.ChainInvoice, v domain.ChainTransfer) error {
+	resolvedNetwork, _ := chaincontract.ResolveNetwork(network)
+	recipient := resolvedNetwork.DisplayAddress(testRecipient)
+	f.s, err = New(chainstore.New(db), f.chain, Config{Network: network, Recipient: recipient, CNYPerUSDT: "6.66", Confirmations: 15}, func(_ context.Context, i domain.ChainInvoice, v domain.ChainTransfer) error {
 		f.calls++
 		return f.settleErr
 	})
@@ -129,7 +131,7 @@ func setupNetwork(t *testing.T, network string) *testFixture {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if result.ExpiresAt == nil || result.QRCodeURL != testRecipient {
+	if result.ExpiresAt == nil || result.QRCodeURL != recipient {
 		t.Fatal("missing payment instructions")
 	}
 	if err = db.First(&f.invoice, "payment_id = ?", 1).Error; err != nil {
@@ -139,7 +141,7 @@ func setupNetwork(t *testing.T, network string) *testFixture {
 }
 func (f *testFixture) event(units string, block uint64, index uint64) Log {
 	amount := decimal.RequireFromString(units).BigInt()
-	return Log{Address: f.s.network.Token, Topics: []string{TransferTopic, addressTopic("0x" + strings.Repeat("1", 40)), addressTopic(testRecipient)}, Data: fmt.Sprintf("0x%064x", amount), BlockNumber: hexBlock(block), BlockHash: fmt.Sprintf("0x%064x", block), TransactionHash: fmt.Sprintf("0x%064x", index+1000), LogIndex: hexBlock(index)}
+	return Log{Address: f.s.network.Token, Topics: []string{TransferTopic, addressTopic("0x" + strings.Repeat("1", 40)), addressTopic(f.invoice.Recipient)}, Data: fmt.Sprintf("0x%064x", amount), BlockNumber: hexBlock(block), BlockHash: fmt.Sprintf("0x%064x", block), TransactionHash: fmt.Sprintf("0x%064x", index+1000), LogIndex: hexBlock(index)}
 }
 func (f *testFixture) run(t *testing.T) {
 	t.Helper()

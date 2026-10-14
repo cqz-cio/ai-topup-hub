@@ -89,6 +89,7 @@ type Container struct {
 	AutoRechargeService *autorechargeapp.Service
 	BSCUSDTService      *bscusdt.Service
 	PlasmaUSDTService   *bscusdt.Service
+	TronUSDTService     *bscusdt.Service
 	Config              *config.Config
 	QueueClient         *queue.Client
 

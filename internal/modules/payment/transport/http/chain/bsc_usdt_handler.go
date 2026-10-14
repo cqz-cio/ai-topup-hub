@@ -21,6 +21,10 @@ func RegisterPlasmaUSDTRoutes(admin *gin.RouterGroup, service ChainPaymentQuerie
 	registerChainUSDTRoutes(admin, "plasma-usdt", service)
 }
 
+func RegisterTronUSDTRoutes(admin *gin.RouterGroup, service ChainPaymentQueries) {
+	registerChainUSDTRoutes(admin, "tron-usdt", service)
+}
+
 func registerChainUSDTRoutes(admin *gin.RouterGroup, network string, service ChainPaymentQueries) {
 	admin.GET("/chain-payments/"+network+"/status", func(c *gin.Context) {
 		c.Header("Cache-Control", "no-store")

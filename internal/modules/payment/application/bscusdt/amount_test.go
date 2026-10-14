@@ -20,7 +20,7 @@ func centInput(id uint, fiat string) contract.GatewayCreateInput {
 }
 
 func TestInvoiceRoundsUpToCentsOnBothNetworks(t *testing.T) {
-	for _, network := range []string{"bsc", "plasma"} {
+	for _, network := range []string{"bsc", "plasma", "tron"} {
 		for _, tc := range []struct{ name, fiat, rate, want string }{
 			{"current_rate", "100.00", "6.649820455", "15.04"},
 			{"exact_cent", "66.60", "6.66", "10.00"},
@@ -135,7 +135,7 @@ func TestCentCapacityStopsAtNinetyNineCentUplift(t *testing.T) {
 }
 
 func TestLegacySixDecimalInvoiceResumesAndSettlesUnchanged(t *testing.T) {
-	for _, network := range []string{"bsc", "plasma"} {
+	for _, network := range []string{"bsc", "plasma", "tron"} {
 		t.Run(network, func(t *testing.T) {
 			f := setupNetwork(t, network)
 			f.invoice.Amount = "20.003517"

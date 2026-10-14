@@ -116,6 +116,7 @@ const providerTypeLabel = (value?: string) => {
     official: t('admin.paymentChannels.providerTypes.official'),
     bscusdt: 'USDT · BNB Smart Chain (BEP-20)',
     plasmausdt: 'USDT · Plasma',
+    tronusdt: 'USDT · TRON (TRC20)',
     xorpay: 'XorPay',
     epay: t('admin.paymentChannels.providerTypes.epay'),
     bepusdt: t('admin.paymentChannels.providerTypes.bepusdt'),

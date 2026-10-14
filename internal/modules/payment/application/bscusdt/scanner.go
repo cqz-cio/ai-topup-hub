@@ -64,9 +64,13 @@ func (s *Service) RunOnce(ctx context.Context) error {
 			return ErrReorg
 		}
 	}
-	// Bound each request to 100 blocks; progress survives restarts and RPC errors.
-	if end-cursor.NextBlock >= 100 {
-		end = cursor.NextBlock + 99
+	// Bound each scan by the network limit; progress survives restarts and RPC errors.
+	batchSize := s.network.ScanBatchSize
+	if batchSize == 0 {
+		batchSize = 100
+	}
+	if end-cursor.NextBlock >= batchSize {
+		end = cursor.NextBlock + batchSize - 1
 	}
 	boundary, err := s.chain.Header(ctx, hexBlock(end))
 	if err != nil {
@@ -148,7 +152,11 @@ func (s *Service) verify(ctx context.Context, l chain.Log, from, to uint64) (*do
 	if !found {
 		return nil, ErrRPC
 	}
-	return &domain.ChainTransfer{Key: fmt.Sprintf("%d/%s/%d", s.network.ChainID, strings.ToLower(l.TransactionHash), idx), Stream: s.stream, TxHash: strings.ToLower(l.TransactionHash), LogIndex: idx, Block: n, BlockHash: strings.ToLower(l.BlockHash), Sender: "0x" + strings.ToLower(l.Topics[1][26:]), Units: units.String(), PaidAt: time.Unix(int64(stamp), 0).UTC(), State: "manual_review", Reason: "unmatched_amount"}, nil
+	txHash := strings.ToLower(l.TransactionHash)
+	if s.network.Name == "tron" {
+		txHash = strings.TrimPrefix(txHash, "0x")
+	}
+	return &domain.ChainTransfer{Key: fmt.Sprintf("%d/%s/%d", s.network.ChainID, txHash, idx), Stream: s.stream, TxHash: txHash, LogIndex: idx, Block: n, BlockHash: strings.ToLower(l.BlockHash), Sender: s.network.DisplayAddress("0x" + strings.ToLower(l.Topics[1][26:])), Units: units.String(), PaidAt: time.Unix(int64(stamp), 0).UTC(), State: "manual_review", Reason: "unmatched_amount"}, nil
 }
 
 func (s *Service) deliver(ctx context.Context) error {

@@ -49,6 +49,10 @@ const network = computed(() => {
     && props.channel.channel_type?.toLowerCase() === 'usdt-plasma') {
     return { title: 'USDT · Plasma', subtitle: t('payment.plasmaNetwork') }
   }
+  if (props.channel.provider_type?.toLowerCase() === 'tronusdt'
+    && props.channel.channel_type?.toLowerCase() === 'usdt-trc20') {
+    return { title: 'USDT · TRON', subtitle: 'TRC20' }
+  }
   return null
 })
 </script>

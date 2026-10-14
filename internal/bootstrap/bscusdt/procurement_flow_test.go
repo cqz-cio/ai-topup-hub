@@ -105,7 +105,7 @@ func (q *purchaseFlowQueue) EnqueuePoll(id uint, _ time.Duration) error {
 }
 
 func TestConfirmedUSDTTransferRunsStorefrontProcurementAndCustomerDelivery(t *testing.T) {
-	for _, networkName := range []string{"bsc", "plasma"} {
+	for _, networkName := range []string{"bsc", "plasma", "tron"} {
 		for _, scenario := range []string{"immediate_card", "delayed_card", "queue_recovery", "insufficient_balance", "unknown_result", "retry_after_topup"} {
 			t.Run(networkName+"/"+scenario, func(t *testing.T) {
 				payments, db, registry := setupPaymentService(t)
@@ -143,7 +143,7 @@ func TestConfirmedUSDTTransferRunsStorefrontProcurementAndCustomerDelivery(t *te
 				}
 				chain := &bscTestChain{head: 100, timestamp: time.Now().UTC().Truncate(time.Second)}
 				settlements := 0
-				gateway, err := bscusdt.New(chainstore.New(db), chain, bscusdt.Config{Network: networkName, Recipient: "0x66a8bab15067eab1efc948ac03684f0397c8416f", CNYPerUSDT: "6.66", Confirmations: 15}, func(_ context.Context, invoice paymentdomain.ChainInvoice, transfer paymentdomain.ChainTransfer) error {
+				gateway, err := bscusdt.New(chainstore.New(db), chain, bscusdt.Config{Network: networkName, Recipient: network.DisplayAddress("0x66a8bab15067eab1efc948ac03684f0397c8416f"), CNYPerUSDT: "6.66", Confirmations: 15}, func(_ context.Context, invoice paymentdomain.ChainInvoice, transfer paymentdomain.ChainTransfer) error {
 					settlements++
 					_, err := payments.HandleCallback(paymentapp.PaymentCallbackInput{PaymentID: invoice.PaymentID, Status: constants.PaymentStatusSuccess, Amount: money.FromDecimal(decimal.RequireFromString(invoice.FiatAmount)), Currency: invoice.Currency, PaidAt: &transfer.PaidAt, ProviderRef: transfer.TxHash})
 					return err
@@ -170,7 +170,7 @@ func TestConfirmedUSDTTransferRunsStorefrontProcurementAndCustomerDelivery(t *te
 				if err = db.First(&invoice, "payment_id = ?", payment.Payment.ID).Error; err != nil {
 					t.Fatal(err)
 				}
-				chain.event = &chaincontract.Log{Address: network.Token, Topics: []string{bscusdt.TransferTopic, "0x" + strings.Repeat("0", 24) + strings.Repeat("1", 40), "0x" + strings.Repeat("0", 24) + invoice.Recipient[2:]}, Data: fmt.Sprintf("0x%064x", decimal.RequireFromString(invoice.Units).BigInt()), BlockNumber: "0x65", BlockHash: fmt.Sprintf("0x%064x", 101), TransactionHash: "0x" + strings.Repeat("a", 64), LogIndex: "0x0"}
+				chain.event = &chaincontract.Log{Address: network.Token, Topics: []string{bscusdt.TransferTopic, "0x" + strings.Repeat("0", 24) + strings.Repeat("1", 40), chaincontract.AddressTopic(invoice.Recipient)}, Data: fmt.Sprintf("0x%064x", decimal.RequireFromString(invoice.Units).BigInt()), BlockNumber: "0x65", BlockHash: fmt.Sprintf("0x%064x", 101), TransactionHash: "0x" + strings.Repeat("a", 64), LogIndex: "0x0"}
 				chain.head = 110
 				if err = gateway.RunOnce(context.Background()); err != nil {
 					t.Fatal(err)
