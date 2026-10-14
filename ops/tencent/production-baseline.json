@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-14T07:48:49.614986+00:00",
+  "checked_at": "2026-10-14T08:15:40.756244+00:00",
   "production_url": "https://www.qzweb.cloud/",
   "documented_release_id": "20261014-150947",
   "verified_release_id": "20261014-150947",
@@ -364,12 +364,12 @@
   "previous_build_verification_at": "2026-10-12T08:19:31.766441+00:00",
   "management_url": "https://124.220.2.69:18888/login",
   "frontend_gateway": {
-    "checked_at": "2026-10-14T07:48:49.614986+00:00",
+    "checked_at": "2026-10-14T08:15:40.756244+00:00",
     "frontend_host": "124.220.2.69",
     "backend_host": "43.134.141.10",
-    "frontend_release": "20261014-150947",
-    "source_commit": "08cc45c4ab9b14561d48dcc350428cebc338c5d7",
-    "static_files_verified": 445,
+    "frontend_release": "20261014-160123",
+    "source_commit": "14e28d402b205ef9fb94a94ba7c1f30a0a76a147",
+    "static_files_verified": 1297,
     "storefront_url": "https://www.qzweb.cloud/",
     "management_url": "https://124.220.2.69:18888/login",
     "www_dns_record": "www A 124.220.2.69",
@@ -385,8 +385,8 @@
     "certificate_renewal_verified": true,
     "certificate_timer": "qzweb-certificates.timer",
     "certificate_renewal_report": "/srv/zhixiang-front/shared/work/renew-final-20261012-1644/status.json",
-    "report_path": "/srv/zhixiang-front/shared/work/tron-usdt-20261014-150947.json",
-    "backend_report_path": "/srv/zhixiang/shared/reports/tron-usdt-release-20261014-150947.json",
+    "report_path": "/srv/zhixiang-front/shared/work/invoice-notices-20261014-160123.json",
+    "backend_report_path": "/srv/zhixiang/backups/before-invoice-notices-20261014-160123/metadata.json",
     "formal_alipay_enabled": false,
     "database_uploaded": false,
     "legacy_singapore_http_entries_retained": true,
@@ -399,26 +399,24 @@
       "browser_current_frontend_confirmed": true,
       "report_path": "/srv/zhixiang-front/shared/work/entry-cache-report.json"
     },
-    "previous_frontend_release": "20261014-151124",
-    "storefront_source_commit": "08cc45c4ab9b14561d48dcc350428cebc338c5d7",
+    "previous_frontend_release": "20261014-150947",
+    "storefront_source_commit": "14e28d402b205ef9fb94a94ba7c1f30a0a76a147",
     "admin_source_commit": "08cc45c4ab9b14561d48dcc350428cebc338c5d7",
-    "backup": "/srv/zhixiang-front/backups/before-tron-usdt-20261014-150947",
-    "frontend_only_update": false,
+    "backup": "/srv/zhixiang-front/backups/before-invoice-notices-20261014-160123",
+    "frontend_only_update": true,
     "previous_hashed_assets_retained": true,
     "verified_services": {
       "nginx": "active",
       "zhixiang-api-tunnel": "active",
       "qzweb-certificates.timer": "active"
     },
-    "release_scope": "TRON USDT support with existing feature-availability, fee notice and redemption navigation retained",
-    "admin_files_verified": 120,
-    "storefront_files_verified": 325,
-    "backend_program_preserved": false,
-    "backend_setting_changes": [
-      "tron_usdt section only"
-    ],
-    "frontend_build_source_commit": "08cc45c4ab9b14561d48dcc350428cebc338c5d7",
-    "frontend_source_identical_to_backend": true,
+    "release_scope": "Product and paid-order invoice support notices; storefront only",
+    "admin_files_verified": 969,
+    "storefront_files_verified": 328,
+    "backend_program_preserved": true,
+    "backend_setting_changes": [],
+    "frontend_build_source_commit": "14e28d402b205ef9fb94a94ba7c1f30a0a76a147",
+    "frontend_source_identical_to_backend": false,
     "admin_base": "/",
     "base_repair_backup": "/srv/zhixiang-front/backups/before-xorpay-admin-base-20261013-173020"
   },
@@ -1771,5 +1769,42 @@
     "script_errors": 0,
     "horizontal_overflow": false,
     "report_directory": "work/codex-runtime/tron-usdt/"
+  },
+  "invoice_support": {
+    "checked_at": "2026-10-14T08:15:40.756244+00:00",
+    "frontend_release": "20261014-160123",
+    "source_commit": "14e28d402b205ef9fb94a94ba7c1f30a0a76a147",
+    "feature_document": "docs/invoicing.md",
+    "user_tests_passed": 108,
+    "typecheck_and_build_passed": true,
+    "viewports": [
+      1920,
+      390,
+      320
+    ],
+    "locales": [
+      "zh-CN",
+      "zh-TW",
+      "en-US"
+    ],
+    "production_browser_checks": 5,
+    "production_paid_order_opened": false,
+    "paid_order_checks_used_local_mock_data": true,
+    "customer_wechat": "Cqz0924ttxk",
+    "copy_wechat_and_order_verified": true,
+    "purchase_notice_and_popup_unchanged": true,
+    "backend_and_redis_preserved": true,
+    "business_tables_verified": [
+      "settings",
+      "payment_channels",
+      "products",
+      "product_skus",
+      "user_product_prices",
+      "member_levels"
+    ],
+    "backend_backup": "/srv/zhixiang/backups/before-invoice-notices-20261014-160123",
+    "frontend_backup": "/srv/zhixiang-front/backups/before-invoice-notices-20261014-160123",
+    "evidence": "work/codex-runtime/invoice-preview-20261014/",
+    "real_payment_or_procurement_performed": false
   }
 }
