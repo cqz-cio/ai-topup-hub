@@ -8,6 +8,7 @@ import (
 	ginutil "github.com/dujiao-next/internal/platform/http/ginutil"
 
 	"github.com/dujiao-next/internal/platform/http/response"
+	"github.com/dujiao-next/internal/platform/runtimecap"
 	"github.com/dujiao-next/internal/selfupdate"
 	"github.com/dujiao-next/internal/version"
 
@@ -29,17 +30,30 @@ func (defaultReleaseChecker) CheckLatestRelease(ctx context.Context) (*version.C
 type AdminHandler struct {
 	releases ReleaseChecker
 	// updates 一键升级任务管理器。进程内单例，串行化升级任务并保存可轮询的进度。
-	updates *selfupdate.Manager
+	updates  *selfupdate.Manager
+	features func() runtimecap.Features
 }
 
-func NewAdminHandler(releases ReleaseChecker) *AdminHandler {
+func NewAdminHandler(releases ReleaseChecker, features ...func() runtimecap.Features) *AdminHandler {
 	if releases == nil {
 		releases = defaultReleaseChecker{}
 	}
-	return &AdminHandler{
+	handler := &AdminHandler{
 		releases: releases,
 		updates:  selfupdate.NewManager(),
 	}
+	if len(features) > 0 {
+		handler.features = features[0]
+	}
+	return handler
+}
+
+func (h *AdminHandler) GetFeatures(c *gin.Context) {
+	features := runtimecap.Resolve(runtimecap.Options{})
+	if h.features != nil {
+		features = h.features()
+	}
+	response.Success(c, features)
 }
 
 // CheckSystemUpdate 通过 GitHub Releases API 检测是否有新版本发布

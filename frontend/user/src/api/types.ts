@@ -161,6 +161,10 @@ export interface GiftCardRedeemResult {
 }
 
 export interface AffiliateDashboardData {
+    enabled: boolean
+    can_open: boolean
+    can_withdraw: boolean
+    profile_status: string
     opened: boolean
     affiliate_code: string
     promotion_path: string

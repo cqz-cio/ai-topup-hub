@@ -20,6 +20,7 @@ func BuildRunner(cfg *config.Config, mode string) (*Runner, error) {
 	if err != nil {
 		return nil, err
 	}
+	dependencies.RuntimeMode = mode
 	if mode == ModeCheckout {
 		// Paid upstream orders remain awaiting fulfillment until procurement is
 		// explicitly enabled. Do not create or enqueue purchases in this mode.

@@ -98,6 +98,8 @@ func registerAdminRoutes(
 	adminauthtransport.RegisterAdmin2FAAuthRoutes(adminAuth, admin2FAHandler, middleware.RateLimitMiddleware(redisClient, adminLoginRule, middleware.KeyByIP))
 
 	// 需要鉴权的接口
+	systemHandler := systemtransport.NewAdminHandler(nil, c.RuntimeFeatures)
+	systemtransport.RegisterFeatureRoutes(admin.Group("", middleware.JWTAuthMiddleware(cfg.JWT.SecretKey, c.AdminStore)), systemHandler)
 	authorized := admin.Use(middleware.JWTAuthMiddleware(cfg.JWT.SecretKey, c.AdminStore), middleware.AdminRBACMiddleware(c.AuthzService))
 	// 支付/财务相关受保护子组：未确认合规声明时拦截
 	// 注：admin.Use(...) 已 mutate admin 自身，新 Group 继承 JWT + RBAC 中间件
@@ -142,7 +144,7 @@ func registerAdminRoutes(
 	adminauthtransport.RegisterAdminPasswordRoutes(authorized, adminLoginHandler)
 
 	// 系统信息与版本检测
-	systemtransport.RegisterAdminRoutes(authorized, systemtransport.NewAdminHandler(nil))
+	systemtransport.RegisterAdminRoutes(authorized, systemHandler)
 
 	adminauthtransport.RegisterAdmin2FARoutes(authorized, admin2FAHandler)
 
@@ -209,11 +211,11 @@ func registerAdminRoutes(
 	procurementtransport.RegisterAdminRoutes(authorized, adminProcurementHandler)
 
 	// 对账管理
-	reconciliationtransport.RegisterAdminRoutes(paymentProtected, reconciliationtransport.NewAdminHandler(c.ReconciliationService))
+	reconciliationtransport.RegisterAdminRoutes(paymentProtected, reconciliationtransport.NewAdminHandler(c.ReconciliationService, func() bool { return c.RuntimeFeatures().Reconciliation.Available }))
 
 	// 渠道客户端管理
 	channelclienthttp.RegisterAdminRoutes(authorized, channelclienthttp.NewAdminHandler(c.ChannelClientService))
 
 	// Telegram Bot 群发
-	broadcasthttp.RegisterAdminRoutes(authorized, broadcasthttp.NewAdminHandler(c.TelegramBroadcastService))
+	broadcasthttp.RegisterAdminRoutes(authorized, broadcasthttp.NewAdminHandler(c.TelegramBroadcastService, func() bool { return c.RuntimeFeatures().TelegramBroadcast.Available }))
 }

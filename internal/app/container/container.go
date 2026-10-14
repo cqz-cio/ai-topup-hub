@@ -91,6 +91,7 @@ type Container struct {
 	PlasmaUSDTService   *bscusdt.Service
 	TronUSDTService     *bscusdt.Service
 	Config              *config.Config
+	RuntimeMode         string
 	QueueClient         *queue.Client
 
 	// Repositories

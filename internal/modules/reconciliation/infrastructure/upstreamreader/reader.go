@@ -3,6 +3,7 @@ package upstreamreader
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	reconciliationcontract "github.com/dujiao-next/internal/modules/reconciliation/contract"
 	siteconnectiondomain "github.com/dujiao-next/internal/modules/siteconnection/domain"
@@ -45,10 +46,21 @@ func (r *Reader) Open(connectionID uint) (reconciliationcontract.UpstreamOrderRe
 	return &session{adapter: adapter}, nil
 }
 
-func (s *session) Get(ctx context.Context, upstreamOrderID uint) (*reconciliationcontract.UpstreamOrder, error) {
-	detail, err := s.adapter.GetOrder(ctx, upstreamOrderID)
+func (s *session) Get(ctx context.Context, upstreamOrderID uint, upstreamOrderNo string) (*reconciliationcontract.UpstreamOrder, error) {
+	var detail *upstream.UpstreamOrderDetail
+	var err error
+	if referenced, ok := s.adapter.(upstream.ReferenceOrderAdapter); ok && strings.TrimSpace(upstreamOrderNo) != "" {
+		detail, err = referenced.GetOrderByReference(ctx, upstreamOrderNo)
+	} else if upstreamOrderID > 0 {
+		detail, err = s.adapter.GetOrder(ctx, upstreamOrderID)
+	} else {
+		return nil, fmt.Errorf("supplier does not support string order references")
+	}
 	if err != nil {
 		return nil, err
+	}
+	if detail == nil {
+		return nil, fmt.Errorf("supplier returned no order detail")
 	}
 	return &reconciliationcontract.UpstreamOrder{Status: detail.Status, Amount: detail.Amount}, nil
 }
