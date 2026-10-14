@@ -14,8 +14,8 @@
 | 本地商城 | http://127.0.0.1:5173/ |
 | 本地后台 | http://127.0.0.1:5174/ |
 | 绿色源码基线 | `baseline/green-20261012`，提交 `419141e` |
-| 后端源码基准 | `20261014-105629`，构建源码 `1be05e228bc34336cfc86e7c7c5558ac3dac5609`，见 [分销申请](docs/reseller-applications.md) |
-| 商城与后台静态发布 | 上海 `20261014-143305`；商城源码 `0fa08784dde3e748e14114e9a6119778532ebf8b`，后台保留 `1be05e2` 来源；分销申请开启，已修复[下拉框导致导航消失](docs/dropdown-scroll.md) |
+| 后端源码基准 | `20261014-145155`，源码 `b6dcc7d1a99b3ed91b1cfeb9b468642984bcd042`；见[功能状态与任务处理](docs/feature-availability.md) |
+| 商城与后台静态发布 | 上海 `20261014-150333`；商城源码 `e10040f8ae2835ab1487502ad8d5edb5831dffea`，后台源码 `b6dcc7d1a99b3ed91b1cfeb9b468642984bcd042`；已上线 [U 支付到账提醒](docs/usdt-transfer-notice.md) |
 | 微信支付 | 已启用 Native 扫码，客户手续费 1.6% 向上取分；真实资金验收尚未完成 |
 
 源码标签、服务器发布号和数据库是三个独立对象。线上比对证据与核验范围在 [production-baseline.json](ops/tencent/production-baseline.json)。推送 GitHub 不会自动部署服务器，也不会同步数据库。2026-10-12 已将 `www` 解析切到上海；两套前端发布 `20261012-164700` 与新加坡后端的构建源码 `948c37f` 对齐，域名 HTTPS、管理端登录鉴权和证书自动续期已核验。旧新加坡 HTTP 入口保留兼容，日常使用上表 HTTPS 地址。正式支付宝仍未启用，代码和沙箱结果见 [支付宝接入记录](docs/alipay-web-payment.md)。
