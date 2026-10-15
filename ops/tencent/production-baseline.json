@@ -2007,5 +2007,20 @@
     "real_funds_test": false,
     "production_browser_verified": true,
     "private_evidence": "work/codex-runtime/unified-wallet/verified-report.json"
+  },
+  "admin_domain_preparation": {
+    "domain": "admin.qzweb.cloud",
+    "target_ip": "124.220.2.69",
+    "status": "pending_dns_account_access",
+    "https_active": false,
+    "configuration_source": "0774d66930c63f55cc16a9b72e80c392ee22d7b8",
+    "http_acme_deployed": true,
+    "local_checks": 27,
+    "production_checks": 5,
+    "frontend_files_preserved": 5298,
+    "backend_backup": "/srv/zhixiang/backups/before-admin-domain-20261015-145331",
+    "frontend_backup": "/srv/zhixiang-front/backups/before-admin-domain-20261015-145331",
+    "staging_directory": "/srv/zhixiang-front/shared/work/admin-domain-20261015-145331",
+    "checked_at": "2026-10-15T06:55:54.133352+00:00"
   }
 }

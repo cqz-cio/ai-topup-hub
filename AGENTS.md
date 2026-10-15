@@ -214,3 +214,8 @@
 - 日常本地已重建重启，资金来源、退款、并发防重及权限相关最终 894 项 Go 回归、商城 114 项、后台 64 项与两套类型/构建通过。模拟提现后冻结、超收益拒绝、刷新恢复及原价说明实际验收；测试数据已清理。本地财务声明未代签，审核用隔离服务/HTTP/组件验证。全量 Go 的既有 Windows 日志锁、CGO SQLite 测试与 Linux 权限假设限制单独记录，未称全量通过。
 - 正式站桌面及 390/320px 钱包、返利入口和后台只读核验通过；450 个新资源、4990 个保留文件和 55 个 Nginx 文件核对通过。切换时 62 组原有业务表内容保留，现有 819.99 元钱包余额未变且未变成可提现；仅新增资金来源字段/表及三条权限，并启用目标配置和商品返利标记。售价、成本、收款配置、Redis 与库存 timer 保留。未上传本机库、提交正式验收提现、代签声明或执行付款采购。
 - 备份 `/srv/zhixiang/backups/before-unified-wallet-20261015-125607`、`/srv/zhixiang-front/backups/before-unified-wallet-20261015-125607`、`/srv/zhixiang/backups/before-wallet-activation-20261015-125607`；私有记录 `work/codex-runtime/unified-wallet/`。D 盘主目录另一个任务的未提交代码保持原样，本次在已附加的 `unified-wallet-earnings` 主线工作区发布；日常本机使用 D 盘配置/数据库、该工作区前端和记录的本地二进制。
+
+## 后台子域名准备（2026-10-15，尚未启用）
+
+- 已准备 `admin.qzweb.cloud` 的 HTTPS 后台入口，配置源码 `0774d66930c63f55cc16a9b72e80c392ee22d7b8`，本地 27 项检查及日常页面通过。腾讯云当前登录账号的 DNSPod 列表为空，等待用户切换到管理 `qzweb.cloud` 的账号后添加 `admin A 124.220.2.69`（TTL 600）。当前 DNS 为 NXDOMAIN；不要把准备完成称为域名上线。
+- 上海仅安装 HTTP ACME 验证入口，完整配置在 `/srv/zhixiang-front/shared/work/admin-domain-20261015-145331/`。解析就绪后使用既有 Certbot 目录与续期 timer 签证，再安装完整入口和专用主站 Host 代理片段。原 IP 后台保留；程序仍为 `20261015-125607`。两地备份均为各自 `backups/before-admin-domain-20261015-145331`，详情见 `ops/tencent/README.md`，私有状态在 D 盘 `work/codex-runtime/admin-domain/pending-report.json`。
