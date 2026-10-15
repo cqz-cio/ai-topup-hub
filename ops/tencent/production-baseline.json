@@ -1,24 +1,24 @@
 {
-  "checked_at": "2026-10-14T08:52:12.595045+00:00",
+  "checked_at": "2026-10-15T05:10:06.114536+00:00",
   "production_url": "https://www.qzweb.cloud/",
-  "documented_release_id": "20261014-162234",
-  "verified_release_id": "20261014-162234",
-  "previous_release_id": "20261014-155607",
-  "source_commit": "506c523bcec9a1cd9c656c0fe62b6d33e47afbcb",
+  "documented_release_id": "20261015-125607",
+  "verified_release_id": "20261015-125607",
+  "previous_release_id": "20261014-162234",
+  "source_commit": "3728a67dd4359af2d39786eb2cde2e9a2acb7466",
   "source_branch": "main",
   "server_git_commit_verified": true,
-  "source_tag": "production/amount-reconciliation-20261014-155607",
+  "source_tag": "production/unified-wallet-20261015-125607",
   "production": {
-    "release_path": "/srv/zhixiang/releases/20261014-162234",
-    "running_executable": "/srv/zhixiang/releases/20261014-162234/zhixiang-shop",
-    "binary_bytes": 90628258,
-    "binary_sha256": "431e7a2798dc54dfddcb126eca3b212a780f11aac211eed9e472dfdb0e6c4671",
-    "running_binary_sha256": "431e7a2798dc54dfddcb126eca3b212a780f11aac211eed9e472dfdb0e6c4671",
-    "manifest_binary_sha256": "431e7a2798dc54dfddcb126eca3b212a780f11aac211eed9e472dfdb0e6c4671",
+    "release_path": "/srv/zhixiang/releases/20261015-125607",
+    "running_executable": "/srv/zhixiang/releases/20261015-125607/zhixiang-shop",
+    "binary_bytes": 90742946,
+    "binary_sha256": "6ec7bf14c57fd98698f933d17c62f105f528adb9ea9286a8b65473a693624243",
+    "running_binary_sha256": "6ec7bf14c57fd98698f933d17c62f105f528adb9ea9286a8b65473a693624243",
+    "manifest_binary_sha256": "6ec7bf14c57fd98698f933d17c62f105f528adb9ea9286a8b65473a693624243",
     "build_info": {
       "go_version": "go1.26.5",
-      "source_commit": "506c523bcec9a1cd9c656c0fe62b6d33e47afbcb",
-      "vcs_revision": "506c523bcec9a1cd9c656c0fe62b6d33e47afbcb",
+      "source_commit": "3728a67dd4359af2d39786eb2cde2e9a2acb7466",
+      "vcs_revision": "3728a67dd4359af2d39786eb2cde2e9a2acb7466",
       "vcs_modified": false,
       "git_metadata_pinned": true,
       "tags": "release,fullstack"
@@ -32,18 +32,19 @@
       "stock_sync_timer": "active"
     },
     "redis_preserved_without_restart": true,
-    "backup": "/srv/zhixiang/backups/before-about-settings-20261014-162234",
+    "backup": "/srv/zhixiang/backups/before-unified-wallet-20261015-125607",
     "database_backup_quick_check": "ok",
-    "report_path": "/srv/zhixiang/shared/reports/about-settings-release-20261014-162234.json",
+    "report_path": "/srv/zhixiang/shared/reports/unified-wallet-release-20261015-125607.json",
     "configuration_unchanged": true,
     "nginx_configuration_preserved": true,
     "source_dirty": false,
     "private_configuration_unchanged": true,
     "configuration_changes": [],
-    "source_commit": "506c523bcec9a1cd9c656c0fe62b6d33e47afbcb",
+    "source_commit": "3728a67dd4359af2d39786eb2cde2e9a2acb7466",
     "configuration_except_tron_preserved": true,
     "settings_changes": [
-      "about_page_config"
+      "affiliate_config",
+      "wallet_config"
     ]
   },
   "payment": {
@@ -219,7 +220,8 @@
     "Payment channels and assets were verified through public GET requests; no production test order was created.",
     "Finance GET permissions were verified in the live policy API; existing payment compliance acknowledgement remains required for monitoring access.",
     "Shanghai HTTPS domain and IP management frontends were verified without placing a production order; official Alipay contracting and payment notification acceptance remain incomplete.",
-    "XorPay local daily channel setup and payment UI flow were not performed at user request because local compliance acknowledgement was declined. Production configuration and checkout fee preview were verified; real payment/notification/funding acceptance remains incomplete."
+    "XorPay local daily channel setup and payment UI flow were not performed at user request because local compliance acknowledgement was declined. Production configuration and checkout fee preview were verified; real payment/notification/funding acceptance remains incomplete.",
+    "Unified-wallet local review was verified with service/HTTP/component fixtures; the daily local financial declaration remained unsigned. Broader Go suite has existing Windows logger lock, CGO-disabled SQLite fixture and Linux-permission selfupdate test limitations; affected wallet/order/payment/affiliate/reseller checks passed. No real payout or procurement was performed."
   ],
   "procurement_verification": {
     "mock_end_to_end_scenarios_passed": 12,
@@ -289,13 +291,13 @@
     "content_preserved_by_release": "20261012-153531"
   },
   "source_identity_verification": {
-    "source_commit": "506c523bcec9a1cd9c656c0fe62b6d33e47afbcb",
+    "source_commit": "3728a67dd4359af2d39786eb2cde2e9a2acb7466",
     "source_branch": "main",
     "source_dirty": false,
     "binary_build_info_commit_matches": true,
     "running_binary_sha256_matches": true,
-    "frontend_files_sha256_verified": 448,
-    "frontend_verification_scope": "Both frontend builds from the backend source; previous hashed assets and images retained."
+    "frontend_files_sha256_verified": 450,
+    "frontend_verification_scope": "User build includes three legacy-statistic label corrections; full manifest, retained assets and runtime APIs verified."
   },
   "previous_release": {
     "release": "20261014-155607",
@@ -349,12 +351,12 @@
   "previous_build_verification_at": "2026-10-12T08:19:31.766441+00:00",
   "management_url": "https://124.220.2.69:18888/login",
   "frontend_gateway": {
-    "checked_at": "2026-10-14T08:52:12.595045+00:00",
+    "checked_at": "2026-10-15T05:10:06.114536+00:00",
     "frontend_host": "124.220.2.69",
     "backend_host": "43.134.141.10",
-    "frontend_release": "20261014-162234",
-    "source_commit": "506c523bcec9a1cd9c656c0fe62b6d33e47afbcb",
-    "static_files_verified": 448,
+    "frontend_release": "20261015-125607",
+    "source_commit": "8f2c17edcb4136cd31d99f2bd74e3870b9d9c75f",
+    "static_files_verified": 450,
     "storefront_url": "https://www.qzweb.cloud/",
     "management_url": "https://124.220.2.69:18888/login",
     "www_dns_record": "www A 124.220.2.69",
@@ -370,8 +372,8 @@
     "certificate_renewal_verified": true,
     "certificate_timer": "qzweb-certificates.timer",
     "certificate_renewal_report": "/srv/zhixiang-front/shared/work/renew-final-20261012-1644/status.json",
-    "report_path": "/srv/zhixiang-front/shared/work/about-settings-20261014-162234.json",
-    "backend_report_path": "/srv/zhixiang/shared/reports/about-settings-release-20261014-162234.json",
+    "report_path": "/srv/zhixiang-front/shared/work/unified-wallet-20261015-125607.json",
+    "backend_report_path": "/srv/zhixiang/shared/reports/unified-wallet-release-20261015-125607.json",
     "formal_alipay_enabled": false,
     "database_uploaded": false,
     "legacy_singapore_http_entries_retained": true,
@@ -384,10 +386,10 @@
       "browser_current_frontend_confirmed": true,
       "report_path": "/srv/zhixiang-front/shared/work/entry-cache-report.json"
     },
-    "previous_frontend_release": "20261014-160123",
-    "storefront_source_commit": "506c523bcec9a1cd9c656c0fe62b6d33e47afbcb",
-    "admin_source_commit": "506c523bcec9a1cd9c656c0fe62b6d33e47afbcb",
-    "backup": "/srv/zhixiang-front/backups/before-about-settings-20261014-162234",
+    "previous_frontend_release": "20261014-162234",
+    "storefront_source_commit": "8f2c17edcb4136cd31d99f2bd74e3870b9d9c75f",
+    "admin_source_commit": "3728a67dd4359af2d39786eb2cde2e9a2acb7466",
+    "backup": "/srv/zhixiang-front/backups/before-unified-wallet-20261015-125607",
     "frontend_only_update": false,
     "previous_hashed_assets_retained": true,
     "verified_services": {
@@ -395,17 +397,19 @@
       "zhixiang-api-tunnel": "active",
       "qzweb-certificates.timer": "active"
     },
-    "release_scope": "About page content settings, storefront and admin editor",
-    "admin_files_verified": 120,
-    "storefront_files_verified": 328,
+    "release_scope": "Unified earnings wallet, original-price affiliate commissions, manual withdrawals",
+    "admin_files_verified": 121,
+    "storefront_files_verified": 329,
     "backend_program_preserved": false,
     "backend_setting_changes": [
-      "about_page_config"
+      "affiliate_config",
+      "wallet_config"
     ],
-    "frontend_build_source_commit": "506c523bcec9a1cd9c656c0fe62b6d33e47afbcb",
-    "frontend_source_identical_to_backend": true,
+    "frontend_build_source_commit": "8f2c17edcb4136cd31d99f2bd74e3870b9d9c75f",
+    "frontend_source_identical_to_backend": false,
     "admin_base": "/",
-    "base_repair_backup": "/srv/zhixiang-front/backups/before-xorpay-admin-base-20261013-173020"
+    "base_repair_backup": "/srv/zhixiang-front/backups/before-xorpay-admin-base-20261013-173020",
+    "frontend_source_difference": "Three labels clarify legacy affiliate withdrawals; all backend and admin code identical."
   },
   "alipay": {
     "code_and_official_sandbox_query_verified": true,
@@ -1967,5 +1971,41 @@
     "real_payment_or_procurement": false,
     "evidence": "work/codex-runtime/tron-content-audit-20261014/",
     "checked_at": "2026-10-14T08:55:23.970748+00:00"
+  },
+  "unified_wallet": {
+    "release": "20261015-125607",
+    "backend_source": "3728a67dd4359af2d39786eb2cde2e9a2acb7466",
+    "frontend_source": "8f2c17edcb4136cd31d99f2bd74e3870b9d9c75f",
+    "affiliate_rate": 2,
+    "confirm_days": 30,
+    "minimum_withdrawal_cny": "20.00",
+    "manual_withdrawal_channels": [
+      "alipay",
+      "wechat"
+    ],
+    "eligible_products": [
+      "qzweb-4",
+      "qzweb-5",
+      "qzweb-55",
+      "qzweb-7",
+      "qzweb-56",
+      "qzweb-58",
+      "qzweb-57",
+      "qzweb-50",
+      "qzweb-51",
+      "qzweb-6"
+    ],
+    "original_price_whole_orders_only": true,
+    "recharge_gift_and_historical_balances_withdrawable": false,
+    "preexisting_balance_preserved": "819.99",
+    "activation_backup": "/srv/zhixiang/backups/before-wallet-activation-20261015-125607",
+    "local_related_go_checks": 894,
+    "user_tests": 114,
+    "admin_tests": 64,
+    "local_declaration_signed": false,
+    "production_declaration_reused": true,
+    "real_funds_test": false,
+    "production_browser_verified": true,
+    "private_evidence": "work/codex-runtime/unified-wallet/verified-report.json"
   }
 }
