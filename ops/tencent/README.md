@@ -1,5 +1,15 @@
 # 上海前端与新加坡后端
 
+## 后台子域名准备（2026-10-15，等待 DNS 账号）
+
+目标为 `https://admin.qzweb.cloud/login`，DNS 记录为 `admin A 124.220.2.69`、TTL 600。当前腾讯云会话的 DNSPod 域名列表为空，尚未找到 `qzweb.cloud` 所属账号；公网查询仍为 NXDOMAIN，**新域名尚未启用 HTTPS**。日常后台继续使用 `https://124.220.2.69:18888/login`。
+
+配置源码 `0774d66930c63f55cc16a9b72e80c392ee22d7b8` 已通过本地 27 项检查及日常后台页面验证并推送。新增 [域名入口](frontend-gateway/nginx-admin-domain.conf) 和 [专用代理片段](frontend-gateway/nginx-admin-domain-backend.conf)；后者将上游 Host 固定到已信任的主站 `www.qzweb.cloud`，兼容登录页的公开配置/验证码读取，保留 API 身份鉴权。不要直接使用新域名 Host 触发分销域名未登记拦截。
+
+上海当前只安装新域名的 HTTP ACME 验证入口，完整配置暂存 `/srv/zhixiang-front/shared/work/admin-domain-20261015-145331/`，等待解析后使用现有 Certbot 和 `/var/lib/letsencrypt` 签发 `admin.qzweb.cloud` 独立证书，再安装代理片段及完整入口、执行 `nginx -t` 和平滑重载，并核验域名实际登录。证书应进入既有 `/srv/zhixiang-front/shared/letsencrypt`，继续由 `qzweb-certificates.timer` 续期；保留原 IP 入口。
+
+两地备份分别为 `/srv/zhixiang/backups/before-admin-domain-20261015-145331`、`/srv/zhixiang-front/backups/before-admin-domain-20261015-145331`。已核验原后台、商城、公开接口与 ACME 路径；5298 个前端文件保留，程序仍为 `20261015-125607`，后端配置及后端/Redis 进程未变。私有记录 `D:/卡网/work/codex-runtime/admin-domain/pending-report.json`。此记录表示准备完成，不表示新域名已上线。
+
 ## 收益钱包与人工提现（2026-10-15）
 
 - 发布 `20261015-125607` 已上线新加坡及上海。后端干净源码 `3728a67dd4359af2d39786eb2cde2e9a2acb7466`，商城静态源码 `8f2c17edcb4136cd31d99f2bd74e3870b9d9c75f`（仅追加三语历史统计标签，后台和后端代码相同）。返利 2%、付款后 30 天确认，10 款已核对成本商品启用；仅原价整单参加，个人/会员优惠、活动、数量优惠、优惠券、自购及分销站订单排除。分销确认期保持原设置。
