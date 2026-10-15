@@ -8,6 +8,11 @@ func RegisterUserRoutes(user gin.IRoutes, handler *UserHandler) {
 		panic("wallet user routes: required dependency is nil")
 	}
 	user.GET("/wallet", handler.GetWallet)
+	if handler.Withdrawals != nil {
+		user.GET("/wallet/withdraw-policy", handler.Withdrawals.Policy)
+		user.GET("/wallet/withdraws", handler.Withdrawals.UserList)
+		user.POST("/wallet/withdraws", handler.Withdrawals.Apply)
+	}
 	user.GET("/wallet/transactions", handler.GetTransactions)
 	user.POST("/wallet/payment-channels", handler.GetPaymentChannels)
 	user.POST("/wallet/recharge", handler.Recharge)
@@ -26,6 +31,10 @@ func RegisterAdminRoutes(paymentProtected gin.IRoutes, handler *AdminHandler) {
 	paymentProtected.GET("/users/:id/wallet/transactions", handler.GetUserTransactions)
 	paymentProtected.POST("/users/:id/wallet/adjust", handler.AdjustUserWallet)
 	paymentProtected.GET("/wallet/recharges", handler.GetRecharges)
+	if handler.Withdrawals != nil {
+		paymentProtected.GET("/wallet/withdraws", handler.Withdrawals.AdminList)
+		paymentProtected.POST("/wallet/withdraws/:id/review", handler.Withdrawals.Review)
+	}
 }
 
 // RegisterChannelRoutes 注册渠道钱包端点。

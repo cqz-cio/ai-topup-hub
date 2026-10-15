@@ -140,6 +140,9 @@ export interface AdminPermissionCatalogItem {
 }
 
 export interface AdminWalletAccount {
+  withdrawable_balance: string
+  frozen_balance: string
+  earnings_debt: string
   id: number
   user_id: number
   balance: string
@@ -148,6 +151,9 @@ export interface AdminWalletAccount {
 }
 
 export interface AdminWalletTransaction {
+  source_amount?: string
+  frozen_amount?: string
+  debt_amount?: string
   id: number
   user_id: number
   order_id?: number | null
@@ -429,6 +435,8 @@ export const adminAPI = {
   getUserPrices: (id: number) => api.get(`/admin/users/${id}/prices`),
   setUserPrices: (id: number, data: { prices: Array<{ product_id: number; sku_id: number; price_amount: string }> }) => api.put(`/admin/users/${id}/prices`, data),
   getUserWallet: (id: number) => api.get(`/admin/users/${id}/wallet`),
+  getWalletWithdraws: (params?: Record<string, unknown>) => api.get('/admin/wallet/withdraws', { params }),
+  reviewWalletWithdraw: (id: number, data: { action: string; remark: string; payout_reference: string }) => api.post(`/admin/wallet/withdraws/${id}/review`, data),
   getUserWalletTransactions: (id: number, params?: Record<string, unknown>) =>
     api.get(`/admin/users/${id}/wallet/transactions`, { params }),
   getWalletRecharges: (params?: Record<string, unknown>) =>

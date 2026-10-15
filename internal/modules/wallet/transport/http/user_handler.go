@@ -93,10 +93,11 @@ type CapturePaymentInput struct {
 
 // UserHandler 处理用户钱包 HTTP 请求。
 type UserHandler struct {
-	wallets  WalletService
-	payments PaymentService
-	users    UserReader
-	settings SiteCurrencyReader
+	Withdrawals *WithdrawalHandler
+	wallets     WalletService
+	payments    PaymentService
+	users       UserReader
+	settings    SiteCurrencyReader
 }
 
 func NewUserHandler(wallets WalletService, payments PaymentService, users UserReader, settings SiteCurrencyReader) *UserHandler {

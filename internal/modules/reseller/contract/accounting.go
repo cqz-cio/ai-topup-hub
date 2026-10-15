@@ -5,6 +5,7 @@ import (
 
 	resellerdomain "github.com/dujiao-next/internal/modules/reseller/domain"
 
+	walletcontract "github.com/dujiao-next/internal/modules/wallet/contract"
 	"github.com/shopspring/decimal"
 )
 
@@ -143,6 +144,8 @@ const (
 
 // BalanceAccountStore 是余额缓存刷新所需的最小持久化端口。
 type BalanceAccountStore interface {
+	walletcontract.Transaction
+	GetProfileByID(id uint) (*resellerdomain.Profile, error)
 	GetOrCreateBalanceAccountForUpdate(resellerID uint, currency string) (*resellerdomain.BalanceAccount, error)
 	SumLedgerAmountGroupedByStatus(resellerID uint, currency string, statuses []string) (map[string]decimal.Decimal, error)
 	UpdateBalanceAccount(account *resellerdomain.BalanceAccount) error

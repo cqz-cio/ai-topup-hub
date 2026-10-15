@@ -9,8 +9,50 @@ import (
 
 	"github.com/dujiao-next/internal/config"
 	"github.com/dujiao-next/internal/constants"
+	walletcontract "github.com/dujiao-next/internal/modules/wallet/contract"
 	"github.com/dujiao-next/internal/shared/jsonmap"
+	"github.com/dujiao-next/internal/shared/money"
 )
+
+// GetWalletWithdrawPolicy fails closed for missing or invalid settings. Payment
+// channels are deliberately unrelated to manual withdrawal destinations.
+func (s *Service) GetWalletWithdrawPolicy() (walletcontract.WithdrawPolicy, error) {
+	policy := walletcontract.WithdrawPolicy{Currency: "CNY", Channels: []string{}}
+	value, err := s.GetByKey(constants.SettingKeyWalletConfig)
+	if err != nil {
+		return policy, err
+	}
+	if value == nil {
+		return policy, nil
+	}
+	var config struct {
+		Enabled  bool         `json:"withdraw_enabled"`
+		Minimum  money.Amount `json:"withdraw_minimum"`
+		Channels []string     `json:"withdraw_channels"`
+	}
+	raw, err := json.Marshal(value)
+	if err != nil {
+		return policy, err
+	}
+	if err := json.Unmarshal(raw, &config); err != nil {
+		return policy, err
+	}
+	policy.Enabled, policy.Minimum = config.Enabled, config.Minimum
+	for _, channel := range config.Channels {
+		if channel != "alipay" && channel != "wechat" {
+			return policy, walletcontract.ErrWithdrawInvalid
+		}
+		policy.Channels = append(policy.Channels, channel)
+	}
+	policy.Currency, err = s.GetSiteCurrency("CNY")
+	if err != nil {
+		return policy, err
+	}
+	if policy.Enabled && (!policy.Minimum.Decimal.IsPositive() || len(policy.Channels) == 0 || policy.Currency != "CNY") {
+		return policy, walletcontract.ErrWithdrawInvalid
+	}
+	return policy, nil
+}
 
 var (
 	ErrInvalidEmail          = errors.New("invalid email")

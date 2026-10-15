@@ -6,7 +6,7 @@
     >
       <template #actions>
         <Button as-child size="sm">
-          <RouterLink to="/reseller/withdraws">
+          <RouterLink to="/me/wallet">
             <Upload class="h-4 w-4" />
             {{ t('resellerConsole.nav.withdraws') }}
           </RouterLink>
@@ -14,11 +14,13 @@
       </template>
     </ResellerSectionHeader>
 
+    <p class="rounded-xl border p-4 text-sm text-muted-foreground">{{ t('walletEarnings.unified') }}</p>
+
     <ResellerPageState v-if="dashboardLoading || balanceLoading" loading :title="t('resellerConsole.common.loading')" />
 
     <template v-else>
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <ResellerMetricCard :label="t('personalCenter.reseller.primaryAvailable')" :value="primaryBalanceText" :hint="primaryBalanceHint" :icon="Banknote" tone="success" />
+        <ResellerMetricCard :label="t('walletEarnings.settled')" :value="primaryBalanceText" :hint="primaryBalanceHint" :icon="Banknote" tone="success" />
         <ResellerMetricCard :label="t('personalCenter.reseller.currencyCount')" :value="balances.length" :icon="Wallet" tone="info" />
         <ResellerMetricCard :label="t('personalCenter.reseller.settlementStatus')" :value="statusText" :icon="BadgeCheck" tone="accent" />
       </div>
@@ -32,7 +34,7 @@
       <template v-else>
         <!-- 可用余额占比 -->
         <Card v-if="donutSegments.length" class="p-5">
-          <h3 class="mb-4 text-sm font-bold text-foreground">{{ t('resellerConsole.finance.distribution') }}</h3>
+          <h3 class="mb-4 text-sm font-bold text-foreground">{{ t('walletEarnings.settled') }}</h3>
           <ResellerDonut :segments="donutSegments" :center-value="balances.length" :center-label="t('personalCenter.reseller.currencyCount')" />
         </Card>
 
@@ -42,7 +44,7 @@
             <div class="flex items-start justify-between gap-3">
               <div>
                 <div class="font-mono text-sm font-bold text-foreground">{{ item.currency }}</div>
-                <div class="mt-2 text-xs text-muted-foreground">{{ t('personalCenter.reseller.availableAmount') }}</div>
+                <div class="mt-2 text-xs text-muted-foreground">{{ t('walletEarnings.settled') }}</div>
                 <div class="mt-1 font-mono text-lg font-black text-foreground">{{ formatResellerConsoleAmount(item.available_amount, item.currency) }}</div>
               </div>
               <div class="flex items-center gap-1.5">
@@ -113,7 +115,7 @@ const balanceSegments = (item: ResellerBalanceData) => [
   {
     value: Number(item.available_amount) || 0,
     color: '#10b981',
-    label: t('personalCenter.reseller.availableAmount'),
+    label: t('walletEarnings.settled'),
     display: formatResellerConsoleAmount(item.available_amount),
   },
   {

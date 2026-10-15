@@ -61,6 +61,9 @@ func setupOrderRefundWalletTest(t *testing.T) (*Service, *gorm.DB) {
 		&affiliatedomain.WithdrawRequest{},
 		&walletdomain.Account{},
 		&walletdomain.Transaction{},
+		&walletdomain.OrderFunding{},
+		&walletdomain.EarningSettlement{},
+		&walletdomain.WithdrawRequest{},
 		&orderdomain.OrderRefundRecord{},
 		&paymentdomain.Payment{},
 		&settingsstore.SettingRecord{},
@@ -89,6 +92,44 @@ func walletServiceForTest(db *gorm.DB) *walletapp.Service {
 		Repository:   walletStore,
 		Transactions: walletStore,
 	})
+}
+
+func TestSplitRefundRestoresEarningsOriginAndCapsWholeOrder(t *testing.T) {
+	svc, db := setupOrderRefundWalletTest(t)
+	createTestUser(t, db, 1)
+	now := time.Now()
+	amount := func(n int64) money.Amount { return money.FromDecimal(decimal.NewFromInt(n)) }
+	root := orderdomain.Order{OrderNo: "root-wallet-origin", UserID: 1, Status: constants.OrderStatusPaid, Currency: "CNY", OriginalAmount: amount(100), TotalAmount: amount(100), WalletPaidAmount: amount(50), OnlinePaidAmount: amount(50), PaidAt: &now}
+	if err := db.Create(&root).Error; err != nil {
+		t.Fatal(err)
+	}
+	child := orderdomain.Order{OrderNo: "child-wallet-origin", UserID: 1, ParentID: &root.ID, Status: constants.OrderStatusPaid, Currency: "CNY", TotalAmount: amount(40), PaidAt: &now}
+	if err := db.Create(&child).Error; err != nil {
+		t.Fatal(err)
+	}
+	if err := db.Create(&walletdomain.OrderFunding{OrderID: root.ID, UserID: 1, Amount: amount(50), WithdrawableAmount: amount(20)}).Error; err != nil {
+		t.Fatal(err)
+	}
+	if _, _, _, err := svc.AdminRefundToWallet(AdminRefundToWalletInput{OrderID: child.ID, Amount: amount(40)}); err != nil {
+		t.Fatal(err)
+	}
+	if _, _, _, err := svc.AdminRefundToWallet(AdminRefundToWalletInput{OrderID: root.ID, Amount: amount(60)}); err != nil {
+		t.Fatal(err)
+	}
+	a, err := walletServiceForTest(db).GetAccount(1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if a.Balance.String() != "100.00" || a.WithdrawableBalance.String() != "20.00" {
+		t.Fatalf("refund lost fund origins: %+v", a)
+	}
+	if _, _, _, err := svc.AdminRefundToWallet(AdminRefundToWalletInput{OrderID: root.ID, Amount: amount(1)}); !errors.Is(err, walletcontract.ErrRefundExceeded) {
+		t.Fatalf("whole order refunded twice: %v", err)
+	}
+	db.First(&root, root.ID)
+	if root.Status != constants.OrderStatusRefunded {
+		t.Fatalf("fully refunded payment root status=%s", root.Status)
+	}
 }
 
 func createTestUser(t *testing.T, db *gorm.DB, id uint) {

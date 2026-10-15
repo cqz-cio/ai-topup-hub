@@ -232,6 +232,12 @@ const navGroups = computed<NavGroup[]>(() => {
           permission: 'GET:/admin/wallet/recharges',
         },
         {
+          label: t('walletEarnings.adminTitle'),
+          to: '/wallet-withdraws',
+          icon: Wallet,
+          permission: 'GET:/admin/wallet/withdraws',
+        },
+        {
           label: t('admin.navItems.walletConfig'),
           to: '/wallet-config',
           icon: Wallet,

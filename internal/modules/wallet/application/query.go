@@ -29,7 +29,7 @@ func (s *Service) GetAccount(userID uint) (*walletdomain.Account, error) {
 		}
 		return nil, walletcontract.ErrAccountCreateFailed
 	}
-	return account, nil
+	return s.repository.GetAccountByUserID(userID)
 }
 
 func (s *Service) ListTransactions(filter walletcontract.TransactionListFilter) ([]walletdomain.Transaction, int64, error) {

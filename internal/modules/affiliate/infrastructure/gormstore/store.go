@@ -8,10 +8,60 @@ import (
 	"github.com/dujiao-next/internal/constants"
 	affiliatecontract "github.com/dujiao-next/internal/modules/affiliate/contract"
 	affiliatedomain "github.com/dujiao-next/internal/modules/affiliate/domain"
+	orderdomain "github.com/dujiao-next/internal/modules/order/domain"
+	walletcontract "github.com/dujiao-next/internal/modules/wallet/contract"
+	walletstore "github.com/dujiao-next/internal/modules/wallet/infrastructure/gormstore"
+	"github.com/dujiao-next/internal/shared/money"
 	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
+
+func (r *Store) Wallets() walletcontract.Repository { return walletstore.New(r.db) }
+
+// Only new checkout snapshots qualify for recovery. Historical orders retain
+// false eligibility flags, so enabling the feature cannot mint retroactive income.
+func (r *Store) ListCommissionRecoveryOrders(limit int) ([]uint, error) {
+	var ids []uint
+	err := r.db.Model(&orderdomain.Order{}).Where("orders.deleted_at IS NULL AND orders.parent_id IS NULL AND orders.paid_at IS NOT NULL AND orders.affiliate_commission_processed = ?", false).
+		Where("(orders.affiliate_profile_id IS NOT NULL OR orders.affiliate_code <> '') AND orders.reseller_id IS NULL").
+		Where("EXISTS (SELECT 1 FROM order_items JOIN orders AS source_order ON source_order.id = order_items.order_id WHERE (source_order.id = orders.id OR source_order.parent_id = orders.id) AND order_items.affiliate_original_price = ? AND order_items.affiliate_product_enabled = ?)", true, true).
+		Order("orders.id ASC").Limit(limit).Pluck("orders.id", &ids).Error
+	return ids, err
+}
+
+func (r *Store) MarkCommissionProcessed(orderID uint) error {
+	return r.db.Model(&orderdomain.Order{}).Where("id = ? AND paid_at IS NOT NULL AND parent_id IS NULL", orderID).Update("affiliate_commission_processed", true).Error
+}
+
+func (r *Store) GetOrderForCommission(id uint) (*orderdomain.Order, error) {
+	var order orderdomain.Order
+	err := r.db.Clauses(clause.Locking{Strength: "UPDATE"}).Where("deleted_at IS NULL").Preload("Items").Preload("Children.Items").First(&order, id).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	ids := []uint{id}
+	for _, child := range order.Children {
+		ids = append(ids, child.ID)
+	}
+	var refunded decimal.Decimal
+	if err := r.db.Model(&orderdomain.OrderRefundRecord{}).Select("COALESCE(SUM(amount),0)").Where("order_id IN ?", ids).Scan(&refunded).Error; err != nil {
+		return nil, err
+	}
+	if refunded.GreaterThan(order.RefundedAmount.Decimal) {
+		order.RefundedAmount = money.FromDecimal(refunded)
+	}
+	return &order, err
+}
+
+func (r *Store) ListCommissionsForSettlement(now time.Time) ([]affiliatedomain.Commission, error) {
+	var rows []affiliatedomain.Commission
+	err := r.db.Clauses(clause.Locking{Strength: "UPDATE"}).Where("deleted_at IS NULL AND withdraw_request_id IS NULL").Where("(status = ? AND confirm_at <= ?) OR (status = ? AND wallet_credited_amount <> commission_amount)", constants.AffiliateCommissionStatusPendingConfirm, now, constants.AffiliateCommissionStatusAvailable).Order("id ASC").Limit(500).Find(&rows).Error
+	return rows, err
+}
 
 // Store GORM 推广返利仓储
 type Store struct {

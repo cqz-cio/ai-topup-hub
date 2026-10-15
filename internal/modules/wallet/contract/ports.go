@@ -10,6 +10,7 @@ import (
 // Repository owns all wallet aggregate persistence. Transactional callers
 // receive the same port bound to their transaction through Transaction.
 type Repository interface {
+	EarningsRepository
 	GetAccountByUserID(userID uint) (*walletdomain.Account, error)
 	GetAccountByUserIDForUpdate(userID uint) (*walletdomain.Account, error)
 	GetAccountsByUserIDs(userIDs []uint) ([]walletdomain.Account, error)

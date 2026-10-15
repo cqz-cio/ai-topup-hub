@@ -2,6 +2,7 @@ package affiliatehttp
 
 import (
 	"errors"
+	walletcontract "github.com/dujiao-next/internal/modules/wallet/contract"
 	"strings"
 
 	affiliatedomain "github.com/dujiao-next/internal/modules/affiliate/domain"
@@ -174,6 +175,8 @@ func (h *Handler) ApplyAffiliateWithdraw(c *gin.Context) {
 			ginutil.RespondError(c, response.CodeBadRequest, "error.bad_request", nil)
 		case errors.Is(err, affiliateapp.ErrWithdrawAmountInvalid):
 			ginutil.RespondError(c, response.CodeBadRequest, "error.bad_request", nil)
+		case errors.Is(err, walletcontract.ErrUnifiedWallet):
+			response.Error(c, response.CodeBadRequest, walletcontract.ErrUnifiedWallet.Error())
 		case errors.Is(err, affiliateapp.ErrWithdrawChannelInvalid):
 			ginutil.RespondError(c, response.CodeBadRequest, "error.bad_request", nil)
 		case errors.Is(err, affiliateapp.ErrWithdrawInsufficient):

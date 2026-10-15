@@ -63,14 +63,22 @@ func (s *Service) ApplyOrderBalance(tx walletcontract.Transaction, input walletc
 	if after.LessThan(decimal.Zero) {
 		return money.Amount{}, walletcontract.ErrInsufficientBalance
 	}
-	account.Balance = money.FromDecimal(after)
+	cash := debitSpendable(account, deduct)
 	account.UpdatedAt = now
+	if err := validateAccount(account); err != nil {
+		return money.Amount{}, err
+	}
 	if err := repository.UpdateAccount(account); err != nil {
 		return money.Amount{}, walletcontract.ErrAccountUpdateFailed
 	}
+	funding := &walletdomain.OrderFunding{OrderID: input.OrderID, UserID: input.UserID, Amount: money.FromDecimal(deduct), WithdrawableAmount: money.FromDecimal(cash), UpdatedAt: now}
+	if err := repository.SaveOrderFunding(funding); err != nil {
+		return money.Amount{}, err
+	}
 	orderID := input.OrderID
 	transaction := &walletdomain.Transaction{
-		UserID: input.UserID, OrderID: &orderID,
+		WithdrawableAmount: money.FromDecimal(cash),
+		UserID:             input.UserID, OrderID: &orderID,
 		Type: constants.WalletTxnTypeOrderPay, Direction: constants.WalletTxnDirectionOut,
 		Amount: money.FromDecimal(deduct), BalanceBefore: money.FromDecimal(before),
 		BalanceAfter: money.FromDecimal(after), Currency: normalizeCurrency(input.Currency),
@@ -127,17 +135,39 @@ func (s *Service) ReleaseOrderBalance(
 		return money.Amount{}, err
 	}
 	before := account.Balance.Decimal.Round(2)
-	after := before.Add(amount).Round(2)
-	account.Balance = money.FromDecimal(after)
+	cash := decimal.Zero
+	funding, err := repository.GetOrderFunding(input.OrderID)
+	if err != nil {
+		return money.Amount{}, err
+	}
+	if funding != nil {
+		if funding.UserID != input.UserID || !funding.Amount.Decimal.Equal(amount) || funding.RefundedWithdrawable.Decimal.IsPositive() {
+			return money.Amount{}, walletcontract.ErrEarningSource
+		}
+		cash = funding.WithdrawableAmount.Decimal
+		funding.Amount, funding.WithdrawableAmount = money.FromDecimal(decimal.Zero), money.FromDecimal(decimal.Zero)
+		funding.UpdatedAt = now
+		if err := repository.SaveOrderFunding(funding); err != nil {
+			return money.Amount{}, err
+		}
+	}
+	debtBefore := account.EarningsDebt.Decimal
+	account.Balance = money.FromDecimal(before.Add(amount.Sub(cash)))
+	restored := creditEarnings(account, cash)
+	after := account.Balance.Decimal
 	account.UpdatedAt = now
+	if err := validateAccount(account); err != nil {
+		return money.Amount{}, err
+	}
 	if err := repository.UpdateAccount(account); err != nil {
 		return money.Amount{}, walletcontract.ErrAccountUpdateFailed
 	}
 	orderID := input.OrderID
 	transaction := &walletdomain.Transaction{
+		WithdrawableAmount: money.FromDecimal(restored), DebtAmount: money.FromDecimal(account.EarningsDebt.Decimal.Sub(debtBefore)),
 		UserID: input.UserID, OrderID: &orderID,
 		Type: input.TransactionType, Direction: constants.WalletTxnDirectionIn,
-		Amount: money.FromDecimal(amount), BalanceBefore: money.FromDecimal(before),
+		Amount: money.FromDecimal(after.Sub(before)), SourceAmount: money.FromDecimal(amount), BalanceBefore: money.FromDecimal(before),
 		BalanceAfter: money.FromDecimal(after), Currency: normalizeCurrency(input.Currency),
 		Reference: reference, Remark: cleanRemark(input.Remark, "订单余额退回"),
 		CreatedAt: now, UpdatedAt: now,

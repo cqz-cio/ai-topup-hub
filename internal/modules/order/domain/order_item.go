@@ -10,6 +10,8 @@ import (
 
 // OrderItem 订单项表
 type OrderItem struct {
+	AffiliateOriginalPrice       bool              `gorm:"not null;default:false" json:"-"`
+	AffiliateProductEnabled      bool              `gorm:"not null;default:false" json:"-"`
 	ID                           uint              `gorm:"primarykey" json:"id"`                                                   // 主键
 	OrderID                      uint              `gorm:"index;not null" json:"order_id"`                                         // 订单ID
 	ProductID                    uint              `gorm:"index;not null" json:"product_id"`                                       // 商品ID

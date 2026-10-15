@@ -13,30 +13,40 @@ import (
 
 // WalletAccountResp 钱包账户响应
 type WalletAccountResp struct {
-	Balance money.Amount `json:"balance"`
+	Balance             money.Amount `json:"balance"`
+	WithdrawableBalance money.Amount `json:"withdrawable_balance"`
+	FrozenBalance       money.Amount `json:"frozen_balance"`
+	EarningsDebt        money.Amount `json:"earnings_debt"`
 }
 
 // NewWalletAccountResp 从 walletdomain.Account 构造响应
 func NewWalletAccountResp(a *walletdomain.Account) WalletAccountResp {
 	return WalletAccountResp{
-		Balance: a.Balance,
+		Balance:             a.Balance,
+		WithdrawableBalance: a.WithdrawableBalance, FrozenBalance: a.FrozenBalance, EarningsDebt: a.EarningsDebt,
 	}
 }
 
 // WalletTransactionResp 钱包流水响应
 type WalletTransactionResp struct {
-	ID           uint         `json:"id"`
-	Type         string       `json:"type"`
-	Direction    string       `json:"direction"`
-	Amount       money.Amount `json:"amount"`
-	BalanceAfter money.Amount `json:"balance_after"`
-	Remark       string       `json:"remark"`
-	CreatedAt    time.Time    `json:"created_at"`
+	SourceAmount       money.Amount `json:"source_amount"`
+	FrozenAmount       money.Amount `json:"frozen_amount"`
+	WithdrawableAmount money.Amount `json:"withdrawable_amount"`
+	DebtAmount         money.Amount `json:"debt_amount"`
+	ID                 uint         `json:"id"`
+	Type               string       `json:"type"`
+	Direction          string       `json:"direction"`
+	Amount             money.Amount `json:"amount"`
+	BalanceAfter       money.Amount `json:"balance_after"`
+	Remark             string       `json:"remark"`
+	CreatedAt          time.Time    `json:"created_at"`
 }
 
 // NewWalletTransactionResp 从 walletdomain.Transaction 构造响应
 func NewWalletTransactionResp(t *walletdomain.Transaction) WalletTransactionResp {
 	return WalletTransactionResp{
+		SourceAmount: t.SourceAmount, FrozenAmount: t.FrozenAmount,
+		WithdrawableAmount: t.WithdrawableAmount, DebtAmount: t.DebtAmount,
 		ID:           t.ID,
 		Type:         t.Type,
 		Direction:    t.Direction,

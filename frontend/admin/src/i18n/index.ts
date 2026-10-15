@@ -1,3 +1,4 @@
+import { walletEarnings } from './walletEarnings'
 import { createI18n } from 'vue-i18n'
 import { featureAvailability } from './featureAvailability'
 import { adminBrandMessages } from './adminBrand'
@@ -13440,7 +13441,7 @@ const sanitizeLinkedMessage = <T>(value: T): T => {
 }
 
 for (const locale of ['zh-CN', 'zh-TW', 'en-US'] as const) {
-  Object.assign(messages[locale], { featureAvailability: featureAvailability[locale] })
+  Object.assign(messages[locale], { featureAvailability: featureAvailability[locale], walletEarnings: walletEarnings[locale] })
 }
 
 const i18n = createI18n({

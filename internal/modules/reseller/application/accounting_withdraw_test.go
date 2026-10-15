@@ -1,6 +1,7 @@
 package application
 
 import (
+	walletcontract "github.com/dujiao-next/internal/modules/wallet/contract"
 	"testing"
 
 	resellercontract "github.com/dujiao-next/internal/modules/reseller/contract"
@@ -18,7 +19,7 @@ func TestAccountingWithdrawServiceRejectsInvalidAmount(t *testing.T) {
 		Channel:  "usdt",
 		Account:  "T",
 	})
-	if err != resellercontract.ErrAccountingUnavailable {
+	if err != walletcontract.ErrUnifiedWallet {
 		t.Fatalf("expected unavailable with nil store, got %v", err)
 	}
 
@@ -29,12 +30,14 @@ func TestAccountingWithdrawServiceRejectsInvalidAmount(t *testing.T) {
 		Channel:  "usdt",
 		Account:  "T",
 	})
-	if err != resellercontract.ErrWithdrawAmountInvalid {
+	if err != walletcontract.ErrUnifiedWallet {
 		t.Fatalf("expected amount invalid, got %v", err)
 	}
 }
 
-type accountingWithdrawStoreStub struct{}
+type accountingWithdrawStoreStub struct {
+	resellercontract.AccountingWithdrawStore
+}
 
 func (accountingWithdrawStoreStub) WithinWithdrawTransaction(fn func(store resellercontract.AccountingWithdrawStore) error) error {
 	return fn(accountingWithdrawStoreStub{})

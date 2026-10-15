@@ -56,13 +56,14 @@ type AdjustBalanceInput struct {
 }
 
 type CreditInput struct {
-	UserID    uint
-	Amount    money.Amount
-	Currency  string
-	Type      string
-	Reference string
-	Remark    string
-	OrderID   *uint
+	RefundFunding *RefundFunding
+	UserID        uint
+	Amount        money.Amount
+	Currency      string
+	Type          string
+	Reference     string
+	Remark        string
+	OrderID       *uint
 }
 
 type OrderBalanceInput struct {

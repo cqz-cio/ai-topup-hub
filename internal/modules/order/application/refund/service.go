@@ -289,7 +289,7 @@ func (s *Service) AdminManualRefund(input AdminManualRefundInput) (*orderdomain.
 
 	if err := s.orderStore.WithinTransaction(func(tx ordercontract.Transaction) error {
 		orders := tx.Orders()
-		locked, err := orders.GetByIDForUpdate(input.OrderID)
+		locked, root, rootRefunded, _, err := lockRefundScope(orders, input.OrderID)
 		if err != nil {
 			return err
 		}
@@ -309,6 +309,9 @@ func (s *Service) AdminManualRefund(input AdminManualRefundInput) (*orderdomain.
 		refundedBefore := order.RefundedAmount.Decimal.Round(2)
 		refundable := order.TotalAmount.Decimal.Sub(refundedBefore).Round(2)
 		if amount.GreaterThan(refundable) {
+			return walletcontract.ErrRefundExceeded
+		}
+		if amount.GreaterThan(root.TotalAmount.Decimal.Sub(rootRefunded)) {
 			return walletcontract.ErrRefundExceeded
 		}
 
@@ -341,6 +344,11 @@ func (s *Service) AdminManualRefund(input AdminManualRefundInput) (*orderdomain.
 				return ErrOrderUpdateFailed
 			}
 		}
+		if rootRefunded.Add(amount).GreaterThanOrEqual(root.TotalAmount.Decimal) {
+			if err := ordersFullyRefunded(orders, root.ID, now); err != nil {
+				return err
+			}
+		}
 		feeRefundedAmount := money.FromDecimal(decimal.Zero)
 		if input.PaymentFeeRefunded {
 			if paymentFeeRefundRootOrderID(&order) != feeSnapshot.rootOrderID {
@@ -365,19 +373,19 @@ func (s *Service) AdminManualRefund(input AdminManualRefundInput) (*orderdomain.
 			return err
 		}
 		createdRecord = record
-		if s.affiliateRefund != nil && order.UserID > 0 {
+		if s.affiliateRefund != nil {
 			if err := s.affiliateRefund.HandleOrderRefunded(
 				tx.Affiliates(),
-				&order,
+				root,
 				amount,
-				refundedBefore,
+				rootRefunded,
 				"order_refunded_manual",
 			); err != nil {
 				return err
 			}
 		}
 		if s.resellerAccounting != nil {
-			if err := s.resellerAccounting.HandleRefundDeduct(tx.ResellerAccounting(), &order, record, refundedBefore); err != nil {
+			if err := s.resellerAccounting.HandleRefundDeduct(tx.ResellerAccounting(), root, record, rootRefunded); err != nil {
 				return err
 			}
 		}

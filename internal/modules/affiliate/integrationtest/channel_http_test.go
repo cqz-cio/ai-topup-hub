@@ -489,26 +489,20 @@ func TestChannelAffiliateApplyWithdraw(t *testing.T) {
 		t.Fatalf("post affiliate withdraw failed: %v", err)
 	}
 	t.Cleanup(func() { _ = resp.Body.Close() })
-	if resp.StatusCode != http.StatusOK {
+	if resp.StatusCode != http.StatusBadRequest {
 		t.Fatalf("expected withdraw apply http status 200, got %d", resp.StatusCode)
 	}
 
 	payload := decodeChannelAffiliateResponse(t, resp)
-	if payload.StatusCode != 0 {
-		t.Fatalf("expected status_code=0, got %d", payload.StatusCode)
-	}
-	if payload.Data["status"] != constants.AffiliateWithdrawStatusPendingReview {
-		t.Fatalf("expected pending_review status, got=%v", payload.Data["status"])
-	}
-	if payload.Data["amount"] != "12.00" {
-		t.Fatalf("expected amount=12.00, got=%v", payload.Data["amount"])
+	if payload.StatusCode == 0 {
+		t.Fatal("legacy withdrawal unexpectedly succeeded")
 	}
 
 	var withdrawCount int64
 	if err := db.Model(&affiliatedomain.WithdrawRequest{}).Where("affiliate_profile_id = ?", profile.ID).Count(&withdrawCount).Error; err != nil {
 		t.Fatalf("count withdraw requests failed: %v", err)
 	}
-	if withdrawCount != 1 {
-		t.Fatalf("expected 1 withdraw request, got %d", withdrawCount)
+	if withdrawCount != 0 {
+		t.Fatalf("expected no legacy withdraw request, got %d", withdrawCount)
 	}
 }

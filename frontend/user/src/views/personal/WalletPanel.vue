@@ -8,6 +8,8 @@
       :total-pages="pagination.total_page"
     />
 
+    <WalletWithdrawalCard :wallet="wallet" @changed="refreshCurrentPage" />
+
     <WalletRechargeForm
       :amount="rechargeForm.amount"
       :channel-id="rechargeForm.channelId"
@@ -47,6 +49,7 @@ import { useAppStore } from '../../stores/app'
 import type { PageAlert } from '../../utils/alerts'
 import { amountToCents, basisPointsToPercent, calculateChannelFeeCents, centsToAmount, rateToBasisPoints } from '../../utils/money'
 import WalletBalanceCard from '../../components/wallet/WalletBalanceCard.vue'
+import WalletWithdrawalCard from '../../components/wallet/WalletWithdrawalCard.vue'
 import WalletRechargeForm from '../../components/wallet/WalletRechargeForm.vue'
 import WalletTransactionList from '../../components/wallet/WalletTransactionList.vue'
 

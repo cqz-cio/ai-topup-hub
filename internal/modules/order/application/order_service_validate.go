@@ -244,9 +244,11 @@ func (s *OrderService) buildOrderResult(input orderCreateParams) (*orderBuildRes
 		}
 
 		orderItem := orderdomain.OrderItem{
-			ProductID: product.ID,
-			SKUID:     sku.ID,
-			TitleJSON: product.TitleJSON,
+			AffiliateOriginalPrice:  !resellerOrder && userPrice == nil && unitPriceAmount.Equal(sku.PriceAmount.Decimal.Round(2)),
+			AffiliateProductEnabled: product.IsAffiliateEnabled,
+			ProductID:               product.ID,
+			SKUID:                   sku.ID,
+			TitleJSON:               product.TitleJSON,
 			SKUSnapshotJSON: jsonmap.JSON{
 				"sku_id":      sku.ID,
 				"sku_code":    sku.SKUCode,

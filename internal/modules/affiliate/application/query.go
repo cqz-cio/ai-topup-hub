@@ -16,6 +16,7 @@ import (
 // GetUserDashboard 获取用户返利中心数据
 func (s *Service) GetUserDashboard(userID uint) (Dashboard, error) {
 	dashboard := Dashboard{
+		WithdrawURL:         "/me/wallet",
 		Opened:              false,
 		PendingCommission:   money.FromDecimal(decimal.Zero),
 		AvailableCommission: money.FromDecimal(decimal.Zero),
@@ -44,7 +45,7 @@ func (s *Service) GetUserDashboard(userID uint) (Dashboard, error) {
 	}
 	dashboard.Opened = true
 	dashboard.ProfileStatus = profile.Status
-	dashboard.CanWithdraw = setting.Enabled && strings.TrimSpace(profile.Status) == constants.AffiliateProfileStatusActive
+	dashboard.CanWithdraw = false // legacy commission withdrawals have moved to the wallet
 	dashboard.AffiliateCode = profile.AffiliateCode
 	dashboard.PromotionPath = "/?aff=" + profile.AffiliateCode
 	dashboard.ClickCount = stats.ClickCount

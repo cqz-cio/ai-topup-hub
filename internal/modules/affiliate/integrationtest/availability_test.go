@@ -38,7 +38,7 @@ func TestDashboardAvailabilityTracksSettingsAndProfile(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				if dashboard.Enabled != enabled || dashboard.Opened != (status != "") || dashboard.CanOpen != (enabled && status == "") || dashboard.CanWithdraw != (enabled && status == constants.AffiliateProfileStatusActive) || dashboard.ProfileStatus != status {
+				if dashboard.Enabled != enabled || dashboard.Opened != (status != "") || dashboard.CanOpen != (enabled && status == "") || dashboard.CanWithdraw || dashboard.WithdrawURL != "/me/wallet" || dashboard.ProfileStatus != status {
 					t.Fatalf("incorrect availability: %+v", dashboard)
 				}
 				if !enabled {

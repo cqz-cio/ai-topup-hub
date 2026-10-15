@@ -90,7 +90,8 @@ func (s *Store) GetAccountsByUserIDs(userIDs []uint) ([]walletdomain.Account, er
 }
 
 func (s *Store) CreateAccount(account *walletdomain.Account) error {
-	return s.db.Create(account).Error
+	// Avoid aborting a concurrent first-credit transaction on PostgreSQL.
+	return s.db.Clauses(clause.OnConflict{Columns: []clause.Column{{Name: "user_id"}}, DoNothing: true}).Create(account).Error
 }
 
 func (s *Store) UpdateAccount(account *walletdomain.Account) error {

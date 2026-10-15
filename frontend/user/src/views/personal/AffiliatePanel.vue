@@ -19,7 +19,7 @@
         <Button type="button" variant="outline" class="mt-3" @click="initialize">{{ t('orders.filters.refresh') }}</Button>
       </div>
       <Alert v-else-if="!dashboard.enabled" class="mb-4"><AlertDescription>{{ t('featureAvailability.affiliateClosed') }}</AlertDescription></Alert>
-      <Alert v-else-if="dashboard.opened && !dashboard.can_withdraw" class="mb-4"><AlertDescription>{{ t('featureAvailability.affiliateSuspended') }}</AlertDescription></Alert>
+      <Alert v-else-if="dashboard.opened && dashboard.profile_status !== 'active'" class="mb-4"><AlertDescription>{{ t('featureAvailability.affiliateSuspended') }}</AlertDescription></Alert>
 
       <template v-if="!loading && dashboard?.opened">
         <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -45,7 +45,7 @@
             <div class="mt-2 text-lg font-bold text-foreground">{{ dashboard?.pending_commission || '0.00' }}</div>
           </div>
           <div class="rounded-xl border p-4">
-            <div class="text-xs text-muted-foreground">{{ t('personalCenter.affiliate.availableCommission') }}</div>
+            <div class="text-xs text-muted-foreground">{{ t('walletEarnings.settled') }}</div>
             <div class="mt-2 text-lg font-bold text-foreground">{{ dashboard?.available_commission || '0.00' }}</div>
           </div>
           <div class="rounded-xl border p-4">
@@ -63,51 +63,10 @@
       </div>
     </div>
 
-    <div v-if="dashboard?.can_withdraw" class="rounded-2xl border bg-card p-7 shadow-sm">
-      <h3 class="text-lg font-bold text-foreground">{{ t('personalCenter.affiliate.withdrawTitle') }}</h3>
-      <p class="mt-1 text-sm text-muted-foreground">{{ t('personalCenter.affiliate.withdrawSubtitle') }}</p>
-      <form class="mt-5 grid grid-cols-1 gap-4 md:grid-cols-4" @submit.prevent="handleApplyWithdraw">
-        <div>
-          <Label class="mb-2 block">{{ t('personalCenter.affiliate.withdrawAmountLabel') }}</Label>
-          <Input
-            v-model="withdrawForm.amount"
-            type="text"
-            inputmode="decimal"
-            class="h-11"
-            :placeholder="t('personalCenter.affiliate.withdrawAmountPlaceholder')"
-          />
-        </div>
-        <div>
-          <Label class="mb-2 block">{{ t('personalCenter.affiliate.withdrawChannelLabel') }}</Label>
-          <Select v-if="channelOptions.length > 0" v-model="withdrawForm.channel">
-            <SelectTrigger class="h-11 w-full"><SelectValue :placeholder="t('personalCenter.affiliate.withdrawChannelPlaceholder')" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem v-for="channel in channelOptions" :key="channel" :value="channel">{{ channel }}</SelectItem>
-            </SelectContent>
-          </Select>
-          <Input
-            v-else
-            v-model="withdrawForm.channel"
-            type="text"
-            class="h-11"
-            :placeholder="t('personalCenter.affiliate.withdrawChannelPlaceholder')"
-          />
-        </div>
-        <div>
-          <Label class="mb-2 block">{{ t('personalCenter.affiliate.withdrawAccountLabel') }}</Label>
-          <Input
-            v-model="withdrawForm.account"
-            type="text"
-            class="h-11"
-            :placeholder="t('personalCenter.affiliate.withdrawAccountPlaceholder')"
-          />
-        </div>
-        <div class="flex items-end">
-          <Button type="submit" :disabled="submittingWithdraw" class="h-11 w-full px-5 font-bold">
-            {{ submittingWithdraw ? t('personalCenter.affiliate.withdrawing') : t('personalCenter.affiliate.withdrawSubmit') }}
-          </Button>
-        </div>
-      </form>
+    <div class="rounded-2xl border bg-card p-5 sm:p-7 space-y-3">
+      <p class="text-sm text-muted-foreground">{{ t('walletEarnings.affiliateRule') }}</p>
+      <p class="text-sm">{{ t('walletEarnings.unified') }}</p>
+      <Button as-child><RouterLink to="/me/wallet">{{ t('walletEarnings.walletLink') }}</RouterLink></Button>
     </div>
 
     <div v-if="dashboard?.opened" class="rounded-2xl border bg-card p-7 shadow-sm">
@@ -160,7 +119,7 @@
 
     <div v-if="dashboard?.opened" class="rounded-2xl border bg-card p-7 shadow-sm">
       <div class="mb-4 flex items-center justify-between">
-        <h3 class="text-lg font-bold text-foreground">{{ t('personalCenter.affiliate.withdrawRecordTitle') }}</h3>
+        <h3 class="text-lg font-bold text-foreground">{{ t('walletEarnings.legacy') }}</h3>
         <Button type="button" variant="outline" size="sm" @click="loadWithdraws(withdrawsPagination.page)">
           {{ t('orders.filters.refresh') }}
         </Button>
@@ -228,10 +187,7 @@ import { pageAlertVariant, pageAlertToneClass, type PageAlert } from '../../util
 import type { BadgeTone } from '../../utils/status'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
-import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import PaginationNav from '../../components/PaginationNav.vue'
 
@@ -240,7 +196,6 @@ const appStore = useAppStore()
 
 const loading = ref(true)
 const opening = ref(false)
-const submittingWithdraw = ref(false)
 const commissionsLoading = ref(false)
 const withdrawsLoading = ref(false)
 const dashboard = ref<AffiliateDashboardData | null>(null)
@@ -261,18 +216,6 @@ const withdrawsPagination = reactive({
   page_size: 20,
   total: 0,
   total_page: 1,
-})
-
-const withdrawForm = reactive({
-  amount: '',
-  channel: '',
-  account: '',
-})
-
-const channelOptions = computed(() => {
-  const channels = appStore.config?.affiliate?.withdraw_channels
-  if (!Array.isArray(channels)) return []
-  return channels.map((item: any) => String(item || '').trim()).filter(Boolean)
 })
 
 const promotionUrl = computed(() => {
@@ -376,55 +319,6 @@ const openAffiliate = async () => {
   }
 }
 
-const handleApplyWithdraw = async () => {
-  if (!dashboard.value?.can_withdraw || submittingWithdraw.value) return
-  panelAlert.value = null
-  if (!withdrawForm.amount.trim()) {
-    panelAlert.value = {
-      level: 'warning',
-      message: t('personalCenter.affiliate.errors.withdrawAmountRequired'),
-    }
-    return
-  }
-  if (!withdrawForm.channel.trim()) {
-    panelAlert.value = {
-      level: 'warning',
-      message: t('personalCenter.affiliate.errors.withdrawChannelRequired'),
-    }
-    return
-  }
-  if (!withdrawForm.account.trim()) {
-    panelAlert.value = {
-      level: 'warning',
-      message: t('personalCenter.affiliate.errors.withdrawAccountRequired'),
-    }
-    return
-  }
-
-  submittingWithdraw.value = true
-  try {
-    await affiliateAPI.applyWithdraw({
-      amount: withdrawForm.amount.trim(),
-      channel: withdrawForm.channel.trim(),
-      account: withdrawForm.account.trim(),
-    })
-    withdrawForm.amount = ''
-    withdrawForm.account = ''
-    panelAlert.value = {
-      level: 'success',
-      message: t('personalCenter.affiliate.withdrawSuccess'),
-    }
-    await Promise.all([loadDashboard(), loadWithdraws(1)])
-  } catch (err: any) {
-    panelAlert.value = {
-      level: 'error',
-      message: err?.message || t('personalCenter.affiliate.errors.withdrawFailed'),
-    }
-  } finally {
-    submittingWithdraw.value = false
-  }
-}
-
 const copyPromotionUrl = async () => {
   if (!dashboard.value?.affiliate_code || !promotionUrl.value || promotionUrl.value === '-') return
   try {
@@ -443,7 +337,7 @@ const copyPromotionUrl = async () => {
 
 const commissionStatusLabel = (status?: string) => {
   if (status === AFFILIATE_COMMISSION_STATUS_PENDING_CONFIRM) return t('personalCenter.affiliate.commissionStatus.pendingConfirm')
-  if (status === AFFILIATE_COMMISSION_STATUS_AVAILABLE) return t('personalCenter.affiliate.commissionStatus.available')
+  if (status === AFFILIATE_COMMISSION_STATUS_AVAILABLE) return t('walletEarnings.settled')
   if (status === AFFILIATE_COMMISSION_STATUS_REJECTED) return t('personalCenter.affiliate.commissionStatus.rejected')
   if (status === AFFILIATE_COMMISSION_STATUS_WITHDRAWN) return t('personalCenter.affiliate.commissionStatus.withdrawn')
   return status || '-'

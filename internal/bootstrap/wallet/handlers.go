@@ -14,7 +14,7 @@ type Handlers struct {
 
 func New(c *container.Container) Handlers {
 	wallets := walletTransportAdapter{wallets: c.WalletService, payments: c.PaymentService}
-	return Handlers{
+	handlers := Handlers{
 		User: wallettransport.NewUserHandler(
 			wallets, wallets, c.UserStore, c.SettingService,
 		),
@@ -28,4 +28,7 @@ func New(c *container.Container) Handlers {
 			c.SettingService,
 		),
 	}
+	withdrawals := wallettransport.NewWithdrawalHandler(c.WalletService)
+	handlers.User.Withdrawals, handlers.Admin.Withdrawals = withdrawals, withdrawals
+	return handlers
 }

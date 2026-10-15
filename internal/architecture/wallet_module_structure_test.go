@@ -83,11 +83,11 @@ func TestWalletOwnsCompleteVerticalSlice(t *testing.T) {
 	assertFileDeclaresTypes(t, filepath.Join(bootstrapRoot, "handlers.go"), []string{"Handlers"})
 	assertFileDeclaresFunctions(t, filepath.Join(bootstrapRoot, "handlers.go"), []string{"New"})
 
-	assertDirectoryGoFileBudget(t, applicationRoot, 7)
+	assertDirectoryGoFileBudget(t, applicationRoot, 8) // earnings settlement and manual withdrawals
 	assertDirectoryGoFileBudget(t, contractRoot, 4)
 	assertDirectoryGoFileBudget(t, domainRoot, 4)
 	assertDirectoryGoFileBudget(t, storeRoot, 2)
-	assertDirectoryGoFileBudget(t, transportRoot, 6)
+	assertDirectoryGoFileBudget(t, transportRoot, 7) // unified withdrawal HTTP surface
 	assertDirectoryGoFileBudget(t, presenterRoot, 2)
 	assertDirectoryGoFileBudget(t, bootstrapRoot, 3)
 

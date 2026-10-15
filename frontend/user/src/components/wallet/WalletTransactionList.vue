@@ -41,7 +41,12 @@
             <TableCell class="px-4 font-mono text-sm text-foreground">
               {{ formatMoney(item.balance_after, item.currency) }}
             </TableCell>
-            <TableCell class="px-4 text-xs text-muted-foreground">{{ item.remark || '-' }}</TableCell>
+            <TableCell class="px-4 text-xs text-muted-foreground">
+              <p>{{ item.remark || '-' }}</p>
+              <p v-if="Number(item.source_amount)">{{ t('walletEarnings.sourceAmount') }}：{{ formatMoney(item.source_amount, item.currency) }}</p>
+              <p v-if="Number(item.frozen_amount)">{{ t('walletEarnings.frozenChange') }}：{{ formatMoney(item.frozen_amount, item.currency) }}</p>
+              <p v-if="Number(item.debt_amount)">{{ t('walletEarnings.debtChange') }}：{{ formatMoney(item.debt_amount, item.currency) }}</p>
+            </TableCell>
           </TableRow>
         </TableBody>
       </Table>
@@ -77,6 +82,9 @@ defineProps<{
     type: string
     direction: string
     amount: string
+    source_amount?: string
+    frozen_amount?: string
+    debt_amount?: string
     currency: string
     balance_after: string
     remark: string

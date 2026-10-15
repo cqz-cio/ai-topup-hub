@@ -2,6 +2,7 @@ package userhttp
 
 import (
 	"errors"
+	walletcontract "github.com/dujiao-next/internal/modules/wallet/contract"
 
 	productcontract "github.com/dujiao-next/internal/modules/catalog/product/contract"
 
@@ -100,6 +101,10 @@ var userFinanceErrorRules = []mappedError{
 }
 
 func respondUserFinanceError(c *gin.Context, err error, fallbackKey string) {
+	if errors.Is(err, walletcontract.ErrUnifiedWallet) {
+		response.Error(c, response.CodeBadRequest, walletcontract.ErrUnifiedWallet.Error())
+		return
+	}
 	for _, rule := range userFinanceErrorRules {
 		if errors.Is(err, rule.target) {
 			ginutil.RespondError(c, rule.code, rule.key, nil)

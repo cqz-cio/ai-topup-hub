@@ -3,6 +3,11 @@ package integrationtest
 import (
 	"errors"
 	"fmt"
+	affiliatedomain "github.com/dujiao-next/internal/modules/affiliate/domain"
+	walletapp "github.com/dujiao-next/internal/modules/wallet/application"
+	walletcontract "github.com/dujiao-next/internal/modules/wallet/contract"
+	walletdomain "github.com/dujiao-next/internal/modules/wallet/domain"
+	walletstore "github.com/dujiao-next/internal/modules/wallet/infrastructure/gormstore"
 	"testing"
 	"time"
 
@@ -70,6 +75,7 @@ func openResellerAccountingServiceTestDB(t *testing.T) *gorm.DB {
 		&resellerdomain.LedgerEntry{},
 		&resellerdomain.WithdrawRequest{},
 		&resellerdomain.BalanceAccount{},
+		&affiliatedomain.Profile{}, &walletdomain.Account{}, &walletdomain.Transaction{}, &walletdomain.EarningSettlement{}, &walletdomain.WithdrawRequest{},
 	); err != nil {
 		t.Fatalf("migrate failed: %v", err)
 	}
@@ -155,7 +161,7 @@ func TestResellerAccountingServiceGetUserFinanceDashboardScopesToUserProfile(t *
 	if !dashboard.Opened || dashboard.Profile == nil || dashboard.Profile.ID != profile.ID {
 		t.Fatalf("expected opened dashboard for profile %d, got %+v", profile.ID, dashboard)
 	}
-	if !dashboard.WithdrawEnabled || dashboard.WithdrawDisabledReason != "" {
+	if dashboard.WithdrawEnabled || dashboard.WithdrawDisabledReason != "unified_wallet" {
 		t.Fatalf("expected active normal profile withdraw enabled, got %+v", dashboard)
 	}
 	if len(dashboard.Balances) != 1 || dashboard.Balances[0].AvailableAmountCache.String() != "18.50" {
@@ -595,51 +601,51 @@ func TestResellerAccountingRefundDeductMissingSnapshotSkipsWithoutRollingBack(t 
 	}
 }
 
-func TestResellerAccountingApplyWithdrawLocksSameCurrencyLedgers(t *testing.T) {
+func TestLegacyResellerWithdrawCannotDoubleSpendWalletEarnings(t *testing.T) {
 	db := openResellerAccountingServiceTestDB(t)
 	profile := seedResellerAccountingProfile(t, db)
-	now := time.Now()
-	rows := []resellerdomain.LedgerEntry{
-		{ResellerID: profile.ID, Type: resellerdomain.LedgerTypeOrderProfit, Amount: money.FromDecimal(decimal.NewFromInt(10)), Currency: "USD", IdempotencyKey: "order_profit:w-usd-1", Status: resellerdomain.LedgerStatusAvailable, AvailableAt: &now},
-		{ResellerID: profile.ID, Type: resellerdomain.LedgerTypeOrderProfit, Amount: money.FromDecimal(decimal.NewFromInt(15)), Currency: "USD", IdempotencyKey: "order_profit:w-usd-2", Status: resellerdomain.LedgerStatusAvailable, AvailableAt: &now},
-		{ResellerID: profile.ID, Type: resellerdomain.LedgerTypeOrderProfit, Amount: money.FromDecimal(decimal.NewFromInt(20)), Currency: "CNY", IdempotencyKey: "order_profit:w-cny-1", Status: resellerdomain.LedgerStatusAvailable, AvailableAt: &now},
+	row := resellerdomain.LedgerEntry{ResellerID: profile.ID, Type: resellerdomain.LedgerTypeOrderProfit, Amount: money.FromDecimal(decimal.NewFromInt(60)), Currency: "CNY", IdempotencyKey: "legacy-blocked", Status: resellerdomain.LedgerStatusAvailable}
+	if err := db.Create(&row).Error; err != nil {
+		t.Fatal(err)
 	}
-	if err := db.Create(&rows).Error; err != nil {
-		t.Fatalf("seed ledger rows failed: %v", err)
+	svc := newResellerAccountingTestHarness(resellergormstore.New(db), 0)
+	if _, err := svc.withdraw.ApplyWithdraw(profile.ID, resellercontract.WithdrawApplyInput{Amount: decimal.NewFromInt(20), Currency: "CNY", Channel: "wechat", Account: "test"}); !errors.Is(err, walletcontract.ErrUnifiedWallet) {
+		t.Fatal(err)
 	}
-	repo := resellergormstore.New(db)
-	svc := newResellerAccountingTestHarness(repo, 0)
-	req, err := svc.withdraw.ApplyWithdraw(profile.ID, resellercontract.WithdrawApplyInput{
-		Amount:   decimal.NewFromInt(12),
-		Currency: "USD",
-		Channel:  "usdt",
-		Account:  "T-address",
-	})
-	if err != nil {
-		t.Fatalf("apply withdraw failed: %v", err)
+	var requests int64
+	db.Model(&resellerdomain.WithdrawRequest{}).Count(&requests)
+	if requests != 0 {
+		t.Fatal("legacy endpoint created a withdrawal")
 	}
-	if req.Status != resellerdomain.WithdrawStatusPending || req.Currency != "USD" || req.Amount.String() != "12.00" {
-		t.Fatalf("unexpected withdraw request: %+v", req)
+	db.First(&row, row.ID)
+	if row.Status != resellerdomain.LedgerStatusAvailable || row.WithdrawRequestID != nil {
+		t.Fatal("legacy endpoint changed an earnings ledger")
 	}
-	var locked []resellerdomain.LedgerEntry
-	if err := db.Where("withdraw_request_id = ?", req.ID).Find(&locked).Error; err != nil {
-		t.Fatalf("load locked ledgers failed: %v", err)
+}
+
+func seedLegacyWithdraw(t *testing.T, db *gorm.DB, row *resellerdomain.LedgerEntry, amount int64) (*resellerdomain.WithdrawRequest, error) {
+	t.Helper()
+	request := &resellerdomain.WithdrawRequest{ResellerID: row.ResellerID, Amount: money.FromDecimal(decimal.NewFromInt(amount)), Currency: row.Currency, Channel: "usdt", Account: "historical-test", Status: resellerdomain.WithdrawStatusPending}
+	if err := db.Create(request).Error; err != nil {
+		return nil, err
 	}
-	if len(locked) != 2 {
-		t.Fatalf("expected split and locked two USD rows, got %+v", locked)
-	}
-	for _, row := range locked {
-		if row.Currency != "USD" || row.Status != resellerdomain.LedgerStatusLocked {
-			t.Fatalf("unexpected locked row: %+v", row)
+	remaining := row.Amount.Decimal.Sub(request.Amount.Decimal)
+	if remaining.IsPositive() {
+		extra := *row
+		extra.ID = 0
+		extra.Amount = money.FromDecimal(remaining)
+		extra.IdempotencyKey += "-remainder"
+		if err := db.Create(&extra).Error; err != nil {
+			return nil, err
 		}
 	}
-	var cnyCount int64
-	if err := db.Model(&resellerdomain.LedgerEntry{}).Where("currency = ? AND status = ?", "CNY", resellerdomain.LedgerStatusAvailable).Count(&cnyCount).Error; err != nil {
-		t.Fatalf("count CNY available failed: %v", err)
+	row.Amount = request.Amount
+	row.Status = resellerdomain.LedgerStatusLocked
+	row.WithdrawRequestID = &request.ID
+	if err := db.Save(row).Error; err != nil {
+		return nil, err
 	}
-	if cnyCount != 1 {
-		t.Fatalf("CNY ledger should remain available, got %d", cnyCount)
-	}
+	return request, nil
 }
 
 func TestResellerAccountingRejectWithdrawUnlocksLedgers(t *testing.T) {
@@ -652,7 +658,7 @@ func TestResellerAccountingRejectWithdrawUnlocksLedgers(t *testing.T) {
 	}
 	repo := resellergormstore.New(db)
 	svc := newResellerAccountingTestHarness(repo, 0)
-	req, err := svc.withdraw.ApplyWithdraw(profile.ID, resellercontract.WithdrawApplyInput{Amount: decimal.NewFromInt(10), Currency: "USD", Channel: "usdt", Account: "T-address"})
+	req, err := seedLegacyWithdraw(t, db, &row, 10)
 	if err != nil {
 		t.Fatalf("apply withdraw failed: %v", err)
 	}
@@ -682,7 +688,7 @@ func TestResellerAccountingPayWithdrawMarksLedgersWithdrawn(t *testing.T) {
 	}
 	repo := resellergormstore.New(db)
 	svc := newResellerAccountingTestHarness(repo, 0)
-	req, err := svc.withdraw.ApplyWithdraw(profile.ID, resellercontract.WithdrawApplyInput{Amount: decimal.NewFromInt(10), Currency: "USD", Channel: "usdt", Account: "T-address"})
+	req, err := seedLegacyWithdraw(t, db, &row, 10)
 	if err != nil {
 		t.Fatalf("apply withdraw failed: %v", err)
 	}
@@ -719,7 +725,7 @@ func TestResellerAccountingPayPartialWithdrawKeepsRemainingAvailableBalance(t *t
 	}
 	repo := resellergormstore.New(db)
 	svc := newResellerAccountingTestHarness(repo, 0)
-	req, err := svc.withdraw.ApplyWithdraw(profile.ID, resellercontract.WithdrawApplyInput{Amount: decimal.NewFromInt(25), Currency: "USD", Channel: "usdt", Account: "T-address"})
+	req, err := seedLegacyWithdraw(t, db, &row, 25)
 	if err != nil {
 		t.Fatalf("apply withdraw failed: %v", err)
 	}
@@ -849,46 +855,71 @@ func TestResellerAccountingRefundDeductDoesNotOverDeductAcrossPartialRefunds(t *
 	}
 }
 
-// TestResellerAccountingApplyWithdrawRejectsExceedingNetAvailable 验证提现额以「净可用余额」为准，
-// 当 available 含退款扣减负数流水时，不能仅凭正数流水之和超额提现。
-func TestResellerAccountingApplyWithdrawRejectsExceedingNetAvailable(t *testing.T) {
+// Negative source entries must reduce the unified wallet, not just its display cache.
+type walletTestPolicy struct{}
+
+func (walletTestPolicy) GetWalletWithdrawPolicy() (walletcontract.WithdrawPolicy, error) {
+	return walletcontract.WithdrawPolicy{Enabled: true, Minimum: money.FromDecimal(decimal.NewFromInt(20)), Channels: []string{"wechat"}, Currency: "CNY"}, nil
+}
+func TestResellerNetIncomeTransfersOnceToUnifiedWallet(t *testing.T) {
 	db := openResellerAccountingServiceTestDB(t)
+	raw, _ := db.DB()
+	raw.SetMaxOpenConns(1)
+	t.Cleanup(func() { raw.Close() })
 	profile := seedResellerAccountingProfile(t, db)
-	now := time.Now()
-	if err := db.Create(&resellerdomain.LedgerEntry{
-		ResellerID: profile.ID, Type: resellerdomain.LedgerTypeOrderProfit,
-		Amount: money.FromDecimal(decimal.NewFromInt(100)), Currency: "USD",
-		IdempotencyKey: "test_profit_net", Status: resellerdomain.LedgerStatusAvailable,
-		CreatedAt: now, UpdatedAt: now,
-	}).Error; err != nil {
-		t.Fatalf("create profit ledger failed: %v", err)
-	}
-	if err := db.Create(&resellerdomain.LedgerEntry{
-		ResellerID: profile.ID, Type: resellerdomain.LedgerTypeRefundDeduct,
-		Amount: money.FromDecimal(decimal.NewFromInt(-50)), Currency: "USD",
-		IdempotencyKey: "test_refund_net", Status: resellerdomain.LedgerStatusAvailable,
-		CreatedAt: now, UpdatedAt: now,
-	}).Error; err != nil {
-		t.Fatalf("create refund ledger failed: %v", err)
-	}
 	repo := resellergormstore.New(db)
-	svc := newResellerAccountingTestHarness(repo, 0)
-
-	// 净可用 = 100 - 50 = 50，提现 80 必须被拒绝（旧逻辑仅看正数 100 会放行造成资损）。
-	if _, err := svc.withdraw.ApplyWithdraw(profile.ID, resellercontract.WithdrawApplyInput{
-		Amount: decimal.NewFromInt(80), Currency: "USD", Channel: "usdt", Account: "Txxx",
-	}); !errors.Is(err, resellercontract.ErrWithdrawInsufficient) {
-		t.Fatalf("expected ErrWithdrawInsufficient for over-net withdraw, got %v", err)
+	for i, amount := range []int64{100, -50} {
+		kind := resellerdomain.LedgerTypeOrderProfit
+		if amount < 0 {
+			kind = resellerdomain.LedgerTypeRefundDeduct
+		}
+		if err := db.Create(&resellerdomain.LedgerEntry{ResellerID: profile.ID, Type: kind, Amount: money.FromDecimal(decimal.NewFromInt(amount)), Currency: "CNY", IdempotencyKey: fmt.Sprintf("net-%d", i), Status: resellerdomain.LedgerStatusAvailable}).Error; err != nil {
+			t.Fatal(err)
+		}
 	}
-
-	// 提现 50（恰好等于净可用）应成功。
-	req, err := svc.withdraw.ApplyWithdraw(profile.ID, resellercontract.WithdrawApplyInput{
-		Amount: decimal.NewFromInt(50), Currency: "USD", Channel: "usdt", Account: "Txxx",
-	})
+	refresh := func() {
+		t.Helper()
+		if err := db.Transaction(func(tx *gorm.DB) error {
+			return resellerapplication.RefreshBalanceAccount(repo.BindTx(tx), profile.ID, "CNY", time.Now())
+		}); err != nil {
+			t.Fatal(err)
+		}
+	}
+	refresh()
+	refresh()
+	ws := walletstore.New(db)
+	svc := walletapp.NewService(walletapp.Options{Repository: ws, Transactions: ws, WithdrawPolicy: walletTestPolicy{}})
+	a, err := svc.GetAccount(profile.UserID)
+	if err != nil || a.WithdrawableBalance.String() != "50.00" || a.Balance.String() != "50.00" {
+		t.Fatalf("net earnings: %+v %v", a, err)
+	}
+	input := walletcontract.WithdrawInput{UserID: profile.UserID, Amount: money.FromDecimal(decimal.NewFromInt(80)), Channel: "wechat", Account: "local-simulated-recipient", RealName: "Local Test", RequestKey: "net-income-wallet-01"}
+	if _, err := svc.ApplyWithdraw(input); !errors.Is(err, walletcontract.ErrWithdrawInsufficient) {
+		t.Fatalf("over-net withdrawal: %v", err)
+	}
+	input.Amount = money.FromDecimal(decimal.NewFromInt(50))
+	request, err := svc.ApplyWithdraw(input)
 	if err != nil {
-		t.Fatalf("expected withdraw of net available 50 to succeed, got %v", err)
+		t.Fatal(err)
 	}
-	if req == nil || req.Amount.Decimal.StringFixed(2) != "50.00" {
-		t.Fatalf("unexpected withdraw request: %+v", req)
+	refresh()
+	a, _ = svc.GetAccount(profile.UserID)
+	if a.Balance.String() != "0.00" || a.FrozenBalance.String() != "50.00" {
+		t.Fatalf("settlement replay minted earnings: %+v", a)
+	}
+	if err := db.Create(&resellerdomain.LedgerEntry{ResellerID: profile.ID, Type: resellerdomain.LedgerTypeRefundDeduct, Amount: money.FromDecimal(decimal.NewFromInt(-50)), Currency: "CNY", IdempotencyKey: "net-final-refund", Status: resellerdomain.LedgerStatusAvailable}).Error; err != nil {
+		t.Fatal(err)
+	}
+	refresh()
+	a, _ = svc.GetAccount(profile.UserID)
+	if a.EarningsDebt.String() != "50.00" {
+		t.Fatalf("missing refund recovery: %+v", a)
+	}
+	if _, err := svc.ReviewWithdraw(walletcontract.WithdrawReviewInput{ID: request.ID, AdminID: 1, Action: "reject", Remark: "Refund reversed income"}); err != nil {
+		t.Fatal(err)
+	}
+	a, _ = svc.GetAccount(profile.UserID)
+	if a.EarningsDebt.String() != "0.00" || a.Balance.String() != "0.00" || a.FrozenBalance.String() != "0.00" {
+		t.Fatalf("refund release failed: %+v", a)
 	}
 }

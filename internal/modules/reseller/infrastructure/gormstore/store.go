@@ -5,6 +5,8 @@ import (
 
 	resellercontract "github.com/dujiao-next/internal/modules/reseller/contract"
 	resellerdomain "github.com/dujiao-next/internal/modules/reseller/domain"
+	walletcontract "github.com/dujiao-next/internal/modules/wallet/contract"
+	walletstore "github.com/dujiao-next/internal/modules/wallet/infrastructure/gormstore"
 	"gorm.io/gorm"
 )
 
@@ -12,6 +14,8 @@ import (
 type Store struct {
 	db *gorm.DB
 }
+
+func (s *Store) Wallets() walletcontract.Repository { return walletstore.New(s.db) }
 
 func New(db *gorm.DB) *Store {
 	return &Store{db: db}

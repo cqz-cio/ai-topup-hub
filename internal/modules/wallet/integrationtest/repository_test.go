@@ -2,6 +2,8 @@ package integrationtest
 
 import (
 	"fmt"
+	affiliatedomain "github.com/dujiao-next/internal/modules/affiliate/domain"
+	resellerdomain "github.com/dujiao-next/internal/modules/reseller/domain"
 	"testing"
 	"time"
 
@@ -62,6 +64,12 @@ func setupWalletRepositoryTest(t *testing.T) (*walletgormstore.Store, *gorm.DB) 
 		&walletdomain.Account{},
 		&walletdomain.Transaction{},
 		&walletdomain.RechargeOrder{},
+		&walletdomain.OrderFunding{},
+		&walletdomain.EarningSettlement{},
+		&walletdomain.WithdrawRequest{},
+		&affiliatedomain.Profile{},
+		&resellerdomain.Profile{},
+		&resellerdomain.BalanceAccount{},
 	); err != nil {
 		t.Fatalf("auto migrate failed: %v", err)
 	}

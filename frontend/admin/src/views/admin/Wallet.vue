@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
 import { notifyError, notifySuccess } from '@/utils/notify'
 import ComplianceGuardWrapper from '@/components/ComplianceGuardWrapper.vue'
 
@@ -15,7 +16,11 @@ const { t } = useI18n()
 const form = reactive({
   recharge_channel_ids: [] as number[],
   wallet_only_payment: false,
+  withdraw_enabled: false,
+  withdraw_minimum: '20.00',
+  withdraw_channels: [] as string[],
 })
+const loadedConfig = ref<Record<string, unknown> | null>(null)
 const channels = ref<AdminPaymentChannel[]>([])
 const saving = ref(false)
 
@@ -23,6 +28,10 @@ const loadConfig = async () => {
   try {
     const res = await adminAPI.getSettings({ key: 'wallet_config' })
     const data = res.data?.data
+    loadedConfig.value = data || {}
+    form.withdraw_enabled = data?.withdraw_enabled === true
+    form.withdraw_minimum = String(data?.withdraw_minimum ?? '20.00')
+    form.withdraw_channels = Array.isArray(data?.withdraw_channels) ? data.withdraw_channels.filter((c: string) => ['alipay', 'wechat'].includes(c)) : []
     if (data && Array.isArray(data.recharge_channel_ids)) {
       form.recharge_channel_ids = data.recharge_channel_ids.filter((id: unknown) => typeof id === 'number' && id > 0)
     } else {
@@ -30,6 +39,8 @@ const loadConfig = async () => {
     }
     form.wallet_only_payment = !!data?.wallet_only_payment
   } catch {
+    loadedConfig.value = null
+    notifyError(t('walletEarnings.loadFailed'))
     form.recharge_channel_ids = []
     form.wallet_only_payment = false
   }
@@ -54,11 +65,17 @@ const toggleChannel = (channelId: number) => {
 }
 
 const save = async () => {
+  if (!loadedConfig.value) return
+  if (form.withdraw_enabled && (!/^\d+(\.\d{1,2})?$/.test(form.withdraw_minimum) || Number(form.withdraw_minimum) <= 0 || !form.withdraw_channels.length)) { notifyError(t('walletEarnings.invalid')); return }
   saving.value = true
   try {
     await adminAPI.updateSettings({
       key: 'wallet_config',
       value: {
+        ...loadedConfig.value,
+        withdraw_enabled: form.withdraw_enabled,
+        withdraw_minimum: form.withdraw_minimum,
+        withdraw_channels: form.withdraw_channels,
         recharge_channel_ids: form.recharge_channel_ids,
         wallet_only_payment: form.wallet_only_payment,
       },
@@ -107,8 +124,14 @@ onMounted(() => {
           <p v-else class="text-xs text-muted-foreground">{{ t('admin.settings.wallet.noChannels') }}</p>
           <p class="mt-1 text-xs text-muted-foreground">{{ t('admin.settings.wallet.rechargeChannelsTip') }}</p>
         </div>
+        <div class="space-y-4 border-t border-border pt-4">
+          <div class="flex items-center justify-between gap-4"><div><Label for="wallet-withdraw-enabled">{{ t('walletEarnings.enable') }}</Label><p class="mt-1 text-xs text-muted-foreground">{{ t('walletEarnings.rule') }}</p></div><Switch id="wallet-withdraw-enabled" v-model="form.withdraw_enabled" /></div>
+          <div><Label for="wallet-withdraw-minimum">{{ t('walletEarnings.minimum') }}</Label><Input id="wallet-withdraw-minimum" v-model="form.withdraw_minimum" inputmode="decimal" class="mt-2 max-w-xs" /></div>
+          <div class="flex flex-wrap gap-4"><Label v-for="channel in ['alipay', 'wechat']" :key="channel" class="inline-flex items-center gap-2"><Checkbox :model-value="form.withdraw_channels.includes(channel)" @update:model-value="checked => { form.withdraw_channels = checked ? [...new Set([...form.withdraw_channels, channel])] : form.withdraw_channels.filter(c => c !== channel) }" />{{ t(`walletEarnings.channels.${channel}`) }}</Label></div>
+          <p class="text-xs text-muted-foreground">{{ t('walletEarnings.adminHint') }}</p>
+        </div>
         <div class="flex justify-end border-t border-border pt-4">
-          <Button :disabled="saving" @click="save">
+          <Button :disabled="saving || !loadedConfig" @click="save">
             {{ saving ? t('admin.settings.actions.saving') : t('admin.settings.actions.save') }}
           </Button>
         </div>

@@ -1,13 +1,15 @@
 package application
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
 
 	orderdomain "github.com/dujiao-next/internal/modules/order/domain"
 
-	productdomain "github.com/dujiao-next/internal/modules/catalog/product/domain"
+	walletapp "github.com/dujiao-next/internal/modules/wallet/application"
+	walletcontract "github.com/dujiao-next/internal/modules/wallet/contract"
 
 	affiliatecontract "github.com/dujiao-next/internal/modules/affiliate/contract"
 	affiliatedomain "github.com/dujiao-next/internal/modules/affiliate/domain"
@@ -20,7 +22,21 @@ import (
 
 // HandleOrderPaid 处理订单支付成功后的佣金生成
 func (s *Service) HandleOrderPaid(orderID uint) error {
-	if orderID == 0 || s.repo == nil || s.orderRepo == nil {
+	if s == nil || s.repo == nil || orderID == 0 {
+		return nil
+	}
+	return s.repo.WithinTransaction(func(repo affiliatecontract.Store) error {
+		bound := *s
+		bound.repo = repo
+		if err := bound.handlePaid(orderID); err != nil {
+			return err
+		}
+		return repo.MarkCommissionProcessed(orderID)
+	})
+}
+
+func (s *Service) handlePaid(orderID uint) error {
+	if orderID == 0 || s.repo == nil || s.settings == nil {
 		return nil
 	}
 	setting, err := s.settings.GetAffiliateSetting()
@@ -31,11 +47,11 @@ func (s *Service) HandleOrderPaid(orderID uint) error {
 		return nil
 	}
 
-	order, err := s.orderRepo.GetByID(orderID)
+	order, err := s.repo.GetOrderForCommission(orderID)
 	if err != nil {
 		return err
 	}
-	if order == nil {
+	if order == nil || order.PaidAt == nil || order.ParentID != nil || !originalPriceOrder(order) {
 		return nil
 	}
 	profile, err := s.resolveAffiliateProfileForOrder(order)
@@ -68,6 +84,10 @@ func (s *Service) HandleOrderPaid(orderID uint) error {
 	if baseAmount.LessThanOrEqual(decimal.Zero) {
 		return nil
 	}
+	if order.RefundedAmount.Decimal.IsPositive() && order.TotalAmount.Decimal.IsPositive() {
+		remaining := decimal.Max(decimal.Zero, order.TotalAmount.Decimal.Sub(order.RefundedAmount.Decimal))
+		baseAmount = baseAmount.Mul(remaining).Div(order.TotalAmount.Decimal).Round(2)
+	}
 	rate := decimal.NewFromFloat(setting.CommissionRate).Round(2)
 	commissionAmount := baseAmount.Mul(rate).Div(decimal.NewFromInt(100)).Round(2)
 	if commissionAmount.LessThanOrEqual(decimal.Zero) {
@@ -90,6 +110,7 @@ func (s *Service) HandleOrderPaid(orderID uint) error {
 	}
 
 	commission := &affiliatedomain.Commission{
+		Currency:           order.Currency,
 		AffiliateProfileID: profile.ID,
 		OrderID:            order.ID,
 		CommissionType:     commissionType,
@@ -100,7 +121,10 @@ func (s *Service) HandleOrderPaid(orderID uint) error {
 		ConfirmAt:          confirmAt,
 		AvailableAt:        availableAt,
 	}
-	return s.repo.CreateCommission(commission)
+	if err := s.repo.CreateCommission(commission); err != nil {
+		return err
+	}
+	return s.saveCommission(s.repo, commission)
 }
 
 // ConfirmDueCommissions 将到期佣金转可提现
@@ -108,16 +132,51 @@ func (s *Service) ConfirmDueCommissions(now time.Time) error {
 	if s.repo == nil {
 		return nil
 	}
-	_, err := s.repo.MarkPendingCommissionsAvailable(now, now)
-	return err
+	// Repair a failed asynchronous payment hook before settling mature income.
+	ids, err := s.repo.ListCommissionRecoveryOrders(100)
+	if err != nil {
+		return err
+	}
+	for _, id := range ids {
+		if err := s.HandleOrderPaid(id); err != nil {
+			return err
+		}
+	}
+	return s.repo.WithinTransaction(func(repo affiliatecontract.Store) error {
+		rows, err := repo.ListCommissionsForSettlement(now)
+		if err != nil {
+			return err
+		}
+		for i := range rows {
+			rows[i].Status = constants.AffiliateCommissionStatusAvailable
+			if rows[i].AvailableAt == nil {
+				rows[i].AvailableAt = &now
+			}
+			if err := s.saveCommission(repo, &rows[i]); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
 }
 
 // HandleOrderCanceled 处理订单取消/退款后的佣金逆向
 func (s *Service) HandleOrderCanceled(orderID uint, reason string) error {
+	if s == nil || s.repo == nil || orderID == 0 {
+		return nil
+	}
+	return s.repo.WithinTransaction(func(repo affiliatecontract.Store) error {
+		bound := *s
+		bound.repo = repo
+		return bound.handleCanceled(orderID, reason)
+	})
+}
+
+func (s *Service) handleCanceled(orderID uint, reason string) error {
 	if orderID == 0 || s.repo == nil {
 		return nil
 	}
-	rows, err := s.repo.ListCommissionsByOrder(orderID, []string{
+	rows, err := s.repo.ListCommissionsByOrderForUpdate(orderID, []string{
 		constants.AffiliateCommissionStatusPendingConfirm,
 		constants.AffiliateCommissionStatusAvailable,
 	})
@@ -142,7 +201,7 @@ func (s *Service) HandleOrderCanceled(orderID uint, reason string) error {
 		item.Status = constants.AffiliateCommissionStatusRejected
 		item.InvalidReason = reasonText
 		item.UpdatedAt = now
-		if err := s.repo.UpdateCommission(&item); err != nil {
+		if err := s.saveCommission(s.repo, &item); err != nil {
 			return err
 		}
 	}
@@ -213,7 +272,7 @@ func (s *Service) HandleOrderRefunded(
 			item.ConfirmAt = nil
 			item.AvailableAt = nil
 			item.UpdatedAt = now
-			if err := repoTx.UpdateCommission(&item); err != nil {
+			if err := s.saveCommission(repoTx, &item); err != nil {
 				return err
 			}
 			continue
@@ -244,7 +303,7 @@ func (s *Service) HandleOrderRefunded(
 			item.ConfirmAt = nil
 			item.AvailableAt = nil
 		}
-		if err := repoTx.UpdateCommission(&item); err != nil {
+		if err := s.saveCommission(repoTx, &item); err != nil {
 			return err
 		}
 	}
@@ -265,20 +324,8 @@ func (s *Service) resolveAffiliateProfileForOrder(order *orderdomain.Order) (*af
 }
 
 func (s *Service) calculateCommissionBaseAmount(order *orderdomain.Order) (decimal.Decimal, error) {
-	if order == nil || s.productRepo == nil {
+	if !originalPriceOrder(order) {
 		return decimal.Zero, nil
-	}
-	productIDs := collectAffiliateProductIDs(order)
-	if len(productIDs) == 0 {
-		return decimal.Zero, nil
-	}
-	products, err := s.productRepo.ListByIDs(productIDs)
-	if err != nil {
-		return decimal.Zero, err
-	}
-	productMap := make(map[uint]productdomain.Product, len(products))
-	for _, product := range products {
-		productMap[product.ID] = product
 	}
 
 	targetOrders := order.Children
@@ -289,8 +336,7 @@ func (s *Service) calculateCommissionBaseAmount(order *orderdomain.Order) (decim
 	total := decimal.Zero
 	for _, current := range targetOrders {
 		for _, item := range current.Items {
-			product, ok := productMap[item.ProductID]
-			if !ok || !product.IsAffiliateEnabled {
+			if !item.AffiliateProductEnabled {
 				continue
 			}
 			payable := item.TotalPrice.Decimal.Sub(item.CouponDiscount.Decimal).Round(2)
@@ -301,6 +347,54 @@ func (s *Service) calculateCommissionBaseAmount(order *orderdomain.Order) (decim
 		}
 	}
 	return total, nil
+}
+
+// Eligibility is frozen at checkout, including personal prices. A single
+// discounted line disqualifies the whole order; using wallet funds does not.
+func originalPriceOrder(order *orderdomain.Order) bool {
+	if order == nil || (order.ResellerID != nil && *order.ResellerID > 0) {
+		return false
+	}
+	if order.DiscountAmount.Decimal.IsPositive() || order.MemberDiscountAmount.Decimal.IsPositive() || order.PromotionDiscountAmount.Decimal.IsPositive() || order.WholesaleDiscountAmount.Decimal.IsPositive() {
+		return false
+	}
+	orders := order.Children
+	if len(orders) == 0 {
+		orders = []orderdomain.Order{*order}
+	}
+	count := 0
+	for _, current := range orders {
+		for _, item := range current.Items {
+			count++
+			if !item.AffiliateOriginalPrice || item.CouponDiscount.Decimal.IsPositive() || item.MemberDiscount.Decimal.IsPositive() || item.PromotionDiscount.Decimal.IsPositive() || item.WholesaleDiscount.Decimal.IsPositive() || !item.UnitPrice.Decimal.Equal(item.OriginalUnitPrice.Decimal) || !item.TotalPrice.Decimal.Equal(item.OriginalTotalPrice.Decimal) {
+				return false
+			}
+		}
+	}
+	return count > 0
+}
+
+func (s *Service) saveCommission(repo affiliatecontract.Store, item *affiliatedomain.Commission) error {
+	if item.WithdrawRequestID == nil && (item.Status == constants.AffiliateCommissionStatusAvailable || item.Status == constants.AffiliateCommissionStatusRejected) {
+		target := item.CommissionAmount
+		if item.Status == constants.AffiliateCommissionStatusRejected {
+			target = money.FromDecimal(decimal.Zero)
+		}
+		if !target.Decimal.Equal(item.WalletCreditedAmount.Decimal) {
+			profile, err := repo.GetProfileByID(item.AffiliateProfileID)
+			if err != nil {
+				return err
+			}
+			if profile == nil {
+				return walletcontract.ErrEarningSource
+			}
+			if err := walletapp.SyncEarningInTransaction(repo, walletcontract.EarningInput{UserID: profile.UserID, Reference: fmt.Sprintf("affiliate:%d", item.ID), Currency: item.Currency, Amount: target, Type: "affiliate_earning", Remark: "推广返利结算 / 退款冲回"}); err != nil {
+				return err
+			}
+			item.WalletCreditedAmount = target
+		}
+	}
+	return repo.UpdateCommission(item)
 }
 
 func collectAffiliateProductIDs(order *orderdomain.Order) []uint {

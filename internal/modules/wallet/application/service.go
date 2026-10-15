@@ -11,19 +11,21 @@ import (
 const defaultCurrency = "CNY"
 
 type Options struct {
-	Repository   walletcontract.Repository
-	Transactions walletcontract.UnitOfWork
+	WithdrawPolicy walletcontract.WithdrawPolicyReader
+	Repository     walletcontract.Repository
+	Transactions   walletcontract.UnitOfWork
 }
 
 type Service struct {
-	repository   walletcontract.Repository
-	transactions walletcontract.UnitOfWork
+	withdrawPolicy walletcontract.WithdrawPolicyReader
+	repository     walletcontract.Repository
+	transactions   walletcontract.UnitOfWork
 }
 
 var _ walletcontract.UseCase = (*Service)(nil)
 
 func NewService(options Options) *Service {
-	return &Service{repository: options.Repository, transactions: options.Transactions}
+	return &Service{repository: options.Repository, transactions: options.Transactions, withdrawPolicy: options.WithdrawPolicy}
 }
 
 func normalizeCurrency(currency string) string {

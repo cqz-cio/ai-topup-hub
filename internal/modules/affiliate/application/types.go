@@ -26,6 +26,7 @@ type WithdrawApplyInput struct {
 
 // Dashboard 推广用户中心数据。
 type Dashboard struct {
+	WithdrawURL         string       `json:"withdraw_url"`
 	Enabled             bool         `json:"enabled"`
 	CanOpen             bool         `json:"can_open"`
 	CanWithdraw         bool         `json:"can_withdraw"`

@@ -97,11 +97,12 @@ type adminWalletRechargeItem struct {
 
 // AdminHandler 处理后台钱包 HTTP 请求。
 type AdminHandler struct {
-	wallets  AdminWalletService
-	users    AdminUserReader
-	channels PaymentChannelReader
-	payments PaymentReader
-	settings SiteCurrencyReader
+	Withdrawals *WithdrawalHandler
+	wallets     AdminWalletService
+	users       AdminUserReader
+	channels    PaymentChannelReader
+	payments    PaymentReader
+	settings    SiteCurrencyReader
 }
 
 // NewAdminHandler 创建后台钱包 Handler。

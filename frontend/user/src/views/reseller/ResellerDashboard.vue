@@ -64,7 +64,7 @@
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <ResellerMetricCard :label="t('resellerConsole.dashboard.orderTotal')" :value="stats?.total || 0" :icon="ShoppingBag" tone="accent" />
         <ResellerMetricCard :label="t('resellerConsole.orders.paidOrders')" :value="paidCount" :hint="paidRatioText" :icon="CheckCircle2" tone="success" />
-        <ResellerMetricCard :label="t('personalCenter.reseller.primaryAvailable')" :value="primaryBalanceText" :hint="primaryBalanceHint" :icon="Banknote" tone="info" />
+        <ResellerMetricCard :label="t('walletEarnings.settled')" :value="primaryBalanceText" :hint="primaryBalanceHint" :icon="Banknote" tone="info" />
         <ResellerMetricCard :label="t('resellerConsole.dashboard.domainCount')" :value="profileSnapshot?.domains?.length || 0" :icon="Globe" tone="neutral" />
       </div>
 

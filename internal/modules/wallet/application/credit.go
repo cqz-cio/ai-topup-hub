@@ -62,18 +62,39 @@ func (s *Service) CreditInTransaction(
 	if err != nil {
 		return nil, nil, err
 	}
+	// Recheck after waiting for the account lock, before changing any money.
+	existing, err = repository.GetTransactionByReference(reference)
+	if err != nil {
+		return nil, nil, err
+	}
+	if existing != nil {
+		return account, existing, nil
+	}
+	cash, err := refundEarnings(repository, input.UserID, input.RefundFunding)
+	if err != nil {
+		return nil, nil, err
+	}
+	if cash.GreaterThan(amount) {
+		return nil, nil, walletcontract.ErrEarningSource
+	}
 	before := account.Balance.Decimal.Round(2)
-	after := before.Add(amount).Round(2)
-	account.Balance = money.FromDecimal(after)
+	debtBefore := account.EarningsDebt.Decimal
+	account.Balance = money.FromDecimal(before.Add(amount.Sub(cash)).Round(2))
+	restored := creditEarnings(account, cash)
+	after := account.Balance.Decimal
 	account.UpdatedAt = now
+	if err := validateAccount(account); err != nil {
+		return nil, nil, err
+	}
 	if err := repository.UpdateAccount(account); err != nil {
 		return nil, nil, walletcontract.ErrAccountUpdateFailed
 	}
 
 	transaction := &walletdomain.Transaction{
+		WithdrawableAmount: money.FromDecimal(restored), DebtAmount: money.FromDecimal(account.EarningsDebt.Decimal.Sub(debtBefore)),
 		UserID: input.UserID, OrderID: input.OrderID,
 		Type: transactionType, Direction: constants.WalletTxnDirectionIn,
-		Amount: money.FromDecimal(amount), BalanceBefore: money.FromDecimal(before),
+		Amount: money.FromDecimal(after.Sub(before)), SourceAmount: money.FromDecimal(amount), BalanceBefore: money.FromDecimal(before),
 		BalanceAfter: money.FromDecimal(after), Currency: normalizeCurrency(input.Currency),
 		Reference: reference, Remark: cleanRemark(input.Remark, "钱包入账"),
 		CreatedAt: now, UpdatedAt: now,
@@ -117,13 +138,22 @@ func (s *Service) changeBalance(
 			amount = delta.Abs().Round(2)
 		}
 
-		account.Balance = money.FromDecimal(after)
+		cash := decimal.Zero
+		if delta.IsNegative() {
+			cash = debitSpendable(account, delta.Abs())
+		} else {
+			account.Balance = money.FromDecimal(after)
+		}
 		account.UpdatedAt = now
+		if err := validateAccount(account); err != nil {
+			return err
+		}
 		if err := repository.UpdateAccount(account); err != nil {
 			return walletcontract.ErrAccountUpdateFailed
 		}
 		transaction := &walletdomain.Transaction{
-			UserID: userID, OperatorAdminID: operatorAdminID, OrderID: orderID, Type: transactionType, Direction: direction,
+			WithdrawableAmount: money.FromDecimal(cash),
+			UserID:             userID, OperatorAdminID: operatorAdminID, OrderID: orderID, Type: transactionType, Direction: direction,
 			Amount: money.FromDecimal(amount), BalanceBefore: money.FromDecimal(before),
 			BalanceAfter: money.FromDecimal(after), Currency: normalizeCurrency(currency),
 			Reference: strings.TrimSpace(reference), Remark: remark, CreatedAt: now, UpdatedAt: now,
@@ -160,5 +190,5 @@ func ensureAccountForUpdate(repository walletcontract.Repository, userID uint, n
 		}
 		return nil, walletcontract.ErrAccountCreateFailed
 	}
-	return account, nil
+	return repository.GetAccountByUserIDForUpdate(userID)
 }

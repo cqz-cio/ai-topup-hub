@@ -76,7 +76,11 @@ func (s *AccountingQueryService) GetUserFinanceDashboard(userID uint) (resellerc
 	if err != nil {
 		return resellercontract.UserFinanceDashboard{}, err
 	}
-	withdrawEnabled, withdrawDisabledReason := WithdrawAvailability(profile)
+	_, withdrawDisabledReason := WithdrawAvailability(profile)
+	if withdrawDisabledReason == "" {
+		withdrawDisabledReason = "unified_wallet"
+	}
+	withdrawEnabled := false
 	return resellercontract.UserFinanceDashboard{
 		Opened:                 true,
 		Profile:                profile,

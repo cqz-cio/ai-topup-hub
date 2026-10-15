@@ -4,7 +4,6 @@ import { useI18n } from 'vue-i18n'
 import { adminAPI, type AdminAffiliateSetting } from '@/api/admin'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import { notifyError, notifySuccess } from '@/utils/notify'
@@ -125,22 +124,9 @@ onMounted(fetchSettings)
             <Input v-model.number="form.confirm_days" type="number" min="0" max="3650" step="1" />
             <p class="text-xs text-muted-foreground">{{ t('admin.settings.affiliate.confirmDaysHint') }}</p>
           </div>
-          <div class="space-y-2">
-            <label class="text-xs font-medium text-muted-foreground">{{ t('admin.settings.affiliate.minWithdrawAmount') }}</label>
-            <Input v-model.number="form.min_withdraw_amount" type="number" min="0" step="0.01" />
-            <p class="text-xs text-muted-foreground">{{ t('admin.settings.affiliate.minWithdrawAmountHint') }}</p>
-          </div>
         </div>
-
-        <div class="space-y-2">
-          <label class="text-xs font-medium text-muted-foreground">{{ t('admin.settings.affiliate.withdrawChannels') }}</label>
-          <Textarea
-            v-model="form.withdraw_channels_text"
-            rows="5"
-            :placeholder="t('admin.settings.affiliate.withdrawChannelsPlaceholder')"
-          />
-          <p class="text-xs text-muted-foreground">{{ t('admin.settings.affiliate.withdrawChannelsHint') }}</p>
-        </div>
+        <p class="text-sm text-muted-foreground">{{ t('walletEarnings.rule') }}</p>
+        <RouterLink to="/wallet" class="text-sm underline">{{ t('walletEarnings.settingsTitle') }}</RouterLink>
 
         <div class="flex justify-end pt-2">
           <Button class="w-full sm:w-auto" @click="saveSettings" :disabled="loading">

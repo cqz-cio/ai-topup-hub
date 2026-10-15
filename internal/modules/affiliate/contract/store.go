@@ -9,6 +9,7 @@ import (
 
 	"github.com/dujiao-next/internal/modules/affiliate/domain"
 	settingsintegration "github.com/dujiao-next/internal/modules/settings/schema/integration"
+	walletcontract "github.com/dujiao-next/internal/modules/wallet/contract"
 	"github.com/shopspring/decimal"
 )
 
@@ -67,6 +68,11 @@ type ProfileStatsAggregate struct {
 }
 
 type Store interface {
+	ListCommissionRecoveryOrders(limit int) ([]uint, error)
+	MarkCommissionProcessed(orderID uint) error
+	walletcontract.Transaction
+	GetOrderForCommission(id uint) (*orderdomain.Order, error)
+	ListCommissionsForSettlement(now time.Time) ([]domain.Commission, error)
 	WithinTransaction(fn func(Store) error) error
 
 	GetProfileByID(id uint) (*domain.Profile, error)

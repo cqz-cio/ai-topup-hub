@@ -336,6 +336,8 @@ const walletDirectionLabel = (direction?: string) => {
 }
 
 const walletTypeLabel = (type?: string) => {
+  const earningsKey = `walletEarnings.types.${type || ''}`
+  if (['affiliate_earning', 'reseller_earning', 'earning_reversal', 'withdraw_freeze', 'withdraw_release', 'withdraw_paid'].includes(type || '')) return t(earningsKey)
   const key = `admin.userDetail.wallet.types.${type || ''}`
   const translated = t(key)
   if (translated === key) return type || '-'
@@ -945,6 +947,9 @@ watch(
           <div>
             <div class="text-xs text-muted-foreground">{{ t('admin.userDetail.wallet.balanceLabel') }}</div>
             <div class="mt-1 text-xl font-bold text-foreground">{{ walletBalanceDisplay }}</div>
+            <p class="mt-2 text-sm">{{ t('walletEarnings.available') }}：{{ formatMoney(walletAccount?.withdrawable_balance, siteCurrency) }}</p>
+            <p class="mt-1 text-sm">{{ t('walletEarnings.frozen') }}：{{ formatMoney(walletAccount?.frozen_balance, siteCurrency) }}</p>
+            <p v-if="Number(walletAccount?.earnings_debt) > 0" class="mt-2 text-sm text-destructive">{{ t('walletEarnings.debt', { amount: walletAccount?.earnings_debt }) }}</p>
           </div>
           <div>
             <div class="text-xs text-muted-foreground">{{ t('admin.userDetail.wallet.updatedAtLabel') }}</div>
@@ -1024,7 +1029,12 @@ watch(
               </TableCell>
               <TableCell class="px-6 py-4 text-xs font-mono text-foreground">{{ formatMoney(item.amount, item.currency) }}</TableCell>
               <TableCell class="px-6 py-4 text-xs font-mono text-foreground">{{ formatMoney(item.balance_after, item.currency) }}</TableCell>
-              <TableCell class="min-w-[220px] px-6 py-4 text-xs text-muted-foreground break-words">{{ item.remark || '-' }}</TableCell>
+              <TableCell class="min-w-[220px] px-6 py-4 text-xs text-muted-foreground break-words">
+                <p>{{ item.remark || '-' }}</p>
+                <p v-if="Number(item.source_amount)">{{ t('walletEarnings.sourceAmount') }}：{{ formatMoney(item.source_amount, item.currency) }}</p>
+                <p v-if="Number(item.frozen_amount)">{{ t('walletEarnings.frozenChange') }}：{{ formatMoney(item.frozen_amount, item.currency) }}</p>
+                <p v-if="Number(item.debt_amount)">{{ t('walletEarnings.debtChange') }}：{{ formatMoney(item.debt_amount, item.currency) }}</p>
+              </TableCell>
               <TableCell class="px-6 py-4 text-xs text-muted-foreground">{{ formatDate(item.created_at) }}</TableCell>
             </TableRow>
           </TableBody>

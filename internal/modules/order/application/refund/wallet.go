@@ -66,7 +66,7 @@ func (s *Service) AdminRefundToWallet(
 
 	err := s.orderStore.WithinTransaction(func(tx ordercontract.Transaction) error {
 		orderRepository := tx.Orders()
-		locked, err := orderRepository.GetByIDForUpdate(input.OrderID)
+		locked, root, rootRefunded, walletRefunded, err := lockRefundScope(orderRepository, input.OrderID)
 		if err != nil {
 			return err
 		}
@@ -92,17 +92,21 @@ func (s *Service) AdminRefundToWallet(
 		if amount.GreaterThan(refundable) {
 			return walletcontract.ErrRefundExceeded
 		}
+		if amount.GreaterThan(root.TotalAmount.Decimal.Sub(rootRefunded)) {
+			return walletcontract.ErrRefundExceeded
+		}
 
 		_, transaction, err := s.wallets.CreditInTransaction(
 			tx.Wallets(),
 			walletcontract.CreditInput{
-				UserID:    order.UserID,
-				Amount:    money.FromDecimal(amount),
-				Currency:  order.Currency,
-				Type:      constants.WalletTxnTypeAdminRefund,
-				Reference: reference,
-				Remark:    walletRemark,
-				OrderID:   &order.ID,
+				RefundFunding: &walletcontract.RefundFunding{RootOrderID: root.ID, RootTotal: root.TotalAmount, RefundedBefore: money.FromDecimal(walletRefunded), RefundedAfter: money.FromDecimal(walletRefunded.Add(amount))},
+				UserID:        order.UserID,
+				Amount:        money.FromDecimal(amount),
+				Currency:      order.Currency,
+				Type:          constants.WalletTxnTypeAdminRefund,
+				Reference:     reference,
+				Remark:        walletRemark,
+				OrderID:       &order.ID,
 			},
 		)
 		if err != nil {
@@ -135,13 +139,19 @@ func (s *Service) AdminRefundToWallet(
 			return ErrOrderUpdateFailed
 		}
 		if s.affiliateRefund != nil {
+			// Source reversal below uses the cumulative payment-root refund amount.
 			if err := s.affiliateRefund.HandleOrderRefunded(
 				tx.Affiliates(),
-				&order,
+				root,
 				amount,
-				refundedBefore,
+				rootRefunded,
 				"order_refunded_to_wallet",
 			); err != nil {
+				return err
+			}
+		}
+		if rootRefunded.Add(amount).GreaterThanOrEqual(root.TotalAmount.Decimal) {
+			if err := ordersFullyRefunded(orderRepository, root.ID, now); err != nil {
 				return err
 			}
 		}
@@ -167,7 +177,7 @@ func (s *Service) AdminRefundToWallet(
 			return ErrRefundRecordCreateFailed
 		}
 		if s.resellerAccounting != nil {
-			if err := s.resellerAccounting.HandleRefundDeduct(tx.ResellerAccounting(), &order, record, refundedBefore); err != nil {
+			if err := s.resellerAccounting.HandleRefundDeduct(tx.ResellerAccounting(), root, record, rootRefunded); err != nil {
 				return err
 			}
 		}
@@ -187,4 +197,63 @@ func (s *Service) AdminRefundToWallet(
 		return nil, nil, nil, ErrOrderNotFound
 	}
 	return order, transactionResult, refundRecordResult, nil
+}
+
+func ordersFullyRefunded(repo ordercontract.Store, rootID uint, now time.Time) error {
+	if err := repo.UpdateFields(rootID, map[string]interface{}{"status": constants.OrderStatusRefunded, "updated_at": now}); err != nil {
+		return err
+	}
+	return applyParentRefundChildStatusUpdates(repo, rootID, constants.OrderStatusRefunded, now)
+}
+
+// Lock the payment root before its child and cap refunds across the entire
+// split order. Wallet-origin restoration uses only refunds actually returned
+// to the wallet; manual external refunds cannot generate another wallet credit.
+func lockRefundScope(repo ordercontract.Store, id uint) (*orderdomain.Order, *orderdomain.Order, decimal.Decimal, decimal.Decimal, error) {
+	initial, err := repo.GetByID(id)
+	if err != nil {
+		return nil, nil, decimal.Zero, decimal.Zero, err
+	}
+	if initial == nil {
+		return nil, nil, decimal.Zero, decimal.Zero, ErrOrderNotFound
+	}
+	rootID := initial.ID
+	if initial.ParentID != nil {
+		rootID = *initial.ParentID
+	}
+	root, err := repo.GetByIDForUpdateWithChildren(rootID)
+	if err != nil {
+		return nil, nil, decimal.Zero, decimal.Zero, err
+	}
+	if root == nil {
+		return nil, nil, decimal.Zero, decimal.Zero, ErrOrderNotFound
+	}
+	locked := root
+	if id != rootID {
+		locked, err = repo.GetByIDForUpdate(id)
+		if err != nil {
+			return nil, nil, decimal.Zero, decimal.Zero, err
+		}
+		if locked == nil {
+			return nil, nil, decimal.Zero, decimal.Zero, ErrOrderNotFound
+		}
+	}
+	ids := []uint{rootID}
+	legacyTotal := root.RefundedAmount.Decimal
+	for _, child := range root.Children {
+		ids = append(ids, child.ID)
+		legacyTotal = legacyTotal.Add(child.RefundedAmount.Decimal)
+	}
+	records, err := repo.ListRefundRecordsByOrderIDs(ids)
+	if err != nil {
+		return nil, nil, decimal.Zero, decimal.Zero, err
+	}
+	total, wallet := decimal.Zero, decimal.Zero
+	for _, record := range records {
+		total = total.Add(record.Amount.Decimal)
+		if record.Type == constants.OrderRefundTypeWallet {
+			wallet = wallet.Add(record.Amount.Decimal)
+		}
+	}
+	return locked, root, decimal.Max(total, legacyTotal).Round(2), wallet.Round(2), nil
 }
