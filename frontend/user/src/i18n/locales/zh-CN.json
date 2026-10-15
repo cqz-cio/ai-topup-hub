@@ -747,7 +747,7 @@
       "conversionDetail": "点击 {clicks} · 有效订单 {orders}",
       "pendingCommission": "待确认佣金",
       "availableCommission": "可提现佣金",
-      "withdrawnCommission": "累计提现佣金",
+      "withdrawnCommission": "原返利账户历史提现",
       "withdrawTitle": "申请提现",
       "withdrawSubtitle": "填写金额、提现渠道和账号后提交审核",
       "withdrawAmountLabel": "提现金额",

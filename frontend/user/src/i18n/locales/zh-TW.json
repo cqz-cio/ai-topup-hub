@@ -794,7 +794,7 @@
       "conversionDetail": "點擊 {clicks} · 有效訂單 {orders}",
       "pendingCommission": "待確認佣金",
       "availableCommission": "可提現佣金",
-      "withdrawnCommission": "累計提現佣金",
+      "withdrawnCommission": "原返利帳戶歷史提現",
       "withdrawTitle": "申請提現",
       "withdrawSubtitle": "填寫金額、提現渠道與帳號後提交審核",
       "withdrawAmountLabel": "提現金額",

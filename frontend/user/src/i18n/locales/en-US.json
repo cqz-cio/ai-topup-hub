@@ -794,7 +794,7 @@
       "conversionDetail": "Clicks {clicks} · Valid Orders {orders}",
       "pendingCommission": "Pending Commission",
       "availableCommission": "Available Commission",
-      "withdrawnCommission": "Total Withdrawn",
+      "withdrawnCommission": "Legacy affiliate withdrawals",
       "withdrawTitle": "Apply Withdraw",
       "withdrawSubtitle": "Fill amount, channel and account to submit for review",
       "withdrawAmountLabel": "Amount",
