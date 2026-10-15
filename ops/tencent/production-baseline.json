@@ -202,7 +202,7 @@
   "catalog": {
     "prices_unchanged": true,
     "qzweb_55_price": "1200.00",
-    "public_categories_count": 6,
+    "public_categories_count": 3,
     "inventory_is_time_dependent": true,
     "product_delivery_content_preserved": true,
     "qzweb_55_price_observed_before_sale_mail": "1200.00",
@@ -220,7 +220,13 @@
     "stock_limit": 9999,
     "mapped_products": 19,
     "database_product_rows": 51,
-    "qzweb_55_price_note": "Observed current pre-release price, preserved without repricing; replaces the stale early 1160.00 note."
+    "qzweb_55_price_note": "Observed current pre-release price, preserved without repricing; replaces the stale early 1160.00 note.",
+    "public_product_count": 18,
+    "category_product_counts": {
+      "GPT": 8,
+      "Codex": 6,
+      "Gemini": 4
+    }
   },
   "verification_limits": [
     "Mock payment and fulfillment tests passed; no real-money transfer or supplier purchase was performed for acceptance.",
@@ -2374,5 +2380,72 @@
     "live_browser_verified": true,
     "backend_verification_passed": true,
     "pending_payment_screenshots": "Local read-only fixtures; no live test order"
+  },
+  "catalog_categories": {
+    "passed": true,
+    "checked_at": "2026-10-15T15:46:39.903653+00:00",
+    "source_commit": "6f60401fd1b956ab2f05d28a075987517bc41b63",
+    "source_tag": "production/product-categories-20261015-234259",
+    "content_only": true,
+    "categories": {
+      "GPT": {
+        "id": 9,
+        "count": 8,
+        "slugs": [
+          "qzweb-4",
+          "qzweb-5",
+          "qzweb-55",
+          "qzweb-56",
+          "qzweb-57",
+          "qzweb-58",
+          "qzweb-6",
+          "qzweb-7"
+        ]
+      },
+      "Codex": {
+        "id": 15,
+        "count": 6,
+        "slugs": [
+          "qzweb-73",
+          "qzweb-74",
+          "qzweb-75",
+          "qzweb-76",
+          "qzweb-77",
+          "qzweb-78"
+        ]
+      },
+      "Gemini": {
+        "id": 11,
+        "count": 4,
+        "slugs": [
+          "qzweb-50",
+          "qzweb-51",
+          "qzweb-52",
+          "qzweb-53"
+        ]
+      }
+    },
+    "public_products_unchanged": 18,
+    "database_backup": "/srv/zhixiang/backups/before-product-categories-20261015T154259351422Z",
+    "configuration_backup": "/srv/zhixiang/backups/before-product-categories-config-20261015T154259350695Z",
+    "protected_tables_unchanged": 67,
+    "other_product_fields_unchanged": true,
+    "local_browser_checks": 11,
+    "production_browser_checks": 12,
+    "browser_errors": 0,
+    "viewports": [
+      1920,
+      390,
+      320
+    ],
+    "repeated_execution_and_rollback_verified": true,
+    "storefront_release": "20261015-230538",
+    "backend_release": "20261015-160016",
+    "runtime_and_private_configuration_unchanged": true,
+    "local_database_uploaded": false,
+    "orders_created": 0,
+    "real_payment_or_purchase_performed": false,
+    "private_evidence": "deployment/local/product-categories/",
+    "browser_evidence": "work/codex-runtime/product-categories-qa/"
   }
 }

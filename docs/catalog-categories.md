@@ -7,3 +7,11 @@
 使用 `scripts/reorganize-catalog-categories.py --db <目标库> --catalog docs/catalog/catalog-categories.json --backup-root <私有备份目录>` 定向迁移。先对副本和日常本机验证，再推送并在正式服务器执行同一提交；脚本先备份，再在事务内只改分类字段与 `products.category_id`，校验其他表及商品字段一致，并检查公开商品集合未变。可重复执行；遇到缺商品、分类冲突或未迁走商品时回滚，不自行猜测归属。
 
 `sync-qzweb-catalog.py` 对旧来源分类应用同一覆盖规则；`codex-credits.json` 指向独立 Codex 分类，旧原站快照保持原样。库存同步只查询/同步现有映射，不改分类。不得为本次维护覆盖线上数据库、重启支付采购服务或提交订单。
+
+## 商品分类整理（2026-10-15）
+
+- 正式目录改为 **GPT 8 款、Codex 6 款、Gemini 4 款**，共 18 款公开商品。GPT 合并原渠道一、渠道二及 iOS 订阅商品，Codex 六档点数独立分类；渠道、开通/续费及质保信息保留在商品名称和详情。已下架商品保持下架，旧分类记录保留并停用。
+- 分类配置与维护脚本来源 `6f60401fd1b956ab2f05d28a075987517bc41b63`，说明见 `docs/catalog-categories.md`。GPT 沿用分类 ID 9，Gemini ID 11，新增 Codex ID 15；后续同步使用 `catalog-categories.json`，避免还原旧渠道分类。
+- 数据库副本的重复执行、冲突回滚及缺商品回滚通过；日常本机 11 项、正式站 12 项页面检查通过，覆盖首页、商品中心、搜索数量、刷新、详情及 1920/390/320px，无页面错误或横向溢出。本机保留独立的 iOS/DEMO 上架状态，公开商品共 21 款，不拿本机目录覆盖正式站。
+- 本次只改分类及商品归属。事务内 67 张其他表与全部商品其他字段一致，公开商品集合、商品/SKU 售价及详情核对一致。上海商城仍为 `20261015-230538`，新加坡后端及后台仍为 `20261015-160016`；后端/Redis/库存 timer 进程与配置未变，没有上传本机库、重启服务、创建订单或执行实际付款采购。
+- 线上数据库备份 `/srv/zhixiang/backups/before-product-categories-20261015T154259351422Z`，配置备份 `/srv/zhixiang/backups/before-product-categories-config-20261015T154259350695Z`。外层私有报告在 `deployment/local/product-categories/`，浏览器证据在 `work/codex-runtime/product-categories-qa/`。
