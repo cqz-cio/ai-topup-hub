@@ -1,14 +1,6 @@
 <template>
-  <div class="mx-auto w-full max-w-[1180px] px-6 pb-8">
-    <div class="my-5 flex items-start justify-between gap-4">
-      <div>
-        <h1 class="mb-1.5 text-[32px] font-extrabold">{{ t('payment.title') }}</h1>
-        <p class="text-muted-foreground">{{ t('payment.subtitle') }}</p>
-      </div>
-      <RouterLink :to="backLink" class="text-[13px] font-semibold text-muted-foreground transition-colors hover:text-primary">{{ t('payment.backToOrders') }}</RouterLink>
-    </div>
-
-    <VaultCheckoutSteps current="payment" />
+  <div class="payment-page-vault mx-auto w-full max-w-[1288px] px-6 pb-8">
+    <PaymentPageHeading :checkout="payment" />
 
     <!-- Loading -->
     <div v-if="loading" class="mb-[18px] rounded-xl border bg-card p-[22px]">
@@ -36,82 +28,7 @@
     </div>
 
     <!-- 结果视图 -->
-    <div v-else-if="showResultView" class="mb-[18px] rounded-xl border bg-card p-[22px]">
-      <UsdtPaymentGuides :payment="usdtPayment" class="mb-5" />
-      <div class="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h2 class="text-lg font-bold">{{ paymentResultTitle }}</h2>
-          <p class="mt-1 text-[13px] text-muted-foreground">{{ paymentGuideTip }}</p>
-          <p class="mt-1.5 text-xs text-muted-foreground">{{ t('payment.methodLabel') }}：{{ resultChannelName }}</p>
-        </div>
-        <div class="flex flex-wrap gap-2">
-          <Button variant="outline" size="sm" class="rounded-full" :disabled="loading" @click="handleRefresh">{{ t('payment.refreshStatus') }}</Button>
-          <Button variant="outline" size="sm" class="rounded-full" @click="handleChangePaymentMethod">{{ t('payment.changeMethod') }}</Button>
-        </div>
-      </div>
-
-      <div class="mt-5 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-        <div>
-          <!-- QR -->
-          <div v-if="showQRCode" class="flex flex-col items-center rounded-xl border bg-secondary p-[22px] text-center">
-            <div class="mb-3 text-[13px] text-muted-foreground">{{ paymentGuideTitle }}</div>
-            <div class="aspect-square w-full max-w-[240px] overflow-hidden rounded-md bg-white p-2"><img :src="qrImageUrl" alt="QR Code" class="h-full w-full object-contain" /></div>
-            <div v-if="qrUsingPayLinkFallback" class="mt-2.5 text-xs text-muted-foreground">{{ t('payment.qrFallbackHint') }}</div>
-            <CryptoPaymentDetails
-              v-if="hasCryptoPaymentDetails"
-              class="mt-4 w-full"
-              :details="cryptoPaymentDetails"
-                  :usdt-payment="usdtPayment"
-              :amount-copied="cryptoAmountCopied"
-              :address-copied="walletAddressCopied"
-              @copy-amount="handleCopyCryptoAmount"
-              @copy-address="handleCopyWalletAddress"
-            />
-            <UsdtTransferNotice v-if="!hasCryptoPaymentDetails" :payment="usdtPayment" class="w-full" />
-          </div>
-
-          <!-- 跳转链接 -->
-          <div v-else class="rounded-xl border bg-secondary p-[22px]">
-            <div class="mb-2.5 text-[13px] text-muted-foreground">{{ t('payment.openPayLink') }}</div>
-            <UsdtTransferNotice :payment="usdtPayment" />
-            <Button size="sm" class="rounded-full" @click="handleOpenPayLink">{{ t('payment.openPayLink') }}</Button>
-            <div v-if="openedPayWindow" class="mt-2.5 text-xs text-[color:var(--teal-strong)]">{{ payLinkOpenedTip }}</div>
-            <div v-if="showTelegramPayHint" class="mt-2.5 text-xs text-muted-foreground">{{ t('payment.telegramExternalHint') }}</div>
-            <div class="mt-2.5 flex items-center gap-2">
-              <Button variant="outline" size="sm" class="rounded-full" @click="handleCopyPayLink">{{ t('payment.copyPayLink') }}</Button>
-              <span v-if="copied" class="text-xs text-[color:var(--teal-strong)]">{{ t('payment.copied') }}</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="grid content-start gap-3.5">
-          <div class="rounded-md border bg-secondary p-3.5">
-            <div class="text-xs text-muted-foreground">{{ t('payment.orderNo') }}</div>
-            <div class="mt-1 font-bold text-foreground">{{ order.order_no }}</div>
-            <div class="mt-2.5 text-xs text-muted-foreground">{{ t('payment.orderStatus') }}：{{ statusLabel(order.status) }}</div>
-            <div class="mt-1 text-xs text-muted-foreground">{{ t('payment.methodLabel') }}：{{ resultChannelName }}</div>
-          </div>
-          <PaymentAmountBreakdown
-            :order="order"
-            :payment-result="paymentResult"
-            :customer-fee-applied="customerFeeApplied"
-            :customer-fee-amount-display="customerFeeAmountDisplay"
-            :payable-amount-display="payableAmountDisplay"
-            :wallet-paid-display="paymentWalletPaidDisplay"
-            :online-pay-display="paymentOnlinePayDisplay"
-            :show-countdown="showCountdown"
-            :countdown-text="countdownText"
-            :polling-active="pollingActive"
-            :format-money="formatMoney"
-            :format-discount-money="formatDiscountMoney"
-            :has-discount-amount="hasDiscountAmount"
-          />
-          <div v-if="paymentResult.expires_at" class="rounded-md border bg-secondary p-3.5 text-xs text-muted-foreground">
-            {{ t('payment.expiresAt') }}：{{ formatDate(paymentResult.expires_at) }}
-          </div>
-        </div>
-      </div>
-    </div>
+    <PaymentResultPanel v-else-if="showResultView" :checkout="payment" />
 
     <!-- 过期 / 取消 -->
     <div v-else-if="orderExpired || orderCanceled" class="mb-[18px] rounded-xl border bg-card p-[22px]">
@@ -141,7 +58,7 @@
               <div class="mt-1 font-bold text-foreground">{{ order.order_no }}</div>
               <div class="mt-2 text-xs text-muted-foreground">{{ t('orderDetail.createdAtLabel') }}：{{ formatDate(order.created_at) }}</div>
             </div>
-            <div class="min-w-[280px] flex-1 rounded-md border bg-secondary p-4">
+            <div class="w-full min-w-0 flex-1 rounded-md border bg-secondary p-4">
               <div class="text-[11px] uppercase tracking-[0.05em] text-muted-foreground">{{ t('payment.payableAmountLabel') }}</div>
               <div class="my-1 mb-3 text-[26px] font-extrabold text-foreground tabular-nums">{{ payableAmountDisplay }}</div>
               <div class="grid gap-[7px] text-[12.5px]">
@@ -258,29 +175,30 @@ import { useI18n } from 'vue-i18n'
 import { AlertCircle } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import PaymentAmountBreakdown from '../../components/payment/PaymentAmountBreakdown.vue'
+import PaymentResultPanel from '../../components/payment/PaymentResultPanel.vue'
+import PaymentPageHeading from '../../components/payment/PaymentPageHeading.vue'
 import PaymentChannelSelector from '../../components/payment/PaymentChannelSelector.vue'
-import CryptoPaymentDetails from '../../components/payment/CryptoPaymentDetails.vue'
-import UsdtTransferNotice from '../../components/payment/UsdtTransferNotice.vue'
 import UsdtPaymentGuides from '../../components/payment/UsdtPaymentGuides.vue'
-import VaultCheckoutSteps from './components/VaultCheckoutSteps.vue'
 import { usePayment } from '../../composables/usePayment'
 
 const { t } = useI18n()
 
+const payment = usePayment()
 const {
-  loading, submitting, order, paymentResult, selectedChannelId, copied, walletAddressCopied, cryptoAmountCopied,
-  openedPayWindow, cachedPayment, guestAuth, guestAuthError, walletLoading, useBalance,
-  backLink, showGuestAuthForm, walletOnlyPayment, showBalanceOption, configReady, channels,
-  selectedChannel, selectedChannelName, cachedChannelName, resultChannelName, interactionLabel,
-  paymentResultTitle, paymentGuideTitle, paymentGuideTip, showPayLink, showTelegramPayHint, payLinkOpenedTip,
-  usdtPayment, cryptoPaymentDetails, hasCryptoPaymentDetails, qrUsingPayLinkFallback, showQRCode, qrImageUrl,
-  orderExpired, orderCanceled, paymentAlert, countdownExpired, countdownText, showCountdown, showResultView, pollingActive, orderItems,
-  customerFeeApplied, customerFeeAmountDisplay, payableAmountDisplay, walletBalanceDisplay,
-  expectedWalletPaidDisplay, expectedOnlinePayDisplay, expectedOnlinePayCents, requiresOnlineChannel,
-  paymentWalletPaidDisplay, paymentOnlinePayDisplay, isChannelDisabledForAmount, channelAmountLimitHint, canSubmitPayment,
-  formatDate, statusLabel, formatMoney, hasDiscountAmount, formatDiscountMoney, getLocalizedText, orderItemSkuText, fulfillmentTypeLabelText,
-  handleCopyPayLink, handleCopyWalletAddress, handleCopyCryptoAmount, handleOpenPayLink, restoreCachedPayment, handleChangePaymentMethod,
-  handlePayment, handleGuestAuthSubmit, handleRefresh,
-} = usePayment()
+  loading, submitting, order, paymentResult, selectedChannelId, cachedPayment,
+  guestAuth, guestAuthError, walletLoading, useBalance, backLink, showGuestAuthForm,
+  walletOnlyPayment, showBalanceOption, configReady, channels, selectedChannel, selectedChannelName,
+  cachedChannelName, resultChannelName, interactionLabel, showPayLink, usdtPayment, orderExpired,
+  orderCanceled, paymentAlert, countdownExpired, countdownText, showCountdown, showResultView,
+  pollingActive, orderItems, payableAmountDisplay, walletBalanceDisplay, expectedWalletPaidDisplay, expectedOnlinePayDisplay,
+  expectedOnlinePayCents, requiresOnlineChannel, isChannelDisabledForAmount, channelAmountLimitHint, canSubmitPayment, formatDate,
+  statusLabel, formatMoney, hasDiscountAmount, formatDiscountMoney, getLocalizedText, orderItemSkuText,
+  fulfillmentTypeLabelText, handleCopyPayLink, handleOpenPayLink, restoreCachedPayment, handlePayment, handleGuestAuthSubmit,
+  handleRefresh,
+} = payment
 </script>
+
+<style scoped>
+.payment-page-vault { padding-inline: 32px; padding-bottom: 40px; }
+@media (max-width: 640px) { .payment-page-vault { padding-inline: 18px; } }
+</style>

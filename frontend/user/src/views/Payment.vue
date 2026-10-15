@@ -1,11 +1,7 @@
 <template>
   <div class="commerce-page payment-page min-h-screen bg-background text-foreground pt-24 pb-16">
     <div class="container mx-auto px-4">
-      <CommerceHeading :title="t('payment.title')" :description="t('shopUi.paymentHint')">
-        <template #actions><Button as-child variant="outline" size="sm"><router-link :to="backLink">{{ t('payment.backToOrders') }}</router-link></Button></template>
-      </CommerceHeading>
-
-      <CheckoutSteps class="mb-8" :current-step="['waiting', 'partial', 'ready'].includes(deliveryState) ? 'delivery' : 'payment'" :complete="deliveryState === 'ready'" />
+    <PaymentPageHeading :checkout="payment" />
 
       <!-- Loading Skeleton -->
       <div v-if="loading" class="space-y-6">
@@ -59,106 +55,7 @@
         :action-to="backLink"
       />
 
-      <div v-else-if="showResultView" class="space-y-6">
-        <div class="border bg-card text-card-foreground shadow-sm rounded-2xl p-6">
-          <UsdtPaymentGuides :payment="usdtPayment" class="mb-5" />
-          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-              <h2 class="text-xl font-bold text-foreground">{{ paymentResultTitle }}</h2>
-              <p class="text-sm text-muted-foreground mt-1">{{ paymentGuideTip }}</p>
-              <div class="mt-2 text-xs text-muted-foreground">
-                {{ t('payment.methodLabel') }}：{{ resultChannelName }}
-              </div>
-            </div>
-            <div class="flex flex-wrap items-center gap-2">
-              <Button variant="secondary" :disabled="loading" @click="handleRefresh">
-                {{ t('payment.refreshStatus') }}
-              </Button>
-              <Button variant="secondary" @click="handleChangePaymentMethod">
-                {{ t('payment.changeMethod') }}
-              </Button>
-            </div>
-          </div>
-
-          <div class="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="lg:col-span-2 space-y-4">
-              <div v-if="showQRCode"
-                class="bg-secondary border rounded-2xl p-4 sm:p-6 flex flex-col items-center justify-center text-center">
-                <div class="text-sm text-muted-foreground mb-4">{{ paymentGuideTitle }}</div>
-                <div class="w-full max-w-[280px] sm:max-w-[240px] aspect-square rounded-xl overflow-hidden bg-white p-2">
-                  <img :src="qrImageUrl" alt="QR Code" class="w-full h-full object-contain" />
-                </div>
-                <div v-if="qrUsingPayLinkFallback" class="mt-3 text-xs text-muted-foreground">
-                  {{ t('payment.qrFallbackHint') }}
-                </div>
-                <CryptoPaymentDetails
-                  v-if="hasCryptoPaymentDetails"
-                  class="mt-4 w-full max-w-xl"
-                  :details="cryptoPaymentDetails"
-                  :usdt-payment="usdtPayment"
-                  :amount-copied="cryptoAmountCopied"
-                  :address-copied="walletAddressCopied"
-                  @copy-amount="handleCopyCryptoAmount"
-                  @copy-address="handleCopyWalletAddress"
-                />
-                <UsdtTransferNotice v-if="!hasCryptoPaymentDetails" :payment="usdtPayment" class="w-full max-w-xl" />
-              </div>
-
-              <div v-else class="bg-secondary border rounded-2xl p-6">
-                <div class="text-sm text-muted-foreground mb-3">{{ t('payment.openPayLink') }}</div>
-                <UsdtTransferNotice :payment="usdtPayment" />
-                <Button type="button" variant="default" class="font-bold" @click="handleOpenPayLink">
-                  <ExternalLink class="h-4 w-4" aria-hidden="true" />
-                  {{ t('payment.openPayLink') }}
-                </Button>
-                <div v-if="openedPayWindow" class="mt-3 text-xs text-success">
-                  {{ payLinkOpenedTip }}
-                </div>
-                <div v-if="showTelegramPayHint" class="mt-3 text-xs text-muted-foreground">
-                  {{ t('payment.telegramExternalHint') }}
-                </div>
-                <div class="mt-3 flex flex-wrap items-center gap-2">
-                  <Button type="button" variant="outline" size="sm" class="font-semibold" @click="handleCopyPayLink">
-                    <Copy class="h-4 w-4" aria-hidden="true" />
-                    {{ t('payment.copyPayLink') }}
-                  </Button>
-                  <span v-if="copied" class="text-xs text-success">{{ t('payment.copied') }}</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="space-y-4">
-              <div class="bg-secondary border rounded-2xl p-4">
-                <div class="text-xs text-muted-foreground">{{ t('payment.orderNo') }}</div>
-                <div class="text-sm font-semibold text-foreground mt-1">{{ order.order_no }}</div>
-                <div class="mt-3 text-xs text-muted-foreground">{{ t('payment.orderStatus') }}：{{ statusLabel(order.status) }}</div>
-                <div class="mt-2 text-xs text-muted-foreground">
-                  {{ t('payment.methodLabel') }}：{{ resultChannelName }}
-                </div>
-              </div>
-              <PaymentAmountBreakdown
-                :order="order"
-                :payment-result="paymentResult"
-                :customer-fee-applied="customerFeeApplied"
-                :customer-fee-amount-display="customerFeeAmountDisplay"
-                :payable-amount-display="payableAmountDisplay"
-                :wallet-paid-display="paymentWalletPaidDisplay"
-                :online-pay-display="paymentOnlinePayDisplay"
-                :show-countdown="showCountdown"
-                :countdown-text="countdownText"
-                :polling-active="pollingActive"
-                :format-money="formatMoney"
-                :format-discount-money="formatDiscountMoney"
-                :has-discount-amount="hasDiscountAmount"
-              />
-              <div v-if="paymentResult.expires_at"
-                class="bg-secondary border rounded-2xl p-4 text-xs text-muted-foreground">
-                {{ t('payment.expiresAt') }}：{{ formatDate(paymentResult.expires_at) }}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <PaymentResultPanel v-else-if="showResultView" :checkout="payment" />
 
       <div v-else-if="orderExpired || orderCanceled" class="space-y-6">
         <div class="border bg-card text-card-foreground shadow-sm rounded-2xl p-6">
@@ -470,19 +367,16 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { orderDeliveryState } from '../utils/orderDelivery'
-import CommerceHeading from '../components/commerce/CommerceHeading.vue'
 import { useI18n } from 'vue-i18n'
 import { Copy, ExternalLink } from 'lucide-vue-next'
 import { pageAlertVariant, pageAlertToneClass } from '../utils/alerts'
-import PaymentAmountBreakdown from '../components/payment/PaymentAmountBreakdown.vue'
+import PaymentResultPanel from '../components/payment/PaymentResultPanel.vue'
+import PaymentPageHeading from '../components/payment/PaymentPageHeading.vue'
 import PaymentChannelSelector from '../components/payment/PaymentChannelSelector.vue'
 import CryptoPaymentDetails from '../components/payment/CryptoPaymentDetails.vue'
 import UsdtTransferNotice from '../components/payment/UsdtTransferNotice.vue'
 import UsdtPaymentGuides from '../components/payment/UsdtPaymentGuides.vue'
 import EmptyState from '../components/EmptyState.vue'
-import CheckoutSteps from '../components/checkout/CheckoutSteps.vue'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -491,20 +385,25 @@ import { usePayment } from '../composables/usePayment'
 
 const { t } = useI18n()
 
+const payment = usePayment()
 const {
-  loading, submitting, order, paymentResult, selectedChannelId, copied, walletAddressCopied, cryptoAmountCopied,
-  openedPayWindow, cachedPayment, guestAuth, guestAuthError, walletLoading, useBalance,
-  backLink, showGuestAuthForm, walletOnlyPayment, showBalanceOption, configReady, channels,
-  selectedChannel, selectedChannelName, cachedChannelName, resultChannelName, interactionLabel,
-  paymentResultTitle, paymentGuideTitle, paymentGuideTip, showPayLink, showTelegramPayHint, payLinkOpenedTip,
-  usdtPayment, cryptoPaymentDetails, hasCryptoPaymentDetails, qrUsingPayLinkFallback, showQRCode, qrImageUrl,
-  orderExpired, orderCanceled, paymentAlert, countdownExpired, countdownText, showCountdown, showResultView, pollingActive, orderItems,
-  customerFeeApplied, customerFeeAmountDisplay, payableAmountDisplay, walletBalanceDisplay,
-  expectedWalletPaidDisplay, expectedOnlinePayDisplay, expectedOnlinePayCents, requiresOnlineChannel,
-  paymentWalletPaidDisplay, paymentOnlinePayDisplay, isChannelDisabledForAmount, channelAmountLimitHint, canSubmitPayment,
-  formatDate, statusLabel, formatMoney, hasDiscountAmount, formatDiscountMoney, getLocalizedText, orderItemSkuText, fulfillmentTypeLabelText,
-  handleCopyPayLink, handleCopyWalletAddress, handleCopyCryptoAmount, handleOpenPayLink, restoreCachedPayment, handleChangePaymentMethod,
-  handlePayment, handleGuestAuthSubmit, handleRefresh,
-} = usePayment()
-const deliveryState = computed(() => orderDeliveryState(order.value))
+  loading, submitting, order, paymentResult, selectedChannelId, copied,
+  walletAddressCopied, cryptoAmountCopied, cachedPayment, guestAuth, guestAuthError, walletLoading,
+  useBalance, backLink, showGuestAuthForm, walletOnlyPayment, showBalanceOption, configReady,
+  channels, selectedChannel, selectedChannelName, cachedChannelName, resultChannelName, interactionLabel,
+  paymentGuideTitle, paymentGuideTip, showPayLink, showTelegramPayHint, usdtPayment, cryptoPaymentDetails,
+  hasCryptoPaymentDetails, qrUsingPayLinkFallback, showQRCode, qrImageUrl, orderExpired, orderCanceled,
+  paymentAlert, countdownExpired, countdownText, showCountdown, showResultView, pollingActive,
+  orderItems, payableAmountDisplay, walletBalanceDisplay, expectedWalletPaidDisplay, expectedOnlinePayDisplay, expectedOnlinePayCents,
+  requiresOnlineChannel, isChannelDisabledForAmount, channelAmountLimitHint, canSubmitPayment, formatDate, statusLabel,
+  formatMoney, hasDiscountAmount, formatDiscountMoney, getLocalizedText, orderItemSkuText, fulfillmentTypeLabelText,
+  handleCopyPayLink, handleCopyWalletAddress, handleCopyCryptoAmount, handleOpenPayLink, restoreCachedPayment, handlePayment,
+  handleGuestAuthSubmit, handleRefresh,
+} = payment
 </script>
+
+<style scoped>
+.payment-page { padding-top: 100px; padding-bottom: 40px; min-height: 72vh; }
+.payment-page > .container { max-width: 1288px; }
+@media (max-width: 640px) { .payment-page { padding-top: 80px; } .payment-page > .container { padding-inline: 18px; } }
+</style>
