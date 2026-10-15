@@ -45,7 +45,7 @@ import { Button } from '@/components/ui/button'
 import { useOrderDisplayHelpers } from '@/composables/useOrderDisplayHelpers'
 import { toast } from '@/composables/useToast'
 import { copyText } from '@/utils/clipboard'
-import { orderDeliveryGroups, orderDeliveryState, type DeliveryGroup } from '@/utils/orderDelivery'
+import { orderDeliveryGroups, orderDeliveryState, hasCardPlatformBalanceIssue, type DeliveryGroup } from '@/utils/orderDelivery'
 
 const props = defineProps<{ order: any; downloading: boolean }>()
 defineEmits<{ download: [orderNo: string] }>()
@@ -56,7 +56,7 @@ const groups = computed(() => orderDeliveryGroups(props.order))
 const state = computed(() => orderDeliveryState(props.order))
 const hasDelivery = computed(() => groups.value.some(group => group.delivered))
 const headingKey = computed(() => ({ unpaid: 'shopUi.deliveryUnpaid', waiting: 'shopUi.deliveryWaiting', partial: 'shopUi.deliveryPartial', ready: 'shopUi.deliveryReady', closed: 'shopUi.deliveryClosed' }[state.value]))
-const hintKey = computed(() => ({ unpaid: 'shopUi.deliveryUnpaidHint', waiting: 'shopUi.deliveryWaitingHint', partial: 'shopUi.deliveryWaitingHint', ready: 'shopUi.deliveryReadyHint', closed: 'shopUi.deliveryClosedHint' }[state.value]))
+const hintKey = computed(() => hasCardPlatformBalanceIssue(props.order) ? 'shopUi.cardPlatformBalanceInsufficient' : ({ unpaid: 'shopUi.deliveryUnpaidHint', waiting: 'shopUi.deliveryWaitingHint', partial: 'shopUi.deliveryWaitingHint', ready: 'shopUi.deliveryReadyHint', closed: 'shopUi.deliveryClosedHint' }[state.value]))
 const hiddenGroups = ref(new Set<string>())
 const copiedOrder = ref('')
 let copyTimer: ReturnType<typeof setTimeout> | undefined

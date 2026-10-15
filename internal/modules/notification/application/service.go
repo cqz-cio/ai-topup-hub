@@ -20,6 +20,7 @@ type Service struct {
 	telegramSender contract.TelegramSender
 	feishuSender   contract.FeishuSender
 	saleSummary    contract.SaleSummaryReader
+	balanceState   balanceAlertState
 }
 
 func (s *Service) SetSaleSummaryReader(reader contract.SaleSummaryReader) {
@@ -81,6 +82,9 @@ func (s *Service) Dispatch(ctx context.Context, payload queue.NotificationDispat
 	setting, err := s.settingService.GetNotificationCenterSetting()
 	if err != nil {
 		return err
+	}
+	if isBalanceAlert(payload) {
+		return s.dispatchBalanceAlert(ctx, setting, payload)
 	}
 	if !setting.Scenes.IsSceneEnabled(eventType) {
 		return nil

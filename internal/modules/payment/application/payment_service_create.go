@@ -57,6 +57,10 @@ func (s *PaymentService) CreatePayment(input CreatePaymentInput) (*CreatePayment
 		return nil, ErrPaymentInvalid
 	}
 
+	if err := s.CheckPaymentBalance(input.Context, input.OrderID); err != nil {
+		return nil, err
+	}
+
 	log := paymentLogger(
 		"order_id", input.OrderID,
 		"channel_id", input.ChannelID,

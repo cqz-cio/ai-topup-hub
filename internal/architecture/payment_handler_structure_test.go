@@ -50,7 +50,7 @@ func TestPaymentHTTPLivesInTransport(t *testing.T) {
 	assertFileDeclaresFunctions(t, filepath.Join(transportRoot, "webhook_handler.go"), []string{
 		"NewWebhookHandler", "PaypalWebhook", "StripeWebhook", "DujiaoPayWebhook",
 	})
-	assertDirectoryGoFileBudget(t, transportRoot, 9)
+	assertDirectoryGoFileBudget(t, transportRoot, 10) // cached payment and mail polling regression tests
 
 	for _, legacy := range []string{
 		filepath.Join(repositoryRoot, "internal", "http", "handlers", "public", "guest_payment.go"),

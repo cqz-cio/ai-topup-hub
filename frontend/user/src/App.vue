@@ -35,6 +35,7 @@
       <Loading :loading="appStore.loading" />
       <Toast />
       <ConfirmDialog />
+      <PaymentBalanceDialog />
     </div>
   </ConfigProvider>
 </template>
@@ -50,6 +51,7 @@ import Footer from './components/Footer.vue'
 import Loading from './components/Loading.vue'
 import Toast from './components/Toast.vue'
 import ConfirmDialog from './components/ConfirmDialog.vue'
+import PaymentBalanceDialog from './components/PaymentBalanceDialog.vue'
 import ErrorBoundary from './components/ErrorBoundary.vue'
 import BackToTop from './components/BackToTop.vue'
 import MobileBottomNav from './components/MobileBottomNav.vue'

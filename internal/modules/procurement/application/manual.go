@@ -28,6 +28,7 @@ func (s *Service) RetryManual(id uint) error {
 	updates := map[string]interface{}{
 		"retry_count":   0,
 		"next_retry_at": nil,
+		"error_code":    "",
 		"error_message": "",
 		"updated_at":    now,
 	}

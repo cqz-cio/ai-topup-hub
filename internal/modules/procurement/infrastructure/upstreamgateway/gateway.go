@@ -2,6 +2,7 @@ package upstreamgateway
 
 import (
 	"context"
+	"errors"
 
 	procurementcontract "github.com/dujiao-next/internal/modules/procurement/contract"
 	siteconnectiondomain "github.com/dujiao-next/internal/modules/siteconnection/domain"
@@ -118,4 +119,16 @@ func fromUpstreamFulfillment(value *upstream.UpstreamFulfillment) *procurementco
 		Type: value.Type, Status: value.Status, Payload: value.Payload,
 		DeliveryData: value.DeliveryData, DeliveredAt: value.DeliveredAt,
 	}
+}
+
+// ReadBalance only calls the supplier account query; never the trade endpoint.
+func (s *session) ReadBalance(ctx context.Context) (string, string, error) {
+	result, err := s.adapter.Ping(ctx)
+	if err != nil {
+		return "", "", err
+	}
+	if result == nil {
+		return "", "", errors.New("empty supplier balance")
+	}
+	return result.Balance, result.Currency, nil
 }

@@ -77,6 +77,10 @@ export const guestOrderAPI = {
         const request = withGuestAuth(data)
         return userApi.post(`/guest/payments/${id}/capture`, request.payload, request.options)
     },
+    balanceNotice: (params: GuestAuthInput) => {
+        const request = withGuestAuth(params, { silentBusinessError: true })
+        return userApi.get('/guest/payments/balance-notice', { ...request.options, params: request.payload })
+    },
     latestPayment: (params: GuestAuthInput) => {
         const request = withGuestAuth(params, { silentBusinessError: true })
         return userApi.get('/guest/payments/latest', { ...request.options, params: request.payload })
@@ -84,6 +88,7 @@ export const guestOrderAPI = {
 }
 
 export const paymentAPI = {
+    balanceNotice: (params: any) => userApi.get('/payments/balance-notice', { params, silentBusinessError: true }),
     create: (data: CreatePaymentPayload) => userApi.post('/payments', data),
     capture: (id: number) => userApi.post(`/payments/${id}/capture`),
     latest: (params: any) => userApi.get('/payments/latest', { params, silentBusinessError: true }),

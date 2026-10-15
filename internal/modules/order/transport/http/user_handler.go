@@ -74,13 +74,14 @@ type UserHandler struct {
 	payments PaymentChannelPolicy
 	refunds  RefundRecordDirectory
 	users    UserLookup
+	issues   FulfillmentIssueSource
 }
 
-func NewUserHandler(orders UserOrderQuery, payments PaymentChannelPolicy, refunds RefundRecordDirectory, users UserLookup) *UserHandler {
+func NewUserHandler(orders UserOrderQuery, payments PaymentChannelPolicy, refunds RefundRecordDirectory, users UserLookup, issues FulfillmentIssueSource) *UserHandler {
 	if orders == nil {
 		panic("order user handler: orders is nil")
 	}
-	return &UserHandler{orders: orders, payments: payments, refunds: refunds, users: users}
+	return &UserHandler{orders: orders, payments: payments, refunds: refunds, users: users, issues: issues}
 }
 
 func tenantFromRequest(c *gin.Context) reseller.TenantContext {
@@ -172,6 +173,7 @@ func (h *UserHandler) GetOrderByOrderNo(c *gin.Context) {
 	orderDetail := orderpresenter.NewOrderDetailTruncated(order)
 	enrichOrderWithAllowedChannels(h.payments, order, &orderDetail)
 	enrichOrderWithRefundRecords(h.refunds, order, &orderDetail)
+	enrichOrderWithFulfillmentIssue(h.issues, order, &orderDetail)
 	response.Success(c, orderDetail)
 }
 
@@ -432,4 +434,34 @@ func collectFulfillmentPayload(order *orderdomain.Order) string {
 		}
 	}
 	return strings.Join(parts, "\n")
+}
+
+// FulfillmentIssueSource exposes a safe reason without supplier details or costs.
+type FulfillmentIssueSource interface {
+	CustomerFulfillmentIssue(localOrderID uint) (string, error)
+}
+
+func enrichOrderWithFulfillmentIssue(source FulfillmentIssueSource, order *orderdomain.Order, detail *orderpresenter.OrderDetail) {
+	if source == nil || order == nil || detail == nil {
+		return
+	}
+	switch order.Status {
+	case "paid", "fulfilling", "partially_delivered", "partially_refunded":
+	default:
+		return
+	}
+	if order.Fulfillment == nil || order.Fulfillment.Status != "delivered" {
+		issue, err := source.CustomerFulfillmentIssue(order.ID)
+		if err != nil {
+			logger.Warnw("customer_fulfillment_issue_lookup_failed", "order_id", order.ID)
+		} else if issue == "card_platform_insufficient_balance" {
+			detail.FulfillmentIssueCode = issue
+		}
+	}
+	for i := range order.Children {
+		if i >= len(detail.Children) {
+			break
+		}
+		enrichOrderWithFulfillmentIssue(source, &order.Children[i], &detail.Children[i])
+	}
 }

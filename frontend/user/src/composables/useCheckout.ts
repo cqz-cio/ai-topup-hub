@@ -5,7 +5,7 @@ import { useCartStore, type CartItem } from '../stores/cart'
 import { useBuyNowStore } from '../stores/buyNow'
 import { useAppStore } from '../stores/app'
 import { useUserAuthStore } from '../stores/userAuth'
-import { guestOrderAPI, userOrderAPI, walletAPI, type CaptchaPayload } from '../api'
+import { guestOrderAPI, paymentAPI, userOrderAPI, walletAPI, type CaptchaPayload } from '../api'
 import { debounceAsync } from '../utils/debounce'
 import { type PageAlert } from '../utils/alerts'
 import { amountToCents, basisPointsToPercent, calculateChannelFeeCents, centsToAmount, parseInteger, rateToBasisPoints } from '../utils/money'
@@ -15,6 +15,8 @@ import { getImageUrl } from '../utils/image'
 import { getAffiliateCode, getAffiliateVisitorKey } from '../utils/affiliate'
 import { saveGuestOrderAuth } from '../utils/guestOrderAuth'
 import { checkoutReturnPath, openCheckoutPayment } from '../utils/checkoutNavigation'
+import { rememberPaymentBlockFocus, showPaymentBlock } from './usePaymentBlock'
+import { readPaymentBlock } from '../utils/paymentBlock'
 import ImageCaptcha from '../components/captcha/ImageCaptcha.vue'
 import TurnstileCaptcha from '../components/captcha/TurnstileCaptcha.vue'
 import { useLocalized, useProductLabels } from './useProduct'
@@ -67,6 +69,7 @@ export function useCheckout() {
   const couponCode = ref('')
   const normalizedCouponCode = computed(() => couponCode.value.trim())
   const submitting = ref(false)
+  const blockedOrderNo = ref('')
   const error = ref('')
   const preview = ref<any>(null)
   const previewLoading = ref(false)
@@ -829,6 +832,7 @@ export function useCheckout() {
       return
     }
 
+    rememberPaymentBlockFocus()
     submitting.value = true
     try {
       await loadPreviewNow()
@@ -846,7 +850,12 @@ export function useCheckout() {
 
       let responseData: any
 
-      if (userAuthStore.isAuthenticated) {
+      if (blockedOrderNo.value) {
+        const response = userAuthStore.isAuthenticated
+          ? await paymentAPI.create({ order_no: blockedOrderNo.value, channel_id: payload.channel_id, use_balance: payload.use_balance })
+          : await guestOrderAPI.createPayment({ order_no: blockedOrderNo.value, channel_id: payload.channel_id, email: guestEmail.value.trim(), order_password: guestPassword.value })
+        responseData = { ...response.data.data, order_no: blockedOrderNo.value }
+      } else if (userAuthStore.isAuthenticated) {
         const response = await userOrderAPI.createAndPay(payload)
         responseData = response.data.data
       } else {
@@ -867,6 +876,10 @@ export function useCheckout() {
         throw new Error(t('checkout.errors.submitFailed'))
       }
 
+      if (readPaymentBlock(responseData)) {
+        blockedOrderNo.value = responseData.order_no
+        throw Object.assign(new Error(responseData.payment_error), { data: responseData })
+      }
       clearSourceStore()
 
       // Redirect to the existing Payment page which handles all payment display
@@ -875,6 +888,13 @@ export function useCheckout() {
         : `guest=1&order_no=${encodeURIComponent(responseData.order_no)}`
       await openCheckoutPayment(router, `/pay?${query}`, returnPath)
     } catch (err: any) {
+      const orderNo = blockedOrderNo.value
+      const guest = { order_no: orderNo, email: guestEmail.value.trim(), order_password: guestPassword.value }
+      const authenticated = userAuthStore.isAuthenticated
+      showPaymentBlock(err, async (notice_id) => {
+        const response = authenticated ? await paymentAPI.balanceNotice({ order_no: orderNo, notice_id }) : await guestOrderAPI.balanceNotice({ ...guest, notice_id })
+        return response.data.data.notification_status
+      })
       error.value = err.message || t('checkout.errors.submitFailed')
       if (guestCaptchaEnabled.value && captchaProvider.value === 'image') {
         guestImageCaptchaRef.value?.refresh()
@@ -894,6 +914,18 @@ export function useCheckout() {
       debouncedLoadPreview()
     },
     { deep: true }
+  )
+
+  // Stock/price polling replaces item objects without changing the requested
+  // purchase. Keep the blocked order until the shopper changes its inputs.
+  watch(
+    () => JSON.stringify([
+      cartItems.value.map(item => [item.productId, item.skuId, item.quantity]),
+      manualFormFingerprint.value, normalizedCouponCode.value, checkoutMode.value,
+      guestEmail.value, guestPassword.value, userAuthStore.user?.id,
+      userAuthStore.isAuthenticated,
+    ]),
+    () => { blockedOrderNo.value = '' },
   )
 
   watch(walletOnlyPayment, (v) => {

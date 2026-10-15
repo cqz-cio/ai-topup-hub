@@ -35,7 +35,8 @@ func TestNotificationImplementationLivesInBoundedContextDirectories(t *testing.T
 	}
 	assertDirectoryGoFileBudget(t, domainRoot, 1)
 	assertDirectoryGoFileBudget(t, contractRoot, 2)
-	assertDirectoryGoFileBudget(t, applicationRoot, 6)
+	assertDirectoryGoFileBudget(t, applicationRoot, 8) // supplier balance email dispatch and its delivery-state tests
+	assertFileDeclaresFunctions(t, filepath.Join(applicationRoot, "balance_alert.go"), []string{"NotifyBalanceShortage", "BalanceAlertStatus", "dispatchBalanceAlert"})
 	assertDirectoryGoFileBudget(t, formatRoot, 6)
 	assertDirectoryGoFileBudget(t, storeRoot, 3)
 	assertDirectoryGoFileBudget(t, transportRoot, 3)

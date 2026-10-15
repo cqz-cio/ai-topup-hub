@@ -175,6 +175,7 @@
     "deliveryPartial": "部分交付已完成，可先領取",
     "deliveryReadyHint": "請妥善保存交付內容，並按商品說明使用。",
     "deliveryWaiting": "付款已確認，正在準備交付",
+    "cardPlatformBalanceInsufficient": "卡台餘額不足，請聯絡客服補充餘額",
     "deliveryWaitingHint": "頁面會自動更新，交付完成後即可在這裡領取。",
     "deliveryUnpaid": "付款後領取交付內容",
     "deliveryUnpaidHint": "完成付款並確認到帳後，帳號或卡密將顯示在這裡。",
@@ -1968,5 +1969,23 @@
     "authInvalid": "資訊不匹配，請重新輸入",
     "authSubmit": "保存並查詢",
     "authClear": "清除已保存資訊"
+  },
+  "paymentBalance": {
+    "title": "卡台餘額不足",
+    "description": "為避免付款後無法發卡，本次付款已暫停。請聯絡客服補充卡台餘額後重試。",
+    "unavailableTitle": "暫時無法確認卡台餘額",
+    "unavailableDescription": "本次付款已暫停，請稍後重試或聯絡客服。",
+    "contact": "客服微信",
+    "confirm": "我知道了",
+    "copy": "複製微信",
+    "copied": "已複製",
+    "copyFailed": "複製失敗，請長按或選取上方微信號複製。",
+    "notice": {
+      "sent": "已發送郵件通知客服儲值",
+      "partial": "部分提醒郵件已發送，請聯絡客服",
+      "pending": "儲值提醒已提交，郵件發送結果待確認",
+      "failed": "郵件提醒未發送成功，請直接聯絡客服",
+      "not_sent": "暫未發送郵件提醒，請直接聯絡客服"
+    }
   }
 }

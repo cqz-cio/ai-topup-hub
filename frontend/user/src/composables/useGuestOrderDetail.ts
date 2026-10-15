@@ -7,6 +7,7 @@ import { clearGuestOrderAuth, loadGuestOrderAuth, saveGuestOrderAuth } from '../
 import { resolveGuestOrderDetailViewState } from '../utils/guestOrderDetailState'
 import { useOrderDisplayHelpers } from './useOrderDisplayHelpers'
 import { createOrderDetailPolling, needsOrderDetailRefresh } from '../utils/orderDetailPolling'
+import { createCardPlatformBalanceNotice } from '../utils/orderDelivery'
 import { toast } from './useToast'
 
 /**
@@ -29,6 +30,9 @@ export function useGuestOrderDetail() {
   let requestVersion = 0
 
   const helpers = useOrderDisplayHelpers(order)
+  const notifyBalanceIssue = createCardPlatformBalanceNotice(() => {
+    toast.error(t('shopUi.cardPlatformBalanceInsufficient'), { duration: 8000 })
+  })
 
   const handleDownloadFulfillment = async (orderNo: string) => {
     if (fulfillmentDownloading.value) return
@@ -80,6 +84,7 @@ export function useGuestOrderDetail() {
       const response = await guestOrderAPI.detail(orderNo, credentials)
       if (!isCurrent()) return
       order.value = response.data.data
+      notifyBalanceIssue(order.value)
       authError.value = ''
     } catch (error) {
       if (isCurrent() && !silent) {

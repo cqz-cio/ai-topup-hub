@@ -26,13 +26,14 @@ type GuestHandler struct {
 	orders   GuestOrderQuery
 	payments PaymentChannelPolicy
 	refunds  RefundRecordDirectory
+	issues   FulfillmentIssueSource
 }
 
-func NewGuestHandler(orders GuestOrderQuery, payments PaymentChannelPolicy, refunds RefundRecordDirectory) *GuestHandler {
+func NewGuestHandler(orders GuestOrderQuery, payments PaymentChannelPolicy, refunds RefundRecordDirectory, issues FulfillmentIssueSource) *GuestHandler {
 	if orders == nil {
 		panic("order guest handler: orders is nil")
 	}
-	return &GuestHandler{orders: orders, payments: payments, refunds: refunds}
+	return &GuestHandler{orders: orders, payments: payments, refunds: refunds, issues: issues}
 }
 
 // ListGuestOrders 获取游客订单列表
@@ -113,6 +114,7 @@ func (h *GuestHandler) GetGuestOrderByOrderNo(c *gin.Context) {
 	orderDetail := orderpresenter.NewOrderDetailTruncated(order)
 	enrichOrderWithAllowedChannels(h.payments, order, &orderDetail)
 	enrichOrderWithRefundRecords(h.refunds, order, &orderDetail)
+	enrichOrderWithFulfillmentIssue(h.issues, order, &orderDetail)
 	response.Success(c, orderDetail)
 }
 

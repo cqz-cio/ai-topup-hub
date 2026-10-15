@@ -130,7 +130,7 @@ func isSaleNotification(payload queue.NotificationDispatchPayload) bool {
 // A supplier balance changes between attempts. Delivery identity therefore uses
 // the order and recipient, not the rendered body or the balance query timestamp.
 func (s *Service) sendNotification(ctx context.Context, payload queue.NotificationDispatchPayload, attempt notificationSendAttempt, send func() error) error {
-	if isSaleNotification(payload) && !payload.Force {
+	if (isSaleNotification(payload) || isBalanceAlert(payload)) && !payload.Force {
 		signature := fmt.Sprintf("%s|%s|%d|%s|%s", payload.EventType, payload.BizType, payload.BizID, attempt.channel, strings.TrimSpace(attempt.recipient))
 		key := fmt.Sprintf("notification:sale:%x", sha256.Sum256([]byte(signature)))
 		delivered, err := s.logService.HasSuccessfulDelivery(payload.EventType, payload.BizType, payload.BizID, attempt.channel, attempt.recipient)

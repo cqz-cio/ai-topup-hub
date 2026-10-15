@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	procurementcontract "github.com/dujiao-next/internal/modules/procurement/contract"
 	"strings"
 	"testing"
 	"time"
@@ -69,6 +70,17 @@ func (s *purchaseFlowSupplier) CreateOrder(_ context.Context, request upstream.C
 	}
 	return result, nil
 }
+
+// Existing failure scenarios model a balance drop AFTER checkout, so receipts
+// must still be persisted. The new case models shortage before any invoice.
+func (s *purchaseFlowSupplier) Ping(context.Context) (*upstream.PingResult, error) {
+	balance := "1000.00"
+	if s.mode == "prepayment_insufficient" {
+		balance = "0.00"
+	}
+	return &upstream.PingResult{Balance: balance, Currency: "CNY"}, nil
+}
+
 func (s *purchaseFlowSupplier) GetOrderByReference(_ context.Context, reference string) (*upstream.UpstreamOrderDetail, error) {
 	s.queryRef = reference
 	return &upstream.UpstreamOrderDetail{OrderNo: reference, Status: "delivered", Fulfillment: purchaseFlowCard()}, nil
@@ -106,7 +118,7 @@ func (q *purchaseFlowQueue) EnqueuePoll(id uint, _ time.Duration) error {
 
 func TestConfirmedUSDTTransferRunsStorefrontProcurementAndCustomerDelivery(t *testing.T) {
 	for _, networkName := range []string{"bsc", "plasma", "tron"} {
-		for _, scenario := range []string{"immediate_card", "delayed_card", "queue_recovery", "insufficient_balance", "unknown_result", "retry_after_topup"} {
+		for _, scenario := range []string{"immediate_card", "delayed_card", "queue_recovery", "insufficient_balance", "unknown_result", "retry_after_topup", "prepayment_insufficient"} {
 			t.Run(networkName+"/"+scenario, func(t *testing.T) {
 				payments, db, registry := setupPaymentService(t)
 				sqlDB, _ := db.DB()
@@ -137,6 +149,7 @@ func TestConfirmedUSDTTransferRunsStorefrontProcurementAndCustomerDelivery(t *te
 					OrderLifecycle:  procurementstore.NewLifecycle(db, nil, nil, config.EmailConfig{}),
 				})
 				payments.SetProcurementService(procurements)
+				payments.SetPaymentReadiness(procurements)
 				network, err := chaincontract.ResolveNetwork(networkName)
 				if err != nil {
 					t.Fatal(err)
@@ -163,6 +176,22 @@ func TestConfirmedUSDTTransferRunsStorefrontProcurementAndCustomerDelivery(t *te
 					t.Fatal(err)
 				}
 				payment, err := payments.CreatePayment(paymentapp.CreatePaymentInput{OrderID: order.ID, ChannelID: channel.ID, Context: context.Background()})
+				if scenario == "prepayment_insufficient" {
+					var block *procurementcontract.PaymentBlock
+					if !errors.As(err, &block) || block.Code != procurementcontract.BalanceInsufficient || payment != nil {
+						t.Fatalf("checkout not blocked: %v", err)
+					}
+					for _, model := range []any{&paymentdomain.Payment{}, &paymentdomain.ChainInvoice{}, &procurementdomain.Order{}} {
+						var n int64
+						if e := db.Model(model).Count(&n).Error; e != nil || n != 0 {
+							t.Fatalf("blocked checkout persisted payment work: %d %v", n, e)
+						}
+					}
+					if supplier.calls != 0 {
+						t.Fatal("blocked checkout purchased cards")
+					}
+					return
+				}
 				if err != nil {
 					t.Fatal(err)
 				}

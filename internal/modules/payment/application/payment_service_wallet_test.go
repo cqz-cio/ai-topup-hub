@@ -6,8 +6,10 @@ import (
 	"crypto/md5"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	xorpayadapter "github.com/dujiao-next/internal/modules/payment/infrastructure/gateway/adapters/xorpay"
+	pc "github.com/dujiao-next/internal/modules/procurement/contract"
 	"net/url"
 	"strconv"
 	"sync"
@@ -1624,5 +1626,66 @@ func TestXorpayFeeRoundingAndChannelIsolation(t *testing.T) {
 	total, fee, policy := calculateChannelPaymentAmounts(decimal.NewFromInt(99), ch, false)
 	if total.StringFixed(2) != "99.00" || fee.StringFixed(2) != "1.58" || policy != constants.PaymentFeePolicyMerchantAbsorbed {
 		t.Fatal("other provider fee policy changed")
+	}
+}
+
+type paymentReadinessStub struct {
+	calls int
+	block error
+}
+
+func (r *paymentReadinessStub) CheckPaymentBalance(context.Context, uint) error {
+	r.calls++
+	return r.block
+}
+func (*paymentReadinessStub) ReadPaymentBalanceNotice(context.Context, uint, uint) string {
+	return "sent"
+}
+
+func TestPaymentBalanceBlocksEveryProviderBeforeSideEffects(t *testing.T) {
+	for _, provider := range []string{"bscusdt", "plasmausdt", "tronusdt", "xorpay", "wallet"} {
+		for _, reuse := range []bool{false, true} {
+			t.Run(provider+map[bool]string{true: "_reuse", false: "_new"}[reuse], func(t *testing.T) {
+				svc, db := setupPaymentServiceWalletTest(t)
+				r := &paymentReadinessStub{block: &pc.PaymentBlock{Code: pc.BalanceInsufficient, NotificationStatus: "pending"}}
+				svc.SetPaymentReadiness(r)
+				order := &orderdomain.Order{OrderNo: "balance-check", UserID: 1, Status: constants.OrderStatusPendingPayment, Currency: "CNY", TotalAmount: money.FromDecimal(decimal.NewFromInt(100))}
+				if err := db.Create(order).Error; err != nil {
+					t.Fatal(err)
+				}
+				channel := &paymentdomain.PaymentChannel{Name: provider, ProviderType: provider, IsActive: true}
+				if err := db.Create(channel).Error; err != nil {
+					t.Fatal(err)
+				}
+				if reuse {
+					p := &paymentdomain.Payment{OrderID: order.ID, ChannelID: channel.ID, ProviderType: provider, Status: constants.PaymentStatusPending, QRCode: "existing-payment", Currency: "CNY"}
+					if err := db.Create(p).Error; err != nil {
+						t.Fatal(err)
+					}
+				}
+				result, err := svc.CreatePayment(CreatePaymentInput{OrderID: order.ID, ChannelID: channel.ID, UseBalance: true})
+				if result != nil || !errors.Is(err, r.block) || r.calls != 1 {
+					t.Fatalf("guard bypassed: result=%v err=%v calls=%d", result, err, r.calls)
+				}
+				var count int64
+				db.Model(&paymentdomain.Payment{}).Count(&count)
+				want := int64(0)
+				if reuse {
+					want = 1
+				}
+				if count != want {
+					t.Fatal("created payment while blocked")
+				}
+				db.Model(&walletdomain.Transaction{}).Count(&count)
+				if count != 0 {
+					t.Fatal("debited wallet while blocked")
+				}
+				var updated orderdomain.Order
+				db.First(&updated, order.ID)
+				if updated.Status != constants.OrderStatusPendingPayment {
+					t.Fatal("changed order status")
+				}
+			})
+		}
 	}
 }

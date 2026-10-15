@@ -175,6 +175,7 @@
     "deliveryPartial": "Part of your delivery is ready to collect",
     "deliveryReadyHint": "Save your delivery securely and follow the product instructions.",
     "deliveryWaiting": "Payment confirmed. Preparing your delivery.",
+    "cardPlatformBalanceInsufficient": "The card platform balance is insufficient. Please contact support to replenish the balance.",
     "deliveryWaitingHint": "This page updates automatically. Collect your delivery here when ready.",
     "deliveryUnpaid": "Complete payment to collect your delivery",
     "deliveryUnpaidHint": "Your account or keys will appear here after payment is confirmed.",
@@ -1968,5 +1969,23 @@
     "authInvalid": "Credentials mismatch, please try again",
     "authSubmit": "Save and search",
     "authClear": "Clear saved info"
+  },
+  "paymentBalance": {
+    "title": "Insufficient card platform balance",
+    "description": "Payment is paused to avoid charging you before cards can be delivered. Please contact support to replenish the card platform balance, then try again.",
+    "unavailableTitle": "Card platform balance unavailable",
+    "unavailableDescription": "Payment is paused. Please try again later or contact support.",
+    "contact": "Support WeChat",
+    "confirm": "Got it",
+    "copy": "Copy",
+    "copied": "Copied",
+    "copyFailed": "Copy failed. Please select and copy the WeChat ID above.",
+    "notice": {
+      "sent": "Support has been emailed a balance top-up reminder",
+      "partial": "Some reminder emails were sent. Please contact support",
+      "pending": "Reminder submitted; email delivery is not yet confirmed",
+      "failed": "The reminder email was not sent. Please contact support",
+      "not_sent": "No reminder email has been sent. Please contact support"
+    }
   }
 }

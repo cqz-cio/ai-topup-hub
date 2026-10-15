@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { orderDeliveryGroups, orderDeliveryState } from '../src/utils/orderDelivery.ts'
+import { orderDeliveryGroups, orderDeliveryState, hasCardPlatformBalanceIssue, createCardPlatformBalanceNotice } from '../src/utils/orderDelivery.ts'
 
 test('a paid order waits for fulfillment instead of claiming keys are ready', () => {
   assert.equal(orderDeliveryState({ status: 'paid' }), 'waiting')
@@ -38,4 +38,46 @@ test('a split order preserves both parent and child fulfillment records', () => 
   ] }
   assert.deepEqual(orderDeliveryGroups(order).map(group => group.fulfillment.payload), ['parent-key', 'child-key'])
   assert.equal(orderDeliveryState(order), 'ready')
+})
+
+test('balance failures are shown only for paid, undelivered orders', () => {
+  const failure = { order_no: 'balance-order', status: 'paid', fulfillment_issue_code: 'card_platform_insufficient_balance' }
+  assert.equal(hasCardPlatformBalanceIssue(failure), true)
+  assert.equal(orderDeliveryState(failure), 'waiting')
+  for (const status of ['pending_payment', 'canceled', 'expired', 'refunded', 'completed', 'delivered']) {
+    assert.equal(hasCardPlatformBalanceIssue({ ...failure, status }), false)
+  }
+  assert.equal(hasCardPlatformBalanceIssue({ ...failure, fulfillment: { status: 'delivered' } }), false)
+  assert.equal(hasCardPlatformBalanceIssue({ ...failure, fulfillment_issue_code: 'product_out_of_stock' }), false)
+  assert.equal(hasCardPlatformBalanceIssue({ ...failure, fulfillment_issue_code: undefined }), false)
+  assert.equal(hasCardPlatformBalanceIssue(null), false)
+})
+
+test('split orders retain delivered cards while surfacing the failed child', () => {
+  const order = { status: 'partially_delivered', children: [
+    { status: 'delivered', fulfillment: { status: 'delivered', payload: 'existing-card' } },
+    { status: 'paid', fulfillment_issue_code: 'card_platform_insufficient_balance' },
+  ] }
+  assert.equal(hasCardPlatformBalanceIssue(order), true)
+  assert.equal(orderDeliveryState(order), 'partial')
+  assert.equal(orderDeliveryGroups(order)[0]?.fulfillment.payload, 'existing-card')
+  order.children[1]!.status = 'refunded'
+  assert.equal(hasCardPlatformBalanceIssue(order), false)
+  assert.equal(hasCardPlatformBalanceIssue({ ...order, children: 'invalid' }), false)
+})
+
+test('polling shows the balance toast once and permits a new failure after recovery', () => {
+  let count = 0
+  const notify = createCardPlatformBalanceNotice(() => { count += 1 })
+  const failed = { order_no: 'first', status: 'paid', fulfillment_issue_code: 'card_platform_insufficient_balance' }
+  notify(failed)
+  notify({ ...failed })
+  notify(null)
+  notify(failed)
+  assert.equal(count, 1)
+  notify({ ...failed, fulfillment_issue_code: undefined })
+  notify(failed)
+  assert.equal(count, 2)
+  notify({ ...failed, order_no: 'second' })
+  assert.equal(count, 3)
 })

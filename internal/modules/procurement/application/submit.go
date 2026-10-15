@@ -52,7 +52,7 @@ func (s *Service) SubmitToUpstream(procurementOrderID uint) error {
 		return fmt.Errorf("load connection: %w", err)
 	}
 	if connection == nil {
-		s.rejectProcurement(procOrder, fmt.Sprintf("connection %d not found", procOrder.ConnectionID))
+		s.rejectProcurement(procOrder, "", fmt.Sprintf("connection %d not found", procOrder.ConnectionID))
 		return nil // 永久性错误，不重试
 	}
 	singleSubmission := requiresSingleSubmission(connection)
@@ -64,15 +64,15 @@ func (s *Service) SubmitToUpstream(procurementOrderID uint) error {
 		return fmt.Errorf("load local order: %w", err)
 	}
 	if localOrder == nil {
-		s.rejectProcurement(procOrder, fmt.Sprintf("local order %d not found", procOrder.LocalOrderID))
+		s.rejectProcurement(procOrder, "", fmt.Sprintf("local order %d not found", procOrder.LocalOrderID))
 		return nil // 永久性错误，不重试
 	}
 	if singleSubmission && localOrder.Status != constants.OrderStatusPaid && localOrder.Status != constants.OrderStatusFulfilling {
-		s.rejectProcurement(procOrder, "supplier purchases require a confirmed paid local order")
+		s.rejectProcurement(procOrder, "", "supplier purchases require a confirmed paid local order")
 		return nil
 	}
 	if len(localOrder.Items) == 0 {
-		s.rejectProcurement(procOrder, fmt.Sprintf("local order %d has no items", localOrder.ID))
+		s.rejectProcurement(procOrder, "", fmt.Sprintf("local order %d has no items", localOrder.ID))
 		return nil // 永久性错误，不重试
 	}
 	item := localOrder.Items[0]
@@ -84,7 +84,7 @@ func (s *Service) SubmitToUpstream(procurementOrderID uint) error {
 		return fmt.Errorf("lookup sku mapping: %w", err)
 	}
 	if !found {
-		s.rejectProcurement(procOrder, fmt.Sprintf("no sku mapping for local sku %d", item.SKUID))
+		s.rejectProcurement(procOrder, "", fmt.Sprintf("no sku mapping for local sku %d", item.SKUID))
 		return nil // 永久性错误，不重试
 	}
 
@@ -126,19 +126,19 @@ func (s *Service) SubmitToUpstream(procurementOrderID uint) error {
 		if singleSubmission {
 			return s.markSubmissionUnknown(procOrder, "supplier purchase outcome is unknown; reconcile before retrying")
 		}
-		return s.handleSubmitFailure(procOrder, connection, fmt.Sprintf("upstream request error: %v", err), true)
+		return s.handleSubmitFailure(procOrder, connection, "", fmt.Sprintf("upstream request error: %v", err), true)
 	}
 
 	if !resp.OK {
 		if singleSubmission {
 			if resp.ErrorCode == "supplier_unavailable" {
 				// Read-only preflight failed before the balance purchase request.
-				return s.handleSubmitFailure(procOrder, connection, resp.ErrorMessage, true)
+				return s.handleSubmitFailure(procOrder, connection, resp.ErrorCode, resp.ErrorMessage, true)
 			}
 			if resp.ErrorCode == "duplicate_order" {
 				return s.markSubmissionUnknown(procOrder, "supplier already has this request; retrieve the original order before retrying")
 			}
-			s.rejectProcurement(procOrder, resp.ErrorMessage)
+			s.rejectProcurement(procOrder, resp.ErrorCode, resp.ErrorMessage)
 			return nil
 		}
 		retryable := isRetryableErrorCode(resp.ErrorCode)
@@ -146,7 +146,7 @@ func (s *Service) SubmitToUpstream(procurementOrderID uint) error {
 		if errMsg == "" {
 			errMsg = resp.ErrorCode
 		}
-		return s.handleSubmitFailure(procOrder, connection, errMsg, retryable)
+		return s.handleSubmitFailure(procOrder, connection, resp.ErrorCode, errMsg, retryable)
 	}
 
 	// 成功：更新状态，重置 retry_count 用于轮询阶段
@@ -156,6 +156,7 @@ func (s *Service) SubmitToUpstream(procurementOrderID uint) error {
 		"upstream_order_no": resp.OrderNo,
 		"upstream_amount":   resp.Amount,
 		"upstream_currency": resp.Currency,
+		"error_code":        "",
 		"error_message":     "",
 		"retry_count":       0,
 		"next_retry_at":     nil,
@@ -198,7 +199,7 @@ func requiresSingleSubmission(connection procurementcontract.UpstreamConnection)
 }
 
 func (s *Service) markSubmissionUnknown(order *procurementdomain.Order, message string) error {
-	changed, err := s.procRepo.UpdateStatusIfCurrent(order.ID, order.Status, "manual_review", map[string]interface{}{"error_message": message, "updated_at": time.Now()})
+	changed, err := s.procRepo.UpdateStatusIfCurrent(order.ID, order.Status, "manual_review", map[string]interface{}{"error_code": "", "error_message": message, "updated_at": time.Now()})
 	if err != nil {
 		return err
 	}
@@ -223,9 +224,10 @@ func (s *Service) markProcurementError(procOrder *procurementdomain.Order, errMs
 
 // rejectProcurement 将采购单标记为 rejected（用于永久性配置错误，不值得重试）
 // 同时回退本地订单状态并通知管理员
-func (s *Service) rejectProcurement(procOrder *procurementdomain.Order, errMsg string) {
+func (s *Service) rejectProcurement(procOrder *procurementdomain.Order, errorCode, errMsg string) {
 	now := time.Now()
 	changed, err := s.procRepo.UpdateStatusIfCurrent(procOrder.ID, procOrder.Status, "rejected", map[string]interface{}{
+		"error_code":    strings.ToLower(strings.TrimSpace(errorCode)),
 		"error_message": errMsg,
 		"updated_at":    now,
 	})
@@ -273,7 +275,7 @@ func (s *Service) notifyProcurementFailure(procOrder *procurementdomain.Order, e
 }
 
 // handleSubmitFailure 处理提交失败
-func (s *Service) handleSubmitFailure(procOrder *procurementdomain.Order, connection procurementcontract.UpstreamConnection, errMsg string, retryable bool) error {
+func (s *Service) handleSubmitFailure(procOrder *procurementdomain.Order, connection procurementcontract.UpstreamConnection, errorCode, errMsg string, retryable bool) error {
 	now := time.Now()
 
 	if retryable && procOrder.RetryCount < connection.RetryMax() {
@@ -288,6 +290,7 @@ func (s *Service) handleSubmitFailure(procOrder *procurementdomain.Order, connec
 		updates := map[string]interface{}{
 			"retry_count":   procOrder.RetryCount + 1,
 			"next_retry_at": &nextRetry,
+			"error_code":    strings.ToLower(strings.TrimSpace(errorCode)),
 			"error_message": errMsg,
 			"updated_at":    now,
 		}
@@ -312,6 +315,7 @@ func (s *Service) handleSubmitFailure(procOrder *procurementdomain.Order, connec
 
 	// 不可重试或已达上限：拒绝
 	updates := map[string]interface{}{
+		"error_code":    strings.ToLower(strings.TrimSpace(errorCode)),
 		"error_message": errMsg,
 		"updated_at":    now,
 	}

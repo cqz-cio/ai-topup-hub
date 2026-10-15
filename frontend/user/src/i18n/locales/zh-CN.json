@@ -175,6 +175,7 @@
     "deliveryPartial": "部分交付已完成，可先领取",
     "deliveryReadyHint": "请妥善保存交付内容，并按商品说明使用。",
     "deliveryWaiting": "付款已确认，正在准备交付",
+    "cardPlatformBalanceInsufficient": "卡台余额不足，请联系客服补充余额",
     "deliveryWaitingHint": "页面会自动更新，交付完成后即可在这里领取。",
     "deliveryUnpaid": "付款后领取交付内容",
     "deliveryUnpaidHint": "完成付款并确认到账后，账号或卡密将显示在这里。",
@@ -1968,5 +1969,23 @@
     "label": "购买身份",
     "member": "会员购买",
     "guest": "游客可购"
+  },
+  "paymentBalance": {
+    "title": "卡台余额不足",
+    "description": "为避免付款后无法发卡，本次付款已暂停。请联系客服补充卡台余额后重试。",
+    "unavailableTitle": "暂时无法确认卡台余额",
+    "unavailableDescription": "本次付款已暂停，请稍后重试或联系客服。",
+    "contact": "客服微信",
+    "confirm": "我知道了",
+    "copy": "复制微信",
+    "copied": "已复制",
+    "copyFailed": "复制失败，请长按或选中上方微信号复制。",
+    "notice": {
+      "sent": "已发送邮件通知客服充值",
+      "partial": "部分提醒邮件已发送，请联系客服",
+      "pending": "充值提醒已提交，邮件发送结果待确认",
+      "failed": "邮件提醒未发送成功，请直接联系客服",
+      "not_sent": "暂未发送邮件提醒，请直接联系客服"
+    }
   }
 }

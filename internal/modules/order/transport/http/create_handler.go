@@ -3,6 +3,7 @@ package orderhttp
 import (
 	"context"
 	"errors"
+	procurementcontract "github.com/dujiao-next/internal/modules/procurement/contract"
 	"strings"
 
 	paymentpresenter "github.com/dujiao-next/internal/modules/payment/transport/presenter"
@@ -282,11 +283,12 @@ func (h *CreateHandler) respondCreateAndPay(c *gin.Context, order *orderdomain.O
 		RequestScheme: requestSchemeFromContext(c),
 	})
 	if err != nil {
-		response.Success(c, gin.H{
-			"order":         orderResp,
-			"order_no":      order.OrderNo,
-			"payment_error": err.Error(),
-		})
+		data := gin.H{"order": orderResp, "order_no": order.OrderNo, "payment_error": err.Error()}
+		var block *procurementcontract.PaymentBlock
+		if errors.As(err, &block) {
+			data["payment_block"] = block
+		}
+		response.Success(c, data)
 		return
 	}
 

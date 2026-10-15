@@ -1,7 +1,12 @@
 package application
 
 import (
+	"context"
 	"errors"
+	"github.com/dujiao-next/internal/constants"
+	orderapp "github.com/dujiao-next/internal/modules/order/application"
+	procurementcontract "github.com/dujiao-next/internal/modules/procurement/contract"
+	"time"
 
 	"github.com/dujiao-next/internal/config"
 	"github.com/dujiao-next/internal/logger"
@@ -62,6 +67,7 @@ type PaymentService struct {
 	affiliateSvc            AffiliatePaymentLifecycle
 	notificationSvc         notificationcontract.NotificationEnqueuer
 	procurementSvc          ProcurementCreator
+	paymentReadiness        PaymentReadiness
 	autoRechargeSvc         ProcurementCreator
 	downstreamCallbackSvc   DownstreamCallbackEnqueuer
 	memberLevelSvc          MemberLevelProgressor
@@ -201,4 +207,47 @@ func paymentLogger(kv ...interface{}) *zap.SugaredLogger {
 		return logger.S()
 	}
 	return logger.SW(kv...)
+}
+
+type PaymentReadiness interface {
+	CheckPaymentBalance(context.Context, uint) error
+	ReadPaymentBalanceNotice(context.Context, uint, uint) string
+}
+
+func (s *PaymentService) SetPaymentReadiness(checker PaymentReadiness) { s.paymentReadiness = checker }
+
+func (s *PaymentService) CheckPaymentBalance(ctx context.Context, orderID uint) error {
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	order, err := s.orderRepo.GetByID(orderID)
+	if err != nil {
+		return orderapp.ErrOrderFetchFailed
+	}
+	if order == nil {
+		return orderapp.ErrOrderNotFound
+	}
+	if order.ParentID != nil || order.Status != constants.OrderStatusPendingPayment ||
+		(order.ExpiresAt != nil && !order.ExpiresAt.After(time.Now())) {
+		return orderapp.ErrOrderStatusInvalid
+	}
+	if s.paymentReadiness != nil {
+		return s.paymentReadiness.CheckPaymentBalance(ctx, orderID)
+	}
+	orders := append([]orderdomain.Order{*order}, order.Children...)
+	for _, candidate := range orders {
+		for _, item := range candidate.Items {
+			if item.FulfillmentType == constants.FulfillmentTypeUpstream {
+				return &procurementcontract.PaymentBlock{Code: procurementcontract.BalanceUnavailable, NotificationStatus: "not_sent"}
+			}
+		}
+	}
+	return nil
+}
+
+func (s *PaymentService) ReadPaymentBalanceNotice(ctx context.Context, orderID, noticeID uint) string {
+	if s.paymentReadiness == nil {
+		return "not_sent"
+	}
+	return s.paymentReadiness.ReadPaymentBalanceNotice(ctx, orderID, noticeID)
 }

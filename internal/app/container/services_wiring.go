@@ -6,6 +6,8 @@ func (c *Container) wireServiceDependencies() {
 	c.OrderRefundService.SetResellerAccounting(c.ResellerAccountingLedger)
 	c.PaymentService.SetMemberLevelService(c.MemberLevelService)
 	c.PaymentService.SetProcurementService(c.ProcurementOrderService)
+	c.PaymentService.SetPaymentReadiness(c.ProcurementOrderService)
+	c.ProcurementOrderService.SetBalanceNotifier(c.NotificationService)
 	c.PaymentService.SetDownstreamCallbackService(c.DownstreamCallbackService)
 	c.FulfillmentService.SetDownstreamCallbackService(c.DownstreamCallbackService)
 }

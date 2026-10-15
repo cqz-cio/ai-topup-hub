@@ -170,3 +170,8 @@ func currentRequestID(c *gin.Context) string {
 	}
 	return ""
 }
+
+// ErrorWithData returns typed, customer-safe details for recoverable failures.
+func ErrorWithData(c *gin.Context, code int, message string, data interface{}) {
+	c.JSON(http.StatusOK, Response{StatusCode: code, Msg: message, Data: attachRequestID(c, data)})
+}

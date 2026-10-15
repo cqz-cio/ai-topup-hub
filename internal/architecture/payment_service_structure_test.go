@@ -13,7 +13,7 @@ func TestPaymentServiceImplementationIsSplitByResponsibility(t *testing.T) {
 	serviceDirectory := filepath.Join(repositoryRoot, "internal", "modules", "payment", "application")
 	expected := map[string][]string{
 		"payment_service.go": {
-			"SetAutoRechargeService",
+			"SetAutoRechargeService", "SetPaymentReadiness", "CheckPaymentBalance", "ReadPaymentBalanceNotice",
 			"SetProcurementService", "SetDownstreamCallbackService", "SetMemberLevelService",
 			"NewPaymentService", "ListPayments", "GetPayment", "ListChannels", "GetChannel",
 			"paymentLogger",

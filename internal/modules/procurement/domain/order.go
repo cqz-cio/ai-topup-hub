@@ -24,6 +24,7 @@ type Order struct {
 	UpstreamCurrency         string       `gorm:"type:varchar(10);not null;default:''" json:"upstream_currency"`
 	LocalSellAmount          money.Amount `gorm:"type:decimal(20,2);not null;default:0" json:"local_sell_amount"`
 	Currency                 string       `gorm:"type:varchar(10);not null" json:"currency"`
+	ErrorCode                string       `gorm:"type:varchar(64)" json:"error_code,omitempty"`
 	ErrorMessage             string       `gorm:"type:text" json:"error_message,omitempty"`
 	RetryCount               int          `gorm:"not null;default:0" json:"retry_count"`
 	NextRetryAt              *time.Time   `gorm:"index" json:"next_retry_at,omitempty"`

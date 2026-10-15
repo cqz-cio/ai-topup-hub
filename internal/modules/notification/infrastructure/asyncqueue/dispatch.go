@@ -26,3 +26,5 @@ func (c *Client) EnqueueNotificationDispatch(payload queue.NotificationDispatchP
 }
 
 var _ contract.DispatchQueue = (*Client)(nil)
+
+func (c *Client) Ready() bool { return c != nil && c.queue != nil }

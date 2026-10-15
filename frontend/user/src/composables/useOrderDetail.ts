@@ -7,6 +7,7 @@ import { useConfirmDialog } from './useConfirmDialog'
 import { toast } from './useToast'
 import { useOrderDisplayHelpers } from './useOrderDisplayHelpers'
 import { createOrderDetailPolling, needsOrderDetailRefresh } from '../utils/orderDetailPolling'
+import { createCardPlatformBalanceNotice } from '../utils/orderDelivery'
 
 /**
  * 已登录用户订单详情逻辑（classic + vault 共用）。
@@ -24,6 +25,9 @@ export function useOrderDetail() {
   let requestVersion = 0
 
   const helpers = useOrderDisplayHelpers(order)
+  const notifyBalanceIssue = createCardPlatformBalanceNotice(() => {
+    toast.error(t('shopUi.cardPlatformBalanceInsufficient'), { duration: 8000 })
+  })
 
   const handleDownloadFulfillment = async (orderNo: string) => {
     if (fulfillmentDownloading.value) return
@@ -52,6 +56,7 @@ export function useOrderDetail() {
       const response = await userOrderAPI.detail(orderNo)
       if (!isCurrent()) return
       order.value = response.data.data
+      notifyBalanceIssue(order.value)
     } catch (error) {
       if (isCurrent() && !silent) order.value = null
     } finally {

@@ -1,5 +1,6 @@
 import i18n from '../i18n'
 import { isPublicAuthEndpoint } from '../utils/authEndpoints'
+import { readPaymentBlock } from '../utils/paymentBlock'
 
 export const t = (key: string, params?: Record<string, any>) =>
     (params ? i18n.global.t(key, params) : i18n.global.t(key)) as string
@@ -172,11 +173,12 @@ function createClient(injectAuth: boolean) {
             }
             const fallbackMessage = t('common.api.requestFailed')
             const errorMessage = data.msg || fallbackMessage
-            const silentBusinessError = Boolean(opts.silentBusinessError)
+            const silentBusinessError = Boolean(opts.silentBusinessError) || readPaymentBlock(data.data) !== null
             if (!silentBusinessError) {
                 console.error('API Error:', errorMessage)
             }
-            const businessError = new Error(errorMessage) as Error & { silentBusinessError?: boolean }
+            const businessError = new Error(errorMessage) as Error & { silentBusinessError?: boolean; data?: any }
+            businessError.data = data.data
             businessError.silentBusinessError = silentBusinessError
             return Promise.reject(businessError)
         }

@@ -1,7 +1,9 @@
 package paymenthttp
 
 import (
+	"context"
 	"errors"
+	"strconv"
 	"time"
 
 	paymentpresenter "github.com/dujiao-next/internal/modules/payment/transport/presenter"
@@ -56,6 +58,7 @@ type LatestHandler struct {
 	guestOrders GuestOrderLookup
 	userOrders  UserOrderLookup
 	payments    PendingPaymentLookup
+	readiness   PaymentReadiness
 }
 
 func NewLatestHandler(guestOrders GuestOrderLookup, userOrders UserOrderLookup, payments PendingPaymentLookup) *LatestHandler {
@@ -75,7 +78,9 @@ func tenantFromRequest(c *gin.Context) reseller.TenantContext {
 }
 
 // GetGuestLatestPayment 获取游客最新待支付记录
-func (h *LatestHandler) GetGuestLatestPayment(c *gin.Context) {
+func (h *LatestHandler) GetGuestLatestPayment(c *gin.Context) { h.getGuestPayment(c, false) }
+func (h *LatestHandler) GetGuestBalanceNotice(c *gin.Context) { h.getGuestPayment(c, true) }
+func (h *LatestHandler) getGuestPayment(c *gin.Context, noticeOnly bool) {
 	var query LatestGuestPaymentQuery
 	if err := c.ShouldBindQuery(&query); err != nil {
 		ginutil.RespondError(c, response.CodeBadRequest, "error.bad_request", err)
@@ -100,11 +105,17 @@ func (h *LatestHandler) GetGuestLatestPayment(c *gin.Context) {
 		ginutil.RespondError(c, response.CodeInternal, "error.order_fetch_failed", err)
 		return
 	}
+	if noticeOnly {
+		h.respondBalanceNotice(c, order)
+		return
+	}
 	h.respondLatestPayment(c, order)
 }
 
 // GetLatestPayment 获取用户最新待支付记录
-func (h *LatestHandler) GetLatestPayment(c *gin.Context) {
+func (h *LatestHandler) GetLatestPayment(c *gin.Context) { h.getUserPayment(c, false) }
+func (h *LatestHandler) GetBalanceNotice(c *gin.Context) { h.getUserPayment(c, true) }
+func (h *LatestHandler) getUserPayment(c *gin.Context, noticeOnly bool) {
 	uid, ok := ginutil.GetUserID(c)
 	if !ok {
 		return
@@ -125,6 +136,10 @@ func (h *LatestHandler) GetLatestPayment(c *gin.Context) {
 		ginutil.RespondError(c, response.CodeInternal, "error.order_fetch_failed", err)
 		return
 	}
+	if noticeOnly {
+		h.respondBalanceNotice(c, order)
+		return
+	}
 	h.respondLatestPayment(c, order)
 }
 
@@ -142,6 +157,12 @@ func (h *LatestHandler) respondLatestPayment(c *gin.Context, order *orderdomain.
 		return
 	}
 
+	if h.readiness != nil {
+		if err := h.readiness.CheckPaymentBalance(c.Request.Context(), order.ID); err != nil {
+			respondPaymentCreateError(c, err)
+			return
+		}
+	}
 	payment, err := h.payments.GetLatestPendingByOrder(order.ID, time.Now())
 	if err != nil {
 		ginutil.RespondError(c, response.CodeInternal, "error.payment_fetch_failed", err)
@@ -153,4 +174,19 @@ func (h *LatestHandler) respondLatestPayment(c *gin.Context, order *orderdomain.
 	}
 
 	response.Success(c, paymentpresenter.NewLatestPaymentResp(payment, order.OrderNo))
+}
+
+type PaymentReadiness interface {
+	CheckPaymentBalance(context.Context, uint) error
+	ReadPaymentBalanceNotice(context.Context, uint, uint) string
+}
+
+func (h *LatestHandler) SetPaymentReadiness(readiness PaymentReadiness) { h.readiness = readiness }
+func (h *LatestHandler) respondBalanceNotice(c *gin.Context, order *orderdomain.Order) {
+	status := "not_sent"
+	noticeID, _ := strconv.ParseUint(c.Query("notice_id"), 10, 32)
+	if h.readiness != nil {
+		status = h.readiness.ReadPaymentBalanceNotice(c.Request.Context(), order.ID, uint(noticeID))
+	}
+	response.Success(c, gin.H{"notification_status": status})
 }

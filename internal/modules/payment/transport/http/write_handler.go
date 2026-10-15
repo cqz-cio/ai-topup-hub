@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	procurementcontract "github.com/dujiao-next/internal/modules/procurement/contract"
 	"strconv"
 	"strings"
 
@@ -337,6 +338,12 @@ func retryAfterSeconds(err error) int64 {
 }
 
 func respondPaymentCreateError(c *gin.Context, err error) {
+	var block *procurementcontract.PaymentBlock
+	if errors.As(err, &block) {
+		response.ErrorWithData(c, response.CodeBadRequest, block.Error(), gin.H{"payment_block": block})
+		return
+	}
+
 	respondWithMappedError(c, err, paymentCreateErrorRules, response.CodeInternal, "error.payment_create_failed")
 }
 

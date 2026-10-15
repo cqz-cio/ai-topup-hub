@@ -283,3 +283,31 @@ func (s *Service) fillUpstreamRefundRecordsForProcurementOrders(orders []procure
 		s.fillUpstreamRefundRecordsForProcurementOrder(&orders[i])
 	}
 }
+
+// CustomerFulfillmentIssue returns only an allowlisted, non-sensitive reason.
+// Callers must authorize the local order before querying this internal ID.
+func (s *Service) CustomerFulfillmentIssue(localOrderID uint) (string, error) {
+	if s == nil || s.procRepo == nil || localOrderID == 0 {
+		return "", nil
+	}
+	order, err := s.procRepo.GetByLocalOrderID(localOrderID)
+	if err != nil {
+		return "", err
+	}
+	if order == nil || order.Status != "rejected" {
+		return "", nil
+	}
+	code := strings.ToLower(strings.TrimSpace(order.ErrorCode))
+	// Compatibility for failures recorded before error codes were persisted.
+	// Only recognize the exact messages emitted by our balance preflight.
+	if code == "" {
+		message := strings.TrimSpace(order.ErrorMessage)
+		if message == "supplier merchant balance is insufficient" || message == "insufficient_balance" || message == "余额不足" {
+			code = "insufficient_balance"
+		}
+	}
+	if code == "insufficient_balance" {
+		return "card_platform_insufficient_balance", nil
+	}
+	return "", nil
+}

@@ -88,7 +88,7 @@ func TestOrderAdminHTTPLivesInTransport(t *testing.T) {
 	assertFileDeclaresFunctions(t, filepath.Join(transportRoot, "create_handler.go"), []string{
 		"NewCreateHandler", "CreateOrder", "CreateGuestOrder", "CreateOrderAndPay", "CreateGuestOrderAndPay",
 	})
-	assertDirectoryGoFileBudget(t, transportRoot, 7)
+	assertDirectoryGoFileBudget(t, transportRoot, 8) // create-and-pay block response test
 
 	for _, legacy := range []string{
 		filepath.Join(repositoryRoot, "internal", "http", "handlers", "admin", "order_admin.go"),

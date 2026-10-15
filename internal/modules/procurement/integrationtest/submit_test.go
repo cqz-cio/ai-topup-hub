@@ -575,3 +575,58 @@ func TestPersistedSupplierCardRecoversAfterOrderReadFailureWithoutNewPurchase(t 
 		t.Fatal("delivery recovery sent another purchase")
 	}
 }
+
+func TestACGBalanceFailureReachesCustomerWithoutChangingPayment(t *testing.T) {
+	for _, code := range []string{"insufficient_balance", "product_out_of_stock", "unknown_outcome"} {
+		t.Run(code, func(t *testing.T) {
+			adapter := &acgProcurementAdapter{result: &upstream.CreateUpstreamOrderResp{ErrorCode: code, ErrorMessage: "supplier-private-detail"}}
+			db, svc, proc, order := acgProcurementFixture(t, constants.OrderStatusPaid, adapter)
+			if err := svc.SubmitToUpstream(proc.ID); err != nil {
+				t.Fatal(err)
+			}
+			var actual procurementdomain.Order
+			if err := db.First(&actual, proc.ID).Error; err != nil {
+				t.Fatal(err)
+			}
+			if actual.Status != "rejected" || actual.ErrorCode != code {
+				t.Fatalf("lost supplier failure code: %#v", actual)
+			}
+			issue, err := svc.CustomerFulfillmentIssue(order.ID)
+			if err != nil {
+				t.Fatal(err)
+			}
+			want := ""
+			if code == "insufficient_balance" {
+				want = "card_platform_insufficient_balance"
+			}
+			if issue != want {
+				t.Fatalf("customer issue = %q, want %q", issue, want)
+			}
+			if err := db.First(order, order.ID).Error; err != nil {
+				t.Fatal(err)
+			}
+			if order.Status != constants.OrderStatusPaid {
+				t.Fatalf("changed payment status: %s", order.Status)
+			}
+			if err := svc.SubmitToUpstream(proc.ID); err != nil {
+				t.Fatal(err)
+			}
+			if adapter.calls.Load() != 1 {
+				t.Fatal("viewing a failure must not repeat a purchase")
+			}
+			if err := svc.RetryManual(proc.ID); err != nil {
+				t.Fatal(err)
+			}
+			if err := db.First(&actual, proc.ID).Error; err != nil {
+				t.Fatal(err)
+			}
+			if actual.ErrorCode != "" {
+				t.Fatal("manual retry retained a stale error code")
+			}
+			issue, err = svc.CustomerFulfillmentIssue(order.ID)
+			if err != nil || issue != "" {
+				t.Fatalf("pending retry retained customer error: %q, %v", issue, err)
+			}
+		})
+	}
+}

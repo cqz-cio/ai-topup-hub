@@ -27,7 +27,7 @@ func TestProcurementUsesCompleteVerticalLayout(t *testing.T) {
 	if production != 0 || total != 0 {
 		t.Fatalf("procurement module root must remain structural only, got production=%d total=%d", production, total)
 	}
-	assertDirectoryGoFileBudget(t, applicationRoot, 9)
+	assertDirectoryGoFileBudget(t, applicationRoot, 11) // read-only prepayment funding check and focused tests
 	assertDirectoryGoFileBudget(t, contractRoot, 3)
 	assertDirectoryGoFileBudget(t, domainRoot, 1)
 	assertDirectoryGoFileBudget(t, storeRoot, 2)
@@ -59,9 +59,10 @@ func TestProcurementUsesCompleteVerticalLayout(t *testing.T) {
 	assertFileDeclaresFunctions(t, filepath.Join(transportRoot, "routes.go"), []string{"RegisterAdminRoutes"})
 
 	expected := map[string][]string{
-		"service.go":  {"NewService"},
-		"recovery.go": {"RecoverPaidOrders"},
-		"create.go":   {"CreateForOrder", "createProcurementForSingleOrder", "hasUpstreamItems"},
+		"service.go":           {"NewService"},
+		"payment_readiness.go": {"SetBalanceNotifier", "unavailableBalance", "fundingNeeds", "CheckPaymentBalance", "ReadPaymentBalanceNotice"},
+		"recovery.go":          {"RecoverPaidOrders"},
+		"create.go":            {"CreateForOrder", "createProcurementForSingleOrder", "hasUpstreamItems"},
 		"submit.go": {
 			"SubmitToUpstream", "markProcurementError", "rejectProcurement",
 			"rollbackLocalOrderOnProcurementFailure", "notifyProcurementFailure", "handleSubmitFailure",
@@ -74,7 +75,7 @@ func TestProcurementUsesCompleteVerticalLayout(t *testing.T) {
 			"applyProcurementLocalRefundedAmountFallback", "shouldSyncUpstreamRefundStatus",
 			"normalizeProcurementUpstreamStatus", "buildUpstreamRefundRecords", "parseUpstreamRefundRecordCreatedAt",
 			"fillUpstreamRefundRecordsForProcurementOrder", "isPositiveUpstreamRefundAmount",
-			"fillUpstreamRefundRecordsForProcurementOrders",
+			"fillUpstreamRefundRecordsForProcurementOrders", "CustomerFulfillmentIssue",
 		},
 		"manual.go": {"RetryManual", "CancelManual"},
 	}

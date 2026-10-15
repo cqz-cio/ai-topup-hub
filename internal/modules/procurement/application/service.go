@@ -26,6 +26,7 @@ type Service struct {
 	downstreamCallback procurementcontract.DownstreamCallbackEnqueuer
 	botNotifier        procurementcontract.BotFulfillmentNotifier
 	notifications      procurementcontract.FailureNotifier
+	balanceNotifier    procurementcontract.BalanceNotifier
 }
 
 var _ procurementcontract.UseCase = (*Service)(nil)

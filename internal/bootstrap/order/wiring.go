@@ -32,11 +32,13 @@ func New(c *container.Container) Handlers {
 			orderUserPaymentChannelAdapter{payments: c.PaymentService},
 			orderUserRefundRecordAdapter{records: c.OrderStore},
 			orderUserLookupAdapter{users: c.UserStore},
+			c.ProcurementOrderService,
 		),
 		Guest: ordertransport.NewGuestHandler(
 			orderGuestQueryAdapter{orders: c.OrderService},
 			orderUserPaymentChannelAdapter{payments: c.PaymentService},
 			orderUserRefundRecordAdapter{records: c.OrderStore},
+			c.ProcurementOrderService,
 		),
 		Preview: ordertransport.NewPreviewHandler(
 			orderPreviewAdapter{orders: c.OrderService},

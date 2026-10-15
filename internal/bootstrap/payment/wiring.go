@@ -23,12 +23,10 @@ func New(c *container.Container) Handlers {
 	userOrders := userOrderLookupAdapter{orders: c.OrderService}
 	alerter := exceptionAlerterAdapter{notifications: c.NotificationService}
 
+	latest := paymenttransport.NewLatestHandler(guestOrders, userOrders, pendingLookupAdapter{payments: c.PaymentStore})
+	latest.SetPaymentReadiness(c.PaymentService)
 	return Handlers{
-		Latest: paymenttransport.NewLatestHandler(
-			guestOrders,
-			userOrders,
-			pendingLookupAdapter{payments: c.PaymentStore},
-		),
+		Latest: latest,
 		Write: paymenttransport.NewWriteHandler(
 			guestOrders,
 			userOrders,

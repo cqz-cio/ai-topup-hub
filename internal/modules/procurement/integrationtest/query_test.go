@@ -436,3 +436,39 @@ func TestProcurement_GetByID_WithoutUpstreamRefundOmitsRefundFields(t *testing.T
 		t.Fatalf("expected upstream_order_id to be omitted from procurement payload, payload=%s", string(payload))
 	}
 }
+
+func TestCustomerFulfillmentIssueOnlyExposesConfirmedBalanceFailure(t *testing.T) {
+	db := setupProcurementTestDB(t)
+	svc := newTestProcurementService(db, nil)
+	cases := []struct {
+		status, code, message string
+		expected              bool
+	}{
+		{"rejected", "insufficient_balance", "private supplier response", true},
+		{"rejected", "", "supplier merchant balance is insufficient", true},
+		{"rejected", "", "余额不足", true},
+		{"rejected", "product_out_of_stock", "余额不足", false},
+		{"rejected", "", "network failed", false},
+		{"manual_review", "insufficient_balance", "", false},
+		{"pending", "insufficient_balance", "", false},
+		{"accepted", "insufficient_balance", "", false},
+		{"fulfilled", "insufficient_balance", "", false},
+		{"refunded", "insufficient_balance", "", false},
+	}
+	for i, tc := range cases {
+		proc := createTestProcurementOrder(t, db, 1, uint(100+i), "balance-case", tc.status)
+		if err := db.Model(proc).Updates(map[string]interface{}{"error_code": tc.code, "error_message": tc.message}).Error; err != nil {
+			t.Fatal(err)
+		}
+		issue, err := svc.CustomerFulfillmentIssue(proc.LocalOrderID)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if (issue == "card_platform_insufficient_balance") != tc.expected || (issue != "" && !tc.expected) {
+			t.Fatalf("case %d exposed wrong customer reason %q", i, issue)
+		}
+	}
+	if issue, err := svc.CustomerFulfillmentIssue(999999); err != nil || issue != "" {
+		t.Fatalf("missing purchase: %q %v", issue, err)
+	}
+}

@@ -12,7 +12,6 @@ import { amountToCents, centsToAmount } from '../utils/money'
 import { directUSDTPaymentInfo } from '../utils/paymentChannelPresentation'
 import { buildSkuDisplayTextFromSnapshot } from '../utils/sku'
 import {
-  getCachedPaymentRestorePolicy,
   getPaymentResetPolicy,
   isCustomerSurchargePayment,
   resolvePaymentInteractionLabelKey,
@@ -22,6 +21,8 @@ import {
   shouldAutoOpenPaymentLink,
   type PaymentResetReason,
 } from '../utils/paymentResumePolicy'
+import { rememberPaymentBlockFocus, showPaymentBlock } from './usePaymentBlock'
+import { readPaymentBlock } from '../utils/paymentBlock'
 import QRCode from 'qrcode'
 import { type PageAlert } from '../utils/alerts'
 import { loadGuestOrderAuth, saveGuestOrderAuth } from '../utils/guestOrderAuth'
@@ -706,11 +707,14 @@ export function usePayment() {
     }
   }
 
+  let readinessCheckedAt = Date.now()
+  let readinessChecking = false
   const startPolling = () => {
     if (pollTimer.value) return
     pollTimer.value = window.setInterval(async () => {
       await captureCurrentPayment({ silent: true })
       await debouncedLoadOrder({ silent: true })
+      if (paymentResult.value && document.visibilityState === 'visible' && Date.now() - readinessCheckedAt > 30000) await revalidatePayment()
     }, 5000)
   }
 
@@ -792,9 +796,49 @@ export function usePayment() {
     openedPayWindow.value = true
   }
 
-  const handleOpenPayLink = () => {
+  const handleOpenPayLink = async () => {
     error.value = ''
-    openPayLinkInCompatibleWindow()
+    if (await revalidatePayment()) openPayLinkInCompatibleWindow(true)
+  }
+
+  const presentPaymentBlock = (err: unknown) => {
+    if (!readPaymentBlock(err)) return false
+    paymentResult.value = null
+    cachedPayment.value = null
+    stopCountdown()
+    const orderNo = orderNoResolved.value
+    const guest = { order_no: orderNo, ...guestAuth.value }
+    const guestMode = isGuest.value
+    return showPaymentBlock(err, async (notice_id) => {
+      const response = guestMode ? await guestOrderAPI.balanceNotice({ ...guest, notice_id }) : await paymentAPI.balanceNotice({ order_no: orderNo, notice_id })
+      return response.data.data.notification_status
+    })
+  }
+
+  // A tab may remain open while supplier funds change. Recheck displayed
+  // instructions periodically and before opening an external cashier.
+  const revalidatePayment = async () => {
+    if (readinessChecking || !paymentResult.value || order.value?.status !== 'pending_payment') return false
+    readinessChecking = true
+    readinessCheckedAt = Date.now()
+    const checkedOrderNo = orderNoResolved.value
+    const paymentID = Number(paymentResult.value.payment_id || paymentResult.value.id)
+    try {
+      const response = isGuest.value
+        ? await guestOrderAPI.latestPayment({ order_no: checkedOrderNo, ...guestAuth.value })
+        : await paymentAPI.latest({ order_no: checkedOrderNo })
+      const current = response.data.data
+      if (checkedOrderNo !== orderNoResolved.value) return false
+      if (Number(current?.payment_id || current?.id) !== paymentID) throw new Error(t('payment.createFailed'))
+      return true
+    } catch (err: any) {
+      if (checkedOrderNo !== orderNoResolved.value) return false
+      paymentResult.value = null
+      cachedPayment.value = null
+      presentPaymentBlock(err)
+      error.value = err.message || t('payment.createFailed')
+      return false
+    } finally { readinessChecking = false }
   }
 
   const loadLatestPayment = async () => {
@@ -826,7 +870,8 @@ export function usePayment() {
           openPayLinkInCompatibleWindow(true)
         }
       }
-    } catch (err) {
+    } catch (err: any) {
+      if (presentPaymentBlock(err)) error.value = err.message
       // 没有历史支付记录时忽略错误
     }
   }
@@ -967,6 +1012,7 @@ export function usePayment() {
   }
 
   const performPayment = async () => {
+    rememberPaymentBlockFocus()
     error.value = ''
     if (!orderNoResolved.value) {
       error.value = t('payment.orderNotFound')
@@ -986,15 +1032,6 @@ export function usePayment() {
     }
     if (orderExpired.value) {
       error.value = t('payment.orderExpired')
-      return
-    }
-    if (requiresOnlineChannel.value && cachedPayment.value && selectedChannelId.value && selectedChannelId.value === cachedPayment.value.channel_id) {
-      paymentResult.value = cachedPayment.value
-      openedPayWindow.value = false
-      startPolling()
-      void captureCurrentPayment({ silent: true })
-      startCountdown()
-      window.scrollTo({ top: 0, behavior: 'smooth' })
       return
     }
     submitting.value = true
@@ -1055,6 +1092,7 @@ export function usePayment() {
         openPayLinkInCompatibleWindow(true)
       }
     } catch (err: any) {
+      presentPaymentBlock(err)
       error.value = err.message || t('payment.createFailed')
     } finally {
       submitting.value = false
@@ -1145,21 +1183,11 @@ export function usePayment() {
     orderPaymentChannelsLoaded.value = false
   }
 
-  const restoreCachedPayment = () => {
+  const restoreCachedPayment = async () => {
     if (!cachedPayment.value) return
-    const restorePolicy = getCachedPaymentRestorePolicy()
-    paymentResult.value = cachedPayment.value
     selectedChannelId.value = cachedPayment.value.channel_id || null
-    openedPayWindow.value = false
-    if (restorePolicy.startActivePaymentWatch) {
-      startPolling()
-      void captureCurrentPayment({ silent: true })
-      startCountdown()
-    }
-    if (restorePolicy.autoOpenPayLink && shouldAutoOpenPaymentLink(paymentResult.value)) {
-      openPayLinkInCompatibleWindow(true)
-    }
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    paymentResult.value = null
+    await performPayment()
   }
 
   const handleChangePaymentMethod = () => {
