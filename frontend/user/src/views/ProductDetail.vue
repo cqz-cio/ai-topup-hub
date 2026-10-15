@@ -257,6 +257,8 @@
                 </div>
               </div>
 
+              <ProductPurchaseGuide :slug="product.slug" />
+
               <!-- Quantity Selector -->
                 <div class="mb-8">
                   <h2 class="mb-3 text-sm font-bold uppercase tracking-widest text-muted-foreground">
@@ -266,6 +268,7 @@
                     <button
                       type="button"
                       class="w-10 h-10 flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors disabled:opacity-30"
+                      :aria-label="t('productDetail.decreaseQuantity')"
                       :disabled="quantity <= quantityEffectiveMin"
                       @click="quantity = Math.max(quantityEffectiveMin, quantity - 1)"
                     >
@@ -274,6 +277,7 @@
                     <input
                       type="text"
                       inputmode="numeric"
+                      :aria-label="t('productDetail.quantity')"
                       class="w-14 h-10 text-center text-sm font-semibold text-foreground border-x bg-transparent outline-none tabular-nums [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       :value="quantity"
                       @change="handleQuantityInput($event)"
@@ -282,6 +286,7 @@
                     <button
                       type="button"
                       class="w-10 h-10 flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors disabled:opacity-30"
+                      :aria-label="t('productDetail.increaseQuantity')"
                       :disabled="quantityEffectiveLimit !== null && quantity >= quantityEffectiveLimit"
                       @click="quantity = quantity + 1"
                     >
@@ -327,7 +332,7 @@
             <span class="w-1.5 h-8 bg-primary rounded-full"></span>
             {{ t('productDetail.details') }}
           </h2>
-          <div v-html="processHtmlForDisplay(getLocalizedText(product.content))"
+          <div v-html="processHtmlForDisplay(productRedemptionContent(getLocalizedText(product.content), product.slug))"
             class="prose prose-gray dark:prose-invert prose-lg max-w-none theme-prose">
           </div>
         </div>
@@ -414,6 +419,8 @@
 </template>
 
 <script setup lang="ts">
+import ProductPurchaseGuide from '../components/product/ProductPurchaseGuide.vue'
+import { productRedemptionContent } from '../utils/productPurchaseGuide'
 import ProductInvoiceNotice from '../components/commerce/ProductInvoiceNotice.vue'
 import CheckoutSteps from '../components/checkout/CheckoutSteps.vue'
 import { ref, onUnmounted } from 'vue'

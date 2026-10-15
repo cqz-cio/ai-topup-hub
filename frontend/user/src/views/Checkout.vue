@@ -183,7 +183,7 @@
               <span class="font-mono text-foreground">{{ formatPrice(previewOriginal, previewCurrency) }}</span>
             </div>
             <template v-if="!isResellerTenant">
-              <div class="flex items-center justify-between">
+              <div v-if="hasPositiveAmount(previewCoupon)" class="flex items-center justify-between">
                 <span>{{ t('checkout.previewCoupon') }}</span>
                 <span
                   class="font-mono"
@@ -192,7 +192,7 @@
                   {{ formatDiscountPrice(previewCoupon, previewCurrency) }}
                 </span>
               </div>
-              <div class="flex items-center justify-between">
+              <div v-if="hasPositiveAmount(previewPromotion)" class="flex items-center justify-between">
                 <span>{{ t('checkout.previewPromotion') }}</span>
                 <span
                   class="font-mono"
@@ -201,7 +201,7 @@
                   {{ formatDiscountPrice(previewPromotion, previewCurrency) }}
                 </span>
               </div>
-              <div class="flex items-center justify-between">
+              <div v-if="hasPositiveAmount(previewWholesale)" class="flex items-center justify-between">
                 <span>{{ t('checkout.previewWholesale') }}</span>
                 <span
                   class="font-mono"
@@ -285,14 +285,17 @@
                 {{ t('checkout.noPaymentChannels') }}
               </div>
             </template>
-            <div v-if="expectedFeeCents > 0" class="text-xs text-warning grid gap-1">
-              <div>{{ t('payment.feeAmountLabel') }}：{{ expectedFeeDisplay }}</div>
-              <div>{{ t('payment.payableAmountLabel') }}：{{ expectedPaymentTotalDisplay }}</div>
-            </div>
             <div v-if="!requiresOnlineChannel" class="text-xs text-success">
               {{ t('checkout.walletCoversAll') }}
             </div>
           </div>
+
+          <CheckoutPaymentSummary
+            :subtotal="previewTotal" :currency="previewCurrency"
+            :wallet-cents="expectedWalletPaidCents" :online-cents="expectedOnlinePayCents" :fee-cents="expectedFeeCents"
+            :channel="selectedPaymentChannel" :requires-channel="requiresOnlineChannel"
+            :updating="previewLoading || couponRefreshing || walletLoading"
+          />
 
           <Button
             size="lg"
@@ -309,6 +312,7 @@
 </template>
 
 <script setup lang="ts">
+import CheckoutPaymentSummary from '../components/checkout/CheckoutPaymentSummary.vue'
 import CommerceHeading from '../components/commerce/CommerceHeading.vue'
 import { useI18n } from 'vue-i18n'
 import { pageAlertVariant, pageAlertToneClass } from '../utils/alerts'
@@ -340,7 +344,7 @@ const {
   previewLoading, couponRefreshing, previewStatusText, hasPositiveAmount, formatDiscountPrice, checkoutAlert,
   showBalanceOption, walletLoading, walletBalance, useBalance, walletOnlyPayment,
   expectedWalletPaidDisplay, expectedOnlinePayDisplay, expectedOnlinePayCents,
-  expectedFeeCents, expectedFeeDisplay, expectedPaymentTotalDisplay,
+  expectedFeeCents, expectedWalletPaidCents, selectedPaymentChannel,
   requiresOnlineChannel, paymentChannels, selectedChannelId, isChannelDisabledForAmount, channelAmountLimitHint,
   handleSelectChannel, formatChannelFeeRate, formatChannelFixedFee,
   submitting, canSubmit, handleSubmit,

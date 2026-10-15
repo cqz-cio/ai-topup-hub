@@ -125,9 +125,9 @@
           <div class="flex items-center justify-between text-[13.5px]"><span class="text-muted-foreground">{{ t('cart.itemsCount') }}</span><span class="font-semibold text-foreground">{{ totalItems }}</span></div>
           <div class="flex items-center justify-between text-[13.5px]"><span class="text-muted-foreground">{{ t('checkout.previewOriginal') }}</span><span class="font-semibold text-foreground">{{ formatPrice(previewOriginal, previewCurrency) }}</span></div>
           <template v-if="!isResellerTenant">
-            <div class="flex items-center justify-between text-[13.5px]"><span class="text-muted-foreground">{{ t('checkout.previewCoupon') }}</span><span class="font-semibold" :class="hasPositiveAmount(previewCoupon) ? 'text-primary' : 'text-foreground'">{{ formatDiscountPrice(previewCoupon, previewCurrency) }}</span></div>
-            <div class="flex items-center justify-between text-[13.5px]"><span class="text-muted-foreground">{{ t('checkout.previewPromotion') }}</span><span class="font-semibold" :class="hasPositiveAmount(previewPromotion) ? 'text-primary' : 'text-foreground'">{{ formatDiscountPrice(previewPromotion, previewCurrency) }}</span></div>
-            <div class="flex items-center justify-between text-[13.5px]"><span class="text-muted-foreground">{{ t('checkout.previewWholesale') }}</span><span class="font-semibold" :class="hasPositiveAmount(previewWholesale) ? 'text-[color:var(--teal-strong)]' : 'text-foreground'">{{ formatDiscountPrice(previewWholesale, previewCurrency) }}</span></div>
+            <div v-if="hasPositiveAmount(previewCoupon)" class="flex items-center justify-between text-[13.5px]"><span class="text-muted-foreground">{{ t('checkout.previewCoupon') }}</span><span class="font-semibold" :class="hasPositiveAmount(previewCoupon) ? 'text-primary' : 'text-foreground'">{{ formatDiscountPrice(previewCoupon, previewCurrency) }}</span></div>
+            <div v-if="hasPositiveAmount(previewPromotion)" class="flex items-center justify-between text-[13.5px]"><span class="text-muted-foreground">{{ t('checkout.previewPromotion') }}</span><span class="font-semibold" :class="hasPositiveAmount(previewPromotion) ? 'text-primary' : 'text-foreground'">{{ formatDiscountPrice(previewPromotion, previewCurrency) }}</span></div>
+            <div v-if="hasPositiveAmount(previewWholesale)" class="flex items-center justify-between text-[13.5px]"><span class="text-muted-foreground">{{ t('checkout.previewWholesale') }}</span><span class="font-semibold" :class="hasPositiveAmount(previewWholesale) ? 'text-[color:var(--teal-strong)]' : 'text-foreground'">{{ formatDiscountPrice(previewWholesale, previewCurrency) }}</span></div>
           </template>
           <div v-if="Number(previewMemberDiscount) > 0" class="flex items-center justify-between text-[13.5px]"><span class="text-muted-foreground">{{ t('checkout.previewMemberDiscount') }}</span><span class="font-semibold text-[color:var(--gold-strong)]">-{{ formatPrice(previewMemberDiscount, previewCurrency) }}</span></div>
           <div class="mt-1 flex items-center justify-between border-t pt-3 font-bold text-foreground"><span>{{ t('checkout.previewTotal') }}</span><span class="text-[22px] text-primary tabular-nums">{{ formatPrice(previewTotal, previewCurrency) }}</span></div>
@@ -200,12 +200,15 @@
             </div>
             <div v-else-if="requiresOnlineChannel && paymentChannels.length === 0" class="text-[13px] text-muted-foreground">{{ t('checkout.noPaymentChannels') }}</div>
           </template>
-          <div v-if="expectedFeeCents > 0" class="text-xs text-warning grid gap-1">
-              <div>{{ t('payment.feeAmountLabel') }}：{{ expectedFeeDisplay }}</div>
-              <div>{{ t('payment.payableAmountLabel') }}：{{ expectedPaymentTotalDisplay }}</div>
-            </div>
-            <div v-if="!requiresOnlineChannel" class="text-[13px] text-[color:var(--teal-strong)]">{{ t('checkout.walletCoversAll') }}</div>
+          <div v-if="!requiresOnlineChannel" class="text-[13px] text-[color:var(--teal-strong)]">{{ t('checkout.walletCoversAll') }}</div>
         </div>
+
+        <CheckoutPaymentSummary
+          :subtotal="previewTotal" :currency="previewCurrency"
+          :wallet-cents="expectedWalletPaidCents" :online-cents="expectedOnlinePayCents" :fee-cents="expectedFeeCents"
+          :channel="selectedPaymentChannel" :requires-channel="requiresOnlineChannel"
+          :updating="previewLoading || couponRefreshing || walletLoading"
+        />
 
         <Button class="h-11 w-full rounded-full font-bold" :disabled="!canSubmit" @click="handleSubmit">
           {{ submitting ? t('checkout.submitting') : t('checkout.submitButton') }}
@@ -216,6 +219,7 @@
 </template>
 
 <script setup lang="ts">
+import CheckoutPaymentSummary from '../../components/checkout/CheckoutPaymentSummary.vue'
 import { useI18n } from 'vue-i18n'
 import { ChevronRight, Package, ShoppingCart } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
@@ -244,7 +248,7 @@ const {
   previewLoading, couponRefreshing, previewStatusText, hasPositiveAmount, formatDiscountPrice, checkoutAlert,
   showBalanceOption, walletLoading, walletBalance, useBalance, walletOnlyPayment,
   expectedWalletPaidDisplay, expectedOnlinePayDisplay, expectedOnlinePayCents,
-  expectedFeeCents, expectedFeeDisplay, expectedPaymentTotalDisplay,
+  expectedFeeCents, expectedWalletPaidCents, selectedPaymentChannel,
   requiresOnlineChannel, paymentChannels, selectedChannelId, isChannelDisabledForAmount, channelAmountLimitHint,
   handleSelectChannel, formatChannelFeeRate, formatChannelFixedFee,
   submitting, canSubmit, handleSubmit,

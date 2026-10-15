@@ -155,13 +155,15 @@
             <p v-if="requiresSKUSelection" class="mt-2 text-[13px] text-warning">{{ t('productDetail.skuRequired') }}</p>
           </div>
 
+          <ProductPurchaseGuide :slug="product.slug" />
+
           <!-- 数量 -->
           <div class="my-5">
             <div class="mb-2.5 text-[13px] font-bold uppercase tracking-[0.04em] text-muted-foreground">{{ t('productDetail.quantity') }}</div>
             <div class="inline-flex items-center overflow-hidden rounded-full border-2 border-hairline-strong">
-              <button type="button" class="grid h-11 w-[42px] place-items-center bg-card text-foreground disabled:opacity-35" :aria-label="t('productDetail.quantity')" :disabled="quantity <= quantityEffectiveMin" @click="quantity = Math.max(quantityEffectiveMin, quantity - 1)"><Minus class="h-[17px] w-[17px]" /></button>
+              <button type="button" class="grid h-11 w-[42px] place-items-center bg-card text-foreground disabled:opacity-35" :aria-label="t('productDetail.decreaseQuantity')" :disabled="quantity <= quantityEffectiveMin" @click="quantity = Math.max(quantityEffectiveMin, quantity - 1)"><Minus class="h-[17px] w-[17px]" /></button>
               <input inputmode="numeric" class="h-11 w-[50px] border-x bg-card text-center font-bold tabular-nums outline-none" :value="quantity" :aria-label="t('productDetail.quantity')" @change="handleQuantityInput($event)" @keydown.enter.prevent="($event.target as HTMLInputElement)?.blur()" />
-              <button type="button" class="grid h-11 w-[42px] place-items-center bg-card text-foreground disabled:opacity-35" :aria-label="t('productDetail.quantity')" :disabled="quantityEffectiveLimit !== null && quantity >= quantityEffectiveLimit" @click="quantity = quantity + 1"><Plus class="h-[17px] w-[17px]" /></button>
+              <button type="button" class="grid h-11 w-[42px] place-items-center bg-card text-foreground disabled:opacity-35" :aria-label="t('productDetail.increaseQuantity')" :disabled="quantityEffectiveLimit !== null && quantity >= quantityEffectiveLimit" @click="quantity = quantity + 1"><Plus class="h-[17px] w-[17px]" /></button>
             </div>
           </div>
 
@@ -194,7 +196,7 @@
         </div>
         <div class="prose max-w-none dark:prose-invert prose-a:text-primary prose-img:rounded-md">
           <p v-if="getLocalizedText(product.description)">{{ getLocalizedText(product.description) }}</p>
-          <div v-if="product.content" v-html="processHtmlForDisplay(getLocalizedText(product.content))"></div>
+          <div v-if="product.content" v-html="processHtmlForDisplay(productRedemptionContent(getLocalizedText(product.content), product.slug))"></div>
         </div>
       </section>
 
@@ -248,6 +250,8 @@
 </template>
 
 <script setup lang="ts">
+import ProductPurchaseGuide from '../../components/product/ProductPurchaseGuide.vue'
+import { productRedemptionContent } from '../../utils/productPurchaseGuide'
 import ProductInvoiceNotice from '../../components/commerce/ProductInvoiceNotice.vue'
 import { computed, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'

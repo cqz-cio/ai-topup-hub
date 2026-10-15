@@ -1250,7 +1250,7 @@ export function useCheckout() {
     walletOnlyPayment,
     expectedWalletPaidDisplay,
     expectedOnlinePayDisplay,
-    expectedFeeCents, expectedFeeDisplay, expectedPaymentTotalDisplay,
+    expectedFeeCents, expectedFeeDisplay, expectedPaymentTotalDisplay, expectedWalletPaidCents, selectedPaymentChannel,
     expectedOnlinePayCents,
     // payment channels
     requiresOnlineChannel,
