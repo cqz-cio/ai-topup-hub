@@ -7,7 +7,7 @@
 
 - `main` 是唯一正式源码主线，维护当前绿色 Go + Vue 商城，包含已确认的 π星卡社名称、派大星 Logo 和水母背景。用户端为 `frontend/user`，后台为 `frontend/admin`；这些品牌改动属于同一项目主版本。
 - 支付、订单、数据库和采购后端部署在腾讯云新加坡 `43.134.141.10`，账号 `ubuntu`，目录 `/srv/zhixiang`。两套前端部署在上海 `124.220.2.69` 的 `/srv/zhixiang-front`：商城 `https://www.qzweb.cloud/`，管理端 `https://124.220.2.69:18888/login`。上海通过受限 SSH 通道连接新加坡回环 API；维护说明见 `ops/tencent/README.md`。
-- 当前新加坡后端与上海商城、后台均为 `20261015-125607`，后端干净源码 `3728a67dd4359af2d39786eb2cde2e9a2acb7466`，商城静态 `8f2c17edcb4136cd31d99f2bd74e3870b9d9c75f`（追加历史统计标签）。关于页所有内容可在后台「系统设置 → 站点设置 → 关于我们 (About)」维护，见 `docs/about-page.md`。保留上游金额对账、开票提示、分销申请和结算、功能状态、U 提醒及兑换返回修复；TRON/BEP20/Plasma USDT 与 XorPay 微信继续支持订单及充值，微信手续费 1.6% 向上取分。保持 `-mode storefront`、`UPSTREAM_PURCHASE_ENABLED=true`；实际来源以 `ops/tencent/production-baseline.json` 为准，后续文档提交不代表程序重建。
+- 当前新加坡后端与上海商城、后台均为 `20261015-160016`，干净构建源码 `41af36617cd9f267520bd934299394ce74f416e6`。已启用商品付款前卡台余额检查，见 `docs/payment-balance-guard.md`。关于页所有内容可在后台「系统设置 → 站点设置 → 关于我们 (About)」维护，见 `docs/about-page.md`。保留上游金额对账、开票提示、分销申请和结算、功能状态、U 提醒及兑换返回修复；TRON/BEP20/Plasma USDT 与 XorPay 微信继续支持订单及充值，微信手续费 1.6% 向上取分。保持 `-mode storefront`、`UPSTREAM_PURCHASE_ENABLED=true`；实际来源以 `ops/tencent/production-baseline.json` 为准，后续文档提交不代表程序重建。
 - 本地使用 `scripts/local/start.ps1`、`status.ps1`、`stop.ps1`，运行库为 `work/codex-runtime/live/shop.db`，本地采购关闭。旧说明位于 `docs/history/`，不能按历史文档覆盖当前环境。
 - 用户要求固定执行“先本地验证，再推送和上线”：先在日常本地入口验证实际运行程序、配置、相关数据和页面，保存验证记录；通过后才推送已验证提交并部署所需改动。后端改动须重建并重启本地后端，支付渠道及商品说明不能只在临时测试入口核验。上线后对照核验本地与生产；环境私有配置、订单和实时库存独立维护，不互相覆盖。
 - 用户已授权真实客户确认付款后的自动采购发卡，仍禁止主动提交有效采购、转账，或将验收订单改为已付款进行扣款测试。测试使用模拟供应商和临时数据库。
@@ -226,4 +226,11 @@
 - 初始库存 9999；这六条映射的 `stock_limit=9999`，既有每 300 秒库存同步服务已实际运行并核验仍为 9999。上游不足、缺货、停供保留实际可售状态；连接 `auto_sync_price=false`，不能用商户报价覆盖售价。其他映射默认 0，保持原逻辑。兑换入口 `https://cdk.bar/`、客服微信 `Cqz0924ttxk`；需已有订阅与点数购买资格，不附带或延长 Plus/Pro 订阅。
 - 新加坡后端、上海商城发布 `20261015-150336`，干净构建源码 `7790885dfca33930f03c8b0ce16e0dd2706196b9`。上海后台原资源完整保留，来源仍为 `3728a67dd4359af2d39786eb2cde2e9a2acb7466`。本机 8080/5173/5174 重建验证；商城 116 项、后台 64 项、相关商品/订单/模拟采购/架构 Go 回归及两套类型构建通过。正式站 14 项浏览器检查覆盖 1920、390、320px 和三语，无脚本错误或页面横向溢出。
 - 切换时 65 组原业务表内容保留；定向事务仅插入六款商品、SKU 与供货映射。337 个商城文件、1165 个后台文件、5292 个保留旧文件、56 个 Nginx 文件及六张后台商品图核验通过；原售价与成本、会员/个人价、支付渠道和设置、私有配置、Redis 保持原状。未上传本机库或执行真实付款采购。
-- 两地程序备份为各自 `backups/before-codex-credits-20261015-150336`，商品库备份 `/srv/zhixiang/backups/before-codex-credits-catalog-20261015-150336/shop.db`；私有证据 `work/codex-runtime/codex-credits-20261015/verified-report.json`。D 盘另一个任务的未提交代码保持原样，主线在已附加的 `unified-wallet-earnings` 工作区合入并推送；日常本机当前由 `codex-credits` 工作区的 `scripts/local/` 管理，使用 D 盘原运行数据库、采购关闭。
+- 两地程序备份为各自 `backups/before-codex-credits-20261015-150336`，商品库备份 `/srv/zhixiang/backups/before-codex-credits-catalog-20261015-150336/shop.db`；私有证据 `work/codex-runtime/codex-credits-20261015/verified-report.json`。D 盘另一个任务的未提交代码保持原样，主线在已附加的 `unified-wallet-earnings` 工作区合入并推送；该次验收时日常本机由 `codex-credits` 工作区的 `scripts/local/` 管理，使用 D 盘原运行数据库、采购关闭。
+
+## 付款前卡台余额检查（2026-10-15）
+
+- 新加坡后端与上海两套前端发布 `20261015-160016`，干净构建源码 `41af36617cd9f267520bd934299394ce74f416e6`。商品付款统一检查卡台余额，覆盖 BEP20、Plasma、TRON U、微信和钱包全额/混合支付；余额不足或查询失败时停止生成、复用付款信息。余额不足明确提示联系客服，微信 `Cqz0924ttxk`；邮件按实际发送状态显示，不把排队成功当成已发送。独立钱包充值仍按原流程。见 `docs/payment-balance-guard.md`。
+- 日常本地已由 `D:\卡网\scripts\local` 重建并接管 `8080/5173/5174`，采购关闭。1641 项相关 Go 回归通过（含子测试，4 项外部依赖跳过），商城 121 项测试及两套类型构建通过。模拟上游/SMTP、四渠道接口、桌面与 390/320px、经典/Vault、三语、焦点、重复点击和旧付款隐藏验证通过；20 条父/子验收订单、2 条未付款支付单已清理，66 张原业务表及原设置恢复核对。
+- 正式 16 项公网、14 项服务器 HTTP、8 项浏览器只读检查通过，真实上游余额只读查询成功。切换时 65 组业务表保留；456 个发布文件、5492 个保留文件和 56 个 Nginx 文件核验通过。原价、成本、会员/个人价、四条收款渠道、邮件配置、点数商品及库存上限保持原状；Redis 未重启，采购队列与 300 秒库存 timer 保留。
+- 后端备份 `/srv/zhixiang/backups/before-prepayment-balance-20261015-160016`，上海备份 `/srv/zhixiang-front/backups/before-prepayment-balance-20261015-160016-preserve-images`。前端首次准备因六张点数 SVG 的换行字节差异在切换前停止，确认内容一致后完整保留线上原图再发布；未覆盖任何运行数据。证据 `work/codex-runtime/prepayment-balance/verified-report.json`。未上传本机库、创建正式验收订单、发送外部验收邮件或进行真实付款采购。余额检查不冻结上游资金，用户已保存的旧二维码/地址无法撤回。

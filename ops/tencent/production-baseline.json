@@ -1,24 +1,24 @@
 {
-  "checked_at": "2026-10-15T07:22:08.938968+00:00",
+  "checked_at": "2026-10-15T08:15:03.410616+00:00",
   "production_url": "https://www.qzweb.cloud/",
-  "documented_release_id": "20261015-150336",
-  "verified_release_id": "20261015-150336",
-  "previous_release_id": "20261015-125607",
-  "source_commit": "7790885dfca33930f03c8b0ce16e0dd2706196b9",
+  "documented_release_id": "20261015-160016",
+  "verified_release_id": "20261015-160016",
+  "previous_release_id": "20261015-150336",
+  "source_commit": "41af36617cd9f267520bd934299394ce74f416e6",
   "source_branch": "main",
   "server_git_commit_verified": true,
-  "source_tag": "production/codex-credits-20261015-150336",
+  "source_tag": "production/prepayment-balance-20261015-160016",
   "production": {
-    "release_path": "/srv/zhixiang/releases/20261015-150336",
-    "running_executable": "/srv/zhixiang/releases/20261015-150336/zhixiang-shop",
-    "binary_bytes": 90771618,
-    "binary_sha256": "87dd821ddadade53401063022493115acb747d8390a48de3ba718f2dc49986ce",
-    "running_binary_sha256": "87dd821ddadade53401063022493115acb747d8390a48de3ba718f2dc49986ce",
-    "manifest_binary_sha256": "87dd821ddadade53401063022493115acb747d8390a48de3ba718f2dc49986ce",
+    "release_path": "/srv/zhixiang/releases/20261015-160016",
+    "running_executable": "/srv/zhixiang/releases/20261015-160016/zhixiang-shop",
+    "binary_bytes": 90816674,
+    "binary_sha256": "1e3814d14000c898863ec6e2afac43a364901cdd17d2cda9da7b1e0537385ded",
+    "running_binary_sha256": "1e3814d14000c898863ec6e2afac43a364901cdd17d2cda9da7b1e0537385ded",
+    "manifest_binary_sha256": "1e3814d14000c898863ec6e2afac43a364901cdd17d2cda9da7b1e0537385ded",
     "build_info": {
       "go_version": "go1.26.5",
-      "source_commit": "7790885dfca33930f03c8b0ce16e0dd2706196b9",
-      "vcs_revision": "7790885dfca33930f03c8b0ce16e0dd2706196b9",
+      "source_commit": "41af36617cd9f267520bd934299394ce74f416e6",
+      "vcs_revision": "41af36617cd9f267520bd934299394ce74f416e6",
       "vcs_modified": false,
       "git_metadata_pinned": true,
       "tags": "release,fullstack"
@@ -32,15 +32,15 @@
       "stock_sync_timer": "active"
     },
     "redis_preserved_without_restart": true,
-    "backup": "/srv/zhixiang/backups/before-codex-credits-20261015-150336",
+    "backup": "/srv/zhixiang/backups/before-prepayment-balance-20261015-160016",
     "database_backup_quick_check": "ok",
-    "report_path": "/srv/zhixiang/shared/reports/codex-credits-release-20261015-150336.json",
+    "report_path": "/srv/zhixiang/shared/reports/prepayment-balance-release-20261015-160016.json",
     "configuration_unchanged": true,
     "nginx_configuration_preserved": true,
     "source_dirty": false,
     "private_configuration_unchanged": true,
     "configuration_changes": [],
-    "source_commit": "7790885dfca33930f03c8b0ce16e0dd2706196b9",
+    "source_commit": "41af36617cd9f267520bd934299394ce74f416e6",
     "configuration_except_tron_preserved": true,
     "settings_changes": []
   },
@@ -188,16 +188,16 @@
     "https://124.220.2.69:18888/login"
   ],
   "verified_asset_sha256": {
-    "user/index.html": "8654631500117b0229d024ee3d849a1fe810de820ba05c192ae77a3fc05b654c",
-    "admin/index.html": "11f531b4ef094ab677b8e9165d8fc07e51437c35abf16a8da4bac8a131ea2128"
+    "user/index.html": "ffc13cc502257736bc594c8c30e45ccd56c7d40abe9db1378445a7c78f900423",
+    "admin/index.html": "6a2f61b83b4c3cef16ad51d466975d6b770d5668f0c9c1afd8203c5a79f18ccc"
   },
   "public_verification": {
-    "checked_at": "2026-10-15T07:22:08.938968+00:00",
-    "public_http_checks_passed": 26,
-    "browser_checks_passed": 14,
+    "checked_at": "2026-10-15T08:15:03.410616+00:00",
+    "public_http_checks_passed": 16,
+    "browser_checks_passed": 8,
     "browser_error_count": 0,
     "production_order_submitted": false,
-    "verification_directory": "work/codex-runtime/codex-credits-20261015/"
+    "verification_directory": "work/codex-runtime/prepayment-balance/"
   },
   "catalog": {
     "prices_unchanged": true,
@@ -229,8 +229,9 @@
     "Payment channels and assets were verified through public GET requests; no production test order was created.",
     "Finance GET permissions were verified in the live policy API; existing payment compliance acknowledgement remains required for monitoring access.",
     "Shanghai HTTPS domain and IP management frontends were verified without placing a production order; official Alipay contracting and payment notification acceptance remain incomplete.",
-    "XorPay local daily channel setup and payment UI flow were not performed at user request because local compliance acknowledgement was declined. Production configuration and checkout fee preview were verified; real payment/notification/funding acceptance remains incomplete.",
-    "Unified-wallet local review was verified with service/HTTP/component fixtures; the daily local financial declaration remained unsigned. Broader Go suite has existing Windows logger lock, CGO-disabled SQLite fixture and Linux-permission selfupdate test limitations; affected wallet/order/payment/affiliate/reseller checks passed. No real payout or procurement was performed."
+    "XorPay prepayment rejection was verified in the daily local runtime with a mock-only channel, supplier and SMTP. No local financial declaration was signed and no real XorPay charge, callback or supplier purchase was submitted.",
+    "Unified-wallet local review was verified with service/HTTP/component fixtures; the daily local financial declaration remained unsigned. Broader Go suite has existing Windows logger lock, CGO-disabled SQLite fixture and Linux-permission selfupdate test limitations; affected wallet/order/payment/affiliate/reseller checks passed. No real payout or procurement was performed.",
+    "The upstream check is a balance snapshot, not a reservation. Previously copied payment instructions cannot be revoked; local mock scenarios do not constitute real-funds acceptance."
   ],
   "procurement_verification": {
     "mock_end_to_end_scenarios_passed": 12,
@@ -300,17 +301,17 @@
     "content_preserved_by_release": "20261012-153531"
   },
   "source_identity_verification": {
-    "source_commit": "3728a67dd4359af2d39786eb2cde2e9a2acb7466",
+    "source_commit": "41af36617cd9f267520bd934299394ce74f416e6",
     "source_branch": "main",
     "source_dirty": false,
     "binary_build_info_commit_matches": true,
     "running_binary_sha256_matches": true,
-    "frontend_files_sha256_verified": 450,
-    "frontend_verification_scope": "User build includes three legacy-statistic label corrections; full manifest, retained assets and runtime APIs verified."
+    "frontend_files_sha256_verified": 456,
+    "frontend_verification_scope": "Full manifest and retained assets verified; six catalog SVG line ending variants preserved byte-for-byte."
   },
   "previous_release": {
-    "release": "20261014-155607",
-    "source_commit": "6331d68873009d366994b5a1f1012368eee939c2",
+    "release": "20261015-150336",
+    "source_commit": "7790885dfca33930f03c8b0ce16e0dd2706196b9",
     "retained": true
   },
   "domain_verification": {
@@ -360,12 +361,12 @@
   "previous_build_verification_at": "2026-10-12T08:19:31.766441+00:00",
   "management_url": "https://124.220.2.69:18888/login",
   "frontend_gateway": {
-    "checked_at": "2026-10-15T07:22:08.938968+00:00",
+    "checked_at": "2026-10-15T08:15:03.410616+00:00",
     "frontend_host": "124.220.2.69",
     "backend_host": "43.134.141.10",
-    "frontend_release": "20261015-150336",
-    "source_commit": "7790885dfca33930f03c8b0ce16e0dd2706196b9",
-    "static_files_verified": 337,
+    "frontend_release": "20261015-160016",
+    "source_commit": "41af36617cd9f267520bd934299394ce74f416e6",
+    "static_files_verified": 456,
     "storefront_url": "https://www.qzweb.cloud/",
     "management_url": "https://124.220.2.69:18888/login",
     "www_dns_record": "www A 124.220.2.69",
@@ -381,8 +382,8 @@
     "certificate_renewal_verified": true,
     "certificate_timer": "qzweb-certificates.timer",
     "certificate_renewal_report": "/srv/zhixiang-front/shared/work/renew-final-20261012-1644/status.json",
-    "report_path": "/srv/zhixiang-front/shared/work/codex-credits-20261015-150336.json",
-    "backend_report_path": "/srv/zhixiang/shared/reports/codex-credits-release-20261015-150336.json",
+    "report_path": "/srv/zhixiang-front/shared/work/prepayment-balance-20261015-160016.json",
+    "backend_report_path": "/srv/zhixiang/shared/reports/prepayment-balance-release-20261015-160016.json",
     "formal_alipay_enabled": false,
     "database_uploaded": false,
     "legacy_singapore_http_entries_retained": true,
@@ -395,10 +396,10 @@
       "browser_current_frontend_confirmed": true,
       "report_path": "/srv/zhixiang-front/shared/work/entry-cache-report.json"
     },
-    "previous_frontend_release": "20261015-125607",
-    "storefront_source_commit": "7790885dfca33930f03c8b0ce16e0dd2706196b9",
-    "admin_source_commit": "3728a67dd4359af2d39786eb2cde2e9a2acb7466",
-    "backup": "/srv/zhixiang-front/backups/before-codex-credits-20261015-150336",
+    "previous_frontend_release": "20261015-150336",
+    "storefront_source_commit": "41af36617cd9f267520bd934299394ce74f416e6",
+    "admin_source_commit": "41af36617cd9f267520bd934299394ce74f416e6",
+    "backup": "/srv/zhixiang-front/backups/before-prepayment-balance-20261015-160016-preserve-images",
     "frontend_only_update": false,
     "previous_hashed_assets_retained": true,
     "verified_services": {
@@ -406,16 +407,16 @@
       "zhixiang-api-tunnel": "active",
       "qzweb-certificates.timer": "active"
     },
-    "release_scope": "Approved B Codex credits storefront and six products; existing admin resources preserved",
-    "admin_files_verified": 1165,
-    "storefront_files_verified": 337,
+    "release_scope": "Pre-payment supplier balance guard and truthful mail status dialog; existing catalog, images and Nginx preserved.",
+    "admin_files_verified": 121,
+    "storefront_files_verified": 335,
     "backend_program_preserved": false,
     "backend_setting_changes": [],
-    "frontend_build_source_commit": "7790885dfca33930f03c8b0ce16e0dd2706196b9",
+    "frontend_build_source_commit": "41af36617cd9f267520bd934299394ce74f416e6",
     "frontend_source_identical_to_backend": true,
     "admin_base": "/",
     "base_repair_backup": "/srv/zhixiang-front/backups/before-xorpay-admin-base-20261013-173020",
-    "frontend_source_difference": "Storefront and backend built from the same clean commit; Shanghai admin retains its previous verified resources."
+    "frontend_source_difference": "Both frontends and backend built from the same clean source; six catalog SVG files retain previous production line endings after content equality verification."
   },
   "alipay": {
     "code_and_official_sandbox_query_verified": true,
@@ -2136,5 +2137,68 @@
     "primary_workspace_other_task_changes_preserved": true,
     "evidence": "work/codex-runtime/codex-credits-20261015/",
     "first_catalog_attempt": "Stopped before database access because the maintenance parent directory was absent; corrected directory creation and published once."
+  },
+  "payment_balance_guard": {
+    "passed": true,
+    "checked_at": "2026-10-15T08:15:03.410616+00:00",
+    "release": "20261015-160016",
+    "source_commit": "41af36617cd9f267520bd934299394ce74f416e6",
+    "source_dirty": false,
+    "source_tag": "production/prepayment-balance-20261015-160016",
+    "backend_backup": "/srv/zhixiang/backups/before-prepayment-balance-20261015-160016",
+    "frontend_backup": "/srv/zhixiang-front/backups/before-prepayment-balance-20261015-160016-preserve-images",
+    "business_tables_preserved_at_switch": 65,
+    "snapshot_ignored_columns": {
+      "site_connections": [
+        "last_ping_at",
+        "updated_at"
+      ],
+      "chain_payment_cursors": [
+        "next_block",
+        "previous_hash",
+        "updated_at"
+      ]
+    },
+    "local_go_tests_passed": 1641,
+    "local_go_tests_skipped": 4,
+    "user_tests_passed": 121,
+    "frontend_typechecks_and_builds_passed": true,
+    "daily_runtime": "D:/卡网",
+    "daily_runtime_purchase_enabled": false,
+    "production_public_checks": 16,
+    "frontend_files_verified": 456,
+    "retained_frontend_files": 5492,
+    "nginx_files_verified": 56,
+    "preserved_catalog_assets": [
+      "user/catalog-products/qzweb/codex-1000-ph-20261015.svg",
+      "user/catalog-products/qzweb/codex-2500-ph-20261015.svg",
+      "user/catalog-products/qzweb/codex-250-ph-20261015.svg",
+      "user/catalog-products/qzweb/codex-500-ph-20261015.svg",
+      "user/catalog-products/qzweb/codex-25000-ph-20261015.svg",
+      "user/catalog-products/qzweb/codex-5000-ph-20261015.svg"
+    ],
+    "redis_restarted": false,
+    "local_database_uploaded": false,
+    "production_test_order_created": false,
+    "external_acceptance_email_sent": false,
+    "real_payment_or_purchase_performed": false,
+    "channels": [
+      "bscusdt",
+      "plasmausdt",
+      "tronusdt",
+      "xorpay"
+    ],
+    "scope": "Product orders including wallet-funded purchases; independent wallet top-ups unchanged.",
+    "mail_states": [
+      "pending",
+      "sent",
+      "partial",
+      "failed",
+      "not_sent"
+    ],
+    "actual_upstream_balance_query_verified": true,
+    "production_browser_checks": 8,
+    "private_evidence": "work/codex-runtime/prepayment-balance/verified-report.json",
+    "document": "docs/payment-balance-guard.md"
   }
 }
