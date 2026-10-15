@@ -1,47 +1,47 @@
-# USDT payment option design QA
+# Payment page — selected option 1
 
-Final result: passed
+final result: passed
 
-## Scope and evidence
+Source visual truth: `C:/Users/CHENZIQIAO/.codex/generated_images/01a13fa7-82bc-7060-b397-39400c050a58/exec-122567e3-2d6d-43c4-92ad-5d0092a4a124.png` (the first displayed option).
 
-- Approved visual: `C:/Users/admin/.codex/generated_images/01a12dfc-f389-7e01-8497-b57c04c63499/exec-7f8e66db-729f-479d-b0df-36b73188e630.png` (approved in this task on 2026-10-12).
-- Implementation: checkout and the payment page's shared `PaymentChannelSelector` / `PaymentChannelOption` components. The existing vault-specific checkout is outside this change.
-- Desktop screenshot: `work/codex-runtime/payment-ui-qa/desktop-plasma.jpg`, 1920 × 1080 CSS viewport.
-- Mobile screenshots: `work/codex-runtime/payment-ui-qa/mobile-plasma.jpg` and `mobile-dark.jpg`, 390 × 844 CSS viewport.
-- Payment selector fixture: `work/codex-runtime/payment-ui-qa/payment-selector-fees-disabled.jpg`.
-- Comparison state: Plasma selected, BEP20 unselected, guest details empty, submit disabled. The original site's validation alert and complete calculation notice remain; these were simplified in the mock and are intentionally preserved.
-- The generated source is an enlarged sidebar crop, not a browser viewport. Compare its card proportions against the 370.66 CSS-pixel desktop sidebar; do not compare outer image whitespace. Its payment rows normalize to roughly 65–70 CSS pixels, against the implementation's measured 70 pixels. Browser screenshots use native density; tool display may scale images to fit.
-- Actual image sizes: source 1058 × 1487 px; desktop capture 1910 × 1074 px from 1920 × 1080 CSS; mobile capture 380 × 822 px from 390 × 844 CSS. The browser capture service slightly scales these outputs (approximately 0.995 and 0.974); layout measurements above use DOM CSS pixels, and visual comparison accounts for that scale.
+Implementation: clean Git archive of `3f9c00349214520784e548ece780163a1b5a6a9e`, built with Vue type checking and Vite. Browser-rendered evidence is in the private outer-workspace directory `deployment/local/payment-redesign-release/`.
 
-## Visual comparison
+## Comparison evidence
 
-Source, desktop implementation and focused mobile payment region were opened together in one comparison input. Both real payment cards use a single column, equal padding, the same USDT asset, left-aligned two-line labels and a right-hand radio control. Desktop rows measure 320.66 × 70 CSS pixels; mobile rows measure 294 × 70. The 10-pixel gap and 10-pixel corners follow the approved layout.
+- Reference and `final-desktop.png` were opened together in the same comparison input at original resolution. Both are 1487 × 1058 pixels; implementation viewport is 1487 × 1058 CSS pixels at DPR 1. No density scaling or device frame was used.
+- State: light theme, classic storefront, pending BEP20 payment, amount `12.345678 USDT`, order total `82.10 CNY`, deliberately non-payable demonstration QR/address. Countdown and expiry are dynamic.
+- The full-resolution pair makes the amount, network, address, copy controls and guide text readable; separate cropped comparison was unnecessary. The real existing header/footer are preserved rather than reproducing the concept's abbreviated navigation/footer.
+- Responsive evidence: `final-classic-1920.png`, `final-classic-768.png`, `final-classic-390.png`, `final-classic-320.png` and the corresponding four `final-vault-*` images. Measurements are in `final-checks.json`.
 
-- **Typography:** existing Inter / PingFang SC / Microsoft YaHei stack; 15px semibold titles and 12px secondary network labels, no wrapping or clipping at the checked widths.
-- **Spacing:** matching icon/text baselines, 36px icons, 14px internal gaps, 70px minimum row height. Rows expand when fees or limits require extra lines. Existing page layout and submit spacing retained.
-- **Colors:** existing deep green accent and soft selected background; dark theme follows existing tokens. Selected state is communicated with a native checked radio as well as color.
-- **Assets:** real vector USDT mark from Cryptocurrency Icons; only its circle color is adapted. No raster placeholders or recreated currency glyphs. Source and license documented beside the asset.
-- **Copy:** BEP20 / BNB Smart Chain and Plasma / Plasma 网络 match the approved meaning. Plasma subtitle is translated in all three supported locales. Existing fee, amount-limit and required-field messages remain.
-- **Expected native-control difference:** radio artwork follows the browser's native rendering rather than the mock's decorative circle; keyboard and assistive-technology behavior is preserved.
+## Findings and fixes
 
-## Interactions and comparison history
+1. **P2, mobile first-screen QR visibility, fixed.** Initial `mobile-v1.png` placed the QR bottom at y=802 on a 390 × 844 viewport, behind the fixed bottom navigation. Reduced heading spacing and used a 192 px mobile QR. Final QR bottom is y=742; both tutorials and the complete QR are visible above the navigation at 390 px. On a 320 × 740 screen the QR requires scrolling, with no clipping or horizontal overflow.
+2. **P2, desktop detail density, fixed.** Initial `desktop-v1.png` repeated fee-help and order details across additional rows. Moved the full fee explanation into the visible warning's disclosure and aligned expiry with the amount-breakdown disclosure. `desktop-v2.png` and the final clean-build comparison retain the flat two-column composition.
+3. **Expected production differences.** The amount uses the existing authoritative currency formatter (`82.10 CNY` rather than a decorative yuan symbol). Real full order numbers, expiry, discounts, wallet deduction and fee breakdown remain available. These require slightly more metadata height than the concept. Vault uses its established theme tokens. No P0/P1/P2 issues remain.
 
-1. Mouse selection and ArrowUp / ArrowDown switched between the two channels; exactly one radio remained checked. Empty customer details kept checkout submission disabled.
-2. Initial mobile keyboard check showed duplicate focus outlines. Removed the inner native outline while retaining a visible focus outline around the entire card. Re-captured and compared the corrected mobile view.
-3. Initial dark-mode check showed a light native unselected radio. Applied `color-scheme: dark` to the radio in dark theme. Re-captured dark mode; selected and unselected controls are now distinct and legible.
-4. Mounted the actual payment-page selector in a temporary isolated UI fixture. Selection emitted channel ID 2, the percentage + fixed fee remained visible, and an amount-limited channel remained disabled with its reason. Fixture bootstrap initially omitted Vite's runtime environment; after using the actual project module and Vite client, it rendered successfully. The temporary source entry was removed after verification.
-5. Checked browser diagnostics: no new application errors in the final checkout view; earlier HMR and fixture-bootstrap diagnostics were confined to development setup and resolved.
+## Fidelity surfaces
 
-No actionable P0/P1/P2 findings remain. No purchases or payments were submitted. Local fixture channels were display-only and order/payment creation was blocked; no production configuration or local database was changed for visual testing.
+- **Typography:** existing Inter / PingFang SC / Microsoft YaHei stack; 52 px desktop heading, 54 px amount, 27 px QR heading, compact readable labels. Amount digits retain all precision and use tabular numerals. English, Simplified and Traditional Chinese were inspected, including 320 px English wrapping.
+- **Spacing/layout:** 1224 px content region, 76 px tutorial band, approximately 490/656 px desktop columns separated by a hairline and generous gutter. Mobile reorders to tutorials → amount/network → QR → address/actions. No horizontal overflow at 1920, 1487, 768, 390 or 320 px.
+- **Color/tokens:** existing warm page background, dark green accent, white QR/address controls, amber fee warning, and existing dark-theme tokens. Focus indicators and contrast remain visible in dark English capture `dark-english-320.png`.
+- **Image quality:** supplied brand logo reused; QR rendered from real payment data by the existing QR renderer, never a generated picture. Lucide icons match the reference's line icons. No custom decorative imagery or placeholder assets were added to production.
+- **Copy/content:** both tutorials remain prominent and open in new tabs. Exact receipt amount and separately paid withdrawal fees remain visible; expanded help preserves the full prior warning. Payment amounts, network and address are sourced from the existing composable. No financial claims or new payment logic were introduced.
 
-## Validation
+## Functional evidence
 
-- Existing user frontend tests: 94 passed.
-- Existing admin frontend tests: 16 passed.
-- User frontend TypeScript check passed after preserving the still-used vault-specific component.
-- Desktop, mobile, light/dark, mouse/keyboard, fee display and disabled-state checks completed.
-- User/admin TypeScript checks, both Vite builds and the Linux fullstack compilation completed. The Windows PowerShell wrapper could not write its final hash manifest; the existing binary was independently checked for its ELF format, source commit, clean VCS state and embedded new component, then hashed and packaged without rebuilding.
-- Deployed release `20261012-134141`, source `b478c600dc6cda365289d4bbb76501987d16a377`. The production checkout was opened in the browser, both networks were selected in turn, and no console errors were reported. Final screenshot: `work/codex-runtime/payment-ui-qa/production-checkout.jpg`.
-- Deployment backup and database consistency check passed. Production configuration, role policies, prices and Redis were preserved; public storefront, admin entry and health endpoints returned 200. No production order, payment or purchase was submitted by this task.
+- Working source passed 138 frontend tests and a typechecked production build. The clean archive passed its own typechecked production build; utility CSS and actual rendered layouts were verified.
+- Actual clipboard checks returned `12.345678` exactly and the complete displayed address, including a long-address fixture. Copy feedback, keyboard focus, fee/amount disclosures, refresh, payment-method selection and reload were checked.
+- Both tutorial links opened their correct articles in new tabs and retained the payment tab. Daily local `5173` payment entry and published guide article were inspected against the actual local backend.
+- Classic and Vault were checked for BEP20, TRON, Plasma/USDT0 and WeChat. WeChat fixture displayed order `82.10 CNY`, fee `1.32 CNY`, payable `83.42 CNY`, without U tutorials. Two-decimal U amounts, wallet deductions, QR fallback and automatic redirect fixtures were checked.
+- Expired and canceled orders do not show a payable QR. The isolated fixture server rejects all POSTs, so creation/recreation of payments was deliberately not exercised; the existing payment composable is unchanged.
+- Final clean-build browser console: no errors. No live order, transfer, purchase, paid-state mutation or backend restart was used for UI validation.
 
-Final result: passed
+## Implementation checklist
+
+- [x] Reuse one presentation component in both payment templates.
+- [x] Preserve existing payment state, polling, expiry and copy operations.
+- [x] Keep tutorials above the QR and in the first screen.
+- [x] Compare final clean-build screenshots with the selected source.
+- [x] Verify responsive layouts, non-U payment and important alternate states.
+
+Follow-up polish: minor font rasterization and existing shared navigation/footer differences are accepted; no blocking visual work remains.

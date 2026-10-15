@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-15T23:03:36.946946+08:00",
+  "checked_at": "2026-10-15T15:09:50.565166+00:00",
   "production_url": "https://www.qzweb.cloud/",
   "documented_release_id": "20261015-160016",
   "verified_release_id": "20261015-160016",
@@ -361,12 +361,12 @@
   "previous_build_verification_at": "2026-10-12T08:19:31.766441+00:00",
   "management_url": "https://124.220.2.69:18888/login",
   "frontend_gateway": {
-    "checked_at": "2026-10-15T23:03:36.946946+08:00",
+    "checked_at": "2026-10-15T15:09:50.565166+00:00",
     "frontend_host": "124.220.2.69",
     "backend_host": "43.134.141.10",
-    "frontend_release": "20261015-225604",
-    "source_commit": "96d9605680f514d8c45480e75a2b50227e746083",
-    "static_files_verified": 254,
+    "frontend_release": "20261015-230538",
+    "source_commit": "3f9c00349214520784e548ece780163a1b5a6a9e",
+    "static_files_verified": 258,
     "storefront_url": "https://www.qzweb.cloud/",
     "management_url": "https://124.220.2.69:18888/login",
     "www_dns_record": "www A 124.220.2.69",
@@ -382,7 +382,7 @@
     "certificate_renewal_verified": true,
     "certificate_timer": "qzweb-certificates.timer",
     "certificate_renewal_report": "/srv/zhixiang-front/shared/work/renew-final-20261012-1644/status.json",
-    "report_path": "/srv/zhixiang-front/shared/work/checkout-search-release-20261015-225604.json",
+    "report_path": "/srv/zhixiang-front/shared/work/payment-redesign-release-20261015-230538.json",
     "backend_report_path": "/srv/zhixiang/shared/reports/prepayment-balance-release-20261015-160016.json",
     "formal_alipay_enabled": false,
     "database_uploaded": false,
@@ -396,10 +396,10 @@
       "browser_current_frontend_confirmed": true,
       "report_path": "/srv/zhixiang-front/shared/work/entry-cache-report.json"
     },
-    "previous_frontend_release": "20261015-222442",
-    "storefront_source_commit": "96d9605680f514d8c45480e75a2b50227e746083",
+    "previous_frontend_release": "20261015-225604",
+    "storefront_source_commit": "3f9c00349214520784e548ece780163a1b5a6a9e",
     "admin_source_commit": "41af36617cd9f267520bd934299394ce74f416e6",
-    "backup": "/srv/zhixiang-front/backups/before-checkout-search-20261015-225604",
+    "backup": "/srv/zhixiang-front/backups/before-payment-redesign-release-20261015-230538",
     "frontend_only_update": true,
     "previous_hashed_assets_retained": true,
     "verified_services": {
@@ -407,20 +407,20 @@
       "zhixiang-api-tunnel": "active",
       "qzweb-certificates.timer": "active"
     },
-    "release_scope": "Preserve buy-now selection after refresh; unify product search aliases and correct matched totals across pages.",
+    "release_scope": "Selected payment design: flat desktop columns, responsive mobile flow and tutorials above the QR; existing payment logic preserved.",
     "admin_files_verified": 121,
-    "storefront_files_verified": 254,
+    "storefront_files_verified": 258,
     "backend_program_preserved": true,
     "backend_setting_changes": [],
-    "frontend_build_source_commit": "96d9605680f514d8c45480e75a2b50227e746083",
+    "frontend_build_source_commit": "3f9c00349214520784e548ece780163a1b5a6a9e",
     "frontend_source_identical_to_backend": false,
     "admin_base": "/",
     "base_repair_backup": "/srv/zhixiang-front/backups/before-xorpay-admin-base-20261013-173020",
-    "frontend_source_difference": "Storefront from clean 96d9605 archive; admin and backend retain 41af366. No production data or payment configuration changes.",
+    "frontend_source_difference": "Storefront from clean 3f9c003 archive; admin and backend retain 41af366. No production data or payment configuration changes.",
     "source_dirty": false,
-    "source_tag": "production/checkout-search-20261015-225604",
+    "source_tag": "production/payment-redesign-20261015-230538",
     "static_verification_scope": "New storefront release files; existing admin and retained resources independently compared before and after.",
-    "retained_files_verified": 6472
+    "retained_files_verified": 6663
   },
   "alipay": {
     "code_and_official_sandbox_query_verified": true,
@@ -2336,5 +2336,43 @@
     "real_payment_or_purchase_submitted": false,
     "evidence": "deployment/local/checkout-search/ (outer workspace, private)",
     "screenshots": "work/codex-runtime/checkout-search-qa/ (original source checkout, ignored)"
+  },
+  "payment_page_redesign": {
+    "passed": true,
+    "release": "20261015-230538",
+    "previous_release": "20261015-225604",
+    "backup": "/srv/zhixiang-front/backups/before-payment-redesign-release-20261015-230538",
+    "source_commit": "3f9c00349214520784e548ece780163a1b5a6a9e",
+    "source_dirty": false,
+    "frontend_only": true,
+    "preserved_files": 6663,
+    "admin_preserved": true,
+    "nginx_files_preserved": 56,
+    "retired_assets_verified": 6,
+    "public_assets_verified": 10,
+    "database_uploaded": false,
+    "backend_restarted": false,
+    "real_payment_or_purchase_submitted": false,
+    "backend_backup": "/srv/zhixiang/backups/before-frontend-payment-redesign-release-20261015-230538",
+    "archive_sha256": "fd221720ea8dbabe7daa8fe3378a805963f74a1a42ef1dc32d74cbe99fb48da6",
+    "source_tag": "production/payment-redesign-20261015-230538",
+    "checked_at": "2026-10-15T15:09:50.565166+00:00",
+    "tests_passed": 138,
+    "responsive_widths": [
+      1920,
+      1487,
+      768,
+      390,
+      320
+    ],
+    "templates": [
+      "classic",
+      "vault"
+    ],
+    "design_qa": "design-qa.md",
+    "evidence": "deployment/local/payment-redesign-release/ (outer workspace, private)",
+    "live_browser_verified": true,
+    "backend_verification_passed": true,
+    "pending_payment_screenshots": "Local read-only fixtures; no live test order"
   }
 }
