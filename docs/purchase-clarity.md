@@ -29,3 +29,5 @@
 前台自动测试覆盖商品分组、Gemini 排除规则、链接修复，以及 130 元商品微信 1.6% 手续费为 2.08 元、合计 132.08 元，部分 / 全额余额抵扣及渠道切换。日常本地 `5173` / `8080` 验证实际页面，覆盖 1920、390、320px、两套模板和三种语言。
 
 本次仅发布商城静态资源；不变更正式支付配置、商品价格、后台或后端程序，不创建付款 / 采购验收记录。私有截图及核验数据保存于 `work/codex-runtime/purchase-clarity-qa/` 和项目根目录 `deployment/local/purchase-clarity/`。
+
+构建验证必须检查产物的实际样式，不能仅凭构建退出码判断布局可用。`src/style.css` 显式登记 Tailwind 源码目录，避免位于 Git 忽略目录下的干净发布快照被自动扫描跳过。生成包需包含 `.grid`、`.p-4` 和响应式导航等工具类，并在浏览器核对计算样式。规则依据 [Tailwind 源码扫描文档](https://tailwindcss.com/docs/detecting-classes-in-source-files#explicitly-registering-sources)。

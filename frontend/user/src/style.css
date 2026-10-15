@@ -3,6 +3,12 @@
 @import "./styles/commerce.css";
 @plugin "@tailwindcss/typography";
 
+/* Release archives may live under an ignored build directory. Register the
+   actual UI sources explicitly so Git ignore rules cannot omit utilities. */
+@source "./";
+@source "../index.html";
+@source "../../shared";
+
 @custom-variant dark (&:where(.dark, .dark *));
 
 /*
