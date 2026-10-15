@@ -1,6 +1,7 @@
 package application
 
 import (
+	mappingdomain "github.com/dujiao-next/internal/modules/catalog/mapping/domain"
 	"testing"
 	"time"
 
@@ -48,5 +49,25 @@ func TestComputeFullSyncIntervalWithoutSettings(t *testing.T) {
 	got := svc.computeFullSyncInterval()
 	if got != fullSyncIntervalFloor {
 		t.Fatalf("expected floor when settings=nil, got %v", got)
+	}
+}
+
+func TestLocalStockLimitPreservesAvailability(t *testing.T) {
+	for _, tc := range []struct {
+		name                  string
+		limit, upstream, want int
+	}{
+		{"credits", 9999, 10000, 9999},
+		{"shortage", 9999, 3, 3},
+		{"sold out", 9999, 0, 0},
+		{"unlimited supplier", 9999, -1, 9999},
+		{"existing mapping", 0, 10000, 10000},
+		{"existing unlimited", 0, -1, -1},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			if got := (mappingdomain.Mapping{StockLimit: tc.limit}).LimitStock(tc.upstream); got != tc.want {
+				t.Fatalf("sellable stock = %d, want %d", got, tc.want)
+			}
+		})
 	}
 }

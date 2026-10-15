@@ -33,15 +33,16 @@
       </div>
 
       <!-- 商品区 -->
-      <section>
+      <section class="min-w-0">
         <div v-if="loading" class="grid gap-4 grid-cols-[repeat(auto-fill,minmax(228px,1fr))]">
           <div v-for="i in 9" :key="i" class="h-[280px] rounded-lg border bg-card"></div>
         </div>
 
         <template v-else-if="products.length">
+          <CodexCreditsSection :products="products" />
           <div class="grid gap-4 grid-cols-[repeat(auto-fill,minmax(228px,1fr))]">
             <VaultProductCard
-              v-for="(product, idx) in products"
+              v-for="(product, idx) in otherProducts"
               :key="product.id"
               :product="product"
               :index="idx"
@@ -92,6 +93,8 @@ import type { PublicCategory } from '../../utils/category'
 import VaultProductCard from './components/VaultProductCard.vue'
 import VaultCategorySidebar from './components/VaultCategorySidebar.vue'
 import ProductQuickBuy from '../../components/ProductQuickBuy.vue'
+import CodexCreditsSection from '../../components/commerce/CodexCreditsSection.vue'
+import { splitCodexCredits } from '../../utils/codexCredits'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -121,6 +124,8 @@ const {
   initialize,
   cleanup,
 } = useProductList({ pageSize: 12, homeRouteName: 'products' })
+
+const otherProducts = computed(() => splitCodexCredits(products.value).other)
 
 const catName = (cat: PublicCategory) => getLocalizedText(cat.name) || cat.slug || ''
 

@@ -42,9 +42,10 @@
                   <span class="min-w-0 truncate text-sm font-bold text-foreground">{{ group.categoryName }}</span>
                   <span class="flex-none text-xs text-muted-foreground">({{ group.products.length }})</span>
                 </div>
+                <CodexCreditsSection :products="group.products" />
                 <div class="space-y-2">
                   <VaultProductListItem
-                    v-for="(product, idx) in group.products"
+                    v-for="(product, idx) in splitCodexCredits(group.products).other"
                     :key="product.id"
                     :product="product"
                     :index="idx"
@@ -112,15 +113,18 @@
         <div v-if="productsLoading" class="grid gap-4 grid-cols-[repeat(auto-fill,minmax(228px,1fr))]">
           <div v-for="i in 10" :key="i" class="h-[280px] rounded-lg border bg-card"></div>
         </div>
-        <div v-else-if="products.length" class="grid gap-4 grid-cols-[repeat(auto-fill,minmax(228px,1fr))]">
+        <template v-else-if="products.length">
+        <CodexCreditsSection :products="products" />
+        <div class="grid gap-4 grid-cols-[repeat(auto-fill,minmax(228px,1fr))]">
           <VaultProductCard
-            v-for="(product, idx) in products"
+            v-for="(product, idx) in splitCodexCredits(products).other"
             :key="product.id"
             :product="product"
             :index="idx"
             @quick-buy="openQuickBuy"
           />
         </div>
+        </template>
         <div v-else class="flex flex-col items-center gap-3 rounded-lg border border-dashed py-14 text-center text-muted-foreground">
           <PackageOpen class="h-12 w-12 opacity-60" />
           <p>{{ t('home.featured.empty') }}</p>
@@ -166,6 +170,8 @@
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
+import CodexCreditsSection from '../../components/commerce/CodexCreditsSection.vue'
+import { splitCodexCredits } from '../../utils/codexCredits'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { ChevronLeft, ChevronRight, PackageOpen, Search, SearchX, Tag, X } from 'lucide-vue-next'

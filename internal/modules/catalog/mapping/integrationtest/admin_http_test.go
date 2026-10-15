@@ -27,9 +27,11 @@ import (
 	mappinghttp "github.com/dujiao-next/internal/modules/catalog/mapping/transport/http"
 	productgormstore "github.com/dujiao-next/internal/modules/catalog/product/store/gormstore"
 	"github.com/dujiao-next/internal/shared/jsonmap"
+	"github.com/dujiao-next/internal/shared/money"
 	"github.com/dujiao-next/internal/upstream"
 	"github.com/gin-gonic/gin"
 	"github.com/glebarez/sqlite"
+	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
 )
 
@@ -284,5 +286,72 @@ func TestBatchImportUpstreamProductsRestoresSoftDeletedAutoCategory(t *testing.T
 	}
 	if restored.NameJSON["zh-CN"] != "流媒体" {
 		t.Fatalf("expected restored category name to be refreshed, got %+v", restored.NameJSON)
+	}
+}
+
+func TestStockSyncHonorsLocalLimitWithoutChangingRetailPrice(t *testing.T) {
+	stock, active := 10000, true
+	h, db, connectionID, cleanup := setupAdminHandlerTest(t, func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/api/v1/upstream/products/73" || r.Method != http.MethodGet {
+			t.Errorf("unexpected upstream request: %s %s", r.Method, r.URL.Path)
+			http.NotFound(w, r)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_ = json.NewEncoder(w).Encode(map[string]any{"ok": true, "product": upstream.UpstreamProduct{
+			ID: 73, IsActive: active, PriceAmount: "66.00", FulfillmentType: constants.FulfillmentTypeAuto,
+			SKUs: []upstream.UpstreamSKU{{ID: 73, IsActive: active, PriceAmount: "66.00", StockQuantity: stock}},
+		}})
+	})
+	defer cleanup()
+	retail := money.FromDecimal(decimal.New(8088, -2))
+	product := productdomain.Product{Slug: "qzweb-73", CategoryID: 1, TitleJSON: jsonmap.JSON{"zh-CN": "Codex 250"}, PriceAmount: retail, IsActive: true, IsMapped: true, FulfillmentType: constants.FulfillmentTypeUpstream}
+	if err := db.Create(&product).Error; err != nil {
+		t.Fatal(err)
+	}
+	sku := productdomain.ProductSKU{ProductID: product.ID, SKUCode: "credits", PriceAmount: retail, IsActive: true}
+	if err := db.Create(&sku).Error; err != nil {
+		t.Fatal(err)
+	}
+	mapping := mappingdomain.Mapping{ConnectionID: connectionID, LocalProductID: product.ID, UpstreamProductID: 73, StockLimit: 9999, IsActive: true}
+	if err := db.Create(&mapping).Error; err != nil {
+		t.Fatal(err)
+	}
+	skuMapping := mappingdomain.SKUMapping{ProductMappingID: mapping.ID, LocalSKUID: sku.ID, UpstreamSKUID: 73, UpstreamStock: 1, UpstreamIsActive: true}
+	if err := db.Create(&skuMapping).Error; err != nil {
+		t.Fatal(err)
+	}
+
+	for _, tc := range []struct {
+		stock, want int
+		active      bool
+	}{{10000, 9999, true}, {3, 3, true}, {0, 0, true}, {10000, 0, false}} {
+		stock, active = tc.stock, tc.active
+		w := httptest.NewRecorder()
+		c, _ := gin.CreateTestContext(w)
+		c.Params = gin.Params{{Key: "id", Value: fmt.Sprint(mapping.ID)}}
+		c.Request = httptest.NewRequest(http.MethodPost, "/sync", nil)
+		h.SyncProductMapping(c)
+		if w.Code != http.StatusOK {
+			t.Fatalf("sync: %d %s", w.Code, w.Body.String())
+		}
+		if err := db.First(&skuMapping, skuMapping.ID).Error; err != nil {
+			t.Fatal(err)
+		}
+		if skuMapping.UpstreamStock != tc.want {
+			t.Fatalf("stock = %d; want %d", skuMapping.UpstreamStock, tc.want)
+		}
+		if err := db.First(&product, product.ID).Error; err != nil {
+			t.Fatal(err)
+		}
+		if err := db.First(&sku, sku.ID).Error; err != nil {
+			t.Fatal(err)
+		}
+		if product.PriceAmount.String() != "80.88" || sku.PriceAmount.String() != "80.88" {
+			t.Fatal("sync changed retail price")
+		}
+		if !active && (product.IsActive || skuMapping.UpstreamIsActive) {
+			t.Fatal("unavailable supplier item remained available")
+		}
 	}
 }

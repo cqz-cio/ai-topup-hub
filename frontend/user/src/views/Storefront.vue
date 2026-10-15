@@ -57,8 +57,10 @@
             <PackageOpen :size="36" aria-hidden="true" /><h3>{{ t(products.length ? 'shopUi.noMatch' : 'shopUi.noProducts') }}</h3><p>{{ t(products.length ? 'shopUi.noMatchHint' : 'shopUi.noProductsHint') }}</p>
             <button v-if="products.length" type="button" class="store-button" @click="clearFilters">{{ t('shopUi.allProducts') }}</button>
           </div>
-          <div v-else class="product-grid">
-            <article v-for="product in visibleProducts" :key="product.slug" class="catalog-card">
+          <template v-else>
+          <CodexCreditsSection :products="visibleProducts" />
+          <div class="product-grid">
+            <article v-for="product in otherVisibleProducts" :key="product.slug" class="catalog-card">
               <RouterLink :to="productPath(product)" class="product-image-link" :aria-label="t('shopUi.detailsLabel', { name: productTitle(product) })">
                 <img v-if="productImage(product) && !failedImages.has(product.slug)" :src="productImage(product)" :alt="productTitle(product)" loading="lazy" decoding="async" @error="failedImages.add(product.slug)" />
                 <div v-else class="product-image-placeholder"><PackageOpen :size="36" aria-hidden="true" /></div>
@@ -85,6 +87,7 @@
               </div>
             </article>
           </div>
+          </template>
           <p class="catalog-note">{{ t('shopUi.catalogHint') }}</p>
         </div>
       </div>
@@ -112,6 +115,8 @@ import { useAppStore } from '../stores/app'
 import { useUserAuthStore } from '../stores/userAuth'
 import { usePageSeo } from '../composables/usePageSeo'
 import AnnouncementModal from '../components/AnnouncementModal.vue'
+import CodexCreditsSection from '../components/commerce/CodexCreditsSection.vue'
+import { splitCodexCredits } from '../utils/codexCredits'
 import { useAnnouncement, type HomeAnnouncement } from '../composables/useAnnouncement'
 import { getImageUrl } from '../utils/image'
 import { storefrontDisplayDetails } from '../data/storefrontCatalog'
@@ -188,6 +193,7 @@ const visibleProducts = computed(() =>
     )
   }),
 )
+const otherVisibleProducts = computed(() => splitCodexCredits(visibleProducts.value).other)
 const productPath = (product: StorefrontProduct) =>
   `/products/${encodeURIComponent(product.slug)}`
 const canPurchase = (product: StorefrontProduct) =>

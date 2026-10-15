@@ -134,7 +134,7 @@ func (s *Service) SyncProduct(mappingID uint) error {
 		skuMappings[i].UpstreamPrice = money.FromDecimal(upPrice.Round(2))
 		skuMappings[i].UpstreamIsActive = upSKU.IsActive
 		skuMappings[i].StockSyncedAt = &now
-		skuMappings[i].UpstreamStock = upSKU.StockQuantity
+		skuMappings[i].UpstreamStock = mapping.LimitStock(upSKU.StockQuantity)
 		_ = s.skuMappings.Update(&skuMappings[i])
 
 		// 同步本地 SKU 字段
@@ -179,7 +179,7 @@ func (s *Service) SyncProduct(mappingID uint) error {
 			UpstreamSKUID:    upSKU.ID,
 			UpstreamPrice:    money.FromDecimal(skuPrice.Round(2)),
 			UpstreamIsActive: upSKU.IsActive,
-			UpstreamStock:    upSKU.StockQuantity,
+			UpstreamStock:    mapping.LimitStock(upSKU.StockQuantity),
 			StockSyncedAt:    &now,
 		}
 		_ = s.skuMappings.Create(newMapping)
@@ -674,14 +674,14 @@ func (s *Service) syncProductFromData(mapping *mappingdomain.Mapping, conn *site
 			// 仅同步库存状态，跳过价格更新
 			skuMappings[i].UpstreamIsActive = upSKU.IsActive
 			skuMappings[i].StockSyncedAt = now
-			skuMappings[i].UpstreamStock = upSKU.StockQuantity
+			skuMappings[i].UpstreamStock = mapping.LimitStock(upSKU.StockQuantity)
 			_ = s.skuMappings.Update(&skuMappings[i])
 			continue
 		}
 		skuMappings[i].UpstreamPrice = money.FromDecimal(upPrice.Round(2))
 		skuMappings[i].UpstreamIsActive = upSKU.IsActive
 		skuMappings[i].StockSyncedAt = now
-		skuMappings[i].UpstreamStock = upSKU.StockQuantity
+		skuMappings[i].UpstreamStock = mapping.LimitStock(upSKU.StockQuantity)
 		_ = s.skuMappings.Update(&skuMappings[i])
 
 		localSKU, _ := s.skus.GetByID(skuMappings[i].LocalSKUID)
@@ -730,7 +730,7 @@ func (s *Service) syncProductFromData(mapping *mappingdomain.Mapping, conn *site
 			UpstreamSKUID:    upSKU.ID,
 			UpstreamPrice:    money.FromDecimal(skuPrice.Round(2)),
 			UpstreamIsActive: upSKU.IsActive,
-			UpstreamStock:    upSKU.StockQuantity,
+			UpstreamStock:    mapping.LimitStock(upSKU.StockQuantity),
 			StockSyncedAt:    now,
 		}
 		_ = s.skuMappings.Create(newSKUMapping)

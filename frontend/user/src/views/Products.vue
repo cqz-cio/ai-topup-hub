@@ -2,7 +2,7 @@
   <div class="commerce-page products-page min-h-screen bg-background text-foreground pt-20 pb-16">
     <div class="container mx-auto px-4">
       <!-- Page Header -->
-      <CommerceHeading :title="t('shopUi.allProducts')" :description="t('shopUi.catalogHint')" />
+      <CommerceHeading :title="seoCategoryName || t('shopUi.allProducts')" :description="t('shopUi.catalogHint')" />
 
       <div class="flex flex-col lg:flex-row gap-8">
         <CategorySidebar
@@ -20,7 +20,7 @@
         />
 
         <!-- Main Content - Products Grid -->
-        <main class="flex-1">
+        <main class="flex-1 min-w-0">
           <!-- Loading Skeleton -->
           <div v-if="loading" class="grid grid-cols-2 gap-3 md:gap-4 md:grid-cols-3 lg:grid-cols-4">
             <div v-for="i in 6" :key="i"
@@ -45,9 +45,10 @@
 
           <!-- Products Grid -->
           <div v-else-if="products.length > 0">
+            <CodexCreditsSection :products="products" />
             <div class="grid grid-cols-2 gap-3 md:gap-4 md:grid-cols-3 lg:grid-cols-4">
               <ProductCard
-                v-for="(product, idx) in products"
+                v-for="(product, idx) in otherProducts"
                 :key="product.id"
                 :product="product"
                 :index="idx"
@@ -102,6 +103,8 @@ import { useProductList } from '../composables/useProductList'
 import { usePageSeo } from '../composables/usePageSeo'
 import { useLocalized } from '../composables/useProduct'
 import ProductCard from '../components/ProductCard.vue'
+import CodexCreditsSection from '../components/commerce/CodexCreditsSection.vue'
+import { splitCodexCredits } from '../utils/codexCredits'
 import ProductQuickBuy from '../components/ProductQuickBuy.vue'
 import CategorySidebar from '../components/CategorySidebar.vue'
 import PaginationNav from '../components/PaginationNav.vue'
@@ -129,6 +132,8 @@ const {
   initialize,
   cleanup,
 } = useProductList({ pageSize: 12, homeRouteName: 'products' })
+
+const otherProducts = computed(() => splitCodexCredits(products.value).other)
 
 // ==================== SEO ====================
 const route = useRoute()

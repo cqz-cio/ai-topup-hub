@@ -24,6 +24,7 @@ type Mapping struct {
 	UpstreamFulfillmentType string     `gorm:"type:varchar(20);not null;default:'manual'" json:"upstream_fulfillment_type"` // 上游原始交付类型（auto/manual）
 	UpstreamStatus          string     `gorm:"type:varchar(16);not null;default:'active';index" json:"upstream_status"`     // 上游商品状态：active/inactive/deleted
 	IsActive                bool       `gorm:"not null;default:true" json:"is_active"`
+	StockLimit              int        `gorm:"not null;default:0" json:"stock_limit"` // 每个 SKU 的本地库存上限；0 保留上游数量
 	LastSyncedAt            *time.Time `json:"last_synced_at,omitempty"`
 	CreatedAt               time.Time  `gorm:"index" json:"created_at"`
 	UpdatedAt               time.Time  `gorm:"index" json:"updated_at"`
@@ -36,6 +37,15 @@ type Mapping struct {
 // TableName 指定表名
 func (Mapping) TableName() string {
 	return "product_mappings"
+}
+
+// LimitStock caps the local sellable quantity without hiding supplier shortages.
+// Unlimited upstream stock is also subject to an explicitly configured local cap.
+func (m Mapping) LimitStock(quantity int) int {
+	if m.StockLimit > 0 && (quantity < 0 || quantity > m.StockLimit) {
+		return m.StockLimit
+	}
+	return quantity
 }
 
 // SKUMapping SKU 映射表

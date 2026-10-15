@@ -81,6 +81,48 @@
       "source_id": 59,
       "upstream_product_id": 59,
       "shared_code": "F15D72A753EBA070"
+    },
+    {
+      "slug": "qzweb-73",
+      "source_id": 73,
+      "upstream_product_id": 73,
+      "shared_code": "ellaix_zovocard_credit250_ph_20261015",
+      "stock_limit": 9999
+    },
+    {
+      "slug": "qzweb-74",
+      "source_id": 74,
+      "upstream_product_id": 74,
+      "shared_code": "ellaix_zovocard_credit500_ph_20261015",
+      "stock_limit": 9999
+    },
+    {
+      "slug": "qzweb-75",
+      "source_id": 75,
+      "upstream_product_id": 75,
+      "shared_code": "ellaix_zovocard_credit1000_ph_20261015",
+      "stock_limit": 9999
+    },
+    {
+      "slug": "qzweb-76",
+      "source_id": 76,
+      "upstream_product_id": 76,
+      "shared_code": "ellaix_zovocard_credit2500_ph_20261015",
+      "stock_limit": 9999
+    },
+    {
+      "slug": "qzweb-77",
+      "source_id": 77,
+      "upstream_product_id": 77,
+      "shared_code": "ellaix_zovocard_credit5000_ph_20261015",
+      "stock_limit": 9999
+    },
+    {
+      "slug": "qzweb-78",
+      "source_id": 78,
+      "upstream_product_id": 78,
+      "shared_code": "ellaix_zovocard_credit25000_ph_20261015",
+      "stock_limit": 9999
     }
   ],
   "unmatched": [

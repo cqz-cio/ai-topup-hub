@@ -131,9 +131,10 @@
                     <span class="text-xs text-muted-foreground">({{ group.products.length }})</span>
                   </div>
                   <!-- Products in this category -->
+                  <CodexCreditsSection :products="group.products" />
                   <div class="space-y-2">
                     <ProductListItem
-                      v-for="(product, idx) in group.products"
+                      v-for="(product, idx) in splitCodexCredits(group.products).other"
                       :key="product.id"
                       :product="product"
                       :index="idx"
@@ -276,9 +277,11 @@
           </router-link>
         </div>
 
-        <div v-if="products.length > 0" class="grid grid-cols-2 gap-3 md:gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+        <template v-if="products.length > 0">
+        <CodexCreditsSection :products="products" />
+        <div class="grid grid-cols-2 gap-3 md:gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           <ProductCard
-            v-for="(product, idx) in products"
+            v-for="(product, idx) in splitCodexCredits(products).other"
             :key="product.id"
             :product="product"
             :index="idx"
@@ -287,6 +290,7 @@
             @quick-buy="openQuickBuy"
           />
         </div>
+        </template>
         <div v-else class="rounded-2xl border border-dashed py-16 text-center text-muted-foreground theme-slide-up">
           <PackageOpen class="mx-auto h-16 w-16 mb-4 text-muted-foreground opacity-50" :stroke-width="1.5" />
           {{ t('home.featured.empty') }}
@@ -361,6 +365,8 @@ import { useProductListGroups } from '../composables/useProductListGroups'
 import { usePageSeo } from '../composables/usePageSeo'
 import { useAppStore } from '../stores/app'
 import ProductCard from '../components/ProductCard.vue'
+import CodexCreditsSection from '../components/commerce/CodexCreditsSection.vue'
+import { splitCodexCredits } from '../utils/codexCredits'
 import ProductListItem from '../components/ProductListItem.vue'
 import ProductQuickBuy from '../components/ProductQuickBuy.vue'
 import CategorySidebar from '../components/CategorySidebar.vue'
