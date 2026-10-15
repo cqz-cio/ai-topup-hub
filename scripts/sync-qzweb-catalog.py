@@ -95,7 +95,12 @@ def main():
     backup = args.backup_dir / f"catalog-before-qzweb-{stamp}.json"
     backup.write_text(json.dumps({"products": products, "categories": categories}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
+    # The source snapshot keeps its historic channel labels. Storefront groups
+    # follow the user's current taxonomy, so later imports cannot undo it.
+    category_layout = json.loads((repo / "docs/catalog/catalog-categories.json").read_text(encoding="utf-8"))
+    category_definitions = {group["key"]: group for group in category_layout["categories"]}
     category_map = {}
+    saved_categories = {}
     for index, group in enumerate(groups):
         category_body = {
             "slug": f"qzweb-category-{group['id']}",
@@ -104,9 +109,17 @@ def main():
             "parent_id": 0,
             "sort_order": 1000 - index,
         }
+        override_key = category_layout["source_category_overrides"].get(str(group["id"]))
+        if override_key:
+            definition = category_definitions[override_key]
+            category_body.update({key: definition[key] for key in ("slug", "name", "icon", "sort_order")})
+        if category_body["slug"] in saved_categories:
+            category_map[group["id"]] = saved_categories[category_body["slug"]]
+            continue
         prior_category = next((row for row in categories if row["slug"] == category_body["slug"]), None)
         category = api("PUT", f"/admin/categories/{prior_category['id']}", category_body)["data"] if prior_category else api("POST", "/admin/categories", category_body)["data"]
         category_map[group["id"]] = category
+        saved_categories[category_body["slug"]] = category
     source_categories = {item["id"]: group for group in groups for item in group["products"]}
     existing = {row["slug"]: row for row in products}
     updated = []

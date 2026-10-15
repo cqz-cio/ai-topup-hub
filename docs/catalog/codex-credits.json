@@ -2,7 +2,7 @@
   "merchant_id": "1039",
   "base_url": "https://ellaixshop.com",
   "protocol": "acg-faka",
-  "category_slug": "qzweb-category-4",
+  "category_slug": "codex",
   "auto_sync_price": false,
   "stock_limit": 9999,
   "ui_variant": "B",

@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "categories": [
+    {
+      "key": "gpt",
+      "slug": "qzweb-category-4",
+      "name": {"zh-CN": "GPT", "zh-TW": "GPT", "en-US": "GPT"},
+      "icon": "/catalog-products/qzweb/categories/4-7b19d7bf095bddd5574df0d27301dda5.png",
+      "sort_order": 1000,
+      "source_category_slugs": ["qzweb-category-4", "qzweb-category-9", "qzweb-category-10"],
+      "product_slugs": ["qzweb-4", "qzweb-5", "qzweb-6", "qzweb-55", "qzweb-7", "qzweb-56", "qzweb-63", "qzweb-58", "qzweb-64", "qzweb-57", "qzweb-59", "qzweb-62"]
+    },
+    {
+      "key": "codex",
+      "slug": "codex",
+      "name": {"zh-CN": "Codex", "zh-TW": "Codex", "en-US": "Codex"},
+      "icon": "/catalog-products/qzweb/categories/4-7b19d7bf095bddd5574df0d27301dda5.png",
+      "sort_order": 999,
+      "source_category_slugs": ["qzweb-category-4"],
+      "product_slugs": ["qzweb-73", "qzweb-74", "qzweb-75", "qzweb-76", "qzweb-77", "qzweb-78"]
+    },
+    {
+      "key": "gemini",
+      "slug": "qzweb-category-7",
+      "name": {"zh-CN": "Gemini", "zh-TW": "Gemini", "en-US": "Gemini"},
+      "icon": "/catalog-products/qzweb/categories/7-aa16fb0f3bb8f6933985a4c8df660946.jpg",
+      "sort_order": 998,
+      "source_category_slugs": ["qzweb-category-7"],
+      "product_slugs": ["qzweb-50", "qzweb-51", "qzweb-52", "qzweb-53"]
+    }
+  ],
+  "retire_category_slugs": ["qzweb-category-9", "qzweb-category-10"],
+  "source_category_overrides": {"4": "gpt", "9": "gpt", "10": "gpt", "7": "gemini"}
+}

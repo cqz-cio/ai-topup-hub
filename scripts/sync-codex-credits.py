@@ -51,7 +51,7 @@ def apply_catalog(db_path, catalog, backup, local_snapshot=False, publish=False)
     db.execute('PRAGMA foreign_keys=ON')
     assert 'stock_limit' in {r[1] for r in db.execute('PRAGMA table_info(product_mappings)')}, 'Rebuild and start the updated backend before importing'
     category = db.execute('SELECT id FROM categories WHERE slug=? AND deleted_at IS NULL', [catalog['category_slug']]).fetchone()
-    assert category, 'Existing channel-one category is required'
+    assert category, 'Configured Codex category is required; apply catalog-categories.json first'
     if local_snapshot:
         connections = db.execute("SELECT id,auto_sync_price FROM site_connections WHERE status != 'active' AND base_url LIKE 'http://127.0.0.1:%' AND deleted_at IS NULL").fetchall()
     else:
