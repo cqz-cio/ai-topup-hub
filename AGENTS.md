@@ -7,7 +7,7 @@
 
 - `main` 是唯一正式源码主线，维护当前绿色 Go + Vue 商城，包含已确认的 π星卡社名称、派大星 Logo 和水母背景。用户端为 `frontend/user`，后台为 `frontend/admin`；这些品牌改动属于同一项目主版本。
 - 支付、订单、数据库和采购后端部署在腾讯云新加坡 `43.134.141.10`，账号 `ubuntu`，目录 `/srv/zhixiang`。两套前端部署在上海 `124.220.2.69` 的 `/srv/zhixiang-front`：商城 `https://www.qzweb.cloud/`，管理端 `https://124.220.2.69:18888/login`。上海通过受限 SSH 通道连接新加坡回环 API；维护说明见 `ops/tencent/README.md`。
-- 当前新加坡后端与上海商城、后台均为 `20261015-160016`，干净构建源码 `41af36617cd9f267520bd934299394ce74f416e6`。已启用商品付款前卡台余额检查，见 `docs/payment-balance-guard.md`。关于页所有内容可在后台「系统设置 → 站点设置 → 关于我们 (About)」维护，见 `docs/about-page.md`。保留上游金额对账、开票提示、分销申请和结算、功能状态、U 提醒及兑换返回修复；TRON/BEP20/Plasma USDT 与 XorPay 微信继续支持订单及充值，微信手续费 1.6% 向上取分。保持 `-mode storefront`、`UPSTREAM_PURCHASE_ENABLED=true`；实际来源以 `ops/tencent/production-baseline.json` 为准，后续文档提交不代表程序重建。
+- 当前新加坡后端与上海后台为 `20261015-160016`，源码 `41af36617cd9f267520bd934299394ce74f416e6`；上海商城为 `20261015-221258`，干净归档源码 `f97c48cadae933e4600e526e26b6cb4eabda79a8`。已启用商品付款前卡台余额检查，见 `docs/payment-balance-guard.md`。关于页所有内容可在后台「系统设置 → 站点设置 → 关于我们 (About)」维护，见 `docs/about-page.md`。保留上游金额对账、开票提示、分销申请和结算、功能状态、U 提醒及兑换返回修复；TRON/BEP20/Plasma USDT 与 XorPay 微信继续支持订单及充值，微信手续费 1.6% 向上取分。保持 `-mode storefront`、`UPSTREAM_PURCHASE_ENABLED=true`；实际来源以 `ops/tencent/production-baseline.json` 为准，后续文档提交不代表程序重建。
 - 本地使用 `scripts/local/start.ps1`、`status.ps1`、`stop.ps1`，运行库为 `work/codex-runtime/live/shop.db`，本地采购关闭。旧说明位于 `docs/history/`，不能按历史文档覆盖当前环境。
 - 用户要求固定执行“先本地验证，再推送和上线”：先在日常本地入口验证实际运行程序、配置、相关数据和页面，保存验证记录；通过后才推送已验证提交并部署所需改动。后端改动须重建并重启本地后端，支付渠道及商品说明不能只在临时测试入口核验。上线后对照核验本地与生产；环境私有配置、订单和实时库存独立维护，不互相覆盖。
 - 用户已授权真实客户确认付款后的自动采购发卡，仍禁止主动提交有效采购、转账，或将验收订单改为已付款进行扣款测试。测试使用模拟供应商和临时数据库。
@@ -22,6 +22,15 @@
 - 11 款 ChatGPT 卡密（渠道一、渠道二及 iOS）统一使用 `https://cdk.bar/` 自助充值，发货须附兑换链接和操作指引；配置见 `docs/catalog/qzweb-redemption-guide.json`。Gemini、DEMO 不套用此地址；iOS 原有覆盖充值与不叠加剩余时长的规则保留。
 - 原始目录和用户价格覆盖保存在 `docs/catalog/`；同步脚本优先遵循价格覆盖，不能拿参考站库存替代商户库存。
 - 表格和 Word 默认白底黑字、首行仅加粗；不使用彩色底色。其他交付物按任务需求选择样式，用户明确指定时优先遵循用户要求。
+
+## 商品条件、兑换入口与实付金额（2026-10-15）
+
+- 上海商城已发布 `20261015-221258`，干净归档源码 `f97c48cadae933e4600e526e26b6cb4eabda79a8`；保留上一版付款页的币安/欧易教程按钮。新加坡后端与上海后台保持 `20261015-160016`、源码 `41af36617cd9f267520bd934299394ce74f416e6`。
+- 商品购买按钮前增加资格及质保摘要，区分新开通、续费、Codex 和 Gemini；ChatGPT/Codex 提供 `https://cdk.bar/`，修复详情中无地址的兑换提示，Gemini 沿用订单交付链接。后台规则变化时须同步维护 `productPurchaseGuide.ts` 与三语言文案，未知商品不套用其他套餐条件。
+- 提交订单前突出商品小计、手续费与实付合计；130 元微信支付为 132.08 元。余额抵扣、未选渠道和 USDT 精确金额提示均单独处理，不改收款算法、售价或支付配置。
+- 128 项前台测试、类型构建、本地两模板三语言及 1920/390/320px 检查通过；最终构建产物在日常本地另验三种宽度，正式站 12 项浏览器检查通过。10 组业务表摘要、18 款公开商品及 SKU 售价、4 条支付渠道一致，后端/Redis/库存定时器未变。没有创建验收订单、上传本机库、重启后端或实际付款采购。
+- 两地备份分别为 `/srv/zhixiang-front/backups/before-purchase-clarity-20261015-221258`、`/srv/zhixiang/backups/before-purchase-clarity-20261015-221258`。私有报告在外层 `deployment/local/purchase-clarity/`，截图在 `work/codex-runtime/purchase-clarity-qa/`，维护说明为 `docs/purchase-clarity.md`。
+- 失败尝试 `20261015-215238` 已立即回滚，不能复用。父仓库忽略目录内的隔离构建须建立独立 Git 扫描根，配合显式 Tailwind 源目录，并检查产物工具类与实际页面；仅构建成功不足以证明样式完整。成功版本已按此要求重新验证。
 
 ## 新会话入口与工作区边界
 
