@@ -34,10 +34,15 @@
 
       <!-- 商品区 -->
       <section class="min-w-0">
+        <p v-if="!loading && !loadFailed" class="mb-4 text-sm text-muted-foreground" role="status">{{ t('shopUi.productCount', { count: totalItems }) }}</p>
         <div v-if="loading" class="grid gap-4 grid-cols-[repeat(auto-fill,minmax(228px,1fr))]">
           <div v-for="i in 9" :key="i" class="h-[280px] rounded-lg border bg-card"></div>
         </div>
 
+        <div v-else-if="loadFailed" class="py-12 text-center" role="alert">
+          <p class="mb-4">{{ t('shopUi.loadFailedHint') }}</p>
+          <Button variant="outline" @click="loadProducts">{{ t('shopUi.reload') }}</Button>
+        </div>
         <template v-else-if="products.length">
           <CodexCreditsSection :products="products" />
           <div class="grid gap-4 grid-cols-[repeat(auto-fill,minmax(228px,1fr))]">
@@ -114,6 +119,9 @@ const {
   searchQuery,
   currentPage,
   totalPages,
+  totalItems,
+  loadFailed,
+  loadProducts,
   expandedParentIds,
   categoryGroups,
   categoryMap,

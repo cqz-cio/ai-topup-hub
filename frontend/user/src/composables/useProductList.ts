@@ -3,6 +3,8 @@ import { useRouter, useRoute } from 'vue-router'
 import { productAPI, categoryAPI } from '../api'
 import { buildCategoryGroups, createCategoryMap, normalizeCategoryParentId, type PublicCategory } from '../utils/category'
 import { debounceAsync } from '../utils/debounce'
+import { loadProductSearchPage } from '../utils/productSearch'
+import { useUserAuthStore } from '../stores/userAuth'
 
 export interface UseProductListOptions {
   pageSize?: number
@@ -19,6 +21,7 @@ export function useProductList(options: UseProductListOptions = {}) {
 
   const router = useRouter()
   const route = useRoute()
+  const authStore = useUserAuthStore()
 
   const loading = ref(true)
   const products = ref<any[]>([])
@@ -28,6 +31,8 @@ export function useProductList(options: UseProductListOptions = {}) {
   const currentPage = ref(1)
   const pageSize = ref(defaultPageSize)
   const totalPages = ref(0)
+  const totalItems = ref(0)
+  const loadFailed = ref(false)
   const showFilterDrawer = ref(false)
   const expandedParentIds = ref<number[]>([])
 
@@ -35,6 +40,7 @@ export function useProductList(options: UseProductListOptions = {}) {
   const categoryMap = computed(() => createCategoryMap(categories.value))
 
   let initializing = true
+  let requestId = 0
 
   const isParentExpanded = (categoryId: number) => {
     return expandedParentIds.value.includes(categoryId)
@@ -85,7 +91,11 @@ export function useProductList(options: UseProductListOptions = {}) {
   }
 
   const loadProducts = async () => {
+    const request = ++requestId
+    const token = authStore.token
+    const isCurrent = () => request === requestId && token === authStore.token
     loading.value = true
+    loadFailed.value = false
     try {
       const params: any = {
         page: currentPage.value,
@@ -96,17 +106,31 @@ export function useProductList(options: UseProductListOptions = {}) {
       }
       const keyword = searchQuery.value.trim()
       if (keyword) {
-        params.search = keyword
-      }
-      const response = await productAPI.list(params)
-      products.value = response.data.data || []
-      if (response.data.pagination) {
-        totalPages.value = response.data.pagination.total_page || 0
+        const result = await loadProductSearchPage(async (page) => {
+          const response = await productAPI.list({ ...params, page, page_size: 100 })
+          return response.data
+        }, keyword, params.page, params.page_size)
+        if (!isCurrent()) return
+        products.value = result.products
+        totalPages.value = result.totalPages
+        totalItems.value = result.totalItems
+      } else {
+        const response = await productAPI.list(params)
+        if (!isCurrent()) return
+        if (response.data.status_code !== 0 || !Array.isArray(response.data.data)) throw new Error('Invalid product response')
+        products.value = response.data.data
+        totalPages.value = response.data.pagination?.total_page || 0
+        totalItems.value = response.data.pagination?.total ?? products.value.length
       }
     } catch (error) {
+      if (!isCurrent()) return
+      products.value = []
+      totalItems.value = 0
+      totalPages.value = 0
+      loadFailed.value = true
       console.error('Failed to load products:', error)
     } finally {
-      loading.value = false
+      if (isCurrent()) loading.value = false
     }
   }
 
@@ -120,11 +144,17 @@ export function useProductList(options: UseProductListOptions = {}) {
   }
 
   const debouncedLoadProducts = debounceAsync(loadProducts, 300)
+  const scheduleLoadProducts = () => {
+    // Invalidate an earlier response immediately, including during the debounce.
+    ++requestId
+    loading.value = true
+    debouncedLoadProducts()
+  }
 
   const changePage = (page: number) => {
     if (page < 1 || page > totalPages.value) return
     currentPage.value = page
-    debouncedLoadProducts()
+    scheduleLoadProducts()
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
@@ -132,12 +162,12 @@ export function useProductList(options: UseProductListOptions = {}) {
     if (!searchQuery.value) return
     searchQuery.value = ''
     currentPage.value = 1
-    debouncedLoadProducts()
+    scheduleLoadProducts()
   }
 
   const onSearch = () => {
     currentPage.value = 1
-    debouncedLoadProducts()
+    scheduleLoadProducts()
   }
 
   const syncSelectedCategoryFromRoute = () => {
@@ -165,7 +195,7 @@ export function useProductList(options: UseProductListOptions = {}) {
     if (initializing) return
     currentPage.value = 1
     syncExpandedCategoryState()
-    debouncedLoadProducts()
+    scheduleLoadProducts()
 
     if (selectedCategory.value) {
       const matched = categories.value.find((category) => category.id === selectedCategory.value)
@@ -180,7 +210,14 @@ export function useProductList(options: UseProductListOptions = {}) {
   watch(searchQuery, () => {
     if (initializing) return
     currentPage.value = 1
-    debouncedLoadProducts()
+    scheduleLoadProducts()
+  })
+
+  watch(() => authStore.token, () => {
+    if (initializing) return
+    products.value = []
+    currentPage.value = 1
+    scheduleLoadProducts()
   })
 
   watch(
@@ -197,11 +234,12 @@ export function useProductList(options: UseProductListOptions = {}) {
     if (syncSelectedCategoryFromRoute()) {
       syncExpandedCategoryState()
     }
-    await loadProducts()
     initializing = false
+    await loadProducts()
   }
 
   const cleanup = () => {
+    ++requestId
     debouncedLoadProducts.cancel()
   }
 
@@ -214,6 +252,8 @@ export function useProductList(options: UseProductListOptions = {}) {
     currentPage,
     pageSize,
     totalPages,
+    totalItems,
+    loadFailed,
     showFilterDrawer,
     expandedParentIds,
     categoryGroups,

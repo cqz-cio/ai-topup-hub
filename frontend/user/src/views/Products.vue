@@ -21,6 +21,7 @@
 
         <!-- Main Content - Products Grid -->
         <main class="flex-1 min-w-0">
+          <p v-if="!loading && !loadFailed" class="mb-4 text-sm text-muted-foreground" role="status">{{ t('shopUi.productCount', { count: totalItems }) }}</p>
           <!-- Loading Skeleton -->
           <div v-if="loading" class="grid grid-cols-2 gap-3 md:gap-4 md:grid-cols-3 lg:grid-cols-4">
             <div v-for="i in 6" :key="i"
@@ -43,6 +44,10 @@
             </div>
           </div>
 
+          <div v-else-if="loadFailed" class="py-12 text-center" role="alert">
+            <p class="mb-4">{{ t('shopUi.loadFailedHint') }}</p>
+            <Button variant="secondary" @click="loadProducts">{{ t('shopUi.reload') }}</Button>
+          </div>
           <!-- Products Grid -->
           <div v-else-if="products.length > 0">
             <CodexCreditsSection :products="products" />
@@ -121,6 +126,9 @@ const {
   searchQuery,
   currentPage,
   totalPages,
+  totalItems,
+  loadFailed,
+  loadProducts,
   showFilterDrawer,
   expandedParentIds,
   categoryGroups,

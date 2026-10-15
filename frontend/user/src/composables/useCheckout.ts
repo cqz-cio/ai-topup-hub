@@ -76,7 +76,7 @@ export function useCheckout() {
   const previewError = ref('')
   const previewRequestId = ref(0)
   const couponRefreshing = ref(false)
-  const syncingStock = ref(false)
+  const syncingStock = ref(true)
   const orderPaymentChannels = ref<any[]>([])
   const orderPaymentChannelsRequestId = ref(0)
 

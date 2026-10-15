@@ -29,10 +29,15 @@
             </div>
 
             <!-- 骨架 -->
+            <p v-if="!listLoading && !listLoadFailed" class="mb-4 text-sm text-muted-foreground" role="status">{{ t('shopUi.productCount', { count: listTotalItems }) }}</p>
             <div v-if="listLoading" class="space-y-2.5">
               <div v-for="i in 8" :key="i" class="h-[76px] rounded-lg border bg-card"></div>
             </div>
 
+            <div v-else-if="listLoadFailed" class="py-12 text-center" role="alert">
+              <p class="mb-4">{{ t('shopUi.loadFailedHint') }}</p>
+              <Button variant="outline" @click="listLoadProducts">{{ t('shopUi.reload') }}</Button>
+            </div>
             <!-- 分组列表 -->
             <div v-else-if="listProductGroups.length" class="space-y-6">
               <div v-for="group in listProductGroups" :key="group.categoryId ?? 'uncategorized'">
@@ -215,6 +220,9 @@ const {
   searchQuery,
   currentPage: listCurrentPage,
   totalPages: listTotalPages,
+  totalItems: listTotalItems,
+  loadFailed: listLoadFailed,
+  loadProducts: listLoadProducts,
   expandedParentIds,
   categoryGroups,
   categoryMap: listCategoryMap,

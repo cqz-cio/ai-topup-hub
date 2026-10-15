@@ -26,7 +26,7 @@
 
     <main id="catalog-content" class="catalog-section" tabindex="-1">
       <div class="catalog-toolbar">
-        <div><p class="commerce-eyebrow">{{ t('shopUi.catalog') }}</p><h2>{{ t('shopUi.allProducts') }}<span v-if="!initialLoading && !loadFailed">{{ t('shopUi.productCount', { count: products.length }) }}</span></h2></div>
+        <div><p class="commerce-eyebrow">{{ t('shopUi.catalog') }}</p><h2>{{ search.trim() ? t('shopUi.searchResults') : (selectedCategory || t('shopUi.allProducts')) }}<span v-if="!initialLoading && !loadFailed" role="status">{{ t('shopUi.productCount', { count: visibleProducts.length }) }}</span></h2></div>
         <label class="catalog-search">
           <Search :size="18" aria-hidden="true" /><span class="sr-only">{{ t('shopUi.search') }}</span>
           <input v-model="search" type="search" :placeholder="t('shopUi.search')" />
@@ -117,6 +117,7 @@ import { usePageSeo } from '../composables/usePageSeo'
 import AnnouncementModal from '../components/AnnouncementModal.vue'
 import CodexCreditsSection from '../components/commerce/CodexCreditsSection.vue'
 import { splitCodexCredits } from '../utils/codexCredits'
+import { matchesProductSearch } from '../utils/productSearch'
 import { useAnnouncement, type HomeAnnouncement } from '../composables/useAnnouncement'
 import { getImageUrl } from '../utils/image'
 import { storefrontDisplayDetails } from '../data/storefrontCatalog'
@@ -179,18 +180,7 @@ const visibleProducts = computed(() =>
       productCategory(product) !== selectedCategory.value
     )
       return false
-    const keyword = search.value.trim().toLocaleLowerCase()
-    return (
-      !keyword ||
-      [
-        productTitle(product),
-        productCategory(product),
-        displayDetails(product)?.deliveryType || '',
-      ]
-        .join(' ')
-        .toLocaleLowerCase()
-        .includes(keyword)
-    )
+    return matchesProductSearch(product, search.value, [productCategory(product), displayDetails(product)?.deliveryType || ''])
   }),
 )
 const otherVisibleProducts = computed(() => splitCodexCredits(visibleProducts.value).other)
