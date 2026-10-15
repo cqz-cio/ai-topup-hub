@@ -20,3 +20,11 @@
 数据快照为 `docs/catalog/codex-credits.json`，封面在 `frontend/user/public/catalog-products/qzweb/codex-*-ph-20261015.svg`。新增时仅运行定向脚本 `scripts/sync-codex-credits.py`，先完成后端 schema migration，再指定当前环境数据库、快照、全新备份路径。`--publish` 明确上架；本机使用 `--local-snapshot` 复用禁用供货连接，采购始终关闭。脚本拒绝覆盖已有目标商品、未确认售价或开启自动价格同步的连接，在事务内核对所有原有记录未变。不要全量重放历史目录或上传本机库。
 
 本次验证使用模拟上游和本机数据，不进行真实付款或有效采购。发布证据存于忽略目录 `work/codex-runtime/codex-credits-20261015/`。
+
+## Codex 点数商品（2026-10-15）
+
+- 已按批准的 B 方案上线六款点数商品 `qzweb-73`–`qzweb-78`，归入「ChatGpt 渠道一」。250 / 500 / 1000 / 2500 / 5000 / 25000 点数售价分别为 **80.88 / 160.88 / 288.88 / 688.88 / 1358.88 / 6588.88 元**，均由用户逐款确认。正式商品/SKU ID 46–51、映射 ID 14–19；原商品不调价。说明见 `docs/codex-credits.md`。
+- 初始库存 9999；这六条映射的 `stock_limit=9999`，既有每 300 秒库存同步服务已实际运行并核验仍为 9999。上游不足、缺货、停供保留实际可售状态；连接 `auto_sync_price=false`，不能用商户报价覆盖售价。其他映射默认 0，保持原逻辑。兑换入口 `https://cdk.bar/`、客服微信 `Cqz0924ttxk`；需已有订阅与点数购买资格，不附带或延长 Plus/Pro 订阅。
+- 新加坡后端、上海商城发布 `20261015-150336`，干净构建源码 `7790885dfca33930f03c8b0ce16e0dd2706196b9`。上海后台原资源完整保留，来源仍为 `3728a67dd4359af2d39786eb2cde2e9a2acb7466`。本机 8080/5173/5174 重建验证；商城 116 项、后台 64 项、相关商品/订单/模拟采购/架构 Go 回归及两套类型构建通过。正式站 14 项浏览器检查覆盖 1920、390、320px 和三语，无脚本错误或页面横向溢出。
+- 切换时 65 组原业务表内容保留；定向事务仅插入六款商品、SKU 与供货映射。337 个商城文件、1165 个后台文件、5292 个保留旧文件、56 个 Nginx 文件及六张后台商品图核验通过；原售价与成本、会员/个人价、支付渠道和设置、私有配置、Redis 保持原状。未上传本机库或执行真实付款采购。
+- 两地程序备份为各自 `backups/before-codex-credits-20261015-150336`，商品库备份 `/srv/zhixiang/backups/before-codex-credits-catalog-20261015-150336/shop.db`；私有证据 `work/codex-runtime/codex-credits-20261015/verified-report.json`。D 盘另一个任务的未提交代码保持原样，主线在已附加的 `unified-wallet-earnings` 工作区合入并推送；日常本机当前由 `codex-credits` 工作区的 `scripts/local/` 管理，使用 D 盘原运行数据库、采购关闭。

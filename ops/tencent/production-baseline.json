@@ -1,24 +1,24 @@
 {
-  "checked_at": "2026-10-15T05:10:06.114536+00:00",
+  "checked_at": "2026-10-15T07:22:08.938968+00:00",
   "production_url": "https://www.qzweb.cloud/",
-  "documented_release_id": "20261015-125607",
-  "verified_release_id": "20261015-125607",
-  "previous_release_id": "20261014-162234",
-  "source_commit": "3728a67dd4359af2d39786eb2cde2e9a2acb7466",
+  "documented_release_id": "20261015-150336",
+  "verified_release_id": "20261015-150336",
+  "previous_release_id": "20261015-125607",
+  "source_commit": "7790885dfca33930f03c8b0ce16e0dd2706196b9",
   "source_branch": "main",
   "server_git_commit_verified": true,
-  "source_tag": "production/unified-wallet-20261015-125607",
+  "source_tag": "production/codex-credits-20261015-150336",
   "production": {
-    "release_path": "/srv/zhixiang/releases/20261015-125607",
-    "running_executable": "/srv/zhixiang/releases/20261015-125607/zhixiang-shop",
-    "binary_bytes": 90742946,
-    "binary_sha256": "6ec7bf14c57fd98698f933d17c62f105f528adb9ea9286a8b65473a693624243",
-    "running_binary_sha256": "6ec7bf14c57fd98698f933d17c62f105f528adb9ea9286a8b65473a693624243",
-    "manifest_binary_sha256": "6ec7bf14c57fd98698f933d17c62f105f528adb9ea9286a8b65473a693624243",
+    "release_path": "/srv/zhixiang/releases/20261015-150336",
+    "running_executable": "/srv/zhixiang/releases/20261015-150336/zhixiang-shop",
+    "binary_bytes": 90771618,
+    "binary_sha256": "87dd821ddadade53401063022493115acb747d8390a48de3ba718f2dc49986ce",
+    "running_binary_sha256": "87dd821ddadade53401063022493115acb747d8390a48de3ba718f2dc49986ce",
+    "manifest_binary_sha256": "87dd821ddadade53401063022493115acb747d8390a48de3ba718f2dc49986ce",
     "build_info": {
       "go_version": "go1.26.5",
-      "source_commit": "3728a67dd4359af2d39786eb2cde2e9a2acb7466",
-      "vcs_revision": "3728a67dd4359af2d39786eb2cde2e9a2acb7466",
+      "source_commit": "7790885dfca33930f03c8b0ce16e0dd2706196b9",
+      "vcs_revision": "7790885dfca33930f03c8b0ce16e0dd2706196b9",
       "vcs_modified": false,
       "git_metadata_pinned": true,
       "tags": "release,fullstack"
@@ -32,20 +32,17 @@
       "stock_sync_timer": "active"
     },
     "redis_preserved_without_restart": true,
-    "backup": "/srv/zhixiang/backups/before-unified-wallet-20261015-125607",
+    "backup": "/srv/zhixiang/backups/before-codex-credits-20261015-150336",
     "database_backup_quick_check": "ok",
-    "report_path": "/srv/zhixiang/shared/reports/unified-wallet-release-20261015-125607.json",
+    "report_path": "/srv/zhixiang/shared/reports/codex-credits-release-20261015-150336.json",
     "configuration_unchanged": true,
     "nginx_configuration_preserved": true,
     "source_dirty": false,
     "private_configuration_unchanged": true,
     "configuration_changes": [],
-    "source_commit": "3728a67dd4359af2d39786eb2cde2e9a2acb7466",
+    "source_commit": "7790885dfca33930f03c8b0ce16e0dd2706196b9",
     "configuration_except_tron_preserved": true,
-    "settings_changes": [
-      "affiliate_config",
-      "wallet_config"
-    ]
+    "settings_changes": []
   },
   "payment": {
     "bep20": {
@@ -191,27 +188,39 @@
     "https://124.220.2.69:18888/login"
   ],
   "verified_asset_sha256": {
-    "user/index.html": "e8d8b893966b8f4854f66ef4467e0c6ac2f96fd660179350636413d83ff2c871",
+    "user/index.html": "8654631500117b0229d024ee3d849a1fe810de820ba05c192ae77a3fc05b654c",
     "admin/index.html": "11f531b4ef094ab677b8e9165d8fc07e51437c35abf16a8da4bac8a131ea2128"
   },
   "public_verification": {
-    "checked_at": "2026-10-14T08:52:12.595045+00:00",
-    "public_http_checks_passed": 6,
+    "checked_at": "2026-10-15T07:22:08.938968+00:00",
+    "public_http_checks_passed": 26,
     "browser_checks_passed": 14,
     "browser_error_count": 0,
     "production_order_submitted": false,
-    "production_reconciliation_jobs_created": 0,
-    "verification_directory": "work/codex-runtime/about-settings-20261014/",
-    "about_configuration_saved": true
+    "verification_directory": "work/codex-runtime/codex-credits-20261015/"
   },
   "catalog": {
     "prices_unchanged": true,
-    "qzweb_55_price": "1160.00",
+    "qzweb_55_price": "1200.00",
     "public_categories_count": 6,
     "inventory_is_time_dependent": true,
     "product_delivery_content_preserved": true,
     "qzweb_55_price_observed_before_sale_mail": "1200.00",
-    "sale_mail_price_verification": "All product and SKU prices and costs exactly match the immediate pre-release database backup; no repricing was performed. The observed product base price differs from the historical 1160.00 note."
+    "sale_mail_price_verification": "All product and SKU prices and costs exactly match the immediate pre-release database backup; no repricing was performed. The observed product base price differs from the historical 1160.00 note.",
+    "existing_prices_unchanged": true,
+    "new_product_slugs": [
+      "qzweb-73",
+      "qzweb-74",
+      "qzweb-75",
+      "qzweb-76",
+      "qzweb-77",
+      "qzweb-78"
+    ],
+    "new_products_count": 6,
+    "stock_limit": 9999,
+    "mapped_products": 19,
+    "database_product_rows": 51,
+    "qzweb_55_price_note": "Observed current pre-release price, preserved without repricing; replaces the stale early 1160.00 note."
   },
   "verification_limits": [
     "Mock payment and fulfillment tests passed; no real-money transfer or supplier purchase was performed for acceptance.",
@@ -351,12 +360,12 @@
   "previous_build_verification_at": "2026-10-12T08:19:31.766441+00:00",
   "management_url": "https://124.220.2.69:18888/login",
   "frontend_gateway": {
-    "checked_at": "2026-10-15T05:10:06.114536+00:00",
+    "checked_at": "2026-10-15T07:22:08.938968+00:00",
     "frontend_host": "124.220.2.69",
     "backend_host": "43.134.141.10",
-    "frontend_release": "20261015-125607",
-    "source_commit": "8f2c17edcb4136cd31d99f2bd74e3870b9d9c75f",
-    "static_files_verified": 450,
+    "frontend_release": "20261015-150336",
+    "source_commit": "7790885dfca33930f03c8b0ce16e0dd2706196b9",
+    "static_files_verified": 337,
     "storefront_url": "https://www.qzweb.cloud/",
     "management_url": "https://124.220.2.69:18888/login",
     "www_dns_record": "www A 124.220.2.69",
@@ -372,8 +381,8 @@
     "certificate_renewal_verified": true,
     "certificate_timer": "qzweb-certificates.timer",
     "certificate_renewal_report": "/srv/zhixiang-front/shared/work/renew-final-20261012-1644/status.json",
-    "report_path": "/srv/zhixiang-front/shared/work/unified-wallet-20261015-125607.json",
-    "backend_report_path": "/srv/zhixiang/shared/reports/unified-wallet-release-20261015-125607.json",
+    "report_path": "/srv/zhixiang-front/shared/work/codex-credits-20261015-150336.json",
+    "backend_report_path": "/srv/zhixiang/shared/reports/codex-credits-release-20261015-150336.json",
     "formal_alipay_enabled": false,
     "database_uploaded": false,
     "legacy_singapore_http_entries_retained": true,
@@ -386,10 +395,10 @@
       "browser_current_frontend_confirmed": true,
       "report_path": "/srv/zhixiang-front/shared/work/entry-cache-report.json"
     },
-    "previous_frontend_release": "20261014-162234",
-    "storefront_source_commit": "8f2c17edcb4136cd31d99f2bd74e3870b9d9c75f",
+    "previous_frontend_release": "20261015-125607",
+    "storefront_source_commit": "7790885dfca33930f03c8b0ce16e0dd2706196b9",
     "admin_source_commit": "3728a67dd4359af2d39786eb2cde2e9a2acb7466",
-    "backup": "/srv/zhixiang-front/backups/before-unified-wallet-20261015-125607",
+    "backup": "/srv/zhixiang-front/backups/before-codex-credits-20261015-150336",
     "frontend_only_update": false,
     "previous_hashed_assets_retained": true,
     "verified_services": {
@@ -397,19 +406,16 @@
       "zhixiang-api-tunnel": "active",
       "qzweb-certificates.timer": "active"
     },
-    "release_scope": "Unified earnings wallet, original-price affiliate commissions, manual withdrawals",
-    "admin_files_verified": 121,
-    "storefront_files_verified": 329,
+    "release_scope": "Approved B Codex credits storefront and six products; existing admin resources preserved",
+    "admin_files_verified": 1165,
+    "storefront_files_verified": 337,
     "backend_program_preserved": false,
-    "backend_setting_changes": [
-      "affiliate_config",
-      "wallet_config"
-    ],
-    "frontend_build_source_commit": "8f2c17edcb4136cd31d99f2bd74e3870b9d9c75f",
-    "frontend_source_identical_to_backend": false,
+    "backend_setting_changes": [],
+    "frontend_build_source_commit": "7790885dfca33930f03c8b0ce16e0dd2706196b9",
+    "frontend_source_identical_to_backend": true,
     "admin_base": "/",
     "base_repair_backup": "/srv/zhixiang-front/backups/before-xorpay-admin-base-20261013-173020",
-    "frontend_source_difference": "Three labels clarify legacy affiliate withdrawals; all backend and admin code identical."
+    "frontend_source_difference": "Storefront and backend built from the same clean commit; Shanghai admin retains its previous verified resources."
   },
   "alipay": {
     "code_and_official_sandbox_query_verified": true,
@@ -1146,22 +1152,14 @@
     "database_uploaded": false
   },
   "previous_public_verification": {
-    "checked_at": "2026-10-14T07:48:49.614986+00:00",
-    "frontend_server_checks_passed": 15,
-    "browser_checks_passed": true,
-    "viewports": [
-      1920,
-      390,
-      320
-    ],
-    "verification_directory": "work/codex-runtime/tron-usdt/",
-    "production_order_submitted": false,
+    "checked_at": "2026-10-14T08:52:12.595045+00:00",
+    "public_http_checks_passed": 6,
+    "browser_checks_passed": 14,
     "browser_error_count": 0,
-    "verified_interactions": [
-      "TRON selection on guest checkout",
-      "existing three channel options retained"
-    ],
-    "public_http_extra_script": "Not executed after automatic approval review timed out twice; actual public browser checks and server HTTPS checks passed."
+    "production_order_submitted": false,
+    "production_reconciliation_jobs_created": 0,
+    "verification_directory": "work/codex-runtime/about-settings-20261014/",
+    "about_configuration_saved": true
   },
   "abuse_protection": {
     "release": "20261014-085600",
@@ -2022,5 +2020,121 @@
     "frontend_backup": "/srv/zhixiang-front/backups/before-admin-domain-20261015-145331",
     "staging_directory": "/srv/zhixiang-front/shared/work/admin-domain-20261015-145331",
     "checked_at": "2026-10-15T06:55:54.133352+00:00"
+  },
+  "codex_credits": {
+    "passed": true,
+    "checked_at": "2026-10-15T07:22:08.938968+00:00",
+    "release": "20261015-150336",
+    "source_commit": "7790885dfca33930f03c8b0ce16e0dd2706196b9",
+    "source_dirty": false,
+    "source_tag": "production/codex-credits-20261015-150336",
+    "ui_variant": "B",
+    "prices_user_confirmed": true,
+    "products": [
+      {
+        "slug": "qzweb-73",
+        "product_id": 46,
+        "sku_id": 46,
+        "mapping_id": 14,
+        "price": "80.88",
+        "stock": 9999
+      },
+      {
+        "slug": "qzweb-74",
+        "product_id": 47,
+        "sku_id": 47,
+        "mapping_id": 15,
+        "price": "160.88",
+        "stock": 9999
+      },
+      {
+        "slug": "qzweb-75",
+        "product_id": 48,
+        "sku_id": 48,
+        "mapping_id": 16,
+        "price": "288.88",
+        "stock": 9999
+      },
+      {
+        "slug": "qzweb-76",
+        "product_id": 49,
+        "sku_id": 49,
+        "mapping_id": 17,
+        "price": "688.88",
+        "stock": 9999
+      },
+      {
+        "slug": "qzweb-77",
+        "product_id": 50,
+        "sku_id": 50,
+        "mapping_id": 18,
+        "price": "1358.88",
+        "stock": 9999
+      },
+      {
+        "slug": "qzweb-78",
+        "product_id": 51,
+        "sku_id": 51,
+        "mapping_id": 19,
+        "price": "6588.88",
+        "stock": 9999
+      }
+    ],
+    "stock_limit": 9999,
+    "stock_sync_verified": true,
+    "catalog_backup": "/srv/zhixiang/backups/before-codex-credits-catalog-20261015-150336/shop.db",
+    "backend_backup": "/srv/zhixiang/backups/before-codex-credits-20261015-150336",
+    "frontend_backup": "/srv/zhixiang-front/backups/before-codex-credits-20261015-150336",
+    "business_table_groups_preserved": 65,
+    "existing_data_preserved": true,
+    "private_configuration_unchanged": true,
+    "payment_providers": [
+      "bscusdt",
+      "plasmausdt",
+      "xorpay",
+      "tronusdt"
+    ],
+    "user_tests": 116,
+    "admin_tests": 64,
+    "related_go_suites": [
+      "catalog",
+      "upstream",
+      "order",
+      "procurement",
+      "architecture"
+    ],
+    "go_test_note": "The initial architecture file-count check was fixed by moving new tests into existing test files; mapping and architecture checks were rerun successfully. Order and procurement suites passed.",
+    "frontend_type_builds_passed": 2,
+    "linux_binary_clean_build": true,
+    "binary_sha256": "87dd821ddadade53401063022493115acb747d8390a48de3ba718f2dc49986ce",
+    "storefront_files_verified": 337,
+    "admin_files_preserved": 1165,
+    "old_files_preserved": 5292,
+    "nginx_files_preserved": 56,
+    "browser_checks": 14,
+    "browser_errors": 0,
+    "viewports": [
+      1920,
+      390,
+      320
+    ],
+    "languages": [
+      "zh-CN",
+      "zh-TW",
+      "en-US"
+    ],
+    "admin_covers_verified": 6,
+    "redis_not_restarted": true,
+    "stock_sync_timer_seconds": 300,
+    "runtime_mode": "storefront",
+    "production_purchase_enabled": true,
+    "local_purchase_enabled": false,
+    "local_database_uploaded": false,
+    "real_payment_or_purchase_performed": false,
+    "local_runtime_source_directory": "C:\\Users\\admin\\.codex\\worktrees\\codex-credits\\卡网",
+    "local_runtime_database": "D:/卡网/work/codex-runtime/live/shop.db",
+    "primary_workspace_other_task_changes_preserved": true,
+    "evidence": "work/codex-runtime/codex-credits-20261015/",
+    "first_catalog_attempt": "Stopped before database access because the maintenance parent directory was absent; corrected directory creation and published once."
   }
 }
