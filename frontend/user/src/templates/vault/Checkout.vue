@@ -22,8 +22,8 @@
       <Button as-child class="mt-2 rounded-full" size="sm"><RouterLink to="/products">{{ t('checkout.emptyAction') }}</RouterLink></Button>
     </div>
 
-    <div v-else class="grid items-start gap-7 lg:grid-cols-[1fr_360px]">
-      <div class="grid gap-[18px]">
+    <div v-else class="grid grid-cols-1 items-start gap-7 lg:grid-cols-[minmax(0,1fr)_360px]">
+      <div class="grid min-w-0 gap-[18px]">
         <!-- 商品确认 -->
         <section class="rounded-xl border bg-card p-5">
           <h2 class="mb-3.5 text-lg font-bold">{{ t('checkout.itemsTitle') }}</h2>
@@ -31,10 +31,10 @@
             <div
               v-for="item in cartItems"
               :key="cartItemKey(item)"
-              class="flex gap-3.5 rounded-md border bg-secondary p-3.5"
+              class="grid grid-cols-[48px_minmax(0,1fr)] gap-3.5 rounded-md border bg-secondary p-3.5 sm:grid-cols-[64px_minmax(0,1fr)_auto]"
               :class="{ 'border-[color:var(--gold-strong)] bg-warning/10': itemStockExceeded(item) }"
             >
-              <div class="relative grid h-16 w-16 flex-none place-items-center overflow-hidden rounded-sm bg-secondary">
+              <div class="relative grid h-12 w-12 place-items-center overflow-hidden rounded-sm bg-secondary sm:h-16 sm:w-16">
                 <img v-if="checkoutItemImage(item)" :src="checkoutItemImage(item)" :alt="getLocalizedText(item.title)" loading="lazy" class="absolute inset-0 h-full w-full object-cover" />
                 <Package v-else class="h-7 w-7 text-muted-foreground" />
               </div>
@@ -44,7 +44,7 @@
                 <div v-if="itemSkuDisplay(item)" class="mt-0.5 text-[12.5px] text-muted-foreground">{{ t('checkout.skuLabel') }}：{{ itemSkuDisplay(item) }}</div>
                 <div v-if="itemStockHint(item)" class="mt-0.5 text-[12.5px]" :class="itemStockExceeded(item) ? 'text-warning' : 'text-muted-foreground'">{{ itemStockHint(item) }}</div>
               </div>
-              <div class="flex-none text-right">
+              <div class="col-start-2 text-right sm:col-start-3">
                 <span class="inline-flex items-baseline font-bold" :class="checkoutItemHasPriceDiscount(item) ? 'text-primary' : 'text-foreground'">
                   <b class="text-[19px]">{{ checkoutItemPriceParts(item).integer }}</b><small class="text-xs font-bold">{{ checkoutItemPriceParts(item).decimal }}</small><em class="ml-0.5 text-[11px] font-bold not-italic">{{ checkoutItemCurrency }}</em>
                 </span>
@@ -117,7 +117,7 @@
       </div>
 
       <!-- 右栏：汇总 + 支付 -->
-      <aside class="sticky top-[90px] rounded-xl border bg-card p-[22px]">
+      <aside class="sticky top-[90px] min-w-0 rounded-xl border bg-card p-[22px]">
         <h2 class="mb-2.5 text-lg font-bold">{{ t('checkout.submitTitle') }}</h2>
         <p class="mb-4 rounded-sm border bg-secondary px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">{{ t('checkout.submitHint') }}</p>
 
@@ -130,7 +130,7 @@
             <div v-if="hasPositiveAmount(previewWholesale)" class="flex items-center justify-between text-[13.5px]"><span class="text-muted-foreground">{{ t('checkout.previewWholesale') }}</span><span class="font-semibold" :class="hasPositiveAmount(previewWholesale) ? 'text-[color:var(--teal-strong)]' : 'text-foreground'">{{ formatDiscountPrice(previewWholesale, previewCurrency) }}</span></div>
           </template>
           <div v-if="Number(previewMemberDiscount) > 0" class="flex items-center justify-between text-[13.5px]"><span class="text-muted-foreground">{{ t('checkout.previewMemberDiscount') }}</span><span class="font-semibold text-[color:var(--gold-strong)]">-{{ formatPrice(previewMemberDiscount, previewCurrency) }}</span></div>
-          <div class="mt-1 flex items-center justify-between border-t pt-3 font-bold text-foreground"><span>{{ t('checkout.previewTotal') }}</span><span class="text-[22px] text-primary tabular-nums">{{ formatPrice(previewTotal, previewCurrency) }}</span></div>
+          <div class="mt-1 flex flex-wrap items-center justify-between gap-2 border-t pt-3 font-bold text-foreground"><span>{{ t('checkout.previewTotal') }}</span><span class="text-[22px] text-primary tabular-nums">{{ formatPrice(previewTotal, previewCurrency) }}</span></div>
         </div>
 
         <div v-if="previewLoading || couponRefreshing" class="mt-3 text-xs text-muted-foreground">{{ previewStatusText }}</div>
