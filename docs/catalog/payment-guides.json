@@ -1,0 +1,29 @@
+{
+  "verified_on": "2026-10-15",
+  "reference_pages": ["https://aisou.pro/item/58", "https://aisou.pro/item/59"],
+  "notes": "参考用户指定的教程主题，按官方文档及本站实际支付流程重新整理；不沿用第三方客服、地址、充值规则或零手续费承诺。",
+  "posts": [
+    {
+      "slug": "binance-usdt-payment-guide",
+      "type": "blog",
+      "title": {"zh-CN": "币安 Binance 下载与 USDT 付款教程", "zh-TW": "", "en-US": ""},
+      "summary": {"zh-CN": "从官方下载、注册认证和买 U，到选择网络、核对到账金额与查询订单，按步骤完成本站 USDT 付款。", "zh-TW": "", "en-US": ""},
+      "content_file": "payment-guides/binance.html",
+      "thumbnail": "",
+      "category_id": null,
+      "is_published": true,
+      "product_ids": []
+    },
+    {
+      "slug": "okx-usdt-payment-guide",
+      "type": "blog",
+      "title": {"zh-CN": "欧易 OKX 下载与 USDT 付款教程", "zh-TW": "", "en-US": ""},
+      "summary": {"zh-CN": "了解欧易官方安装、认证与买 U，按本站付款页选择链上网络、核对手续费和到账数量，并查询交付结果。", "zh-TW": "", "en-US": ""},
+      "content_file": "payment-guides/okx.html",
+      "thumbnail": "",
+      "category_id": null,
+      "is_published": true,
+      "product_ids": []
+    }
+  ]
+}
