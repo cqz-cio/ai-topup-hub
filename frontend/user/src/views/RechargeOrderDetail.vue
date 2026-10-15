@@ -87,6 +87,7 @@
         <!-- 支付区域（仅待支付状态） -->
         <div v-if="isPending" class="rounded-2xl border bg-card shadow-sm p-6">
           <h2 class="text-lg font-bold mb-4">{{ t('rechargeOrder.paymentTitle') }}</h2>
+          <UsdtPaymentGuides :payment="payment" class="mb-5" />
           <div v-if="isPending" class="mb-3 text-xs text-muted-foreground">
             {{ t('personalCenter.wallet.pendingHint') }}
           </div>
@@ -154,6 +155,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import EmptyState from '../components/EmptyState.vue'
 import UsdtTransferNotice from '../components/payment/UsdtTransferNotice.vue'
+import UsdtPaymentGuides from '../components/payment/UsdtPaymentGuides.vue'
 import { useRechargeOrderDetail } from '../composables/useRechargeOrderDetail'
 
 const { t } = useI18n()

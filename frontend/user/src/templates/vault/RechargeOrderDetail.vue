@@ -83,6 +83,7 @@
       <!-- 支付区域 -->
       <section v-if="isPending" class="mb-[18px] rounded-xl border bg-card p-[22px]">
         <h2 class="mb-4 text-lg font-bold">{{ t('rechargeOrder.paymentTitle') }}</h2>
+        <UsdtPaymentGuides :payment="payment" class="mb-5" />
         <div class="mb-3.5 text-[13px] text-muted-foreground">{{ t('personalCenter.wallet.pendingHint') }}</div>
         <div class="grid gap-[18px] md:grid-cols-2">
           <div v-if="showQRCode" class="flex flex-col items-center rounded-xl border bg-secondary p-5 text-center">
@@ -131,6 +132,7 @@ import { AlertCircle, CheckCircle2 } from 'lucide-vue-next'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import UsdtTransferNotice from '../../components/payment/UsdtTransferNotice.vue'
+import UsdtPaymentGuides from '../../components/payment/UsdtPaymentGuides.vue'
 import { useRechargeOrderDetail } from '../../composables/useRechargeOrderDetail'
 
 const { t } = useI18n()

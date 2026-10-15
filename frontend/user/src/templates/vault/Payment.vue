@@ -37,6 +37,7 @@
 
     <!-- 结果视图 -->
     <div v-else-if="showResultView" class="mb-[18px] rounded-xl border bg-card p-[22px]">
+      <UsdtPaymentGuides :payment="usdtPayment" class="mb-5" />
       <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h2 class="text-lg font-bold">{{ paymentResultTitle }}</h2>
@@ -219,6 +220,7 @@
         <!-- 支付信息 -->
         <section v-if="paymentResult" class="rounded-xl border bg-card p-[22px]">
           <h2 class="mb-3.5 text-lg font-bold">{{ t('payment.infoTitle') }}</h2>
+          <UsdtPaymentGuides :payment="usdtPayment" class="mb-5" />
           <div class="grid gap-1.5 text-[13px] text-muted-foreground">
             <div>{{ t('payment.methodLabel') }}：{{ resultChannelName }}</div>
             <div>{{ t('payment.interactionLabel') }}：{{ interactionLabel }}</div>
@@ -260,6 +262,7 @@ import PaymentAmountBreakdown from '../../components/payment/PaymentAmountBreakd
 import PaymentChannelSelector from '../../components/payment/PaymentChannelSelector.vue'
 import CryptoPaymentDetails from '../../components/payment/CryptoPaymentDetails.vue'
 import UsdtTransferNotice from '../../components/payment/UsdtTransferNotice.vue'
+import UsdtPaymentGuides from '../../components/payment/UsdtPaymentGuides.vue'
 import VaultCheckoutSteps from './components/VaultCheckoutSteps.vue'
 import { usePayment } from '../../composables/usePayment'
 

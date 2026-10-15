@@ -61,6 +61,7 @@
 
       <div v-else-if="showResultView" class="space-y-6">
         <div class="border bg-card text-card-foreground shadow-sm rounded-2xl p-6">
+          <UsdtPaymentGuides :payment="usdtPayment" class="mb-5" />
           <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
               <h2 class="text-xl font-bold text-foreground">{{ paymentResultTitle }}</h2>
@@ -362,6 +363,7 @@
           <div v-if="paymentResult"
             class="border bg-card text-card-foreground shadow-sm rounded-2xl p-6">
             <h2 class="text-lg font-bold mb-4 text-foreground">{{ t('payment.infoTitle') }}</h2>
+            <UsdtPaymentGuides :payment="usdtPayment" class="mb-5" />
             <div class="text-sm text-muted-foreground space-y-2">
               <div>{{ t('payment.methodLabel') }}：{{ resultChannelName }}</div>
               <div>{{ t('payment.interactionLabel') }}：{{ interactionLabel }}</div>
@@ -478,6 +480,7 @@ import PaymentAmountBreakdown from '../components/payment/PaymentAmountBreakdown
 import PaymentChannelSelector from '../components/payment/PaymentChannelSelector.vue'
 import CryptoPaymentDetails from '../components/payment/CryptoPaymentDetails.vue'
 import UsdtTransferNotice from '../components/payment/UsdtTransferNotice.vue'
+import UsdtPaymentGuides from '../components/payment/UsdtPaymentGuides.vue'
 import EmptyState from '../components/EmptyState.vue'
 import CheckoutSteps from '../components/checkout/CheckoutSteps.vue'
 import { Input } from '@/components/ui/input'
