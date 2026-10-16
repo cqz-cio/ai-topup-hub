@@ -66,7 +66,8 @@
             <!-- Product Info (Right) -->
             <div class="product-purchase-panel">
               <div class="product-purchase-summary">
-                <div v-if="categoryName" class="mb-3 text-xs uppercase tracking-wider text-muted-foreground">
+                <div v-if="categoryName || product.tags?.length" class="product-meta">
+                <div v-if="categoryName" class="text-xs uppercase tracking-wider text-muted-foreground">
                   {{ t('productDetail.categoryLabel') }} · {{ categoryName }}
                 </div>
 
@@ -80,6 +81,7 @@
                   </Badge>
                 </div>
 
+                </div>
                 <h1 class="product-title text-foreground">
                   {{ getLocalizedText(product.title) }}
                 </h1>
@@ -502,7 +504,8 @@ onUnmounted(() => {
 .product-description p { font-size: 15px; line-height: 1.8; color: var(--ui-text-muted); overflow-wrap: anywhere; }
 .product-redemption { border-top: 1px solid var(--ui-border); padding-top: 12px; }
 .product-purchase-panel { order: 1; min-width: 0; padding: 20px; border: 1px solid var(--ui-border); border-radius: 16px; background: var(--ui-bg-elevated); }
-.product-purchase-summary > :first-child { margin-bottom: 10px; }
+.product-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; margin-bottom: 18px; }
+.product-meta > div { margin: 0; }
 .product-purchase-summary > .mb-4 { margin-bottom: 12px; }
 .product-purchase-summary > .mb-6 { margin-bottom: 20px; }
 .product-title { margin-bottom: 16px; font-size: 25px; font-weight: 750; line-height: 1.3; letter-spacing: -.025em; overflow-wrap: anywhere; }
@@ -520,6 +523,9 @@ onUnmounted(() => {
 .product-full-details :deep(.theme-prose h3) { margin-top: 1.5em; font-size: 19px; }
 .product-detail-page :deep(.commerce-steps) { margin-bottom: 24px; }
 @media (min-width: 1024px) {
+  .product-detail-page { padding-top: 106px; }
+  .product-detail-page :deep(nav[aria-label]) { margin-bottom: 20px; }
+  .product-detail-page :deep(.commerce-steps) { padding-top: 12px; padding-bottom: 12px; margin-bottom: 20px; }
   .product-overview-layout { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 20px; }
   .product-media-panel { display: flex; min-width: 0; flex-direction: column; gap: 24px; padding: 16px; border: 1px solid var(--ui-border); border-radius: 16px; background: var(--ui-bg-elevated); }
   .product-media-panel :deep(.product-image-gallery) { padding: 0; border: 0; border-radius: 0; }
