@@ -1,6 +1,6 @@
 <template>
-  <aside class="support-widget" :data-open="open" @keydown.esc.stop.prevent="escape">
-    <section v-if="open" id="pi-support-window" class="support-window" role="dialog" :aria-labelledby="'pi-support-title'" :aria-busy="busy">
+  <aside ref="widget" class="support-widget" :style="widgetStyle" :data-open="open" :data-moved="!!widgetStyle" :data-dragging="dragging" :data-panel-overlap="panelOverlap" @keydown.esc.stop.prevent="escape">
+    <section v-if="open" id="pi-support-window" ref="panel" class="support-window" :style="panelStyle" role="dialog" :aria-labelledby="'pi-support-title'" :aria-busy="busy">
       <header class="support-header">
         <img :src="avatar" alt="" class="support-avatar" />
         <div class="support-identity"><h2 id="pi-support-title">{{ copy.name }}</h2><span>{{ copy.subtitle }}</span></div>
@@ -30,9 +30,9 @@
         <span v-if="copyStatus" class="support-copy-status" role="status">{{ copyStatus }}</span>
       </section>
     </section>
-    <div v-if="open || greetingVisible" class="support-speech" aria-hidden="true">{{ speech }}</div>
+    <div v-if="open || greetingVisible" ref="speechElement" class="support-speech" :style="speechStyle" :data-side="speechSide" aria-hidden="true">{{ speech }}</div>
     <div class="support-ground" aria-hidden="true" />
-    <button ref="launcher" class="support-launcher" type="button" :aria-label="open ? copy.close : copy.open" :aria-expanded="open" aria-controls="pi-support-window" @click="toggle">
+    <button ref="launcher" class="support-launcher" type="button" :aria-label="open ? copy.close : copy.open" :aria-expanded="open" aria-controls="pi-support-window" @click="activate" @pointerdown="pointerDown" @pointermove="pointerMove" @pointerup="finish" @pointercancel="finish" @lostpointercapture="finish" @dragstart.prevent>
       <SupportPet :action="action" :sequence="sequence" @phase="phase = $event" />
     </button>
     <span class="support-name">{{ copy.name }}</span>
@@ -47,10 +47,13 @@ import SupportPet from './SupportPet.vue'
 import avatar from './patrick-avatar.webp'
 import type { PetAction } from './petMotion'
 import { getDemoAnswer, getSupportCopy, supportContacts } from './supportDemo'
+import { useSupportDrag } from './useSupportDrag'
 
 const app = useAppStore(), copy = computed(() => getSupportCopy(app.locale))
 const open = ref(false), busy = ref(false), input = ref(''), contactsOpen = ref(false), showTopics = ref(false), copyStatus = ref('')
 const launcher = ref<HTMLButtonElement>(), closeButton = ref<HTMLButtonElement>(), inputElement = ref<HTMLInputElement>(), body = ref<HTMLElement>()
+const widget = ref<HTMLElement>(), panel = ref<HTMLElement>(), speechElement = ref<HTMLElement>()
+const { widgetStyle, panelStyle, speechStyle, speechSide, panelOverlap, dragging, pointerDown, pointerMove, finish, allowClick } = useSupportDrag(widget, launcher, panel, speechElement)
 const action = ref<PetAction>('wave'), phase = ref<PetAction>('wave'), sequence = ref(0), greetingVisible = ref(true)
 const messages = ref<{ id: number; role: 'user' | 'assistant'; text: string }[]>([])
 let replyTimer: ReturnType<typeof setTimeout> | undefined, greetingTimer: ReturnType<typeof setTimeout> | undefined, messageId = 0
@@ -58,6 +61,7 @@ const speech = computed(() => busy.value ? copy.value.think : phase.value === 'r
 function animate(next: PetAction) { action.value = next; sequence.value++ }
 function close() { open.value = false; contactsOpen.value = false; nextTick(() => launcher.value?.focus({ preventScroll: true })) }
 function escape() { if (contactsOpen.value) contactsOpen.value = false; else close() }
+function activate(event: MouseEvent) { if (allowClick(event)) void toggle() }
 async function toggle() {
   if (open.value) { close(); return }
   open.value = true
@@ -92,17 +96,23 @@ onBeforeUnmount(() => { clearTimeout(replyTimer); clearTimeout(greetingTimer) })
 
 <style scoped>
 .support-widget { --sp-paper: #fff; --sp-ink: #202720; --sp-muted: #667366; --sp-soft: #eff4ed; --sp-line: #dfe6da; --sp-accent: #294b36; --sp-on-accent: #fff; --sp-shadow: rgba(35,59,41,.13); --sp-bottom: 18px; position: fixed; z-index: 45; bottom: var(--sp-bottom); right: 24px; width: 132px; height: 167px; color: var(--sp-ink); font: 14px/1.55 Inter,"PingFang SC","Microsoft YaHei",sans-serif; }
+/* Stay reachable over the sticky navigation; announcements and payment dialogs remain above. */
+.support-widget[data-moved="true"], .support-widget[data-open="true"] { z-index: 55; }
 :global(.dark .support-widget) { --sp-paper: #202923; --sp-ink: #f2f5f0; --sp-muted: #bdc9be; --sp-soft: #2d3a31; --sp-line: #425247; --sp-accent: #c4dbc5; --sp-on-accent: #193021; --sp-shadow: rgba(0,0,0,.32); }
 .support-widget *, .support-widget *::after { box-sizing: border-box; }
 .support-widget button { cursor: pointer; font: inherit; }
 .support-widget button:disabled { cursor: default; opacity: .5; }
 .support-widget button:focus-visible, .support-widget a:focus-visible, .support-widget input:focus-visible { outline: 2px solid var(--sp-accent); outline-offset: 3px; }
 .support-launcher { position: absolute; right: 8px; bottom: 23px; width: 115.2px; height: 144px; border: 0; padding: 0; background: transparent; border-radius: 16px; filter: drop-shadow(0 4px 3px var(--sp-shadow)); }
+.support-widget .support-launcher { cursor: grab; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+.support-widget[data-dragging="true"] .support-launcher { cursor: grabbing; }
+.support-widget[data-panel-overlap="true"] .support-launcher, .support-widget[data-panel-overlap="true"] .support-ground, .support-widget[data-panel-overlap="true"] .support-name { visibility: hidden; }
 .support-ground { position: absolute; width: 73px; height: 7px; right: 29px; bottom: 25px; background: var(--sp-shadow); border-radius: 50%; filter: blur(4px); pointer-events: none; }
 .support-name { position: absolute; bottom: 0; right: 8px; padding: 4px 11px; background: var(--sp-paper); border: 1px solid var(--sp-line); border-radius: 20px; font-size: 12px; white-space: nowrap; pointer-events: none; }
 .support-name::before { content: ''; display: inline-block; width: 5px; height: 5px; background: var(--sp-accent); border-radius: 50%; margin-right: 5px; vertical-align: 2px; }
 .support-speech { position: absolute; right: 140px; bottom: 66px; width: max-content; max-width: 176px; padding: 10px 13px; background: var(--sp-paper); border: 1px solid var(--sp-line); border-radius: 18px; box-shadow: 0 4px 15px var(--sp-shadow); font-size: 12px; text-align: center; pointer-events: none; }
 .support-speech::after { content: ''; position: absolute; width: 10px; height: 10px; right: -6px; bottom: 14px; transform: rotate(-45deg); background: var(--sp-paper); border-right: 1px solid var(--sp-line); border-bottom: 1px solid var(--sp-line); }
+.support-speech[data-side="right"]::after { right: auto; left: -6px; transform: rotate(135deg); }
 .support-window { position: absolute; right: 0; bottom: 180px; width: 390px; max-width: calc(100vw - 32px); height: 500px; max-height: calc(100dvh - var(--sp-bottom) - 192px); display: flex; flex-direction: column; border: 1px solid var(--sp-line); border-radius: 24px; background: var(--sp-paper); box-shadow: 0 14px 42px var(--sp-shadow); }
 .support-header { flex-shrink: 0; display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--sp-line); }
 .support-avatar { width: 34px; height: 40px; object-fit: contain; }

@@ -193,3 +193,15 @@ final result: passed
 - 自动检查：149 项商城测试（包含 6 项演示回复边界测试）、Vue/TypeScript 类型检查及最终 Vite 构建通过。
 - 私有截图与报告：日常目录 `work/codex-runtime/customer-support-planning/implementation/qa/` 的 `report.json`、`lifecycle-report.json`、`approved-window.png`、`final-window.png`、`final-desktop.png`、`final-mobile.png` 和 `final-dark.png`。
 - 范围：演示问答只在内存中选择预设回复，不连接模型或客服后端，不查询订单、不读取支付状态、不承诺返利。没有推送或部署。分支仍基于 `4243550352902139cd9c4d7530615b6a5131c9f2`；后续拟合入时需要同步 main 的后续商品展示、客服和隐私改动，不能直接把此基线作为线上发布包。
+
+## 小π客服入口鼠标拖动（2026-10-16）
+
+final result: passed
+
+- 默认入口位置和原画动作保留。新增鼠标按住拖动、6px 点击容差、拖动后不误触开关、指针取消/失焦清理；手机仍为轻点打开，不通过滑动移动入口。
+- 拖动位置只保存在当前页面，刷新恢复默认；缩放后限制在可见区域。小窗根据可用空间在角色上方、下方或侧面展开，窄屏优先显示聊天内容；气泡自动换边并避开小窗。
+- 31 项实际浏览器检查通过：默认位置、轻微手抖点击、四角与中间拖动、展开时拖动、取消/失焦后的下一次点击、Escape/Enter、页面滚动、刷新、经典/Vault、演示回复，以及 1920/768/390/320px 和 390×500 短屏。手机触摸轻点展开收起、鼠标拖动后切换触摸点击正常，无页面脚本错误或业务写请求。
+- 已修正拖到顶部时导航盖住角色、短屏导航挡住关闭按钮的问题。拖动/展开层级位于导航上方，仍低于公告与付款拦截弹窗。核对顶部、中间及短屏截图，角色完整、输入区与关闭按钮可用。
+- 最终 Vue/TypeScript 类型检查及 Vite 构建通过。原有网格动画、预设回复及业务接口没有修改，本次未重复计入上一轮 149 项测试。
+- 私有证据：日常目录 work/codex-runtime/customer-support-planning/implementation/qa-drag/report.json 及同目录 top-left.png、middle.png、drag-open.png、mobile-500.png、touch-open.png。
+- 保存在原 codex/customer-support-agent 独立分支；没有合入主目录、推送、接入模型或部署。
