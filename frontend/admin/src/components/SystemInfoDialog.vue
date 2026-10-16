@@ -2,7 +2,7 @@
 import { useI18n } from 'vue-i18n'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import AdminBrand from '@/components/AdminBrand.vue'
-import { ADMIN_BRAND_NAME, CHATGPT_REDEMPTION_URL, STOREFRONT_URL, SUPPORT_WECHAT } from '@/utils/branding'
+import { ADMIN_BRAND_NAME, STOREFRONT_URL, SUPPORT_WECHAT } from '@/utils/branding'
 
 defineProps<{ open: boolean; version?: string }>()
 const emit = defineEmits<{ 'update:open': [value: boolean] }>()
@@ -20,7 +20,6 @@ const { t } = useI18n()
         <div class="flex justify-between gap-5 py-3.5"><dt class="text-muted-foreground">{{ t('admin.systemInfo.siteName') }}</dt><dd>{{ ADMIN_BRAND_NAME }}</dd></div>
         <div class="flex justify-between gap-5 py-3.5"><dt class="text-muted-foreground">{{ t('admin.systemInfo.storefront') }}</dt><dd><a :href="STOREFRONT_URL" target="_blank" rel="noopener noreferrer">www.qzweb.cloud ↗</a></dd></div>
         <div class="flex justify-between gap-5 py-3.5"><dt class="text-muted-foreground">{{ t('admin.systemInfo.wechat') }}</dt><dd>{{ SUPPORT_WECHAT }}</dd></div>
-        <div class="flex justify-between gap-5 py-3.5"><dt class="text-muted-foreground">{{ t('admin.systemInfo.redemption') }}</dt><dd><a :href="CHATGPT_REDEMPTION_URL" target="_blank" rel="noopener noreferrer">cdk.bar ↗</a></dd></div>
       </dl>
       <p class="text-xs leading-relaxed text-muted-foreground">{{ t('admin.systemInfo.orderHint') }}</p>
       <p v-if="version" class="text-xs text-muted-foreground">{{ t('admin.systemInfo.programVersion', { version }) }}</p>
