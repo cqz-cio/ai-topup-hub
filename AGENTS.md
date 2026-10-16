@@ -1,10 +1,10 @@
 ## 新付款自动采购恢复（2026-10-16）
 
-- 用户已澄清修复与测试不得扣款，但正常客户新付款后的自动采购发卡应保持开启。新加坡后端已发布 `20261016-212857`，干净源码 `98bb05a274505ffd0be8838e59262b9481b13266`；北京时间 **21:31:15.812954** 恢复，`UPSTREAM_PURCHASE_ENABLED=true`。
+- 用户已澄清修复与测试不得扣款，但正常客户新付款后的自动采购发卡应保持开启。新加坡后端已发布 `20261016-213728`，干净源码 `25212ac879ef687176b92b0f0b18015b537b9d16`；北京时间 **21:31:15.812954** 恢复，`UPSTREAM_PURCHASE_ENABLED=true`。
 - 固定边界为 `UPSTREAM_PURCHASE_ORDER_ID_FLOOR=44`、`UPSTREAM_PURCHASE_PAID_AFTER=2026-10-16T13:31:15.812954Z`，保存在 `95-new-paid-orders.conf`。只处理恢复后创建且确认付款的新父子订单；历史订单、旧任务、迟到回调及后台重试不能再次采购扣款。重启及后续发布必须原样保留这两个值，不得刷新或移除边界。
 - `90-no-purchase.conf` 保留作为不支持边界的旧程序回退保护；回退旧程序前先撤下 `95-new-paid-orders.conf` 并重载 systemd，使旧程序在采购关闭状态启动。不得回退业务数据库或恢复历史采购队列。
 - 2017 项相关 Go 回归通过，4 项外部依赖跳过；本机 12 项 API、正式 9 项检查通过。模拟新付款采购发卡、重复回调、拆单后续交付、旧任务恢复与人工重试阻断均通过。验证未创建正式订单或进行实际扣款测试，历史采购与钱包、上游余额均保持一致；前次两封补发邮件各保留一次成功记录。
-- 私有配置及上海 8599 个前端文件、57 个 Nginx 文件保留，Redis 与库存 timer 未重启，BSC 到账扫描正常。备份 `/srv/zhixiang/backups/before-new-paid-purchases-20261016-212857`，私有报告 `deployment/local/new-paid-purchases/verified-report.json`；维护见 `docs/new-paid-purchases.md`。
+- 私有配置及上海 8599 个前端文件、57 个 Nginx 文件保留，Redis 与库存 timer 未重启，BSC 到账扫描正常。备份 `/srv/zhixiang/backups/before-new-paid-purchases-20261016-213728`，私有报告 `deployment/local/new-paid-purchases/verified-report.json`；维护见 `docs/new-paid-purchases.md`。
 
 ## 三项历史遗留补齐（2026-10-16）
 
