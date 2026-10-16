@@ -1,7 +1,7 @@
 <template>
-  <div class="storefront">
+  <div class="storefront" :class="{ 'storefront-products': catalogOnly }">
     <a class="skip-link" href="#catalog-content">{{ t('shopUi.skipCatalog') }}</a>
-    <section class="store-hero" aria-labelledby="store-title">
+    <section v-if="!catalogOnly" class="store-hero" aria-labelledby="store-title">
       <div class="hero-copy">
         <p class="commerce-eyebrow"><span class="hero-dot" aria-hidden="true"></span>{{ t('shopUi.heroEyebrow') }}</p>
         <h1 id="store-title">{{ t('shopUi.heroTitle') }}<br /><span>{{ t('shopUi.heroAccent') }}</span></h1>
@@ -26,7 +26,7 @@
 
     <main id="catalog-content" class="catalog-section" tabindex="-1">
       <div class="catalog-toolbar">
-        <div><p class="commerce-eyebrow">{{ t('shopUi.catalog') }}</p><h2>{{ search.trim() ? t('shopUi.searchResults') : (selectedCategory || t('shopUi.allProducts')) }}<span v-if="!initialLoading && !loadFailed" role="status">{{ t('shopUi.productCount', { count: visibleProducts.length }) }}</span></h2></div>
+        <div><p class="commerce-eyebrow">{{ t('shopUi.catalog') }}</p><component :is="catalogOnly ? 'h1' : 'h2'" class="catalog-title">{{ search.trim() ? t('shopUi.searchResults') : (selectedCategory || t('shopUi.allProducts')) }}<span v-if="!initialLoading && !loadFailed" role="status">{{ t('shopUi.productCount', { count: visibleProducts.length }) }}</span></component></div>
         <label class="catalog-search">
           <Search :size="18" aria-hidden="true" /><span class="sr-only">{{ t('shopUi.search') }}</span>
           <input v-model="search" type="search" :placeholder="t('shopUi.search')" />
@@ -36,8 +36,8 @@
         <aside class="catalog-sidebar" :aria-label="t('shopUi.categories')">
           <h3>{{ t('shopUi.categories') }}</h3>
           <nav class="category-nav" :aria-label="t('shopUi.categories')">
-            <button type="button" :aria-pressed="selectedCategory === ''" :class="{ active: selectedCategory === '' }" @click="selectedCategory = ''">{{ t('shopUi.allProducts') }}<span>{{ products.length }}</span></button>
-            <button v-for="category in categories" :key="category" type="button" :aria-pressed="selectedCategory === category" :class="{ active: selectedCategory === category }" @click="selectedCategory = category">{{ category }}<ArrowUpRight :size="13" aria-hidden="true" /></button>
+            <button type="button" :aria-pressed="selectedCategory === ''" :class="{ active: selectedCategory === '' }" @click="selectCategory('')">{{ t('shopUi.allProducts') }}<span>{{ products.length }}</span></button>
+            <button v-for="category in categories" :key="category" type="button" :aria-pressed="selectedCategory === category" :class="{ active: selectedCategory === category }" @click="selectCategory(category)">{{ category }}<ArrowUpRight :size="13" aria-hidden="true" /></button>
           </nav>
           <div class="purchase-help">
             <ClipboardList :size="21" aria-hidden="true" /><h3>{{ t('shopUi.helpTitle') }}</h3><p>{{ t('shopUi.helpDescription') }}</p>
@@ -94,13 +94,13 @@
         </div>
       </div>
     </main>
-    <section class="order-lookup" aria-labelledby="lookup-title">
+    <section v-if="!catalogOnly" class="order-lookup" aria-labelledby="lookup-title">
       <div class="lookup-copy"><p class="commerce-eyebrow">{{ t('shopUi.deliveryEyebrow') }}</p><h2 id="lookup-title">{{ t('shopUi.lookupTitle') }}</h2><p>{{ t('shopUi.lookupHint') }}</p></div>
       <div class="lookup-actions"><RouterLink to="/me/orders" class="store-button is-primary">{{ t('shopUi.memberOrders') }}<ArrowUpRight :size="16" aria-hidden="true" /></RouterLink><RouterLink to="/guest/orders" class="store-button">{{ t('shopUi.guestOrders') }}</RouterLink></div>
     </section>
-    <p class="store-service-note"><Check :size="14" aria-hidden="true" />{{ t('shopUi.flowDescription') }}</p>
+    <p v-if="!catalogOnly" class="store-service-note"><Check :size="14" aria-hidden="true" />{{ t('shopUi.flowDescription') }}</p>
     <AnnouncementModal
-      v-if="activeAnnouncement"
+      v-if="!catalogOnly && activeAnnouncement"
       :announcement="activeAnnouncement"
       v-model:visible="announcementVisible"
     />
@@ -109,7 +109,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { ArrowUpRight, ArrowRight, Check, Copy, Info, PackageOpen, Search, ShoppingBag, ClipboardList } from 'lucide-vue-next'
 import { useI18n } from 'vue-i18n'
 import { categoryAPI, productAPI } from '../api/product'
@@ -132,6 +132,10 @@ import {
   type StorefrontProduct,
 } from '../utils/storefront'
 
+// Both entry points render this catalog so card and responsive changes stay in sync.
+const { catalogOnly = false } = defineProps<{ catalogOnly?: boolean }>()
+const route = useRoute()
+const router = useRouter()
 const appStore = useAppStore()
 const { shouldShow } = useAnnouncement()
 const activeAnnouncement = computed<HomeAnnouncement | undefined>(() => appStore.config?.announcement)
@@ -151,7 +155,7 @@ const supportWechat = computed(
     (appStore.isResellerTenant ? '' : 'Cqz0924ttxk'),
 )
 const products = ref<StorefrontProduct[]>([])
-const categoryRows = ref<Array<{ name?: unknown }>>([])
+const categoryRows = ref<Array<{ name?: unknown; slug?: string }>>([])
 const initialLoading = ref(true)
 const refreshing = ref(false)
 const loadFailed = ref(false)
@@ -175,6 +179,26 @@ const categories = computed(() => [
     ...products.value.map(productCategory),
   ]),
 ])
+const syncCategoryFromRoute = () => {
+  if (!catalogOnly) return
+  const category = route.name === 'category-products'
+    ? categoryRows.value.find((row) => row.slug === route.params.slug)
+    : undefined
+  selectedCategory.value = category
+    ? storefrontText(category.name, appStore.locale)
+    : ''
+}
+const selectCategory = (category: string) => {
+  selectedCategory.value = category
+  if (!catalogOnly) return
+  const row = categoryRows.value.find((item) => storefrontText(item.name, appStore.locale) === category)
+  if (category && row?.slug) {
+    void router.replace({ name: 'category-products', params: { slug: row.slug } })
+  } else if (!category && route.name === 'category-products') {
+    void router.replace({ name: 'products' })
+  }
+}
+watch(() => [route.name, route.params.slug, appStore.locale], syncCategoryFromRoute)
 const visibleProducts = computed(() =>
   products.value.filter((product) => {
     if (
@@ -240,7 +264,7 @@ const formattedPrice = (product: StorefrontProduct) => {
   }
 }
 const clearFilters = () => {
-  selectedCategory.value = ''
+  selectCategory('')
   search.value = ''
 }
 let disposed = false
@@ -265,6 +289,7 @@ const refreshProducts = async () => {
     categoryRows.value = Array.isArray(categoryResponse?.data?.data)
       ? categoryResponse.data.data
       : []
+    syncCategoryFromRoute()
     loadFailed.value = false
     if (
       selectedCategory.value &&
@@ -304,10 +329,10 @@ const copyWechat = async () => {
   }, 3000)
 }
 usePageSeo({
-  title: () => siteName.value,
+  title: () => catalogOnly ? (selectedCategory.value || t('nav.products')) : siteName.value,
   description: () =>
-    t('shopUi.heroDescription'),
-  canonicalPath: () => '/',
+    t(catalogOnly ? 'shopUi.catalogHint' : 'shopUi.heroDescription'),
+  canonicalPath: () => catalogOnly ? route.path : '/',
 })
 onMounted(() => {
   void refreshProducts()
@@ -326,6 +351,8 @@ onUnmounted(() => {
 
 <style scoped>
 .storefront { max-width: 1240px; margin: 0 auto; padding: 122px 32px 48px; color: var(--ui-text-primary); }
+.storefront-products { padding-top: 108px; min-height: 72vh; }
+.storefront-products .catalog-toolbar { padding-top: 0; border-top: 0; }
 .storefront a { text-decoration: none; }
 .storefront :is(a, button, input):focus-visible { outline: 2px solid var(--ui-success); outline-offset: 4px; }
 .storefront button, .storefront a { touch-action: manipulation; }
@@ -360,8 +387,8 @@ onUnmounted(() => {
 .catalog-section { scroll-margin-top: 100px; outline: none; }
 .catalog-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 25px; padding-top: 32px; border-top: 1px solid var(--ui-border); margin-bottom: 28px; }
 .catalog-toolbar .commerce-eyebrow { margin-bottom: 8px; }
-.catalog-toolbar h2 { font-size: 25px; font-weight: 700; }
-.catalog-toolbar h2 span { font-size: 10px; font-weight: 400; color: var(--ui-text-muted); margin-left: 16px; vertical-align: middle; }
+.catalog-title { font-size: 25px; font-weight: 700; }
+.catalog-title span { font-size: 10px; font-weight: 400; color: var(--ui-text-muted); margin-left: 16px; vertical-align: middle; }
 .catalog-search { display: flex; align-items: center; gap: 10px; border: 1px solid var(--ui-border); background: var(--ui-bg-elevated); padding: 12px 14px; border-radius: 9px; color: var(--ui-text-muted); width: 290px; }
 .catalog-search input { width: 100%; min-width: 0; background: transparent; font-size: 12px; border: none; outline: none; color: var(--ui-text-primary); }
 .catalog-search:focus-within { outline: 2px solid var(--ui-success); outline-offset: 2px; }
@@ -448,7 +475,7 @@ onUnmounted(() => {
   .hero-flow p { font-size: 9px; }
   .hero-flow-number { height: 27px; width: 27px; border-radius: 7px; }
   .catalog-toolbar { flex-direction: column; align-items: stretch; gap: 18px; padding-top: 26px; margin-bottom: 18px; }
-  .catalog-toolbar h2 { font-size: 23px; }
+  .catalog-title { font-size: 23px; }
   .catalog-search { width: 100%; }
   .catalog-shell { display: block; }
   .catalog-sidebar { position: static; max-height: none; overflow: visible; }
