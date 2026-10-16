@@ -56,15 +56,19 @@
 - 切换时 65 组原业务表内容保留；定向事务仅插入六款商品、SKU 与供货映射。337 个商城文件、1165 个后台文件、5292 个保留旧文件、56 个 Nginx 文件及六张后台商品图核验通过；原售价与成本、会员/个人价、支付渠道和设置、私有配置、Redis 保持原状。未上传本机库或执行真实付款采购。
 - 两地程序备份为各自 `backups/before-codex-credits-20261015-150336`，商品库备份 `/srv/zhixiang/backups/before-codex-credits-catalog-20261015-150336/shop.db`；私有证据 `work/codex-runtime/codex-credits-20261015/verified-report.json`。D 盘另一个任务的未提交代码保持原样，主线在已附加的 `unified-wallet-earnings` 工作区合入并推送；该次验收时日常本机由 `codex-credits` 工作区的 `scripts/local/` 管理，使用 D 盘原运行数据库、采购关闭。
 
-## 后台子域名准备（2026-10-15，等待 DNS 账号）
+## 后台子域名与 HTTPS（2026-10-16，已启用）
 
-目标为 `https://admin.qzweb.cloud/login`，DNS 记录为 `admin A 124.220.2.69`、TTL 600。当前腾讯云会话的 DNSPod 域名列表为空，尚未找到 `qzweb.cloud` 所属账号；公网查询仍为 NXDOMAIN，**新域名尚未启用 HTTPS**。日常后台继续使用 `https://124.220.2.69:18888/login`。
+正式后台入口为 `https://admin.qzweb.cloud/login`。用户已在 DNSPod 保存 `admin A 124.220.2.69`、TTL 600；2026-10-16 公共解析及公网 HTTPS 均已验证。原 `https://124.220.2.69:18888/login` 保留为备用入口。
 
-配置源码 `0774d66930c63f55cc16a9b72e80c392ee22d7b8` 已通过本地 27 项检查及日常后台页面验证并推送。新增 [域名入口](frontend-gateway/nginx-admin-domain.conf) 和 [专用代理片段](frontend-gateway/nginx-admin-domain-backend.conf)；后者将上游 Host 固定到已信任的主站 `www.qzweb.cloud`，兼容登录页的公开配置/验证码读取，保留 API 身份鉴权。不要直接使用新域名 Host 触发分销域名未登记拦截。
+沿用此前已推送、通过本地 27 项检查的配置源码 `0774d66930c63f55cc16a9b72e80c392ee22d7b8`。已启用上海 `/etc/nginx/conf.d/qzweb-admin-domain.conf` 和 `/etc/nginx/snippets/qzweb-admin-domain-backend.conf`，对应 [域名入口](frontend-gateway/nginx-admin-domain.conf) 和 [专用代理片段](frontend-gateway/nginx-admin-domain-backend.conf)。接口仍经回环 SSH 通道 `127.0.0.1:18880` 到新加坡；上游 Host 固定为主站 `www.qzweb.cloud`，保留公开配置、验证码及后台 API 鉴权。HTTP 以 308 跳到 HTTPS，保留路径和查询参数；HTTP ACME 验证目录保持 `/var/lib/letsencrypt`。
 
-上海当前只安装新域名的 HTTP ACME 验证入口，完整配置暂存 `/srv/zhixiang-front/shared/work/admin-domain-20261015-145331/`，等待解析后使用现有 Certbot 和 `/var/lib/letsencrypt` 签发 `admin.qzweb.cloud` 独立证书，再安装代理片段及完整入口、执行 `nginx -t` 和平滑重载，并核验域名实际登录。证书应进入既有 `/srv/zhixiang-front/shared/letsencrypt`，继续由 `qzweb-certificates.timer` 续期；保留原 IP 入口。
+独立证书由 Let's Encrypt 签发，证书名 `admin.qzweb.cloud`，有效期至 **2027-01-14 08:26:11（Asia/Shanghai）**。证书及私钥保留在 `/srv/zhixiang-front/shared/letsencrypt/live/admin.qzweb.cloud/`；续期配置在同目录树的 `renewal/admin.qzweb.cloud.conf`。既有 `qzweb-certificates.timer` 已启用并运行，使用专用 Certbot 环境及原重载钩子。指定本证书的 `renew --dry-run --run-deploy-hooks` 已通过，Nginx 检查和重载成功。
 
-两地备份分别为 `/srv/zhixiang/backups/before-admin-domain-20261015-145331`、`/srv/zhixiang-front/backups/before-admin-domain-20261015-145331`。已核验原后台、商城、公开接口与 ACME 路径；5298 个前端文件保留，程序仍为 `20261015-125607`，后端配置及后端/Redis 进程未变。私有记录 `D:/卡网/work/codex-runtime/admin-domain/pending-report.json`。此记录表示准备完成，不表示新域名已上线。
+公网 19 项检查通过，覆盖 TLS、HTTP 跳转、ACME、JS/CSS 字节与 MIME、内页刷新、公开配置、后台未登录鉴权、健康、图标及错误状态；商城和原 IP 后台均正常。已用既有有效后台凭据通过新域名完成一次 API 登录，商品和分类接口只读查询成功，未输出或保存登录令牌。Chrome 实际打开、刷新登录页及 Logo 正常，无控制台警告或错误；未在浏览器中填写账号。
+
+本次只启用两份 Nginx 配置及证书，没有发布新程序。本次启用时（2026-10-16 09:25）上海目录为 `/srv/zhixiang-front/releases/20261015-230538`，6861 个既有前端文件校验一致；新加坡后端仍为 `20261015-160016`，程序、配置、后端/Redis PID 与库存 timer 核验不变。未上传本机库、更改业务数据或进行付款采购。
+
+两地备份为 `/srv/zhixiang-front/backups/before-admin-https-20261016` 和 `/srv/zhixiang/backups/before-admin-https-20261016`；数据库副本完整性检查通过。服务器审计及签证、模拟续期日志在 `/srv/zhixiang-front/shared/work/admin-domain-20261016-https/`；本机私有证据在 `work/codex-runtime/admin-domain-live-20261016/verified-report.json`。此前 `admin-domain/pending-report.json` 是 2026-10-15 等待解析的历史状态，不能再作为当前可用性结论。
 
 ## 收益钱包与人工提现（2026-10-15）
 
@@ -264,7 +268,7 @@
 
 `zhixiang-api-tunnel.service` 使用上海本机私钥，将 `127.0.0.1:18880` 转发到新加坡 `127.0.0.1:8080`。新加坡账号 `zhixiang-api-proxy` 只接受上海来源和这一转发目标，禁止终端、其他转发、代理转发与数据库访问；上海私钥不复制至开发机或提交 Git。Nginx 配置和服务模板见本目录 `frontend-gateway/`。后端反代禁止自动重试付款请求；管理 API 未登录返回业务状态码 401。
 
-根域、WWW 与管理 IP 的三张证书由独立 Certbot 5.8.0 环境管理，配置目录为 `/srv/zhixiang-front/shared/letsencrypt`。`qzweb-certificates.timer` 每日 00、06、12、18 时 15 分触发，续期成功后校验并重载 Nginx；管理端使用短期 IP 证书，必须保持该定时器运行。原有 WWW 和管理 IP 两张证书的实际续期、Webroot 配置、定时服务和 HTTPS 访问均已核验；根域证书于 2026-10-13 签发并核验 HTTPS，续期配置已纳入同一定时器。根域及 WWW Webroot 为 `/var/lib/letsencrypt`，管理 IP Webroot 为 `/var/lib/enterprise-exam-acme`，不能互相覆盖；未改动服务器其他站点的证书环境。
+根域、WWW、后台子域名与管理 IP 的四张证书由独立 Certbot 5.8.0 环境管理，配置目录为 `/srv/zhixiang-front/shared/letsencrypt`。`qzweb-certificates.timer` 每日 00、06、12、18 时 15 分触发，续期成功后校验并重载 Nginx；管理端使用短期 IP 证书，必须保持该定时器运行。原有 WWW 和管理 IP 两张证书的实际续期、Webroot 配置、定时服务和 HTTPS 访问均已核验；根域证书于 2026-10-13 签发并核验 HTTPS，续期配置已纳入同一定时器。根域、WWW 及后台子域名 Webroot 为 `/var/lib/letsencrypt`，管理 IP Webroot 为 `/var/lib/enterprise-exam-acme`，不能互相覆盖；未改动服务器其他站点的证书环境。
 
 上海证据保存在 `shared/work/frontend-final-report.json` 与 `shared/work/renew-final-20261012-1644/status.json`；新加坡最终只读核验报告为 `/srv/zhixiang/shared/reports/shanghai-backend-final-read.json`。本机截图与记录在忽略的 `work/codex-runtime/alipay-domain-qa/`、`work/codex-logs/`。腾讯云上海实例为 `lhins-kb6tfs2w`；尚未另行提供上海 SSH 凭据，维护可使用账号本人已登录的腾讯云自动化助手，不能借用其他账号或项目凭据。
 

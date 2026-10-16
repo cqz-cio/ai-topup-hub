@@ -14,7 +14,7 @@
 - 2026-10-13 已补齐并上线中文隐私政策和服务条款，文案快照为 `docs/catalog/site-legal.json`，配置来源 `9b260f889420d8c386c6c2c20d76c27e1630a94d`。后台 **系统设置 → 站点设置 → 法律条款** 可继续编辑；公开入口 `/privacy`、`/terms`，注册页实际链接已核验。仅修改 `site_config.legal.privacy.zh-CN` 和 `site_config.legal.terms.zh-CN`，保留其他配置及语言内容。条款中的兑换入口遵循各笔订单交付说明，质保和退款按具体商品约定及适用法律处理；不写统一永久质保或“概不退款”。本机、正式站各通过 1920、390、320px 共 9 项只读页面检查，记录在忽略目录 `work/codex-runtime/site-legal-qa/`。线上备份 `/srv/zhixiang/backups/before-site-legal-20261013-003435`，未更换程序、重启后端、上传本机库或执行付款采购测试。
 
 - `main` 是唯一正式源码主线，维护当前绿色 Go + Vue 商城，包含已确认的 π星卡社名称、派大星 Logo 和水母背景。用户端为 `frontend/user`，后台为 `frontend/admin`；这些品牌改动属于同一项目主版本。
-- 支付、订单、数据库和采购后端部署在腾讯云新加坡 `43.134.141.10`，账号 `ubuntu`，目录 `/srv/zhixiang`。两套前端部署在上海 `124.220.2.69` 的 `/srv/zhixiang-front`：商城 `https://www.qzweb.cloud/`，管理端 `https://124.220.2.69:18888/login`。上海通过受限 SSH 通道连接新加坡回环 API；维护说明见 `ops/tencent/README.md`。
+- 支付、订单、数据库和采购后端部署在腾讯云新加坡 `43.134.141.10`，账号 `ubuntu`，目录 `/srv/zhixiang`。两套前端部署在上海 `124.220.2.69` 的 `/srv/zhixiang-front`：商城 `https://www.qzweb.cloud/`，管理端 `https://admin.qzweb.cloud/login`（原 IP:18888 入口保留备用）。上海通过受限 SSH 通道连接新加坡回环 API；维护说明见 `ops/tencent/README.md`。
 - 当前新加坡后端与上海后台为 `20261015-160016`，源码 `41af36617cd9f267520bd934299394ce74f416e6`；上海商城为 `20261015-230538`，干净归档源码 `3f9c00349214520784e548ece780163a1b5a6a9e`；付款页已按用户选择的第 1 版重设计，币安/欧易教程保持在二维码上方。已启用商品付款前卡台余额检查，见 `docs/payment-balance-guard.md`。关于页所有内容可在后台「系统设置 → 站点设置 → 关于我们 (About)」维护，见 `docs/about-page.md`。保留上游金额对账、开票提示、分销申请和结算、功能状态、U 提醒及兑换返回修复；TRON/BEP20/Plasma USDT 与 XorPay 微信继续支持订单及充值，微信手续费 1.6% 向上取分。保持 `-mode storefront`、`UPSTREAM_PURCHASE_ENABLED=true`；实际来源以 `ops/tencent/production-baseline.json` 为准，后续文档提交不代表程序重建。
 - 本地使用 `scripts/local/start.ps1`、`status.ps1`、`stop.ps1`，运行库为 `work/codex-runtime/live/shop.db`，本地采购关闭。旧说明位于 `docs/history/`，不能按历史文档覆盖当前环境。
 - 用户要求固定执行“先本地验证，再推送和上线”：先在日常本地入口验证实际运行程序、配置、相关数据和页面，保存验证记录；通过后才推送已验证提交并部署所需改动。后端改动须重建并重启本地后端，支付渠道及商品说明不能只在临时测试入口核验。上线后对照核验本地与生产；环境私有配置、订单和实时库存独立维护，不互相覆盖。
@@ -253,10 +253,11 @@
 - 正式站桌面及 390/320px 钱包、返利入口和后台只读核验通过；450 个新资源、4990 个保留文件和 55 个 Nginx 文件核对通过。切换时 62 组原有业务表内容保留，现有 819.99 元钱包余额未变且未变成可提现；仅新增资金来源字段/表及三条权限，并启用目标配置和商品返利标记。售价、成本、收款配置、Redis 与库存 timer 保留。未上传本机库、提交正式验收提现、代签声明或执行付款采购。
 - 备份 `/srv/zhixiang/backups/before-unified-wallet-20261015-125607`、`/srv/zhixiang-front/backups/before-unified-wallet-20261015-125607`、`/srv/zhixiang/backups/before-wallet-activation-20261015-125607`；私有记录 `work/codex-runtime/unified-wallet/`。D 盘主目录另一个任务的未提交代码保持原样，本次在已附加的 `unified-wallet-earnings` 主线工作区发布；日常本机使用 D 盘配置/数据库、该工作区前端和记录的本地二进制。
 
-## 后台子域名准备（2026-10-15，尚未启用）
+## 后台子域名与 HTTPS（2026-10-16，已启用）
 
-- 已准备 `admin.qzweb.cloud` 的 HTTPS 后台入口，配置源码 `0774d66930c63f55cc16a9b72e80c392ee22d7b8`，本地 27 项检查及日常页面通过。腾讯云当前登录账号的 DNSPod 列表为空，等待用户切换到管理 `qzweb.cloud` 的账号后添加 `admin A 124.220.2.69`（TTL 600）。当前 DNS 为 NXDOMAIN；不要把准备完成称为域名上线。
-- 上海仅安装 HTTP ACME 验证入口，完整配置在 `/srv/zhixiang-front/shared/work/admin-domain-20261015-145331/`。解析就绪后使用既有 Certbot 目录与续期 timer 签证，再安装完整入口和专用主站 Host 代理片段。原 IP 后台保留；程序仍为 `20261015-125607`。两地备份均为各自 `backups/before-admin-domain-20261015-145331`，详情见 `ops/tencent/README.md`，私有状态在 D 盘 `work/codex-runtime/admin-domain/pending-report.json`。
+- 正式后台为 `https://admin.qzweb.cloud/login`，DNSPod `admin A 124.220.2.69`、TTL 600 已生效。原 `https://124.220.2.69:18888/login` 保留备用。沿用已本地验证并推送的配置源码 `0774d66930c63f55cc16a9b72e80c392ee22d7b8`，上海已启用域名入口与专用主站 Host 代理片段；不要恢复为等待 DNS 状态。
+- Let's Encrypt 独立证书有效期至 2027-01-14 08:26:11（Asia/Shanghai），存于 `/srv/zhixiang-front/shared/letsencrypt/live/admin.qzweb.cloud/`。既有 `qzweb-certificates.timer` 正常，指定证书模拟续期及 Nginx 重载钩子通过；保留 HTTP ACME 目录 `/var/lib/letsencrypt`。
+- 公网 19 项、既有有效凭据 API 登录及商品/分类只读查询通过，Chrome 登录页和刷新无控制台错误。6861 个前端文件保持一致；未发布新程序或更改业务数据。两地备份均为各自 `backups/before-admin-https-20261016`；详情见 `ops/tencent/README.md`，证据 `work/codex-runtime/admin-domain-live-20261016/verified-report.json`。旧 `admin-domain/pending-report.json` 仅为历史记录。
 
 ## Codex 点数商品（2026-10-15）
 
