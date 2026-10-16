@@ -58,9 +58,10 @@
             <button v-if="products.length" type="button" class="store-button" @click="clearFilters">{{ t('shopUi.allProducts') }}</button>
           </div>
           <template v-else>
-          <CodexCreditsSection :products="visibleProducts" />
-          <div class="product-grid">
-            <article v-for="product in otherVisibleProducts" :key="product.slug" class="catalog-card">
+          <template v-for="group in visibleProductGroups" :key="group.category">
+          <CodexCreditsSection :products="group.credits" />
+          <div v-if="group.other.length" class="product-grid">
+            <article v-for="product in group.other" :key="product.slug" class="catalog-card">
               <RouterLink :to="productPath(product)" class="product-image-link" :aria-label="t('shopUi.detailsLabel', { name: productTitle(product) })">
                 <img v-if="productImage(product) && !failedImages.has(product.slug)" :src="productImage(product)" :alt="productTitle(product)" loading="lazy" decoding="async" @error="failedImages.add(product.slug)" />
                 <div v-else class="product-image-placeholder"><PackageOpen :size="36" aria-hidden="true" /></div>
@@ -87,6 +88,7 @@
               </div>
             </article>
           </div>
+          </template>
           </template>
           <p class="catalog-note">{{ t('shopUi.catalogHint') }}</p>
         </div>
@@ -183,7 +185,17 @@ const visibleProducts = computed(() =>
     return matchesProductSearch(product, search.value, [productCategory(product), displayDetails(product)?.deliveryType || ''])
   }),
 )
-const otherVisibleProducts = computed(() => splitCodexCredits(visibleProducts.value).other)
+// Share the directory order instead of promoting credits ahead of every category.
+const visibleProductGroups = computed(() =>
+  categories.value
+    .map((category) => ({
+      category,
+      ...splitCodexCredits(
+        visibleProducts.value.filter((product) => productCategory(product) === category),
+      ),
+    }))
+    .filter((group) => group.credits.length || group.other.length),
+)
 const productPath = (product: StorefrontProduct) =>
   `/products/${encodeURIComponent(product.slug)}`
 const canPurchase = (product: StorefrontProduct) =>
@@ -372,6 +384,7 @@ onUnmounted(() => {
 .delivery-notice { display: flex; align-items: flex-start; gap: 8px; color: var(--ui-text-muted); font-size: 12px; line-height: 1.7; margin-bottom: 16px; }
 .delivery-notice > svg { color: var(--ui-success); flex-shrink: 0; }
 .product-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.product-grid + .codex-credits, .product-grid + .product-grid { margin-top: 32px; }
 .catalog-card { display: flex; flex-direction: column; border: 1px solid var(--ui-border); border-radius: 13px; overflow: hidden; background: var(--ui-bg-elevated); transition: border-color .2s, box-shadow .2s; }
 .catalog-card:hover { border-color: var(--ui-border-strong); box-shadow: var(--ui-shadow-soft); }
 .product-image-link { position: relative; display: block; aspect-ratio: 5/3; background: var(--ui-bg-soft); overflow: hidden; }
