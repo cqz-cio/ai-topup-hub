@@ -2,7 +2,7 @@
 import { useI18n } from 'vue-i18n'
 import { RouterLink } from 'vue-router'
 import { useAdminAuthStore } from '@/stores/auth'
-import { PURCHASE_NOTICE_URL, SUPPORT_WECHAT } from '@/utils/branding'
+import { PURCHASE_NOTICE_URL, SUPPORT_WECHAT, SUPPORT_QQ, SUPPORT_TELEGRAM } from '@/utils/branding'
 
 const { t } = useI18n()
 const authStore = useAdminAuthStore()
@@ -26,7 +26,7 @@ const authStore = useAdminAuthStore()
     </div>
     <div class="operation">
       <h2>{{ t('admin.operations.supportTitle') }}</h2>
-      <p>{{ t('admin.operations.supportDescription', { wechat: SUPPORT_WECHAT }) }}</p>
+      <p>{{ t('admin.operations.supportDescription', { wechat: SUPPORT_WECHAT, qq: SUPPORT_QQ, telegram: SUPPORT_TELEGRAM }) }}</p>
       <RouterLink v-if="authStore.hasPermission('GET:/admin/orders')" to="/orders">
         {{ t('admin.operations.supportAction') }} <span aria-hidden="true">→</span>
       </RouterLink>

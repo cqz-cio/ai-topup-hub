@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import SupportContacts from '../SupportContacts.vue'
 import { computed, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ReceiptText } from 'lucide-vue-next'
@@ -54,6 +55,7 @@ onUnmounted(() => { disposed = true; resetCopy() })
           <span>{{ t('shopUi.wechat') }}</span>
           <strong>{{ supportWechat }}</strong>
         </div>
+        <SupportContacts />
       </div>
     </div>
     <div class="invoice-support-actions">

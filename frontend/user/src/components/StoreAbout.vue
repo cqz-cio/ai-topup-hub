@@ -59,8 +59,8 @@
           <p class="sr-only" role="status" aria-live="polite">{{ copied ? copy.copiedLabel : '' }}</p>
           <p class="about-contact-note">{{ copy.contactNote }}</p>
           <p class="about-contact-note">{{ copy.contactTip }}</p>
-          <div v-if="contactConfig?.telegram || contactConfig?.whatsapp" class="about-extra-contact">
-            <a v-if="contactConfig?.telegram" :href="contactConfig.telegram" target="_blank" rel="noopener noreferrer">{{ copy.telegramLabel }} <ArrowUpRight :size="16" /></a>
+          <div v-if="!appStore.isResellerTenant || contactConfig?.qq || contactConfig?.telegram || contactConfig?.whatsapp" class="about-extra-contact">
+            <SupportContacts />
             <a v-if="contactConfig?.whatsapp" :href="contactConfig.whatsapp" target="_blank" rel="noopener noreferrer">{{ copy.whatsappLabel }} <ArrowUpRight :size="16" /></a>
           </div>
         </section>
@@ -77,6 +77,7 @@
 </template>
 
 <script setup lang="ts">
+import SupportContacts from './SupportContacts.vue'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ArrowRight, ArrowUpRight, Check, ClipboardList, Copy, Handshake, KeyRound, ShieldCheck, ShoppingCart } from 'lucide-vue-next'

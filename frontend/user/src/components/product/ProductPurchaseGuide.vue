@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import SupportContacts from '../SupportContacts.vue'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ProductRedemptionGuide from './ProductRedemptionGuide.vue'
@@ -18,6 +19,7 @@ const guide = computed(() => productPurchaseGuide(props.slug))
       <li v-for="rule in guide.rules" :key="rule">{{ copy.rules[rule] }}</li>
     </ul>
     <p class="mt-3 text-muted-foreground">{{ copy.help }}</p>
+    <SupportContacts />
     <ProductRedemptionGuide v-if="!hideRedemption" :slug="slug" class="mt-3 border-t pt-3" />
   </section>
 </template>

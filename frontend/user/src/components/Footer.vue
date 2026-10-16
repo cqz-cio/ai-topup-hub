@@ -9,7 +9,7 @@
         <div class="brand-footer-links">
           <div><h4>{{ t('shopUi.catalog') }}</h4><router-link v-for="item in quickLinks" :key="item.path" :to="item.path">{{ t(item.label) }}</router-link></div>
           <div><h4>{{ t('shopUi.lookupAction') }}</h4><router-link to="/me/orders">{{ t('shopUi.memberOrders') }}</router-link><router-link to="/guest/orders">{{ t('shopUi.guestOrders') }}</router-link><router-link to="/cart">{{ t('navbar.cart') }}</router-link></div>
-          <div v-if="supportWechat || config?.contact?.telegram || config?.contact?.whatsapp"><h4>{{ t('shopUi.support') }}</h4><button v-if="supportWechat" type="button" class="flex items-center gap-2 text-left" @click="copyWechat">{{ t('shopUi.wechat') }}<Copy :size="12" /></button><span v-if="supportWechat" class="font-semibold">{{ supportWechat }}</span><a v-if="config?.contact?.telegram" :href="config.contact.telegram" target="_blank" rel="noopener noreferrer">Telegram</a><a v-if="config?.contact?.whatsapp" :href="config.contact.whatsapp" target="_blank" rel="noopener noreferrer">WhatsApp</a></div>
+          <div v-if="!appStore.isResellerTenant || supportWechat || config?.contact?.qq || config?.contact?.telegram || config?.contact?.whatsapp"><h4>{{ t('shopUi.support') }}</h4><button v-if="supportWechat" type="button" class="flex items-center gap-2 text-left" @click="copyWechat">{{ t('shopUi.wechat') }}<Copy :size="12" /></button><span v-if="supportWechat" class="font-semibold">{{ supportWechat }}</span><SupportContacts /><a v-if="config?.contact?.whatsapp" :href="config.contact.whatsapp" target="_blank" rel="noopener noreferrer">WhatsApp</a></div>
         </div>
       </div>
       <div class="brand-footer-bottom">
@@ -21,6 +21,7 @@
 </template>
 
 <script setup lang="ts">
+import SupportContacts from './SupportContacts.vue'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Copy, Home, LayoutGrid, Newspaper, Info } from 'lucide-vue-next'

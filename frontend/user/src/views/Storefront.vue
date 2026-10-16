@@ -42,6 +42,7 @@
           <div class="purchase-help">
             <ClipboardList :size="21" aria-hidden="true" /><h3>{{ t('shopUi.helpTitle') }}</h3><p>{{ t('shopUi.helpDescription') }}</p>
             <template v-if="supportWechat"><span>{{ t('shopUi.wechat') }}</span><button type="button" class="wechat-copy" @click="copyWechat">{{ supportWechat }}<Copy :size="13" aria-hidden="true" /></button><span v-if="copyMessage" role="status">{{ copyMessage }}</span></template>
+            <SupportContacts />
           </div>
         </aside>
         <div class="catalog-main">
@@ -87,6 +88,7 @@
 </template>
 
 <script setup lang="ts">
+import SupportContacts from '../components/SupportContacts.vue'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { ArrowUpRight, ArrowRight, Check, Copy, Info, PackageOpen, Search, ShoppingBag, ClipboardList } from 'lucide-vue-next'

@@ -45,12 +45,13 @@
     </div>
     <footer class="credits-help">
       <div><strong>{{ copy.redeemTitle }}</strong><p>{{ copy.redeem }}</p></div>
-      <div><strong>{{ copy.helpTitle }}</strong><p>{{ copy.help }}</p></div>
+      <div><strong>{{ copy.helpTitle }}</strong><p>{{ copy.help }}</p><SupportContacts /></div>
     </footer>
   </section>
 </template>
 
 <script setup lang="ts">
+import SupportContacts from '../SupportContacts.vue'
 import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useI18n } from 'vue-i18n'

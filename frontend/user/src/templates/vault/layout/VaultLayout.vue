@@ -111,7 +111,7 @@
           <h4 class="mb-3 text-sm font-bold">{{ t('vault.footer.support') }}</h4>
           <RouterLink v-if="aboutEnabled" to="/about" class="flex items-center gap-[7px] py-[5px] text-[14.5px] text-muted-foreground hover:text-primary"><Info class="h-4 w-4" /> {{ t('nav.about') }}</RouterLink>
           <RouterLink v-if="!userAuthStore.isAuthenticated" to="/guest/orders" class="flex items-center gap-[7px] py-[5px] text-[14.5px] text-muted-foreground hover:text-primary"><ClipboardList class="h-4 w-4" /> {{ t('navbar.guestOrders') }}</RouterLink>
-          <a v-if="contact?.telegram" :href="contact.telegram" target="_blank" rel="noopener noreferrer" class="flex items-center gap-[7px] py-[5px] text-[14.5px] text-muted-foreground hover:text-primary"><Send class="h-4 w-4" /> Telegram</a>
+          <SupportContacts include-wechat />
           <a v-if="contact?.whatsapp" :href="contact.whatsapp" target="_blank" rel="noopener noreferrer" class="flex items-center gap-[7px] py-[5px] text-[14.5px] text-muted-foreground hover:text-primary"><MessageCircle class="h-4 w-4" /> WhatsApp</a>
         </div>
         <div>
@@ -136,11 +136,12 @@
 </template>
 
 <script setup lang="ts">
+import SupportContacts from '../../../components/SupportContacts.vue'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
   Search, Moon, Sun, ShoppingCart, Languages, Menu, X, User, Info, ClipboardList, LogOut, Github,
-  LayoutGrid, Send, MessageCircle,
+  LayoutGrid, MessageCircle,
 } from 'lucide-vue-next'
 import { useAppStore } from '../../../stores/app'
 import { useCartStore } from '../../../stores/cart'

@@ -21,9 +21,9 @@ export const aboutCopy = {
   cooperationTitle: '代理与长期合作',
   cooperation: '欢迎个人代理与团队咨询代理价格、批量采购及长期合作方式，具体以双方确认的方案为准。',
   cooperationNote: '如需开通分销，可登录后提交申请，审核通过后再配置店铺。',
-  contactTitle: '有问题，微信联系就好',
+  contactTitle: '有问题，随时联系我们',
   contactSubtitle: '商品咨询 · 订单售后 · 代理合作',
-  contactNote: '微信支持留言咨询。如未及时回复，请留下订单号和问题描述，我们会在客服在线后尽快处理。',
+  contactNote: '微信、QQ 和 Telegram 均支持留言咨询。如未及时回复，请留下订单号和问题描述，我们会在客服在线后尽快处理。',
   contactTip: '咨询订单问题时，请一并提供订单号与必要截图，方便核查。',
   links: [
     { title: '购买须知与代理合作', to: '/blog/purchase-and-agent-guide' },
