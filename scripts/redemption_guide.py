@@ -4,6 +4,7 @@ Without --apply, this command only reports a plan. Applying to SQLite requires
 a consistent backup and never changes prices, stock, orders, or card contents.
 """
 
+from public_redemption import public_copy
 import argparse
 from datetime import datetime, timezone
 import html
@@ -75,7 +76,7 @@ def catalog_fields(slug, content, instructions, guide):
     instructions["zh-CN"] = delivery_instructions(
         slug, instructions.get("zh-CN") or content["zh-CN"], guide,
     )
-    return content, instructions
+    return public_copy(content), instructions
 
 
 def plan_updates(connection, guide):

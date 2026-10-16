@@ -1,7 +1,7 @@
 import type { PurchaseRule } from '../utils/productPurchaseGuide'
 
 type Copy = {
-  title: string; help: string; redeem: string; codeDelivery: string; creditsDelivery: string; linkDelivery: string
+  title: string; help: string; codeDelivery: string; creditsDelivery: string; linkDelivery: string
   rules: Record<PurchaseRule, string>
   subtotal: string; fee: string; total: string; wallet: string; online: string
   choose: string; updating: string; channel: string; usdt: string; final: string
@@ -10,8 +10,8 @@ type Copy = {
 export const purchaseClarityCopy: Record<string, Copy> = {
   'zh-CN': {
     title: '购买前请确认', help: '不确定账号是否符合条件，请先联系微信 Cqz0924ttxk 核实再购买。',
-    redeem: '打开兑换页 · cdk.bar', codeDelivery: '付款后在订单中领取兑换码，再到兑换页按提示预检、提交并查询结果。收到卡密不代表账号已开通。',
-    creditsDelivery: '付款后在订单中领取兑换码，再到兑换页完成资格预检、提交并查询结果。收到兑换码不代表点数已到账。',
+    codeDelivery: '付款后在订单交付说明中领取兑换码和兑换入口，再按提示预检、提交并查询结果。收到卡密不代表账号已开通。',
+    creditsDelivery: '付款后在订单交付说明中领取兑换码和兑换入口，再完成资格预检、提交并查询结果。收到兑换码不代表点数已到账。',
     linkDelivery: '付款后在订单中领取本商品的兑换链接，使用自己的账号兑换，无需提供密码。',
     rules: {
       activation: '适用账号：从未开通过会员，或上次订阅已到期 / 掉订至少 10 分钟。最终资格以兑换预检为准。',
@@ -33,8 +33,8 @@ export const purchaseClarityCopy: Record<string, Copy> = {
   },
   'zh-TW': {
     title: '購買前請確認', help: '不確定帳號是否符合條件，請先聯絡微信 Cqz0924ttxk 核實再購買。',
-    redeem: '開啟兌換頁 · cdk.bar', codeDelivery: '付款後在訂單中領取兌換碼，再到兌換頁依提示預檢、提交並查詢結果。收到卡密不代表帳號已開通。',
-    creditsDelivery: '付款後在訂單中領取兌換碼，再到兌換頁完成資格預檢、提交並查詢結果。收到兌換碼不代表點數已到帳。',
+    codeDelivery: '付款後在訂單交付說明中領取兌換碼和兌換入口，再依提示預檢、提交並查詢結果。收到卡密不代表帳號已開通。',
+    creditsDelivery: '付款後在訂單交付說明中領取兌換碼和兌換入口，再完成資格預檢、提交並查詢結果。收到兌換碼不代表點數已到帳。',
     linkDelivery: '付款後在訂單中領取本商品的兌換連結，使用自己的帳號兌換，無需提供密碼。',
     rules: {
       activation: '適用帳號：從未開通會員，或上次訂閱已到期 / 掉訂至少 10 分鐘。最終資格以兌換預檢為準。',
@@ -55,8 +55,8 @@ export const purchaseClarityCopy: Record<string, Copy> = {
   },
   'en-US': {
     title: 'Check before buying', help: 'Unsure about eligibility? Check with support on WeChat Cqz0924ttxk before buying.',
-    redeem: 'Open redemption page · cdk.bar', codeDelivery: 'Find the code in your order after payment. Follow the eligibility check, submit and check the result on the redemption page. Code delivery does not activate your account.',
-    creditsDelivery: 'Find the code in your order after payment. Complete the eligibility check, submit and check the result on the redemption page. Code delivery does not mean credits have been added.',
+    codeDelivery: 'Find the code and redemption link in your order delivery instructions after payment. Follow the eligibility check, submit and check the result on the redemption page. Code delivery does not activate your account.',
+    creditsDelivery: 'Find the code and redemption link in your order delivery instructions after payment. Complete the eligibility check, submit and check the result on the redemption page. Code delivery does not mean credits have been added.',
     linkDelivery: 'Find this product’s redemption link in your order after payment. Redeem with your own account; no password is required.',
     rules: {
       activation: 'For accounts with no previous membership, or a subscription that expired / ended at least 10 minutes ago. Eligibility is confirmed during redemption.',

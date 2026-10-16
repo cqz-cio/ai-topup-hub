@@ -196,7 +196,7 @@
         </div>
         <div class="prose max-w-none dark:prose-invert prose-a:text-primary prose-img:rounded-md">
           <p v-if="getLocalizedText(product.description)">{{ getLocalizedText(product.description) }}</p>
-          <div v-if="product.content" v-html="processHtmlForDisplay(productRedemptionContent(getLocalizedText(product.content), product.slug))"></div>
+          <div v-if="product.content" v-html="processHtmlForDisplay(getLocalizedText(product.content))"></div>
         </div>
       </section>
 
@@ -251,7 +251,6 @@
 
 <script setup lang="ts">
 import ProductPurchaseGuide from '../../components/product/ProductPurchaseGuide.vue'
-import { productRedemptionContent } from '../../utils/productPurchaseGuide'
 import ProductInvoiceNotice from '../../components/commerce/ProductInvoiceNotice.vue'
 import { computed, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'

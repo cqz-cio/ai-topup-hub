@@ -8,6 +8,7 @@ import unittest
 
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from public_redemption import public_copy
 from redemption_guide import apply_to_database, catalog_fields, load_guide
 
 
@@ -39,7 +40,7 @@ class RedemptionGuideTest(unittest.TestCase):
     def test_plan_is_read_only(self):
         before = self.snapshot()
         report = apply_to_database(self.database, self.guide)
-        self.assertEqual(report["planned_count"], 11)
+        self.assertEqual(report["planned_count"], len(self.guide["product_slugs"]))
         self.assertEqual(report["changed_count"], 0)
         self.assertIsNone(report["backup"])
         self.assertEqual(self.snapshot(), before)
@@ -47,7 +48,7 @@ class RedemptionGuideTest(unittest.TestCase):
     def test_apply_scopes_changes_and_preserves_backup(self):
         before = self.snapshot()
         report = apply_to_database(self.database, self.guide, apply=True, backup_dir=self.backups)
-        self.assertEqual(report["changed_count"], 11)
+        self.assertEqual(report["changed_count"], len(self.guide["product_slugs"]))
         self.assertEqual(self.snapshot(report["backup"]), before)
         after = self.snapshot()
         self.assertEqual(after["orders"], before["orders"])
@@ -69,12 +70,12 @@ class RedemptionGuideTest(unittest.TestCase):
             if new[1] in self.guide["ios_product_slugs"]:
                 content = json.loads(new[2])["zh-CN"]
                 self.assertNotIn("请勿直接套用普通卡充渠道", content)
-                self.assertIn("https://cdk.bar/", content)
+                self.assertNotIn("cdk.bar", content)
                 self.assertIn("原有剩余时长不会叠加", content)
                 self.assertIn("30 天权益", content)
             else:
                 expected_content = {locale: body.replace("https://cdkai.kdns.fr/", "https://cdk.bar/") for locale, body in json.loads(old[2]).items()}
-                self.assertEqual(json.loads(new[2]), expected_content)
+                self.assertEqual(json.loads(new[2]), public_copy(expected_content))
 
     def test_repeat_is_idempotent(self):
         apply_to_database(self.database, self.guide, apply=True, backup_dir=self.backups)

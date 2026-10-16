@@ -1,6 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { productPurchaseGuide, productRedemptionContent } from '../src/utils/productPurchaseGuide.ts'
+import { productPurchaseGuide } from '../src/utils/productPurchaseGuide.ts'
+import { purchaseClarityCopy } from '../src/i18n/purchaseClarity.ts'
 import { checkoutPaymentSummary } from '../src/utils/checkoutPaymentSummary.ts'
 import { calculateChannelFeeCents } from '../src/utils/money.ts'
 
@@ -15,18 +16,9 @@ test('Gemini retains distinct age and warranty rules and never gets the ChatGPT 
   assert.deepEqual(productPurchaseGuide('qzweb-50')?.rules, ['jio', 'accountAge', 'activationOnly', 'antigravity'])
   assert.deepEqual(productPurchaseGuide('qzweb-51')?.rules, ['jio', 'geminiWarranty', 'antigravity'])
   assert.ok(productPurchaseGuide('qzweb-52')?.rules.includes('presale'))
-  for (let id = 50; id <= 53; id++) assert.equal(productPurchaseGuide(`qzweb-${id}`)?.redemptionUrl, null)
+  for (let id = 50; id <= 53; id++) assert.equal(productPurchaseGuide(`qzweb-${id}`)?.kind, 'link')
 })
 
-test('repairs missing redemption links without duplicating existing links or altering other products', () => {
-  const plain = '<li>打开兑换页，按提示输入卡密。</li>'
-  const naked = '<li>打开<a>兑换页</a>，按提示输入卡密。</li>'
-  const fixed = productRedemptionContent(plain, 'qzweb-5')
-  assert.match(fixed, /href="https:\/\/cdk.bar\/"/)
-  assert.equal(productRedemptionContent(naked, 'qzweb-55'), fixed)
-  assert.equal(productRedemptionContent(fixed, 'qzweb-5'), fixed)
-  assert.equal(productRedemptionContent(plain, 'qzweb-50'), plain)
-})
 
 const wechat = { fee_policy: 'customer_surcharge', fee_rate: '1.60', fixed_fee: '0', fee_rounding: 'ceil' }
 test('130 CNY WeChat order displays 132.08 including its 2.08 surcharge', () => {
@@ -45,4 +37,12 @@ test('channel changes remove old fees and discounted amounts use the existing ce
   const total = 8088
   assert.equal(checkoutPaymentSummary(total, 0, total, calculateChannelFeeCents(total, wechat)).total, 8218)
   assert.equal(checkoutPaymentSummary(total, 0, total, calculateChannelFeeCents(total, { fee_policy: 'merchant_absorb' })).total, 8088)
+})
+
+test('presales guides contain eligibility and delivery directions without a redemption address', () => {
+  for (const slug of ['qzweb-5', 'qzweb-7', 'qzweb-73', 'qzweb-50']) {
+    assert.ok(productPurchaseGuide(slug)?.rules.length)
+    assert.equal('redemptionUrl' in productPurchaseGuide(slug)!, false)
+  }
+  assert.doesNotMatch(JSON.stringify(purchaseClarityCopy), /cdk\.bar|cdkai\.kdns\.fr/)
 })
