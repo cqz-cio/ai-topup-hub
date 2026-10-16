@@ -10,7 +10,7 @@ export const adminBrandMessages = {
       pricingAction: '管理会员商品价',
       supportTitle: '客服与兑换指引',
       supportDescription: '客服微信：{wechat} · 兑换方式以订单说明为准。',
-      supportAction: 'ChatGPT 卡密自助充值',
+      supportAction: '查看订单交付',
     },
     systemInfo: {
       button: '系统信息',
@@ -35,7 +35,7 @@ export const adminBrandMessages = {
       pricingAction: '管理會員商品價',
       supportTitle: '客服與兌換指引',
       supportDescription: '客服微信：{wechat} · 兌換方式以訂單說明為準。',
-      supportAction: 'ChatGPT 卡密自助充值',
+      supportAction: '查看訂單交付',
     },
     systemInfo: {
       button: '系統資訊',
@@ -60,7 +60,7 @@ export const adminBrandMessages = {
       pricingAction: 'Manage member prices',
       supportTitle: 'Support & redemption',
       supportDescription: 'WeChat: {wechat} · Follow the redemption instructions in each order.',
-      supportAction: 'Redeem ChatGPT cards',
+      supportAction: 'View order deliveries',
     },
     systemInfo: {
       button: 'System information',
