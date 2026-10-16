@@ -210,3 +210,5 @@ final result: passed
 - 售前页面、公开 API、商城发布包不含具体兑换域名；订单交付说明原值保留。关于页共享默认文案的构建残留已修正并重新扫描。
 
 无待处理 P0/P1/P2；不同身份的价格、实时库存和浏览器字体栅格化差异不作为视觉偏差。最终发布产物与线上截图继续记录在同一私有证据目录。
+
+正式复核：发布 `20261016-104524`，7 项页面检查通过，1920/390/320px 无溢出和脚本错误；左右卡片坐标与日常本机一致。正式截图 `production-desktop.jpg`、`production-390.jpg`、`production-320.jpg`、`production-qzweb-73.jpg`、`production-qzweb-50.jpg` 位于同一私有证据目录。final result: passed。
