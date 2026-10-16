@@ -15,7 +15,7 @@ export const purchaseClarityCopy: Record<string, Copy> = {
     linkDelivery: '付款后在订单中领取本商品的兑换链接，使用自己的账号兑换，无需提供密码。',
     rules: {
       activation: '适用账号：从未开通过会员，或上次订阅已到期 / 掉订至少 10 分钟。最终资格以兑换预检为准。',
-      renewal: '续费条件：账号当前仍为 Pro 20x。请勿按新开通商品购买；绑卡后需联系客服确认。',
+      renewal: '续费条件：账号当前仍为 Pro 10x。请勿按新开通商品购买；绑卡后需联系客服确认。',
       go: '这是 ChatGPT Go 兑换码。账号资格、套餐权益与实际有效期以兑换预检和兑换结果为准。',
       credits: '须已有有效订阅，并符合点数购买资格。仅充值 Codex 点数，不包含 Plus / Pro 订阅，也不延长订阅时长。',
       jio: '已使用过 Jio 活动的账号无法再次使用，请勿购买。',
@@ -38,7 +38,7 @@ export const purchaseClarityCopy: Record<string, Copy> = {
     linkDelivery: '付款後在訂單中領取本商品的兌換連結，使用自己的帳號兌換，無需提供密碼。',
     rules: {
       activation: '適用帳號：從未開通會員，或上次訂閱已到期 / 掉訂至少 10 分鐘。最終資格以兌換預檢為準。',
-      renewal: '續費條件：帳號目前仍為 Pro 20x。請勿按新開通商品購買；綁卡後需聯絡客服確認。',
+      renewal: '續費條件：帳號目前仍為 Pro 10x。請勿按新開通商品購買；綁卡後需聯絡客服確認。',
       go: '這是 ChatGPT Go 兌換碼。帳號資格、方案權益與實際有效期以兌換預檢和兌換結果為準。',
       credits: '須已有有效訂閱，並符合點數購買資格。僅儲值 Codex 點數，不包含 Plus / Pro 訂閱，也不延長訂閱時長。',
       jio: '已使用過 Jio 活動的帳號無法再次使用，請勿購買。', accountAge: '註冊未滿 7 天的新帳號請勿購買。',
@@ -60,7 +60,7 @@ export const purchaseClarityCopy: Record<string, Copy> = {
     linkDelivery: 'Find this product’s redemption link in your order after payment. Redeem with your own account; no password is required.',
     rules: {
       activation: 'For accounts with no previous membership, or a subscription that expired / ended at least 10 minutes ago. Eligibility is confirmed during redemption.',
-      renewal: 'Renewal requires an account currently on Pro 20x. This is not a new activation. Contact support after linking the card.',
+      renewal: 'Renewal requires an account currently on Pro 10x. This is not a new activation. Contact support after linking the card.',
       go: 'This is a ChatGPT Go redemption code. Eligibility, benefits and duration depend on the eligibility check and redemption result.',
       credits: 'Requires an active subscription and eligibility to purchase credits. Codex credits only; no Plus / Pro subscription or subscription extension.',
       jio: 'Accounts that previously used the Jio offer are ineligible. Do not purchase for these accounts.',

@@ -9,9 +9,9 @@ const localizedValues = (value: unknown): string[] => {
 function normalizeSearchText(text: string): string {
   return text.normalize('NFKC').toLowerCase()
     .replace(/chat\s+gpt/g, 'chatgpt')
-    .replace(/(^|[^\d])(5|20|50)\s*(?:x|×|倍)(?![a-z\d])/g, '$1$2x')
+    .replace(/(^|[^\d])(5|10|20|25|50)\s*(?:x|×|倍)(?![a-z\d])/g, '$1$2x')
     // The catalog also names Pro tiers without the trailing x (e.g. Pro 20新老号).
-    .replace(/\bpro\s*(5|20|50)(?!\d)(?:x)?/g, 'pro $1x')
+    .replace(/\bpro\s*(5|10|20|25|50)(?!\d)(?:x)?/g, 'pro $1x')
     .replace(/\s+/g, ' ').trim()
 }
 
