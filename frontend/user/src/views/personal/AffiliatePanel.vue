@@ -1,9 +1,9 @@
 <template>
   <div class="space-y-6">
-    <div class="rounded-2xl border bg-card p-7 shadow-sm">
+    <div class="rounded-2xl border bg-card p-5 shadow-sm sm:p-7">
       <PanelHeading :title="t('personalCenter.affiliate.title')" :description="t('personalCenter.affiliate.subtitle')" :icon="Megaphone">
         <template #actions>
-          <Badge variant="accent" size="sm">{{ t('personalCenter.tabs.affiliate') }}</Badge>
+          <Badge variant="accent" size="sm" class="hidden sm:inline-flex">{{ t('personalCenter.tabs.affiliate') }}</Badge>
         </template>
       </PanelHeading>
 
@@ -21,6 +21,8 @@
       <Alert v-else-if="!dashboard.enabled" class="mb-4"><AlertDescription>{{ t('featureAvailability.affiliateClosed') }}</AlertDescription></Alert>
       <Alert v-else-if="dashboard.opened && dashboard.profile_status !== 'active'" class="mb-4"><AlertDescription>{{ t('featureAvailability.affiliateSuspended') }}</AlertDescription></Alert>
 
+      <AffiliateRulesSummary v-if="!loading && dashboard?.enabled" />
+
       <template v-if="!loading && dashboard?.opened">
         <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
           <div class="rounded-xl border p-4 md:col-span-2">
@@ -33,24 +35,24 @@
             </div>
             <div class="mt-3 text-xs text-muted-foreground break-all">{{ promotionUrl }}</div>
           </div>
-          <div class="rounded-xl border p-4">
+          <div class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 rounded-xl border p-4 md:block">
             <div class="text-xs text-muted-foreground">{{ t('personalCenter.affiliate.conversionRate') }}</div>
-            <div class="mt-2 text-lg font-bold text-foreground">{{ conversionRateText }}</div>
-            <div class="mt-2 text-xs text-muted-foreground">
+            <div class="text-lg font-bold text-foreground md:mt-2">{{ conversionRateText }}</div>
+            <div class="col-span-2 mt-2 text-xs text-muted-foreground">
               {{ t('personalCenter.affiliate.conversionDetail', { clicks: dashboard?.click_count || 0, orders: dashboard?.valid_order_count || 0 }) }}
             </div>
           </div>
-          <div class="rounded-xl border p-4">
+          <div class="flex items-center justify-between gap-3 rounded-xl border p-4 md:block">
             <div class="text-xs text-muted-foreground">{{ t('personalCenter.affiliate.pendingCommission') }}</div>
-            <div class="mt-2 text-lg font-bold text-foreground">{{ dashboard?.pending_commission || '0.00' }}</div>
+            <div class="text-lg font-bold text-foreground md:mt-2">{{ dashboard?.pending_commission || '0.00' }}</div>
           </div>
-          <div class="rounded-xl border p-4">
+          <div class="flex items-center justify-between gap-3 rounded-xl border p-4 md:block">
             <div class="text-xs text-muted-foreground">{{ t('walletEarnings.settled') }}</div>
-            <div class="mt-2 text-lg font-bold text-foreground">{{ dashboard?.available_commission || '0.00' }}</div>
+            <div class="text-lg font-bold text-foreground md:mt-2">{{ dashboard?.available_commission || '0.00' }}</div>
           </div>
-          <div class="rounded-xl border p-4">
+          <div class="flex items-center justify-between gap-3 rounded-xl border p-4 md:block">
             <div class="text-xs text-muted-foreground">{{ t('personalCenter.affiliate.withdrawnCommission') }}</div>
-            <div class="mt-2 text-lg font-bold text-foreground">{{ dashboard?.withdrawn_commission || '0.00' }}</div>
+            <div class="text-lg font-bold text-foreground md:mt-2">{{ dashboard?.withdrawn_commission || '0.00' }}</div>
           </div>
         </div>
       </template>
@@ -64,7 +66,9 @@
     </div>
 
     <div class="rounded-2xl border bg-card p-5 sm:p-7 space-y-3">
-      <p class="text-sm text-muted-foreground">{{ t('walletEarnings.affiliateRule') }}</p>
+      <h3 class="text-base font-bold">{{ rulesCopy.conditionsTitle }}</h3>
+      <p class="text-sm leading-relaxed text-muted-foreground"><strong class="font-semibold text-ink-secondary">{{ rulesCopy.eligibility }}</strong> {{ rulesCopy.exclusions }}</p>
+      <p class="text-sm leading-relaxed text-muted-foreground">{{ rulesCopy.settlement }} <strong class="font-semibold text-ink-secondary">{{ rulesCopy.withdrawal }}</strong></p>
       <p class="text-sm">{{ t('walletEarnings.unified') }}</p>
       <Button as-child><RouterLink to="/me/wallet">{{ t('walletEarnings.walletLink') }}</RouterLink></Button>
     </div>
@@ -172,6 +176,8 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Megaphone } from 'lucide-vue-next'
 import PanelHeading from '../../components/shared/PanelHeading.vue'
+import AffiliateRulesSummary from '../../components/affiliate/AffiliateRulesSummary.vue'
+import { affiliateRulesCopy } from '../../i18n/affiliateRules'
 import { affiliateAPI, type AffiliateCommissionData, type AffiliateDashboardData, type AffiliateWithdrawData } from '../../api'
 import {
   AFFILIATE_COMMISSION_STATUS_AVAILABLE,
@@ -191,7 +197,8 @@ import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import PaginationNav from '../../components/PaginationNav.vue'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
+const rulesCopy = computed(() => affiliateRulesCopy[locale.value] || affiliateRulesCopy['zh-CN']!)
 const appStore = useAppStore()
 
 const loading = ref(true)
