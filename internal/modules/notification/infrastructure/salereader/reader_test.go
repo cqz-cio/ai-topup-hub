@@ -163,3 +163,21 @@ func TestSaleSummaryDoesNotMixCurrenciesOrReadBalanceForLocalGoods(t *testing.T)
 		t.Fatalf("unexpected upstream read for local goods: %v %v", data, err)
 	}
 }
+
+func TestFulfilledProcurementIsFinalAndIncludesActualCost(t *testing.T) {
+	for locale, delivered := range map[string]string{constants.LocaleZhCN: "已发货", constants.LocaleZhTW: "已發貨", constants.LocaleEnUS: "Delivered"} {
+		t.Run(locale, func(t *testing.T) {
+			order := upstreamOrder(1)
+			adapter := &balanceAdapter{result: &upstream.PingResult{Balance: "67", Currency: "CNY"}}
+			r := New(orderStub{&order}, procurementStub{1: purchase(9, "fulfilled", "33", "CNY")}, connectionStub{9: adapter})
+			data, err := r.Build(context.Background(), 1, locale, false)
+			if err != nil {
+				t.Fatal(err)
+			}
+			text := data["upstream_summary"].(string)
+			if data["upstream_purchase_amounts"] != "33.00 CNY" || !strings.Contains(text, delivered) || strings.Contains(text, "CARD-MUST-NOT-APPEAR") || adapter.calls != 1 {
+				t.Fatalf("incorrect completed purchase summary: %v", data)
+			}
+		})
+	}
+}

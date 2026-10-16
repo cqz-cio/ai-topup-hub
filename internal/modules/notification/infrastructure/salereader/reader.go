@@ -98,7 +98,7 @@ func (r *Reader) Build(ctx context.Context, orderID uint, locale string, allowPe
 			line += fmt.Sprintf(" / %s：%s", labels.reference, purchase.UpstreamOrderNo)
 		}
 		switch purchase.Status {
-		case "accepted", "delivered", "refunded", "partially_refunded":
+		case "accepted", "fulfilled", "delivered", "refunded", "partially_refunded":
 			currency := strings.ToUpper(strings.TrimSpace(purchase.UpstreamCurrency))
 			if currency != "" && purchase.UpstreamAmount.Decimal.GreaterThan(decimal.Zero) {
 				line += fmt.Sprintf(" / %s：%s %s", labels.cost, purchase.UpstreamAmount.Decimal.StringFixed(2), currency)
@@ -176,7 +176,7 @@ func (r *Reader) Build(ctx context.Context, orderID uint, locale string, allowPe
 
 func pending(status string) bool {
 	switch status {
-	case "accepted", "delivered", "rejected", "manual_review", "canceled", "refunded", "partially_refunded":
+	case "accepted", "fulfilled", "delivered", "rejected", "manual_review", "canceled", "refunded", "partially_refunded":
 		return false
 	default:
 		return true
@@ -189,6 +189,10 @@ type labels struct {
 }
 
 func (l labels) status(value string) string {
+	// Procurement records use fulfilled; delivered is the customer order state.
+	if value == "fulfilled" {
+		value = "delivered"
+	}
 	if text, ok := l.statuses[value]; ok {
 		return text
 	}
