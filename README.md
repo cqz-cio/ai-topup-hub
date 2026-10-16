@@ -98,3 +98,5 @@ USDT 新支付单统一向上取到两位小数，同额时按 0.01 USDT 选择�
 ## 客服独立分支：换设备与密钥
 
 客服功能在 `codex/customer-support-agent` 分支调试。换设备前阅读 [开发密钥清单与初始化](docs/development-secrets.md)，或执行 `node scripts/local/support-secrets.mjs check` 检查本机配置。GitHub Actions Secret 名为 `SUPPORT_DEEPSEEK_API_KEY`；Git 拉取只包含清单、空模板和脚本，不包含 Key 原文。实际服务配置只保存于忽略的 `work/codex-runtime/support-agent/private/config.json`，不能提交。
+
+2026-10-16 已从客服开发分支建立 `codex/customer-support-review-20261016` 并完成本机检查；范围、结果及主线差异见 [客服 Agent 分支检查记录](docs/customer-support-review-20261016.md)。该分支保留现有客服代码，未合并主线或部署。
