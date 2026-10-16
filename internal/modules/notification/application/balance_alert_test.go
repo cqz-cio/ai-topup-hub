@@ -87,8 +87,9 @@ func TestBalanceAlertUsesActualSMTPResultAndDeduplicates(t *testing.T) {
 			if len(q.payloads) != 1 {
 				t.Fatal("repeated click enqueued duplicate mail")
 			}
-			if err := svc.Dispatch(ctx, q.payloads[0]); err != nil {
-				t.Fatal(err)
+			err := svc.Dispatch(ctx, q.payloads[0])
+			if (tc.status == "sent" && err != nil) || (tc.status != "sent" && !errors.Is(err, contract.ErrSendFailed)) {
+				t.Fatalf("failed recipients must be retryable: %v", err)
 			}
 			if status := svc.BalanceAlertStatus(ctx, 7); status != tc.status {
 				t.Fatalf("mail status %s, want %s", status, tc.status)

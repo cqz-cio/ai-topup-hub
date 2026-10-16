@@ -33,13 +33,29 @@ type balanceAdapter struct {
 	err              error
 	calls            int
 	bounded          bool
+	stall            bool
 }
 
 func (a *balanceAdapter) Ping(ctx context.Context) (*upstream.PingResult, error) {
 	a.calls++
 	deadline, ok := ctx.Deadline()
 	a.bounded = ok && time.Until(deadline) <= 8*time.Second
+	if a.stall {
+		<-ctx.Done()
+		return nil, ctx.Err()
+	}
 	return a.result, a.err
+}
+
+func TestSlowSupplierCannotDelayMailBeyondBalanceBudget(t *testing.T) {
+	order := &orderdomain.Order{ID: 1, Children: []orderdomain.Order{upstreamOrder(2), upstreamOrder(3)}}
+	adapter := &balanceAdapter{stall: true}
+	r := New(orderStub{order}, procurementStub{2: purchase(8, "fulfilled", "33", "CNY"), 3: purchase(9, "fulfilled", "10", "CNY")}, connectionStub{8: adapter, 9: adapter})
+	start := time.Now()
+	data, err := r.Build(context.Background(), 1, constants.LocaleZhCN, true)
+	if err != nil || time.Since(start) > 4*time.Second || !strings.Contains(data["upstream_summary"].(string), "余额暂时查询失败") {
+		t.Fatalf("slow supplier blocked notification: %v %v", err, data)
+	}
 }
 
 type connectionStub map[uint]*balanceAdapter

@@ -2,6 +2,7 @@ package queue
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/dujiao-next/internal/constants"
 
@@ -44,9 +45,10 @@ const (
 
 // OrderStatusEmailPayload 订单状态邮件任务载荷
 type OrderStatusEmailPayload struct {
-	OrderID        uint   `json:"order_id"`
-	RefundRecordID uint   `json:"refund_record_id,omitempty"`
-	Status         string `json:"status"`
+	EnqueuedAt     time.Time `json:"enqueued_at,omitempty"`
+	OrderID        uint      `json:"order_id"`
+	RefundRecordID uint      `json:"refund_record_id,omitempty"`
+	Status         string    `json:"status"`
 }
 
 // OrderAutoFulfillPayload 自动交付任务载荷
@@ -66,12 +68,14 @@ type WalletRechargeExpirePayload struct {
 
 // NotificationDispatchPayload 通知中心分发任务载荷
 type NotificationDispatchPayload struct {
-	EventType string                 `json:"event_type"`
-	BizType   string                 `json:"biz_type"`
-	BizID     uint                   `json:"biz_id"`
-	Locale    string                 `json:"locale"`
-	Force     bool                   `json:"force"`
-	Data      map[string]interface{} `json:"data"`
+	EnqueuedAt time.Time              `json:"enqueued_at,omitempty"`
+	IsTest     bool                   `json:"is_test,omitempty"`
+	EventType  string                 `json:"event_type"`
+	BizType    string                 `json:"biz_type"`
+	BizID      uint                   `json:"biz_id"`
+	Locale     string                 `json:"locale"`
+	Force      bool                   `json:"force"`
+	Data       map[string]interface{} `json:"data"`
 }
 
 // NewOrderStatusEmailTask 创建订单状态邮件任务

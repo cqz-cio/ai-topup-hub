@@ -232,7 +232,20 @@ func (s *Service) prepareSMTPEnvelope(toEmail, fromNameOverride string) (string,
 }
 
 // sendSMTPMessage 根据配置选择 SSL/STARTTLS/明文通道发送邮件。
-func (s *Service) sendSMTPMessage(addr, toEmail string, msg []byte) error {
+func (s *Service) sendSMTPMessage(addr, toEmail string, msg []byte) (sendErr error) {
+	started := time.Now()
+	defer func() {
+		status := "accepted"
+		if sendErr != nil {
+			status = "failed"
+		}
+		messageID := ""
+		if parsed, err := mail.ReadMessage(bytes.NewReader(msg)); err == nil {
+			messageID = parsed.Header.Get("Message-ID")
+		}
+		logger.Infow("smtp_send_complete", "host", s.cfg.Host, "message_id", messageID,
+			"status", status, "elapsed_ms", time.Since(started).Milliseconds())
+	}()
 	recipients := []string{toEmail}
 	if s.cfg.UseSSL {
 		return normalizeEmailSendError(sendMailWithSSL(addr, s.cfg.Host, s.cfg.From, recipients, msg, s.cfg.Username, s.cfg.Password))
@@ -516,7 +529,7 @@ func dialSMTPClient(addr, host string, implicitTLS bool, budget time.Duration) (
 }
 
 func sendMailWithSSL(addr, host, from string, to []string, msg []byte, username, password string) (err error) {
-	client, err := dialSMTPClient(addr, host, true, 30*time.Second)
+	client, err := dialSMTPClient(addr, host, true, 15*time.Second)
 	if err != nil {
 		return err
 	}
@@ -531,7 +544,7 @@ func sendMailWithSSL(addr, host, from string, to []string, msg []byte, username,
 }
 
 func sendMailWithStartTLS(addr, host, from string, to []string, msg []byte, username, password string) (err error) {
-	client, err := dialSMTPClient(addr, host, false, 30*time.Second)
+	client, err := dialSMTPClient(addr, host, false, 15*time.Second)
 	if err != nil {
 		return err
 	}
@@ -550,7 +563,7 @@ func sendMailWithStartTLS(addr, host, from string, to []string, msg []byte, user
 }
 
 func sendMailPlain(addr, host, from string, to []string, msg []byte, username, password string) (err error) {
-	client, err := dialSMTPClient(addr, host, false, 30*time.Second)
+	client, err := dialSMTPClient(addr, host, false, 15*time.Second)
 	if err != nil {
 		return err
 	}
@@ -696,7 +709,12 @@ func sendSMTPData(client *smtp.Client, host, addr, from string, to []string, msg
 	if err := w.Close(); err != nil {
 		return err
 	}
-	return quitSMTPClient(client, host, addr)
+	// DATA has been accepted. A failed QUIT is cleanup failure, not failed mail;
+	// retrying here would send an already accepted message a second time.
+	if err := quitSMTPClient(client, host, addr); err != nil {
+		logger.Debugw("smtp_quit_after_accept_failed", "host", host, "error", err)
+	}
+	return nil
 }
 
 // quitSMTPClient 优先执行 SMTP QUIT；仅在 QUIT 失败时补偿 Close 回收连接。

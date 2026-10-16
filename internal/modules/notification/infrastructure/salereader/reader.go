@@ -130,7 +130,7 @@ func (r *Reader) Build(ctx context.Context, orderID uint, locale string, allowPe
 	}
 	sort.Slice(ids, func(i, j int) bool { return ids[i] < ids[j] })
 	// Bound all balance lookups together; these reads are independent of delivery.
-	queryCtx, cancel := context.WithTimeout(ctx, 15*time.Second)
+	queryCtx, cancel := context.WithTimeout(ctx, 3*time.Second)
 	defer cancel()
 	var balances []string
 	for _, id := range ids {
@@ -143,7 +143,7 @@ func (r *Reader) Build(ctx context.Context, orderID uint, locale string, allowPe
 			}
 			adapter, adapterErr := r.connections.GetAdapter(connection)
 			if adapterErr == nil && adapter != nil {
-				accountCtx, accountCancel := context.WithTimeout(queryCtx, 8*time.Second)
+				accountCtx, accountCancel := context.WithTimeout(queryCtx, 3*time.Second)
 				result, pingErr := adapter.Ping(accountCtx)
 				accountCancel()
 				if pingErr == nil && result != nil {

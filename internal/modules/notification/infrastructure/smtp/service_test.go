@@ -1,6 +1,7 @@
 package smtp
 
 import (
+	"bufio"
 	"crypto/tls"
 	"errors"
 	"fmt"
@@ -23,6 +24,103 @@ import (
 
 	"github.com/shopspring/decimal"
 )
+
+// Exercise every mail path through the real SMTP protocol, including a peer
+// that accepts DATA then disconnects before QUIT. No external recipients.
+func TestAllEmailKindsUseBoundedSMTPAndDoNotRetryAcceptedData(t *testing.T) {
+	listener, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer listener.Close()
+	messages := make(chan string, 20)
+	go func() {
+		for {
+			conn, err := listener.Accept()
+			if err != nil {
+				return
+			}
+			go func() {
+				defer conn.Close()
+				_ = conn.SetDeadline(time.Now().Add(5 * time.Second))
+				reader := bufio.NewReader(conn)
+				_, _ = io.WriteString(conn, "220 localhost test\r\n")
+				for {
+					line, err := reader.ReadString('\n')
+					if err != nil {
+						return
+					}
+					switch {
+					case strings.HasPrefix(line, "EHLO"), strings.HasPrefix(line, "HELO"):
+						_, _ = io.WriteString(conn, "250 localhost\r\n")
+					case strings.HasPrefix(line, "MAIL"), strings.HasPrefix(line, "RCPT"):
+						_, _ = io.WriteString(conn, "250 OK\r\n")
+					case strings.HasPrefix(line, "DATA"):
+						_, _ = io.WriteString(conn, "354 send body\r\n")
+						var body strings.Builder
+						for {
+							part, err := reader.ReadString('\n')
+							if err != nil {
+								return
+							}
+							if part == ".\r\n" {
+								break
+							}
+							body.WriteString(part)
+						}
+						messages <- body.String()
+						_, _ = io.WriteString(conn, "250 accepted\r\n")
+						return
+					default:
+						_, _ = io.WriteString(conn, "500 unsupported\r\n")
+					}
+				}
+			}()
+		}
+	}()
+	port := listener.Addr().(*net.TCPAddr).Port
+	svc := New(&config.EmailConfig{Enabled: true, Host: "127.0.0.1", Port: port, From: "sender@example.invalid"})
+	brand := mailbrand.Brand{SiteName: "测试站", SiteURL: "https://example.invalid"}
+	started := time.Now()
+	count := 0
+	for _, purpose := range []string{"register", "reset", "telegram_bind", "change_email_old", "change_email_new"} {
+		if err := svc.SendVerifyCode("owner@example.invalid", "TEST-NOT-VALID", purpose, "zh-CN", brand); err != nil {
+			t.Fatal(err)
+		}
+		count++
+	}
+	for _, status := range []string{"paid", "delivered", "completed", "refunded", "partially_refunded"} {
+		input := notificationcontract.OrderStatusEmailInput{OrderNo: "TEST-NO-ORDER", Status: status, Currency: "CNY", MailBrand: brand}
+		if status == "completed" {
+			input.AttachmentName = "test.txt"
+			input.AttachmentContent = "TEST-NOT-A-CARD"
+		}
+		if err := svc.SendOrderStatusEmailWithTemplate("owner@example.invalid", input, "zh-CN", nil); err != nil {
+			t.Fatal(err)
+		}
+		count++
+	}
+	if err := svc.SendCustomEmail("owner@example.invalid", "测试通知", "仅测试邮件"); err != nil {
+		t.Fatal(err)
+	}
+	count++
+	if time.Since(started) > 5*time.Second {
+		t.Fatal("mail was artificially delayed")
+	}
+	for i := 0; i < count; i++ {
+		select {
+		case message := <-messages:
+			if !strings.Contains(message, "Message-ID:") {
+				t.Fatal("missing trace ID")
+			}
+		case <-time.After(time.Second):
+			t.Fatal("mail missing")
+		}
+	}
+	if len(messages) != 0 {
+		t.Fatal("accepted message was duplicated")
+	}
+}
 
 func TestBuildOrderStatusContent(t *testing.T) {
 	tests := []struct {

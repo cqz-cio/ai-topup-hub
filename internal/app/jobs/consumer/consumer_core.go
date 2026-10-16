@@ -32,6 +32,14 @@ func New(c *container.Container) *Consumer {
 }
 
 // Register 注册消费者
+func (c *Consumer) RegisterNotifications(mux *asynq.ServeMux) {
+	if c == nil || mux == nil {
+		return
+	}
+	mux.HandleFunc(queue.TaskOrderStatusEmail, withPanicRecovery(queue.TaskOrderStatusEmail, c.handleOrderStatusEmail))
+	mux.HandleFunc(queue.TaskNotificationDispatch, withPanicRecovery(queue.TaskNotificationDispatch, c.handleNotificationDispatch))
+}
+
 func (c *Consumer) Register(mux *asynq.ServeMux) {
 	if c == nil || mux == nil {
 		logger.Debugw("worker_register_skip_nil", "consumer_nil", c == nil, "mux_nil", mux == nil)

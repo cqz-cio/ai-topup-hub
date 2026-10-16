@@ -130,10 +130,26 @@ func isSaleNotification(payload queue.NotificationDispatchPayload) bool {
 // A supplier balance changes between attempts. Delivery identity therefore uses
 // the order and recipient, not the rendered body or the balance query timestamp.
 func (s *Service) sendNotification(ctx context.Context, payload queue.NotificationDispatchPayload, attempt notificationSendAttempt, send func() error) error {
-	if (isSaleNotification(payload) || isBalanceAlert(payload)) && !payload.Force {
+	if !payload.Force {
+		durable := isSaleNotification(payload) || isBalanceAlert(payload) ||
+			(payload.BizID > 0 && (payload.EventType == constants.NotificationEventWalletRechargeSuccess || payload.EventType == constants.NotificationEventManualFulfillmentPending))
 		signature := fmt.Sprintf("%s|%s|%d|%s|%s", payload.EventType, payload.BizType, payload.BizID, attempt.channel, strings.TrimSpace(attempt.recipient))
 		key := fmt.Sprintf("notification:sale:%x", sha256.Sum256([]byte(signature)))
-		delivered, err := s.logService.HasSuccessfulDelivery(payload.EventType, payload.BizType, payload.BizID, attempt.channel, attempt.recipient)
+		ttl := 7 * 24 * time.Hour
+		if !durable {
+			key = fmt.Sprintf("%s:%x", buildNotificationDedupeKey(payload), sha256.Sum256([]byte(attempt.channel+"|"+strings.TrimSpace(attempt.recipient))))
+			ttl = time.Duration(attempt.dedupeTTLSeconds) * time.Second
+			if ttl <= 0 {
+				ttl = 5 * time.Minute
+			}
+		}
+		wasDelivered := func() (bool, error) {
+			if !durable {
+				return false, nil
+			}
+			return s.logService.HasSuccessfulDelivery(payload.EventType, payload.BizType, payload.BizID, attempt.channel, attempt.recipient)
+		}
+		delivered, err := wasDelivered()
 		if err != nil || delivered {
 			return err
 		}
@@ -141,7 +157,7 @@ func (s *Service) sendNotification(ctx context.Context, payload queue.Notificati
 		if err != nil || cached == "1" {
 			return err
 		}
-		locked, err := cache.SetNX(ctx, key+":sending", "1", 2*time.Minute)
+		locked, err := cache.SetNX(ctx, key+":sending", "1", 30*time.Second)
 		if err != nil {
 			return err
 		}
@@ -154,7 +170,7 @@ func (s *Service) sendNotification(ctx context.Context, payload queue.Notificati
 			_ = cache.Del(cleanupCtx, key+":sending")
 		}()
 		// Another worker may have finished between the first lookup and our lock.
-		delivered, err = s.logService.HasSuccessfulDelivery(payload.EventType, payload.BizType, payload.BizID, attempt.channel, attempt.recipient)
+		delivered, err = wasDelivered()
 		if err != nil || delivered {
 			return err
 		}
@@ -166,7 +182,7 @@ func (s *Service) sendNotification(ctx context.Context, payload queue.Notificati
 		if attempt.sendErr == nil {
 			// The database log remains the durable receipt; this also covers a
 			// temporary log-write failure after SMTP has accepted the message.
-			_ = cache.SetString(ctx, key+":sent", "1", 7*24*time.Hour)
+			_ = cache.SetString(ctx, key+":sent", "1", ttl)
 		}
 	} else {
 		attempt.sendErr = send()

@@ -355,3 +355,27 @@ func TestDisabledSaleNotificationsDoNotQuerySupplier(t *testing.T) {
 		t.Fatal("disabled channel queried supplier")
 	}
 }
+
+func TestWalletAndManualNotificationsRetryOnlyFailedRecipients(t *testing.T) {
+	for _, event := range []string{constants.NotificationEventWalletRechargeSuccess, constants.NotificationEventManualFulfillmentPending} {
+		t.Run(event, func(t *testing.T) {
+			setting := settingsmessaging.NotificationCenterDefaultSetting()
+			setting.Scenes.WalletRechargeSuccess = true
+			setting.Scenes.ManualFulfillmentPending = true
+			setting.Channels.Email = settingsmessaging.NotificationChannelSetting{Enabled: true, Recipients: []string{"owner@example.com", "backup@example.com"}}
+			sender := &saleEmailStub{calls: map[string]int{}, fail: "backup@example.com"}
+			s := NewService(notificationSettingsStub{notification: setting}, sender, nil, nil, NewLogService(&saleLogStub{}), nil, nil)
+			payload := queue.NotificationDispatchPayload{EventType: event, BizType: "test", BizID: 888}
+			if err := s.Dispatch(context.Background(), payload); err == nil {
+				t.Fatal("failure swallowed")
+			}
+			sender.fail = ""
+			if err := s.Dispatch(context.Background(), payload); err != nil {
+				t.Fatal(err)
+			}
+			if sender.calls["owner@example.com"] != 1 || sender.calls["backup@example.com"] != 2 {
+				t.Fatal(sender.calls)
+			}
+		})
+	}
+}
