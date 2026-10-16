@@ -1,3 +1,9 @@
+## 客服独立分支与 GitHub Secret（2026-10-16）
+
+- 客服开发保持在 `codex/customer-support-agent`。DeepSeek Key 已存为 `cqz-cio/ai-topup-hub` 的 Actions Secret `SUPPORT_DEEPSEEK_API_KEY`；只同步独立分支供换设备使用，不合并主线或部署。
+- 新设备先读 `docs/development-secrets.md` 与 `docs/development-secrets.json`，运行 `node scripts/local/support-secrets.mjs check`。本机已有 `work/codex-runtime/support-agent/private/config.json` 时直接复用，不重复索要或覆盖；缺失时通过隐藏输入或安全注入环境执行 `init`。
+- GitHub Secret 不能通过 git pull 或 API 读回值；仓库只保存名称、用途、相对文件路径和空模板。不得把私密文件提交，或用 workflow 日志/公开产物导出 Secret。这里仅迁移客服 API Key 的配置知识，不授权同步服务器、支付或其他凭据。
+
 # π星卡社开发约束
 
 ## 推广返利规则说明上线（2026-10-16）

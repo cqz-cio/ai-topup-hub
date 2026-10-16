@@ -93,3 +93,8 @@ USDT 新支付单统一向上取到两位小数，同额时按 0.01 USDT 选择�
 关于页面所有文案、充值续费说明、客服提示及相关入口现在都可在后台「系统设置 → 站点设置 → 关于我们 (About)」直接修改，保存后刷新商城生效；原有商品说明保持独立。
 
 2026-10-15 已上线[付款前卡台余额检查](docs/payment-balance-guard.md)：U 和微信商品付款前汇总采购成本并查询余额，不足或无法查询时暂停付款；弹窗明确联系客服，邮件提醒按实际发送结果显示。日常本地验收通过后推送、备份并发布，原商品、收款配置和业务数据保留。
+
+
+## 客服独立分支：换设备与密钥
+
+客服功能在 `codex/customer-support-agent` 分支调试。换设备前阅读 [开发密钥清单与初始化](docs/development-secrets.md)，或执行 `node scripts/local/support-secrets.mjs check` 检查本机配置。GitHub Actions Secret 名为 `SUPPORT_DEEPSEEK_API_KEY`；Git 拉取只包含清单、空模板和脚本，不包含 Key 原文。实际服务配置只保存于忽略的 `work/codex-runtime/support-agent/private/config.json`，不能提交。
