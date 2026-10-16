@@ -45,20 +45,27 @@
         <CheckoutSteps class="mb-8" current-step="cart" />
 
         <!-- Main Info Card -->
-        <div
-          class="bg-card backdrop-blur-xl border rounded-3xl overflow-hidden mb-8 shadow-2xl">
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-0">
-            <!-- Product Images (Left) -->
-            <ProductImageGallery
-              :images="images"
-              :current-image="currentImage"
-              :product-title="getLocalizedText(product.title)"
-              @update:current-image="currentImage = $event"
-            />
+        <div class="product-overview">
+          <div class="product-overview-layout">
+            <div class="product-media-panel">
+              <ProductImageGallery
+                :images="images"
+                :current-image="currentImage"
+                :product-title="getLocalizedText(product.title)"
+                @update:current-image="currentImage = $event"
+              />
+              <div class="product-media-copy">
+                <section v-if="getLocalizedText(product.description)" class="product-description">
+                  <h2>{{ t('productDetail.description') }}</h2>
+                  <p>{{ getLocalizedText(product.description) }}</p>
+                </section>
+                <ProductRedemptionGuide :slug="product.slug" class="product-redemption" />
+              </div>
+            </div>
 
             <!-- Product Info (Right) -->
-            <div class="p-6 md:p-8 lg:p-12 flex flex-col justify-center">
-              <div class="mb-6">
+            <div class="product-purchase-panel">
+              <div class="product-purchase-summary">
                 <div v-if="categoryName" class="mb-3 text-xs uppercase tracking-wider text-muted-foreground">
                   {{ t('productDetail.categoryLabel') }} · {{ categoryName }}
                 </div>
@@ -73,7 +80,7 @@
                   </Badge>
                 </div>
 
-                <h1 class="mb-4 text-2xl md:text-3xl lg:text-5xl font-black leading-tight text-foreground">
+                <h1 class="product-title text-foreground">
                   {{ getLocalizedText(product.title) }}
                 </h1>
 
@@ -95,7 +102,7 @@
                   </Badge>
                 </div>
 
-                <div class="mb-8 border-b pb-8" ref="priceSection">
+                <div class="product-price border-b" ref="priceSection">
                   <div class="mb-3 flex flex-wrap items-center gap-2">
                     <span class="text-sm text-muted-foreground">{{ t('products.price') }}</span>
                     <Badge v-if="(selectedSku && hasSkuPromotionPrice(selectedSku)) || (!selectedSku && hasPromotionPrice(product))" variant="danger">
@@ -216,7 +223,7 @@
                   </ul>
                 </div>
 
-                <div v-if="activeSkus.length" class="mb-8">
+                <div v-if="activeSkus.length" class="product-skus">
                   <h2 class="mb-3 text-sm font-bold uppercase tracking-widest text-muted-foreground">
                     {{ t('productDetail.skuTitle') }}
                   </h2>
@@ -247,20 +254,12 @@
                   </p>
                 </div>
 
-                <div class="mb-8">
-                  <h2 class="mb-3 text-sm font-bold uppercase tracking-widest text-muted-foreground">
-                    {{ t('productDetail.description') }}
-                  </h2>
-                  <p class="text-lg leading-relaxed text-muted-foreground">
-                    {{ getLocalizedText(product.description) }}
-                  </p>
-                </div>
               </div>
 
-              <ProductPurchaseGuide :slug="product.slug" />
+              <ProductPurchaseGuide :slug="product.slug" hide-redemption class="product-conditions" />
 
               <!-- Quantity Selector -->
-                <div class="mb-8">
+                <div class="product-quantity">
                   <h2 class="mb-3 text-sm font-bold uppercase tracking-widest text-muted-foreground">
                     {{ t('productDetail.quantity') }}
                   </h2>
@@ -296,7 +295,7 @@
                 </div>
 
               <!-- Purchase Actions (Desktop + original position) -->
-              <div ref="purchaseActionsRef" class="mt-auto space-y-6">
+              <div ref="purchaseActionsRef" class="product-actions space-y-4">
                 <Alert v-if="cannotPurchaseReason" variant="destructive">
                   <AlertDescription class="font-semibold">{{ cannotPurchaseReason }}</AlertDescription>
                 </Alert>
@@ -308,12 +307,12 @@
                   <Button v-if="requiresLogin" class="w-full h-12 font-bold" @click="goLogin">
                     {{ t('productDetail.loginToBuy') }}
                   </Button>
-                  <div v-else class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <Button variant="secondary" class="h-12 font-bold" :disabled="!canPurchase" @click="addToCart">
-                      {{ t('productDetail.addToCart') }}
-                    </Button>
+                  <div v-else class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <Button class="h-12 font-bold" :disabled="!canPurchase" @click="buyNow">
                       {{ t('productDetail.buyNow') }}
+                    </Button>
+                    <Button variant="outline" class="h-12 font-bold" :disabled="!canPurchase" @click="addToCart">
+                      {{ t('productDetail.addToCart') }}
                     </Button>
                   </div>
                 </div>
@@ -325,8 +324,7 @@
         </div>
 
         <!-- Details Content Card -->
-        <div v-if="product.content"
-          class="bg-card backdrop-blur-xl border rounded-3xl overflow-hidden mb-12 p-6 md:p-8 lg:p-12 relative">
+        <div v-if="product.content" class="product-full-details">
           <h2
             class="text-2xl font-bold mb-8 text-foreground flex items-center gap-3 border-b pb-6">
             <span class="w-1.5 h-8 bg-primary rounded-full"></span>
@@ -420,6 +418,7 @@
 
 <script setup lang="ts">
 import ProductPurchaseGuide from '../components/product/ProductPurchaseGuide.vue'
+import ProductRedemptionGuide from '../components/product/ProductRedemptionGuide.vue'
 import { productRedemptionContent } from '../utils/productPurchaseGuide'
 import ProductInvoiceNotice from '../components/commerce/ProductInvoiceNotice.vue'
 import CheckoutSteps from '../components/checkout/CheckoutSteps.vue'
@@ -492,3 +491,45 @@ onUnmounted(() => {
   }
 })
 </script>
+
+<style scoped>
+.product-overview { margin-bottom: 28px; }
+.product-overview-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; align-items: start; }
+.product-media-panel { display: contents; }
+.product-media-panel :deep(.product-image-gallery) { min-width: 0; padding: 12px; border: 1px solid var(--ui-border); border-radius: 16px; background: var(--ui-bg-elevated); }
+.product-media-copy { order: 2; min-width: 0; display: grid; gap: 20px; padding: 20px; border: 1px solid var(--ui-border); border-radius: 16px; background: var(--ui-bg-elevated); }
+.product-description h2 { margin-bottom: 10px; font-size: 15px; line-height: 1.5; font-weight: 700; }
+.product-description p { font-size: 15px; line-height: 1.8; color: var(--ui-text-muted); overflow-wrap: anywhere; }
+.product-redemption { border-top: 1px solid var(--ui-border); padding-top: 12px; }
+.product-purchase-panel { order: 1; min-width: 0; padding: 20px; border: 1px solid var(--ui-border); border-radius: 16px; background: var(--ui-bg-elevated); }
+.product-purchase-summary > :first-child { margin-bottom: 10px; }
+.product-purchase-summary > .mb-4 { margin-bottom: 12px; }
+.product-purchase-summary > .mb-6 { margin-bottom: 20px; }
+.product-title { margin-bottom: 16px; font-size: 25px; font-weight: 750; line-height: 1.3; letter-spacing: -.025em; overflow-wrap: anywhere; }
+.product-price { margin-bottom: 20px; padding-bottom: 20px; }
+.product-price :deep(.theme-price-lg) { font-size: clamp(28px, 6vw, 38px); overflow-wrap: anywhere; }
+.product-skus { margin-bottom: 20px; }
+.product-conditions { margin-bottom: 16px; padding: 14px; border: 0; border-radius: 10px; }
+.product-conditions :deep(ul) { margin-top: 8px; }
+.product-conditions :deep(li + li) { margin-top: 6px; }
+.product-quantity { margin-bottom: 16px; }
+.product-quantity h2, .product-skus h2 { margin-bottom: 10px; letter-spacing: .02em; }
+.product-full-details { margin-bottom: 36px; padding: 24px 0; border-top: 1px solid var(--ui-border); }
+.product-full-details > h2 { margin-bottom: 20px; padding-bottom: 16px; font-size: 21px; }
+.product-full-details :deep(.theme-prose) { font-size: 16px; line-height: 1.8; overflow-wrap: anywhere; }
+.product-full-details :deep(.theme-prose h3) { margin-top: 1.5em; font-size: 19px; }
+.product-detail-page :deep(.commerce-steps) { margin-bottom: 24px; }
+@media (min-width: 1024px) {
+  .product-overview-layout { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 20px; }
+  .product-media-panel { display: flex; min-width: 0; flex-direction: column; gap: 24px; padding: 16px; border: 1px solid var(--ui-border); border-radius: 16px; background: var(--ui-bg-elevated); }
+  .product-media-panel :deep(.product-image-gallery) { padding: 0; border: 0; border-radius: 0; }
+  .product-media-copy { order: initial; padding: 0 0 8px; border: 0; border-radius: 0; }
+  .product-purchase-panel { order: initial; padding: 24px; }
+  .product-title { font-size: 30px; }
+  .product-price :deep(.theme-price-lg) { font-size: 38px; }
+}
+@media (min-width: 1440px) {
+  .product-overview-layout { gap: 24px; }
+  .product-title { font-size: 32px; }
+}
+</style>

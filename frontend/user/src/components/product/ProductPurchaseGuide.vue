@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ExternalLink } from 'lucide-vue-next'
+import ProductRedemptionGuide from './ProductRedemptionGuide.vue'
 import { productPurchaseGuide } from '../../utils/productPurchaseGuide'
 import { purchaseClarityCopy } from '../../i18n/purchaseClarity'
 
-const props = defineProps<{ slug: string }>()
+const props = defineProps<{ slug: string; hideRedemption?: boolean }>()
 const { locale } = useI18n()
 const copy = computed(() => purchaseClarityCopy[locale.value] || purchaseClarityCopy['zh-CN']!)
 const guide = computed(() => productPurchaseGuide(props.slug))
@@ -18,11 +18,6 @@ const guide = computed(() => productPurchaseGuide(props.slug))
       <li v-for="rule in guide.rules" :key="rule">{{ copy.rules[rule] }}</li>
     </ul>
     <p class="mt-3 text-muted-foreground">{{ copy.help }}</p>
-    <div class="mt-3 border-t pt-3">
-      <a v-if="guide.redemptionUrl" :href="guide.redemptionUrl" target="_blank" rel="noopener noreferrer" class="inline-flex min-h-11 items-center gap-2 font-semibold text-primary underline underline-offset-4">
-        {{ copy.redeem }} <ExternalLink class="h-4 w-4 shrink-0" aria-hidden="true" />
-      </a>
-      <p class="text-muted-foreground">{{ guide.rules.includes('credits') ? copy.creditsDelivery : guide.kind === 'code' ? copy.codeDelivery : copy.linkDelivery }}</p>
-    </div>
+    <ProductRedemptionGuide v-if="!hideRedemption" :slug="slug" class="mt-3 border-t pt-3" />
   </section>
 </template>

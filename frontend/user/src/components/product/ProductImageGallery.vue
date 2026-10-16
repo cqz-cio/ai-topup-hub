@@ -1,10 +1,10 @@
 <template>
-  <div class="p-4 md:p-8 bg-secondary border-r">
-    <div class="mb-4 md:mb-6 relative group"
+  <div class="product-image-gallery min-w-0">
+    <div class="relative group"
       @touchstart="onImageTouchStart"
       @touchend="onImageTouchEnd">
       <img v-if="currentImage" :src="currentImage" :alt="productTitle"
-        class="block w-full aspect-[5/3] object-contain object-center bg-muted rounded-xl border relative z-10 shadow-lg" />
+        class="block w-full aspect-[5/3] object-contain object-center bg-muted rounded-xl border relative z-10" />
       <div v-else
         class="w-full aspect-[5/3] bg-muted rounded-xl border flex items-center justify-center relative z-10">
         <ImageIcon class="w-24 h-24 text-muted-foreground" :stroke-width="1.5" />
@@ -12,7 +12,7 @@
     </div>
 
     <!-- Thumbnail Gallery: horizontal scroll on mobile, grid on desktop -->
-    <div v-if="images.length > 1" class="flex md:grid md:grid-cols-5 gap-3 overflow-x-auto md:overflow-visible pb-2 md:pb-0 -mx-1 px-1 snap-x snap-mandatory">
+    <div v-if="images.length > 1" class="mt-4 flex md:grid md:grid-cols-5 gap-3 overflow-x-auto md:overflow-visible pb-2 md:pb-0 -mx-1 px-1 snap-x snap-mandatory">
       <div v-for="(image, index) in images" :key="index" @click="$emit('update:currentImage', image)"
         class="cursor-pointer rounded-lg overflow-hidden border-2 transition-all duration-300 shrink-0 w-16 h-16 md:w-auto md:h-auto md:aspect-square snap-start"
         :class="currentImage === image ? 'border-primary ring-1 ring-primary/40 opacity-100' : 'border-transparent opacity-60 hover:opacity-100 hover:scale-105'">
