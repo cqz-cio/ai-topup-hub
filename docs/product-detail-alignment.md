@@ -11,6 +11,6 @@ python -B scripts/public_redemption.py --database work/codex-runtime/live/shop.d
 python -B scripts/public_redemption.py --database work/codex-runtime/live/shop.db --apply --backup-dir work/codex-runtime/product-detail-alignment-20261016/local-backups
 ```
 
-商品导入和 Codex 维护脚本同步使用公开文案处理函数，交付指引继续保留具体地址。历史商城中含兑换网址的 42 个资源加入 Nginx 精确撤下清单，与原有 6 个地址共同返回 410/no-store。回滚旧程序时也要保留此规则；已被浏览器或第三方下载的副本无法撤回。
+商品导入和 Codex 维护脚本同步使用公开文案处理函数，交付指引继续保留具体地址。历史商城中含兑换网址的 45 个资源加入 Nginx 精确撤下清单，与原有 6 个地址共同返回 410/no-store。回滚旧程序时也要保留此规则；已被浏览器或第三方下载的副本无法撤回。
 
 验证证据位于忽略目录 `work/codex-runtime/product-detail-alignment-20261016/`：143 项商城回归、13 项迁移/交付保留测试、日常 5173 的桌面和窄屏检查、公开 API 扫描、最终静态构建扫描与页面截图。测试没有提交订单或进行真实付款、采购。
