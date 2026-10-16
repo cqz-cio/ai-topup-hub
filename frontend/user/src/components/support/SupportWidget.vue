@@ -47,12 +47,12 @@ import { useAppStore } from '../../stores/app'
 import SupportPet from './SupportPet.vue'
 import avatar from './patrick-avatar.webp'
 import type { PetAction } from './petMotion'
-import { getDemoAnswer, getSupportCopy, supportContacts } from './supportDemo'
+import { getSupportCopy, supportContacts } from './supportDemo'
 import { useSupportDrag } from './useSupportDrag'
-import { getConversationCopy, respondToSupport, type SupportConversation, type SupportProduct, type SupportLink } from './supportConversation'
-import { loadSupportCatalog } from './supportCatalog'
+import type { SupportLink } from './supportConversation'
+import { askSupport, agentCopy, agentError } from './supportApi'
 
-const app = useAppStore(), copy = computed(() => ({ ...getSupportCopy(app.locale), subtitle: getConversationCopy(app.locale).subtitle, footer: getConversationCopy(app.locale).footer }))
+const app = useAppStore(), copy = computed(() => ({ ...getSupportCopy(app.locale), ...agentCopy(app.locale) }))
 const route = useRoute()
 const open = ref(false), busy = ref(false), input = ref(''), contactsOpen = ref(false), showTopics = ref(false), copyStatus = ref('')
 const launcher = ref<HTMLButtonElement>(), closeButton = ref<HTMLButtonElement>(), inputElement = ref<HTMLInputElement>(), body = ref<HTMLElement>()
@@ -61,7 +61,7 @@ const { widgetStyle, panelStyle, speechStyle, speechSide, panelOverlap, dragging
 const action = ref<PetAction>('wave'), phase = ref<PetAction>('wave'), sequence = ref(0), greetingVisible = ref(true)
 const messages = ref<{ id: number; role: 'user' | 'assistant'; text: string; links?: SupportLink[] }[]>([])
 let greetingTimer: ReturnType<typeof setTimeout> | undefined, messageId = 0
-let conversation: SupportConversation = {}, catalog: SupportProduct[] = [], catalogAt = 0, catalogLocale = ''
+let conversationId = crypto.randomUUID()
 let request: AbortController | undefined, generation = 0
 const speech = computed(() => busy.value ? copy.value.think : phase.value === 'reply' ? copy.value.reply : phase.value === 'wave' ? copy.value.greeting : copy.value.idle)
 function animate(next: PetAction) { action.value = next; sequence.value++ }
@@ -98,40 +98,29 @@ async function ask(question: string) {
   request?.abort(); request = new AbortController()
   messages.value.push({ id: ++messageId, role: 'user', text: value }); input.value = ''; busy.value = true; showTopics.value = false; contactsOpen.value = false
   animate('think'); scrollMessages()
-  let available = true
-  let response = respondToSupport(value, conversation, catalog, locale)
-  // Other topics retain the existing basic replies; the first guide uses live catalog names.
-  if (response && (Date.now() - catalogAt > 60000 || catalogLocale !== locale)) {
-    try {
-      const loaded = await loadSupportCatalog(locale, request.signal)
-      if (turn !== generation) return
-      catalog = loaded; catalogAt = Date.now(); catalogLocale = locale
-    } catch {
-      if (turn !== generation) return
-      available = false; catalog = []; catalogAt = 0
-    }
+  try {
+    const response = await askSupport(value, locale, conversationId, typeof route.params.slug === 'string' ? route.params.slug : '', request.signal)
     if (turn !== generation) return
+    messages.value.push({ id: ++messageId, role: 'assistant', text: response.text, links: response.links })
+    contactsOpen.value = response.handoff === true
+  } catch (error) {
+    if (turn !== generation) return
+    messages.value.push({ id: ++messageId, role: 'assistant', text: agentError(error, locale) })
+  } finally {
+    if (turn === generation) {
+      busy.value = false; animate('reply'); scrollMessages(true)
+      if (messages.value.length > 40) messages.value.splice(0, messages.value.length - 40)
+      if (open.value && matchMedia('(pointer: fine)').matches) nextTick(() => inputElement.value?.focus({ preventScroll: true }))
+    }
   }
-  if (turn !== generation) return
-  if (response) {
-    const pageProduct = !conversation.family ? catalog.find(product => product.slug === route.params.slug) : undefined
-    const context = pageProduct ? { ...conversation, product: pageProduct, family: pageProduct.family, variant: /\bios\b/i.test(pageProduct.title) ? 'ios' as const : undefined } : conversation
-    response = respondToSupport(value, context, catalog, locale, available)
-  }
-  conversation = response?.state || {}
-  messages.value.push({ id: ++messageId, role: 'assistant', text: response?.text || getDemoAnswer(value, locale), links: response?.links })
-  contactsOpen.value = response?.handoff === true
-  busy.value = false; animate('reply'); scrollMessages(true)
-  // Session context stays in memory. Never persist input or send it to a model.
-  if (messages.value.length > 40) messages.value.splice(0, messages.value.length - 40)
-  if (open.value && matchMedia('(pointer: fine)').matches) nextTick(() => inputElement.value?.focus({ preventScroll: true }))
 }
+
 async function copyContact(value: string) {
   try { await navigator.clipboard.writeText(value); copyStatus.value = copy.value.copied }
   catch { copyStatus.value = copy.value.copyFailed }
 }
 onMounted(() => { greetingTimer = setTimeout(() => { greetingVisible.value = false }, 8000) })
-watch(() => app.locale, () => { generation++; request?.abort(); busy.value = false; conversation = {}; catalog = []; catalogAt = 0; animate('idle') })
+watch(() => app.locale, () => { generation++; request?.abort(); busy.value = false; conversationId = crypto.randomUUID(); messages.value = []; animate('idle') })
 onBeforeUnmount(() => { generation++; request?.abort(); clearTimeout(greetingTimer) })
 </script>
 

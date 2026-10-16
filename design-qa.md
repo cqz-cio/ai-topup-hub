@@ -217,3 +217,16 @@ final result: passed
 - 16 项浏览器检查通过：实际目录读取、GPT 多轮选择与兑换、iOS 上下文、商城钱包、Codex 点数、人工入口、纯文本转义、商品详情上下文、实际游客查单导航与返回、拖动保留会话、目录失败重试、经典/Vault 两模板 390/320px 三语言，以及切换语言取消旧请求。没有页面脚本错误和业务写请求。
 - 私有证据位于日常目录 work/codex-runtime/customer-support-planning/conversation/qa/：report.json、gpt-conversation.png、classic-zh-CN-390.png、vault-zh-CN-320.png、classic-en-US-390.png 和 vault-zh-TW-320.png。已查看中文桌面、手机和 320px 长列表截图。
 - 会话只保存在组件内存；规则返回已维护的步骤，不连接大模型。开发保存在原 codex/customer-support-agent 分支，没有合入主目录、推送或部署。分支较旧基线的合入约束沿用上文。
+
+
+## 2026-10-16 小π客服 DeepSeek 本地接入
+
+在原 `codex/customer-support-agent` 分支完成；5175 小窗调用独立回环 8085 客服服务，现有本机商城 8080 保持运行。仅客服测试消息写入模型用量账本，没有订单、支付、钱包或供应商写入，也没有生产访问、推送或部署。
+
+- 177 项前端测试、TypeScript 检查和 Vite 构建通过；Go 客服测试覆盖 18 个用例（含子用例），只使用模拟模型和临时预算库。
+- 真实 DeepSeek API 验证：充值指引、自然追问、复杂越界拒答；明确天气问法返回 local，未调用模型。多轮回复格式问题已修复并回归。
+- 浏览器 9 项检查通过：真实钱包/GPT 多轮对话、拖动后聊天保留、天气本地拒答、额度错误后输入恢复、人工入口、商品上下文，以及经典/Vault 的 390/320px 与三语言。没有脚本错误或商城业务写入。
+- 商品页补充 2 轮真实检查：Codex 250 点数页“这个充完会延长我的 Plus 时间吗？”与“所以只是多一些点数，对吧？”，均直接回答当前商品而非重复询问商品名称。
+- 已检查桌面和手机截图，保留已批准的 UI 和动画。前端源码、构建产物及本次日志做真实密钥精确扫描；密钥、用量库均在 Git 忽略目录，ACL 仅当前用户与 SYSTEM。
+
+私有证据：`D:\卡网\work\codex-runtime\customer-support-planning\deepseek\qa\` 内 `api-report.json`、`browser-report.json`、`page-context-report.json`、`private-audit.json`、`desktop-live-chat.png`、`mobile-live-chat.png`。完整运行及上线前限制见 `docs/customer-support-deepseek.md`。本轮限额 UI 为模拟触发，真实服务硬额度由临时账本测试验证；不消耗整日预算做验收。

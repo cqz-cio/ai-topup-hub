@@ -2,14 +2,14 @@
 
 开发分支：`codex/customer-support-agent`。沿用创建时基线 `4243550352902139cd9c4d7530615b6a5131c9f2`，未合并主目录的其他草稿。
 
-当前阶段实现商城 UI 和本地规则对话：读取公开商品目录，提供选购、充值和使用步骤，并记录当前商品与对话步骤。没有模型请求、客服后端、实际订单查询、支付或其他业务写入。没有部署。会话只保存在组件内存，刷新后清空。
+当前阶段已在本机接入 DeepSeek 自然对话，使用独立客服后端和持久化额度账本；公开商品资料来自已有本机商城 API。配置、运行和限制详见 [DeepSeek 本地调试](customer-support-deepseek.md)。没有合并、推送或部署；不读私有订单，不执行支付、采购或其他商城写入。
 
 - 主站经典/Vault 模板共用右下角派大星入口，分销店铺、分销控制台和独立功能页不挂载。
 - 点击展开/收起小窗，支持快捷问题、文字输入、思考与回应、人工联系方式和键盘 Escape；手机避开底部导航，短屏优先容纳聊天内容。
 - 默认右下角；用鼠标按住派大星可拖动，6px 内的轻微移动仍按点击处理，拖动松手不触发展开/收起。手机保留轻点打开，不通过滑动移动入口。位置只保存在当前页面，刷新回到默认位置；窗口缩放后自动限制在可见区域。拖动后聊天窗优先在角色上方、下方或侧面展开，窄屏空间不足时优先显示聊天内容，收起后恢复角色；气泡避开聊天窗。
 - 保留批准的原画、连续动画及托腮遮挡修复。墨镜反光用于眨眼拟态。网格深度确保前臂位于身体前，透明像素不写入深度；肩部保持连接。
 - 遵循减少动态效果设置，后台标签暂停动画；WebGL 不可用时显示原画，客服交互仍可使用。
-- 商品选购、充值与使用由多轮规则处理；付款、返利和开分店暂时沿用已有基础指引。不会推断真实订单、金额、库存、资格或返利；未覆盖的问题澄清或转人工。具体兑换入口只指向付款后的订单交付说明，不在答案中写域名。
+- 当前问答通过后端读取公开资料、调用 DeepSeek；问候、明确天气问法和人工入口等由本地规则处理。需要进一步打磨的业务细则澄清或转人工。具体兑换入口只指向付款后的订单交付说明，不在答案中写域名。
 - 主站联系方式：微信 `Cqz0924ttxk`、QQ `1669268759`、Telegram `@czq_piestar`。
 
 ## 本地运行
@@ -19,6 +19,7 @@
 在本工作区运行：
 
 ```powershell
+pwsh -NoProfile -File scripts/local/support-agent.ps1 start
 pwsh -NoProfile -File scripts/local/support-preview.ps1 start
 pwsh -NoProfile -File scripts/local/support-preview.ps1 status
 pwsh -NoProfile -File scripts/local/support-preview.ps1 stop
@@ -32,9 +33,9 @@ pwsh -NoProfile -File scripts/local/support-preview.ps1 stop
 
 `frontend/user` 中执行 `pnpm test`、`pnpm build`；浏览器核对两模板、桌面/窄屏、展开收起、快捷/自由输入、人工联系方式、动态效果降级和托腮前臂完整性。截图和检查报告保存于忽略目录，验证结果见根目录 `design-qa.md` 中的本功能记录。
 
-## 第一阶段实际对话：商品选购、充值与使用
+## 历史第一阶段：商品选购、充值与使用规则流程
 
-实现位于 `frontend/user/src/components/support/supportConversation.ts` 和 `supportCatalog.ts`，对应逻辑测试为 `tests/supportConversation.test.ts`。目前是确定性规则流程，不是能够任意理解问题的大模型；接入模型前先验证业务口径和状态转换。
+实现位于 `frontend/user/src/components/support/supportConversation.ts` 和 `supportCatalog.ts`，对应逻辑测试为 `tests/supportConversation.test.ts`。这一阶段为确定性规则流程；源码与测试保留用于对照，当前小窗已切换到上文的 DeepSeek 接口，以下描述仅记录旧版行为。
 
 - 区分 GPT 订阅、Codex 点数、Gemini 和商城钱包。用当前目录的商品名让客户选择；支持序号、完整名称和商品标识。首次在商品详情提问时读取该页面商品上下文。
 - 记住当前商品、选购/使用目标、步骤及 iOS 渠道。覆盖还没买、已付款未交付、已拿到卡密/链接、兑换报错、结果未变化；切换商品或重新开始会清理旧选择。
