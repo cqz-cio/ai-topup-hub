@@ -188,6 +188,11 @@ Follow-up polish: minor font rasterization and existing shared navigation/footer
 已核对分类切换、搜索、刷新、详情往返、GPT/Gemini 卡片回归、明暗主题与语言。截图和逐项结果保存于忽略目录 `work/codex-runtime/codex-card-layout/`。未发现有意义的卡片视觉偏差；没有改动后端业务流程。
 
 
+## Codex 卡片正式发布验收 20261016-103742
+
+final result: passed。批准桌面稿与日常截图、批准手机稿与最终构建截图已分别在同一输入中对照；卡片信息、字号、间距、完整图片和按钮位置一致。保留现有站点导航、底部手机导航及各环境数据。正式截图 `work/codex-runtime/codex-card-layout/production-desktop.jpg` 和 `production-390.jpg`；桌面卡片约 311.66×485.38px，390/320px 为单列，无横向溢出。10 项正式页面检查和 9 项公网入口/静态资源哈希通过，未发现脚本错误，无待处理 P0/P1/P2 问题。正式构建来源 `b0e36c6889a6ccd624bd9c403f0cfd92f7c09e27`，后台与后端保持原版本。
+
+
 ---
 
 # 商品详情：用户标注修正（2026-10-16）

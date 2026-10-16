@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-16T02:23:39.829199+00:00",
+  "checked_at": "2026-10-16T02:44:11.145685+00:00",
   "production_url": "https://www.qzweb.cloud/",
   "documented_release_id": "20261015-160016",
   "verified_release_id": "20261015-160016",
@@ -367,11 +367,11 @@
   "previous_build_verification_at": "2026-10-12T08:19:31.766441+00:00",
   "management_url": "https://admin.qzweb.cloud/login",
   "frontend_gateway": {
-    "checked_at": "2026-10-16T02:23:39.829199+00:00",
+    "checked_at": "2026-10-16T02:44:11.145685+00:00",
     "frontend_host": "124.220.2.69",
     "backend_host": "43.134.141.10",
-    "frontend_release": "20261016-102000",
-    "source_commit": "4b53a82bdd3e39410872cf1c78f0e7048fce881c",
+    "frontend_release": "20261016-103742",
+    "source_commit": "b0e36c6889a6ccd624bd9c403f0cfd92f7c09e27",
     "static_files_verified": 256,
     "storefront_url": "https://www.qzweb.cloud/",
     "management_url": "https://admin.qzweb.cloud/login",
@@ -388,7 +388,7 @@
     "certificate_renewal_verified": true,
     "certificate_timer": "qzweb-certificates.timer",
     "certificate_renewal_report": "/srv/zhixiang-front/shared/work/renew-final-20261012-1644/status.json",
-    "report_path": "/srv/zhixiang-front/shared/work/affiliate-rules-20261016-102000.json",
+    "report_path": "/srv/zhixiang-front/shared/work/codex-card-layout-20261016-103742.json",
     "backend_report_path": "/srv/zhixiang/shared/reports/prepayment-balance-release-20261015-160016.json",
     "formal_alipay_enabled": false,
     "database_uploaded": false,
@@ -402,10 +402,10 @@
       "browser_current_frontend_confirmed": true,
       "report_path": "/srv/zhixiang-front/shared/work/entry-cache-report.json"
     },
-    "previous_frontend_release": "20261016-100816",
-    "storefront_source_commit": "4b53a82bdd3e39410872cf1c78f0e7048fce881c",
+    "previous_frontend_release": "20261016-102000",
+    "storefront_source_commit": "b0e36c6889a6ccd624bd9c403f0cfd92f7c09e27",
     "admin_source_commit": "41af36617cd9f267520bd934299394ce74f416e6",
-    "backup": "/srv/zhixiang-front/backups/before-affiliate-rules-20261016-102000",
+    "backup": "/srv/zhixiang-front/backups/before-codex-card-layout-20261016-103742",
     "frontend_only_update": true,
     "previous_hashed_assets_retained": true,
     "verified_services": {
@@ -413,19 +413,20 @@
       "zhixiang-api-tunnel": "active",
       "qzweb-certificates.timer": "active"
     },
-    "release_scope": "Affiliate rules from backend settings; preserve approved product center and product detail releases.",
+    "release_scope": "Classic homepage and product center share product cards for Codex points and ordinary products",
     "admin_files_verified": 1165,
     "storefront_files_verified": 256,
     "backend_program_preserved": true,
     "backend_setting_changes": [],
-    "frontend_build_source_commit": "4b53a82bdd3e39410872cf1c78f0e7048fce881c",
+    "frontend_build_source_commit": "b0e36c6889a6ccd624bd9c403f0cfd92f7c09e27",
     "frontend_source_identical_to_backend": false,
     "admin_base": "/",
     "base_repair_backup": "/srv/zhixiang-front/backups/before-xorpay-admin-base-20261013-173020",
-    "frontend_source_difference": "Storefront source 4b53a82bdd3e39410872cf1c78f0e7048fce881c; backend and admin retain 41af36617cd9f267520bd934299394ce74f416e6.",
+    "frontend_source_difference": "Storefront from clean b0e36c6 archive; backend/admin retain 41af366. Existing merged features preserved.",
     "source_dirty": false,
-    "source_tag": "production/affiliate-rules-20261016-102000",
-    "static_verification_scope": "New storefront release files; existing admin and retained resources independently compared before and after."
+    "source_tag": "production/codex-card-layout-20261016-103742",
+    "static_verification_scope": "New storefront release files; existing admin and retained resources independently compared before and after.",
+    "retained_files_preserved": true
   },
   "alipay": {
     "code_and_official_sandbox_query_verified": true,
@@ -2576,5 +2577,31 @@
     "private_evidence": "work/codex-runtime/affiliate-rules-20261016/",
     "production_screenshot_limitation": "Chrome screenshot capture timed out; authenticated production DOM, viewport metrics and public asset hashes verified; screenshots captured from identical local release bundle.",
     "source_tag": "production/affiliate-rules-20261016-102000"
+  },
+  "codex_card_layout": {
+    "passed": true,
+    "checked_at": "2026-10-16T02:44:11.145685+00:00",
+    "release": "20261016-103742",
+    "source_commit": "b0e36c6889a6ccd624bd9c403f0cfd92f7c09e27",
+    "source_dirty": false,
+    "scope": "Classic homepage and product center share product cards for Codex points and ordinary products",
+    "frontend_tests": 143,
+    "daily_frontend_tests": 142,
+    "local_browser_checks": 16,
+    "built_browser_checks": 6,
+    "production_browser_checks": 10,
+    "public_http_hash_checks": 9,
+    "storefront_files_verified": 256,
+    "admin_files_preserved": 1165,
+    "backups": {
+      "shanghai": "/srv/zhixiang-front/backups/before-codex-card-layout-20261016-103742",
+      "singapore": "/srv/zhixiang/backups/before-codex-card-layout-20261016-103742"
+    },
+    "backend_release": "20261015-160016",
+    "backend_and_redis_preserved": true,
+    "prices_payment_channels_settings_preserved": true,
+    "database_uploaded": false,
+    "real_payment_or_purchase_performed": false,
+    "source_tag": "production/codex-card-layout-20261016-103742"
   }
 }
