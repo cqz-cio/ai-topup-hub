@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-16T03:59:35.461872+00:00",
+  "checked_at": "2026-10-16T07:09:48.772746+00:00",
   "production_url": "https://www.qzweb.cloud/",
   "documented_release_id": "20261015-160016",
   "verified_release_id": "20261015-160016",
@@ -44,7 +44,39 @@
     "configuration_except_tron_preserved": true,
     "settings_changes": [],
     "nginx_configuration_source_commit": "c1791c57d73a0526244343eba5f766309107c8bd",
-    "nginx_change_scope": "Retire embedded frontend exposure; preserve API/uploads/health proxy behavior"
+    "nginx_change_scope": "Retire embedded frontend exposure; preserve API/uploads/health proxy behavior",
+    "pids": {
+      "zhixiang-shop": "2942544",
+      "zhixiang-redis": "52983"
+    },
+    "last_api_recovery": {
+      "recovered": true,
+      "reason": "Business HTTP requests blocked while health endpoint and data stores remained responsive",
+      "backup": "/srv/zhixiang/backups/before-api-recovery-20261016T070422Z",
+      "old_api_pid": "2265207",
+      "new_api_pid": "2942544",
+      "same_binary": true,
+      "private_configuration_preserved": true,
+      "redis_pid_preserved": true,
+      "stock_timer": "active",
+      "checks": [
+        {
+          "route": "/health",
+          "result": "200|0.000832",
+          "exit": 0
+        },
+        {
+          "route": "/api/v1/public/config",
+          "result": "200|0.006168",
+          "exit": 0
+        },
+        {
+          "route": "/api/v1/public/products/qzweb-58",
+          "result": "200|0.002638",
+          "exit": 0
+        }
+      ]
+    }
   },
   "payment": {
     "bep20": {
@@ -369,12 +401,12 @@
   "previous_build_verification_at": "2026-10-12T08:19:31.766441+00:00",
   "management_url": "https://admin.qzweb.cloud/login",
   "frontend_gateway": {
-    "checked_at": "2026-10-16T03:59:35.461872+00:00",
+    "checked_at": "2026-10-16T07:09:48.772746+00:00",
     "frontend_host": "124.220.2.69",
     "backend_host": "43.134.141.10",
-    "frontend_release": "20261016-115609",
-    "source_commit": "d2dd5f19115df612dc522c14586eed4eefbcaabc",
-    "static_files_verified": 458,
+    "frontend_release": "20261016-144429",
+    "source_commit": "7f6e10ca014f5c63df01f1ddfe746baa2f0c59f4",
+    "static_files_verified": 470,
     "storefront_url": "https://www.qzweb.cloud/",
     "management_url": "https://admin.qzweb.cloud/login",
     "www_dns_record": "www A 124.220.2.69",
@@ -390,7 +422,7 @@
     "certificate_renewal_verified": true,
     "certificate_timer": "qzweb-certificates.timer",
     "certificate_renewal_report": "/srv/zhixiang-front/shared/work/renew-final-20261012-1644/status.json",
-    "report_path": "/srv/zhixiang-front/shared/work/support-contacts-20261016-115609.json",
+    "report_path": "/srv/zhixiang-front/shared/work/pro-quota-labels-20261016-144429.json",
     "backend_report_path": "/srv/zhixiang/shared/reports/prepayment-balance-release-20261015-160016.json",
     "formal_alipay_enabled": false,
     "database_uploaded": false,
@@ -404,10 +436,10 @@
       "browser_current_frontend_confirmed": true,
       "report_path": "/srv/zhixiang-front/shared/work/entry-cache-report.json"
     },
-    "previous_frontend_release": "20261016-111238",
-    "storefront_source_commit": "d2dd5f19115df612dc522c14586eed4eefbcaabc",
+    "previous_frontend_release": "20261016-115609",
+    "storefront_source_commit": "7f6e10ca014f5c63df01f1ddfe746baa2f0c59f4",
     "admin_source_commit": "d2dd5f19115df612dc522c14586eed4eefbcaabc",
-    "backup": "/srv/zhixiang-front/backups/before-support-contacts-20261016-115609",
+    "backup": "/srv/zhixiang-front/backups/before-pro-quota-labels-20261016-144429",
     "frontend_only_update": true,
     "previous_hashed_assets_retained": true,
     "verified_services": {
@@ -415,29 +447,29 @@
       "zhixiang-api-tunnel": "active",
       "qzweb-certificates.timer": "active"
     },
-    "release_scope": "Add QQ and Telegram to all current customer-support locations",
+    "release_scope": "Correct storefront Pro quotas and replace public channel numbers with regions",
     "admin_files_verified": 122,
-    "storefront_files_verified": 336,
+    "storefront_files_verified": 348,
     "backend_program_preserved": true,
     "backend_setting_changes": [
-      "contact.telegram and customer-support copy only"
+      "57 public catalog/about display fields only"
     ],
-    "frontend_build_source_commit": "d2dd5f19115df612dc522c14586eed4eefbcaabc",
+    "frontend_build_source_commit": "7f6e10ca014f5c63df01f1ddfe746baa2f0c59f4",
     "frontend_source_identical_to_backend": false,
     "admin_base": "/",
     "base_repair_backup": "/srv/zhixiang-front/backups/before-xorpay-admin-base-20261013-173020",
-    "frontend_source_difference": "Both frontend builds use d2dd5f1; backend binary remains 41af366.",
+    "frontend_source_difference": "Storefront uses 7f6e10ca014f5c63df01f1ddfe746baa2f0c59f4; admin retains d2dd5f1; backend retains 41af366.",
     "source_dirty": false,
-    "source_tag": "production/support-contacts-20261016-115609",
-    "static_verification_scope": "458 new build files and all 8105 retained old files verified on server; public browser, API, asset and retired-resource checks passed.",
+    "source_tag": "production/pro-quota-labels-20261016-144429",
+    "static_verification_scope": "348 current storefront build files and all 7035 prior storefront files plus 1360 admin files preserved; browser and public API checks passed.",
     "retained_files_preserved": true,
-    "storefront_release": "20261016-115609",
+    "storefront_release": "20261016-144429",
     "admin_release": "20261016-115609",
     "storefront_files_preserved": 6844,
     "legacy_singapore_embedded_frontend_public": false,
     "legacy_singapore_frontend_behavior": "308 to maintained Shanghai storefront/admin; API/uploads/health retained",
-    "old_files_preserved": 8105,
-    "admin_files_preserved": 1261
+    "old_files_preserved": 8395,
+    "admin_files_preserved": 1360
   },
   "alipay": {
     "code_and_official_sandbox_query_verified": true,
@@ -932,7 +964,7 @@
     "real_payment_or_purchase_submitted": false,
     "verification_directory": "work/codex-runtime/register-captcha-preview-20261013/"
   },
-  "previous_verification_checked_at": "2026-10-14T07:12:16.873815+00:00",
+  "previous_verification_checked_at": "2026-10-16T03:59:35.461872+00:00",
   "sale_email": {
     "release": "20261013-162050",
     "source_commit": "2bbb4e0b802114dd3bda394b28cddcf83639228a",
@@ -2733,5 +2765,81 @@
     "production_test_orders_created": false,
     "real_payment_or_purchase_performed": false,
     "private_evidence": "work/codex-runtime/support-contacts/verified-report.json"
+  },
+  "pro_quota_presentation": {
+    "passed": true,
+    "checked_at": "2026-10-16T07:09:48.772746+00:00",
+    "release": "20261016-144429",
+    "source_commit": "7f6e10ca014f5c63df01f1ddfe746baa2f0c59f4",
+    "backend_release": "20261015-160016",
+    "admin_source_preserved": "d2dd5f19115df612dc522c14586eed4eefbcaabc",
+    "checks": {
+      "user_tests": 147,
+      "migration_tests": 4,
+      "daily_browser": 38,
+      "built_browser": 38,
+      "production_browser": 38,
+      "production_public_api": 22,
+      "public_asset_hashes": 15,
+      "retired_public_requests": 6,
+      "user_build_files_verified": 348,
+      "admin_files_preserved": 1360,
+      "old_user_files_preserved": 7035,
+      "nginx_files_preserved": 57
+    },
+    "corrected_products": {
+      "qzweb-55": "10x · 菲区 · 开通",
+      "qzweb-7": "10x · 菲区 · 续费",
+      "qzweb-56": "25x · 菲区",
+      "qzweb-58": "25x · 智利"
+    },
+    "public_channel_number_labels_removed": true,
+    "approved_cover_hashes_verified": true,
+    "content_fields_updated": 57,
+    "all_other_database_fields_preserved": true,
+    "prices_payment_and_supplier_mappings_preserved": true,
+    "historical_orders_and_private_delivery_preserved": true,
+    "backend_binary_redis_and_stock_timer_preserved": true,
+    "private_redemption_hosts_not_public": true,
+    "retired_asset_paths_preserved": 69,
+    "api_same_version_restarts": 1,
+    "api_recovery": {
+      "recovered": true,
+      "reason": "Business HTTP requests blocked while health endpoint and data stores remained responsive",
+      "backup": "/srv/zhixiang/backups/before-api-recovery-20261016T070422Z",
+      "old_api_pid": "2265207",
+      "new_api_pid": "2942544",
+      "same_binary": true,
+      "private_configuration_preserved": true,
+      "redis_pid_preserved": true,
+      "stock_timer": "active",
+      "checks": [
+        {
+          "route": "/health",
+          "result": "200|0.000832",
+          "exit": 0
+        },
+        {
+          "route": "/api/v1/public/config",
+          "result": "200|0.006168",
+          "exit": 0
+        },
+        {
+          "route": "/api/v1/public/products/qzweb-58",
+          "result": "200|0.002638",
+          "exit": 0
+        }
+      ]
+    },
+    "api_hang_root_cause_confirmed": false,
+    "backups": {
+      "shanghai": "/srv/zhixiang-front/backups/before-pro-quota-labels-20261016-144429",
+      "singapore": "/srv/zhixiang/backups/before-pro-quota-labels-20261016-144429",
+      "content": "/srv/zhixiang/backups/before-pro-quota-labels-20261016-144429/before-catalog-presentation-20261016T064552883309Z.db"
+    },
+    "database_uploaded": false,
+    "production_test_orders_created": false,
+    "real_payment_or_purchase_performed": false,
+    "private_evidence": "work/codex-runtime/pro-quota-labels-20261016/verified-report.json"
   }
 }

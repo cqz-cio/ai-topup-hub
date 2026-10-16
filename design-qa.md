@@ -1,3 +1,19 @@
+# 商城倍率与地区展示：批准稿实施核验（2026-10-16）
+
+final result: passed
+
+视觉依据为用户最后批准的 `work/codex-runtime/pro-quota-icons-preview-20261016/preview-v4.png`。四张 SVG 与批准稿资产逐字节一致：大号数字 247／750；ChatGPT 27／560；PRO 29／720；备注 25／600；右侧文字坐标和蓝线位置统一。两张 10x 均标注菲区，两张 25x 仅标菲区／智利。
+
+日常入口、最终构建与正式站均在 1920×1080、390×844、320×844 检查首页、商品中心和详情；含经典／Vault、简繁英、10x／25x 搜索及地区组合筛选，各 38 项通过，无横向溢出和脚本错误。正式验收拆分为经典 29 项与 Vault 9 项，结果完整保存在本次私有证据目录。
+
+Vault 复核使用正式公开配置的只读快照，仅在浏览器中切换模板选择，商品接口继续读取正式数据；未更改正式模板设置。
+
+实际组件截图：`work/codex-runtime/pro-quota-labels-20261016/production-classic-qzweb-55-card.png`、`production-classic-qzweb-7-card.png`、`production-classic-qzweb-56-card.png`、`production-classic-qzweb-58-card.png`。标题完整显示并保留价格、库存和购买入口。原有绿色品牌、背景、页面布局和购买行为保持一致；地域文字替代渠道编号属于批准范围，未发现需要保留的视觉偏差。
+
+实际发布 `20261016-144429`，构建来源 `7f6e10ca014f5c63df01f1ddfe746baa2f0c59f4`。348 个构建文件、15 项公网资源哈希及 22 项公开 API 验证通过；数据和程序保护结果见 `docs/catalog-presentation.md` 及本次 `verified-report.json`。
+
+---
+
 # 推广返利规则说明（2026-10-16）
 
 结果：通过。用户批准预览位于 `work/codex-runtime/affiliate-rules-preview-20261016/` 的 desktop/mobile/detail 图片；实现截图位于 `work/codex-runtime/affiliate-rules-20261016/` 的 local-final-1920/390/320、built-1920/390/320 和 result-detail。
