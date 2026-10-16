@@ -3,6 +3,7 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"flag"
@@ -33,6 +34,9 @@ type probe struct {
 	ElapsedMS  int64     `json:"elapsed_ms"`
 	LogID      uint      `json:"log_id,omitempty"`
 }
+
+const priorProbeQuery = "select count(*) from notification_logs where is_test=1 and instr(cast(variables_json as text),?)>0"
+const probeReceiptQuery = "select id,status,created_at from notification_logs where is_test=1 and biz_type='mail_latency_test' and instr(cast(variables_json as text),?)>0 order by id desc limit 1"
 
 func main() {
 	if err := run(); err != nil {
@@ -105,7 +109,7 @@ func run() error {
 		return json.NewEncoder(os.Stdout).Encode(map[string]interface{}{"ready": true, "recipient_count": 1, "read_only": true})
 	}
 	var prior int
-	if err := conn.QueryRow("select count(*) from notification_logs where is_test=1 and variables_json like ?", "%"+*token+"%").Scan(&prior); err != nil {
+	if err := conn.QueryRow(priorProbeQuery, *token).Scan(&prior); err != nil {
 		return err
 	}
 	if prior > 0 {
@@ -135,7 +139,12 @@ func run() error {
 		if kind == "verification" {
 			err = sender.SendVerifyCode(target, "TEST-NOT-VALID", "register", constants.LocaleZhCN, brand)
 		} else {
-			err = sender.SendOrderStatusEmail(target, notificationcontract.OrderStatusEmailInput{OrderNo: "MAILTEST-" + *token, Status: constants.OrderStatusCompleted, Currency: "CNY", SiteName: brand.SiteName, SiteURL: brand.SiteURL, MailBrand: brand, AttachmentName: "mail-speed-test.txt", AttachmentContent: "这是邮件测速附件，不是卡密；没有创建订单、付款或采购。标识：" + *token}, constants.LocaleZhCN)
+			template := settingsmessaging.DefaultOrderEmailTemplateSetting()
+			template.Templates.Delivered.ZHCN = settingsmessaging.OrderEmailLocalizedTemplate{
+				Subject: "【邮件测速测试】交付附件 " + *token,
+				Body:    "仅验证交付邮件及附件，没有创建订单、付款或采购。标识：" + *token,
+			}
+			err = sender.SendOrderStatusEmailWithTemplate(target, notificationcontract.OrderStatusEmailInput{OrderNo: "MAILTEST-" + *token, Status: constants.OrderStatusCompleted, Currency: "CNY", SiteName: brand.SiteName, SiteURL: brand.SiteURL, MailBrand: brand, AttachmentName: "mail-speed-test.txt", AttachmentContent: "这是邮件测速附件，不是卡密；没有创建订单、付款或采购。标识：" + *token}, constants.LocaleZhCN, &template)
 		}
 		if err != nil {
 			return fmt.Errorf("%s probe failed: %w", kind, err)
@@ -147,7 +156,10 @@ func run() error {
 		var id uint
 		var status string
 		var accepted time.Time
-		err = conn.QueryRow("select id,status,created_at from notification_logs where is_test=1 and biz_type='mail_latency_test' and variables_json like ? order by id desc limit 1", "%"+*token+"%").Scan(&id, &status, &accepted)
+		err = conn.QueryRow(probeReceiptQuery, *token).Scan(&id, &status, &accepted)
+		if err != nil && !errors.Is(err, sql.ErrNoRows) {
+			return fmt.Errorf("cannot read mail receipt: %w", err)
+		}
 		if err == nil && status == "success" {
 			reports = append(reports, probe{Kind: "merchant_queue", StartedAt: started, AcceptedAt: accepted.UTC(), ElapsedMS: accepted.Sub(started).Milliseconds(), LogID: id})
 			return json.NewEncoder(os.Stdout).Encode(map[string]interface{}{"token": *token, "probes": reports, "test_mail_only": true, "database_mode": "read-only", "orders_created": 0, "purchases_submitted": 0})
