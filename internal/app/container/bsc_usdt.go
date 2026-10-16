@@ -52,6 +52,7 @@ func (c *Container) initChainUSDT(cfg config.BSCUSDTConfig, networkName string) 
 	}
 	prefix := strings.ToUpper(network.Name)
 	endpoint := strings.TrimSpace(os.Getenv(prefix + "_RPC_URL"))
+	logsEndpoint := strings.TrimSpace(os.Getenv(prefix + "_LOGS_RPC_URL"))
 	receiptEndpoint := strings.TrimSpace(os.Getenv(prefix + "_RECEIPT_RPC_URL"))
 	if endpoint == "" {
 		if network.Name == "bsc" {
@@ -69,7 +70,7 @@ func (c *Container) initChainUSDT(cfg config.BSCUSDTConfig, networkName string) 
 	if network.Name == "tron" {
 		rpc, err = tronrpc.NewRPC(endpoint, os.Getenv("TRON_API_KEY"))
 	} else {
-		rpc, err = bscrpc.NewRPCForNetwork(endpoint, receiptEndpoint, network.Name)
+		rpc, err = bscrpc.NewRPCWithEndpoints(endpoint, logsEndpoint, receiptEndpoint, network.Name)
 	}
 	if err != nil {
 		return nil, err

@@ -24,7 +24,7 @@ func TestChainUSDTStartupCreatesIndependentChannelsAndPreservesMerchantSettings(
 	if err = db.AutoMigrate(&domain.PaymentChannel{}); err != nil {
 		t.Fatal(err)
 	}
-	for _, key := range []string{"BSC_RPC_URL", "BSC_RECEIPT_RPC_URL", "PLASMA_RPC_URL", "PLASMA_RECEIPT_RPC_URL"} {
+	for _, key := range []string{"BSC_RPC_URL", "BSC_LOGS_RPC_URL", "BSC_RECEIPT_RPC_URL", "PLASMA_RPC_URL", "PLASMA_LOGS_RPC_URL", "PLASMA_RECEIPT_RPC_URL"} {
 		t.Setenv(key, "")
 	}
 	c := &Container{Config: &config.Config{}, PaymentProviderRegistry: newPaymentProviderRegistry()}
