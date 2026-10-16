@@ -2,6 +2,8 @@
 
 final result: passed
 
+正式发布 `20261016-100816` 已核验。最终合并构建截图 `final-built-desktop.jpg`、`final-built-390.jpg`、`final-built-320.jpg`；正式站截图 `production-desktop.jpg`、`production-390.jpg`、`production-320.jpg`。7 项正式页面检查无错误，并确认商品中心 18 款展示保持。
+
 Source visual truth: `C:/Users/admin/.codex/generated_images/01a1425e-4b8d-7d62-a180-d18b83cd477f/exec-dd1deb73-a460-432f-a2b4-f7a11db3d666.png`。
 
 Implementation evidence: `D:/卡网/work/codex-runtime/product-detail-preview-20261016/` 内的 `local-desktop-v2.jpg`、`built-desktop.jpg`、`built-390.jpg`、`built-320.jpg` 与 `local-verified.json`。
