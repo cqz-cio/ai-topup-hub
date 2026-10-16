@@ -179,3 +179,17 @@ Implementation: clean Git archive of `3f9c00349214520784e548ece780163a1b5a6a9e`,
 - [x] Verify responsive layouts, non-U payment and important alternate states.
 
 Follow-up polish: minor font rasterization and existing shared navigation/footer differences are accepted; no blocking visual work remains.
+
+## 小π悬浮客服本地实现（2026-10-16）
+
+final result: passed
+
+- 目标：本会话批准的 `patrick-motion-occlusion.html` 原画派大星、挥手/墨镜反光/托腮动作及客服小窗。使用同一原画网格与头像资产；主入口挂载到独立客服分支，未部署。
+- 外观：核对批准的小窗截图与实现的 390×500px 小窗，保留头像、标题、四个话题、输入区、人工入口、圆角和绿色调。把预览文字输入占位变成实际输入框，明确标识演示问答；手机避开底栏，短屏优先展示聊天。
+- 动作：生产组件渲染器与批准预览的 7 个关键帧逐像素一致（思考 0/350/700/2240/3825/4200ms，挥手 560ms），差异像素均为 0。托腮前臂在身体前方，肩部连续。
+- 功能：快捷问题、自由输入、未知问题说明、纯文本转义、微信复制、QQ/Telegram 联系方式、Escape 收起与焦点返回均通过；检查期间没有业务写请求和页面脚本错误。
+- 布局：经典/Vault 在 1920×1080、390×844、320×844 下均无横向溢出和小窗裁切；另检查 390×500 短屏、真实触摸上下文、三语言和暗色主题。已修复暗色选择器和窄屏对称留白。
+- 降级：减少动态效果、WebGL 不可用、WebGL 上下文丢失/恢复通过；无法播放时仍显示原画和可用的客服问答。
+- 自动检查：149 项商城测试（包含 6 项演示回复边界测试）、Vue/TypeScript 类型检查及最终 Vite 构建通过。
+- 私有截图与报告：日常目录 `work/codex-runtime/customer-support-planning/implementation/qa/` 的 `report.json`、`lifecycle-report.json`、`approved-window.png`、`final-window.png`、`final-desktop.png`、`final-mobile.png` 和 `final-dark.png`。
+- 范围：演示问答只在内存中选择预设回复，不连接模型或客服后端，不查询订单、不读取支付状态、不承诺返利。没有推送或部署。分支仍基于 `4243550352902139cd9c4d7530615b6a5131c9f2`；后续拟合入时需要同步 main 的后续商品展示、客服和隐私改动，不能直接把此基线作为线上发布包。
