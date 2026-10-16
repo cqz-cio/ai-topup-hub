@@ -2498,5 +2498,36 @@
     ],
     "console_errors": 0,
     "private_evidence": "work/codex-runtime/product-detail-preview-20261016/verified-report.json"
+  },
+  "product_center_display": {
+    "passed": true,
+    "checked_at": "2026-10-16T02:10:23.105823+00:00",
+    "release": "20261016-100417",
+    "source_commit": "a4beda922912f4e2221a6584b8ba6745fa55e652",
+    "source_dirty": false,
+    "scope": "Classic product center shares homepage catalog display and category order",
+    "frontend_tests": 138,
+    "local_browser_checks": 16,
+    "built_browser_checks": 6,
+    "production_browser_checks": 11,
+    "public_http_hash_checks": 9,
+    "storefront_files_verified": 255,
+    "admin_files_preserved": 1165,
+    "backups": {
+      "shanghai": "/srv/zhixiang-front/backups/before-product-center-display-20261016-100417",
+      "singapore": "/srv/zhixiang/backups/before-product-center-display-20261016-100417"
+    },
+    "backend_release": "20261015-160016",
+    "backend_and_redis_preserved": true,
+    "prices_payment_channels_settings_preserved": true,
+    "database_uploaded": false,
+    "real_payment_or_purchase_performed": false,
+    "concurrent_detail_changes_excluded": true,
+    "source_tag": "production/product-center-display-20261016-100417",
+    "current_frontend_release": "20261016-100816",
+    "current_frontend_source_commit": "149b049921245d18cebd05d8b5d7f8a2617166ad",
+    "current_release_includes_catalog_commit": true,
+    "current_release_files_verified": 256,
+    "current_release_browser_checks": 3
   }
 }
