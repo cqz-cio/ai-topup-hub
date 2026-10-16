@@ -179,3 +179,10 @@ Implementation: clean Git archive of `3f9c00349214520784e548ece780163a1b5a6a9e`,
 - [x] Verify responsive layouts, non-U payment and important alternate states.
 
 Follow-up polish: minor font rasterization and existing shared navigation/footer differences are accepted; no blocking visual work remains.
+
+
+## 2026-10-16 Codex 商品卡片统一（批准稿实施）
+
+状态：本机视觉检查通过。批准稿和真实 1920×911 截图在同一次检查中对照：三列卡片约 311.66×485.38px，横图完整，三行信息、价格库存与两个操作位置一致。390px/320px 单列，768px 两列，无横向溢出；所有六档图片完整加载。原站导航登录态、本机独立分类和动态库存按实际环境保留。
+
+已核对分类切换、搜索、刷新、详情往返、GPT/Gemini 卡片回归、明暗主题与语言。截图和逐项结果保存于忽略目录 `work/codex-runtime/codex-card-layout/`。未发现有意义的卡片视觉偏差；没有改动后端业务流程。
