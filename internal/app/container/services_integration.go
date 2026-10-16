@@ -3,6 +3,7 @@ package container
 import (
 	catalogmappingbootstrap "github.com/dujiao-next/internal/bootstrap/catalogmapping"
 	telegrambroadcast "github.com/dujiao-next/internal/bootstrap/telegrambroadcast"
+	"github.com/dujiao-next/internal/config"
 	"github.com/dujiao-next/internal/logger"
 	apicredentialapp "github.com/dujiao-next/internal/modules/apicredential/application"
 	auditlogapp "github.com/dujiao-next/internal/modules/auditlog/application"
@@ -24,6 +25,7 @@ import (
 	paymentapp "github.com/dujiao-next/internal/modules/payment/application"
 	paymentqueue "github.com/dujiao-next/internal/modules/payment/infrastructure/queueadapter"
 	procurementapp "github.com/dujiao-next/internal/modules/procurement/application"
+	procurementdomain "github.com/dujiao-next/internal/modules/procurement/domain"
 	procurementmapping "github.com/dujiao-next/internal/modules/procurement/infrastructure/mappingreader"
 	procurementnotification "github.com/dujiao-next/internal/modules/procurement/infrastructure/notificationadapter"
 	procurementorder "github.com/dujiao-next/internal/modules/procurement/infrastructure/orderreader"
@@ -115,7 +117,17 @@ func (c *Container) initIntegrationServices() {
 		PaymentProviderRegistry: c.PaymentProviderRegistry,
 		ResellerAccounting:      c.ResellerAccountingLedger,
 	})
+	orderFloor, paidAfter, err := config.UpstreamPurchaseWindow()
+	if err != nil {
+		logger.Errorw("invalid_upstream_purchase_window", "error", err)
+		panic(err)
+	}
+	var purchaseWindow *procurementdomain.PurchaseWindow
+	if paidAfter != nil {
+		purchaseWindow = &procurementdomain.PurchaseWindow{OrderIDFloor: orderFloor, PaidAfter: *paidAfter}
+	}
 	c.ProcurementOrderService = procurementapp.NewService(procurementapp.Options{
+		PurchaseWindow:     purchaseWindow,
 		Repository:         c.ProcurementOrderRepo,
 		Orders:             procurementorder.New(c.OrderStore),
 		ProductMappings:    procurementmapping.NewProducts(c.ProductMappingRepo),

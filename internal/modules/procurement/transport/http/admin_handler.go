@@ -184,7 +184,7 @@ func (h *AdminHandler) RetryProcurementOrder(c *gin.Context) {
 			ginutil.RespondError(c, response.CodeNotFound, "error.procurement_not_found", nil)
 			return
 		}
-		if errors.Is(err, procurementcontract.ErrStatusInvalid) {
+		if errors.Is(err, procurementcontract.ErrStatusInvalid) || errors.Is(err, procurementcontract.ErrOutsidePurchaseWindow) {
 			ginutil.RespondErrorWithMsg(c, response.CodeBadRequest, err.Error(), nil)
 			return
 		}

@@ -68,7 +68,10 @@ func TestConfirmedBEP20PaymentAutomaticallyPurchasesAndDeliversSplitOrder(t *tes
 	options := procurementOptionsForTest(db)
 	options.Queue = q
 	options.Connections = procurementupstream.New(&acgProcurementProvider{adapter: adapter})
+	options.PurchaseWindow = &procurementdomain.PurchaseWindow{PaidAfter: time.Now().Add(-time.Minute)}
 	procurement := procurementapp.NewService(options)
+	// Mutating the caller's copy must not widen or close a running boundary.
+	options.PurchaseWindow.OrderIDFloor = parent.ID
 	payments := paymentapp.NewPaymentService(paymentapp.PaymentServiceOptions{OrderStore: ordergormstore.New(db, "test-guest-credential-secret-with-32-bytes"), PaymentStore: paymentgormstore.New(db, "test-guest-credential-secret-with-32-bytes"), ChannelStore: paymentgormstore.NewChannelStore(db)})
 	payments.SetProcurementService(procurement)
 	input := paymentapp.PaymentCallbackInput{PaymentID: payment.ID, OrderNo: parent.OrderNo, ChannelID: 1, Status: constants.PaymentStatusSuccess, Amount: parent.TotalAmount, Currency: "CNY", ProviderRef: "fixture-confirmed-chain-transfer"}

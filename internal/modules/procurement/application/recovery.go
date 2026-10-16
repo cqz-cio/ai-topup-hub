@@ -15,7 +15,7 @@ func (s *Service) RecoverPaidOrders() error {
 	if !ok || s.queue == nil {
 		return nil
 	}
-	ids, err := reader.FindPaidOrdersMissingProcurement(100)
+	ids, err := reader.FindPaidOrdersMissingProcurement(100, s.purchaseWindow)
 	if err != nil {
 		return err
 	}
@@ -25,12 +25,18 @@ func (s *Service) RecoverPaidOrders() error {
 			failures = append(failures, fmt.Errorf("recover paid order %d: %w", id, err))
 		}
 	}
-	orders, err := reader.ListRecoverable(time.Now().Add(-2*time.Minute), 100)
+	orders, err := reader.ListRecoverable(time.Now().Add(-2*time.Minute), 100, s.purchaseWindow)
 	if err != nil {
 		return err
 	}
 	for i := range orders {
 		order := &orders[i]
+		if allowed, windowErr := s.procurementWithinPurchaseWindow(order); windowErr != nil || !allowed {
+			if windowErr != nil {
+				failures = append(failures, windowErr)
+			}
+			continue
+		}
 		switch order.Status {
 		case "pending", "failed":
 			err = s.queue.EnqueueSubmit(order.ID, 0)

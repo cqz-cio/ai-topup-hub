@@ -23,6 +23,13 @@ func (s *Service) RetryManual(id uint) error {
 	if procOrder.Status != "failed" && procOrder.Status != "rejected" {
 		return procurementcontract.ErrStatusInvalid
 	}
+	allowed, err := s.procurementWithinPurchaseWindow(procOrder)
+	if err != nil {
+		return err
+	}
+	if !allowed {
+		return procurementcontract.ErrOutsidePurchaseWindow
+	}
 
 	now := time.Now()
 	updates := map[string]interface{}{

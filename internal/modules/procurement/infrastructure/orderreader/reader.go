@@ -55,6 +55,7 @@ func MapOrder(order orderdomain.Order) procurementdomain.LocalOrder {
 	result := procurementdomain.LocalOrder{
 		ID: order.ID, OrderNo: order.OrderNo, ParentID: order.ParentID,
 		UserID: order.UserID, GuestEmail: order.GuestEmail, Status: order.Status,
+		PaidAt:   order.PaidAt,
 		Currency: order.Currency, TotalAmount: order.TotalAmount, RefundedAmount: order.RefundedAmount,
 		Items:    make([]procurementdomain.LocalOrderItem, 0, len(order.Items)),
 		Children: make([]procurementdomain.LocalOrder, 0, len(order.Children)),
