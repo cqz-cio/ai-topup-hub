@@ -12,7 +12,7 @@
           <button v-for="(topic, index) in copy.topics" :key="index" type="button" :disabled="busy" @click="ask(copy.questions[index]!)">{{ topic }}<small>{{ copy.hints[index] }}</small></button>
         </div>
         <div class="support-messages" role="log" aria-live="polite" aria-relevant="additions text">
-          <p v-for="message in messages" :key="message.id" class="support-message" :class="`support-message-${message.role}`">{{ message.text }}</p>
+          <div v-for="message in messages" :key="message.id" class="support-message" :class="`support-message-${message.role}`"><p>{{ message.text }}</p><div v-if="message.links?.length" class="support-message-links"><RouterLink v-for="link in message.links" :key="link.to" :to="link.to">{{ link.label }}</RouterLink></div></div>
           <p v-if="busy" class="support-message support-message-assistant">{{ copy.thinking }}</p>
         </div>
         <button v-if="messages.length && !showTopics && !busy" class="support-more" type="button" @click="showTopics = true">{{ copy.newQuestion }}</button>
@@ -40,7 +40,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { RouterLink, useRoute } from 'vue-router'
 import { ExternalLink, Minus, X } from 'lucide-vue-next'
 import { useAppStore } from '../../stores/app'
 import SupportPet from './SupportPet.vue'
@@ -48,15 +49,20 @@ import avatar from './patrick-avatar.webp'
 import type { PetAction } from './petMotion'
 import { getDemoAnswer, getSupportCopy, supportContacts } from './supportDemo'
 import { useSupportDrag } from './useSupportDrag'
+import { getConversationCopy, respondToSupport, type SupportConversation, type SupportProduct, type SupportLink } from './supportConversation'
+import { loadSupportCatalog } from './supportCatalog'
 
-const app = useAppStore(), copy = computed(() => getSupportCopy(app.locale))
+const app = useAppStore(), copy = computed(() => ({ ...getSupportCopy(app.locale), subtitle: getConversationCopy(app.locale).subtitle, footer: getConversationCopy(app.locale).footer }))
+const route = useRoute()
 const open = ref(false), busy = ref(false), input = ref(''), contactsOpen = ref(false), showTopics = ref(false), copyStatus = ref('')
 const launcher = ref<HTMLButtonElement>(), closeButton = ref<HTMLButtonElement>(), inputElement = ref<HTMLInputElement>(), body = ref<HTMLElement>()
 const widget = ref<HTMLElement>(), panel = ref<HTMLElement>(), speechElement = ref<HTMLElement>()
 const { widgetStyle, panelStyle, speechStyle, speechSide, panelOverlap, dragging, pointerDown, pointerMove, finish, allowClick } = useSupportDrag(widget, launcher, panel, speechElement)
 const action = ref<PetAction>('wave'), phase = ref<PetAction>('wave'), sequence = ref(0), greetingVisible = ref(true)
-const messages = ref<{ id: number; role: 'user' | 'assistant'; text: string }[]>([])
-let replyTimer: ReturnType<typeof setTimeout> | undefined, greetingTimer: ReturnType<typeof setTimeout> | undefined, messageId = 0
+const messages = ref<{ id: number; role: 'user' | 'assistant'; text: string; links?: SupportLink[] }[]>([])
+let greetingTimer: ReturnType<typeof setTimeout> | undefined, messageId = 0
+let conversation: SupportConversation = {}, catalog: SupportProduct[] = [], catalogAt = 0, catalogLocale = ''
+let request: AbortController | undefined, generation = 0
 const speech = computed(() => busy.value ? copy.value.think : phase.value === 'reply' ? copy.value.reply : phase.value === 'wave' ? copy.value.greeting : copy.value.idle)
 function animate(next: PetAction) { action.value = next; sequence.value++ }
 function close() { open.value = false; contactsOpen.value = false; nextTick(() => launcher.value?.focus({ preventScroll: true })) }
@@ -71,27 +77,62 @@ async function toggle() {
   else closeButton.value?.focus({ preventScroll: true })
   scrollMessages()
 }
-function scrollMessages() { void nextTick(() => { body.value?.scrollTo({ top: body.value.scrollHeight, behavior: 'auto' }) }) }
+function scrollMessages(newReply = false) {
+  void nextTick(() => {
+    const container = body.value
+    if (!container) return
+    const replies = container.querySelectorAll<HTMLElement>('.support-message-assistant')
+    const latest = replies[replies.length - 1]
+    // Long instructions start at their first step instead of showing only the tail.
+    const top = newReply && latest && latest.offsetHeight > container.clientHeight - 24
+      ? container.scrollTop + latest.getBoundingClientRect().top - container.getBoundingClientRect().top - 12
+      : container.scrollHeight
+    container.scrollTo({ top: Math.max(0, top), behavior: 'auto' })
+  })
+}
 function preventComposition(event: KeyboardEvent) { if (event.isComposing || event.keyCode === 229) event.preventDefault() }
-function ask(question: string) {
+async function ask(question: string) {
   const value = question.trim().slice(0, 500)
   if (!value || busy.value) return
-  const answer = getDemoAnswer(value, app.locale)
+  const locale = app.locale, turn = ++generation
+  request?.abort(); request = new AbortController()
   messages.value.push({ id: ++messageId, role: 'user', text: value }); input.value = ''; busy.value = true; showTopics.value = false; contactsOpen.value = false
   animate('think'); scrollMessages()
-  replyTimer = setTimeout(() => {
-    messages.value.push({ id: ++messageId, role: 'assistant', text: answer }); busy.value = false; animate('reply'); scrollMessages()
-    // Keep the local demo bounded without persisting customer input.
-    if (messages.value.length > 40) messages.value.splice(0, messages.value.length - 40)
-    if (open.value && matchMedia('(pointer: fine)').matches) nextTick(() => inputElement.value?.focus({ preventScroll: true }))
-  }, matchMedia('(prefers-reduced-motion: reduce)').matches ? 250 : 4500)
+  let available = true
+  let response = respondToSupport(value, conversation, catalog, locale)
+  // Other topics retain the existing basic replies; the first guide uses live catalog names.
+  if (response && (Date.now() - catalogAt > 60000 || catalogLocale !== locale)) {
+    try {
+      const loaded = await loadSupportCatalog(locale, request.signal)
+      if (turn !== generation) return
+      catalog = loaded; catalogAt = Date.now(); catalogLocale = locale
+    } catch {
+      if (turn !== generation) return
+      available = false; catalog = []; catalogAt = 0
+    }
+    if (turn !== generation) return
+  }
+  if (turn !== generation) return
+  if (response) {
+    const pageProduct = !conversation.family ? catalog.find(product => product.slug === route.params.slug) : undefined
+    const context = pageProduct ? { ...conversation, product: pageProduct, family: pageProduct.family, variant: /\bios\b/i.test(pageProduct.title) ? 'ios' as const : undefined } : conversation
+    response = respondToSupport(value, context, catalog, locale, available)
+  }
+  conversation = response?.state || {}
+  messages.value.push({ id: ++messageId, role: 'assistant', text: response?.text || getDemoAnswer(value, locale), links: response?.links })
+  contactsOpen.value = response?.handoff === true
+  busy.value = false; animate('reply'); scrollMessages(true)
+  // Session context stays in memory. Never persist input or send it to a model.
+  if (messages.value.length > 40) messages.value.splice(0, messages.value.length - 40)
+  if (open.value && matchMedia('(pointer: fine)').matches) nextTick(() => inputElement.value?.focus({ preventScroll: true }))
 }
 async function copyContact(value: string) {
   try { await navigator.clipboard.writeText(value); copyStatus.value = copy.value.copied }
   catch { copyStatus.value = copy.value.copyFailed }
 }
 onMounted(() => { greetingTimer = setTimeout(() => { greetingVisible.value = false }, 8000) })
-onBeforeUnmount(() => { clearTimeout(replyTimer); clearTimeout(greetingTimer) })
+watch(() => app.locale, () => { generation++; request?.abort(); busy.value = false; conversation = {}; catalog = []; catalogAt = 0; animate('idle') })
+onBeforeUnmount(() => { generation++; request?.abort(); clearTimeout(greetingTimer) })
 </script>
 
 <style scoped>
@@ -129,6 +170,9 @@ onBeforeUnmount(() => { clearTimeout(replyTimer); clearTimeout(greetingTimer) })
 .support-topics button:hover:not(:disabled) { background: var(--sp-soft); border-color: var(--sp-accent); }
 .support-topics small { display: block; font-size: 11px; color: var(--sp-muted); }
 .support-message { margin: 0 0 14px; padding: 11px 13px; font-size: 13px; white-space: pre-line; overflow-wrap: anywhere; }
+.support-message p { margin: 0; }
+.support-message-links { display: flex; flex-wrap: wrap; gap: 8px 14px; margin-top: 12px; white-space: normal; }
+.support-message-links a { color: var(--sp-accent); text-decoration: underline; text-underline-offset: 3px; }
 .support-message-user { margin-left: 36px; background: var(--sp-accent); color: var(--sp-on-accent); border-radius: 14px 14px 4px 14px; }
 .support-message-assistant { margin-right: 12px; padding: 14px; background: var(--sp-soft); border-radius: 4px 14px 14px; }
 .support-more { color: var(--sp-accent); border: 0; background: transparent; padding: 6px 0; font-size: 12px !important; }

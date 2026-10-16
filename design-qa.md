@@ -205,3 +205,15 @@ final result: passed
 - 最终 Vue/TypeScript 类型检查及 Vite 构建通过。原有网格动画、预设回复及业务接口没有修改，本次未重复计入上一轮 149 项测试。
 - 私有证据：日常目录 work/codex-runtime/customer-support-planning/implementation/qa-drag/report.json 及同目录 top-left.png、middle.png、drag-open.png、mobile-500.png、touch-open.png。
 - 保存在原 codex/customer-support-agent 独立分支；没有合入主目录、推送、接入模型或部署。
+
+## 小π客服第一阶段实际对话（2026-10-16）
+
+final result: passed
+
+- 按用户选择优先实现商品选购、充值与使用。使用本机公开目录的商品名，记住当前商品、iOS 渠道及对话步骤；区分 GPT 订阅、Codex 点数、Gemini 和商城钱包。付款、返利和开店仍保留基础指引。
+- 新增站内商品、订单、游客查单和钱包链接；只跳转现有页面，不在客服中查询私有订单或执行业务操作。具体兑换入口只引导到付款后的订单交付说明。
+- 长回复从首个步骤开始展示，修复窄屏商品列表只看到末尾的问题；保持批准的小窗外观、角色动作与拖动交互。
+- 174 项商城测试通过，其中本轮新增 25 项多轮规则及公开目录边界测试；Vue/TypeScript 类型检查和最终 Vite 构建通过。构建仍有已有 Browserslist 数据版本提示，无新增依赖。
+- 16 项浏览器检查通过：实际目录读取、GPT 多轮选择与兑换、iOS 上下文、商城钱包、Codex 点数、人工入口、纯文本转义、商品详情上下文、实际游客查单导航与返回、拖动保留会话、目录失败重试、经典/Vault 两模板 390/320px 三语言，以及切换语言取消旧请求。没有页面脚本错误和业务写请求。
+- 私有证据位于日常目录 work/codex-runtime/customer-support-planning/conversation/qa/：report.json、gpt-conversation.png、classic-zh-CN-390.png、vault-zh-CN-320.png、classic-en-US-390.png 和 vault-zh-TW-320.png。已查看中文桌面、手机和 320px 长列表截图。
+- 会话只保存在组件内存；规则返回已维护的步骤，不连接大模型。开发保存在原 codex/customer-support-agent 分支，没有合入主目录、推送或部署。分支较旧基线的合入约束沿用上文。
