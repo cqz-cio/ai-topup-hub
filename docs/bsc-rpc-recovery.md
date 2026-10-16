@@ -10,7 +10,7 @@
 
 三个接口均限定 HTTPS，拒绝重定向、错误链 ID、错误 USDT 精度和无效 JSON-RPC 响应。应用发送 `PiStarPaymentMonitor/1.0` 标识。所有独立接口先校验 BSC 链 ID 56 和官方 USDT 合约精度 18，到账仍核对确认数、最终区块、收款地址、金额及成功交易回执。
 
-本次候选组合为 BNB 官方 `https://bsc-dataseed.bnbchain.org` 查询区块和回执，48 Club 的 `https://rpc.48.club` 查询日志。正式服务器只读验证了原游标区块哈希、连续 500 个积压区块，以及库内已有到账日志与独立官方回执的完整一致性。未注册或购买服务。公共接口可调整访问规则，后续替换时也必须验证历史 `eth_getLogs` 和已知交易，不能只检查 `eth_chainId`。
+当前正式配置为 BNB 官方 `https://bsc-dataseed.bnbchain.org` 查询区块和回执，48 Club 的 `https://rpc.48.club` 查询日志。正式服务器只读验证了原游标区块哈希、连续 500 个积压区块，以及库内已有到账日志与独立官方回执的完整一致性。未注册或购买服务。公共接口可调整访问规则，后续替换时也必须验证历史 `eth_getLogs` 和已知交易，不能只检查 `eth_chainId`。
 
 服务环境通过独立的 `zhixiang-shop.service.d/40-bsc-rpc.conf` 设置；原配置文件、收款地址、汇率、确认数、支付渠道及采购开关保持现状。私有 RPC 令牌只能保存在受限服务器配置或本机忽略目录，不能写入仓库或日志。
 
@@ -27,4 +27,12 @@ RPC 日志请求按最多 50 个区块连续分页，全部页面成功且每条
 - [BNB 官方公共 RPC 说明](https://docs.bnbchain.org/bnb-smart-chain/developers/json_rpc/json-rpc-endpoint/)：公共节点的 `eth_getLogs` 限制。
 - [48 Club RPC 官方说明](https://docs.48.club/privacy-rpc)：公共访问地址；本站只调用查询方法。
 
-实际发布号、源码和恢复证据在上线验证完成后补充。
+## 正式验收
+
+发布 `20261016-194753`，源码 `969505b226cb6b29443d8a395b98276254e43eb4`，二进制 SHA256 `ec3df039b8fc62649144b568acca0611c61675767bc5597e0841b2b33110eae7`。截至 2026-10-16 20:01:01（Asia/Shanghai），游标从 `127945720` 连续补扫至下一块 `127974731`，距离已确认目标 17 块，最近游标更新距检查 7.81 秒。连续三次相隔约 45 秒的观测已追平且持续前进，新进程三条链监听错误均为 0。库内既有 BSC 到账数保持 1。
+
+1811 项相关 Go 回归通过，2 项外部依赖跳过；日常本机已重建并通过 12 项 API 检查，正式 9 项公网检查与本机/正式浏览器结账刷新、支付渠道和后台访问通过。前端源码及内嵌资源与已验收的上一版一致，上海静态资源未重新发布。
+
+69 张表已核对，受保护数据、原私有配置和 Redis/库存 timer 保留。备份 `/srv/zhixiang/backups/before-bsc-rpc-recovery-20261016-194753`；私有核验记录在外层 `deployment/local/bsc-rpc-recovery/verified-report.json`，连续扫描记录为 `scan-observations.json`。没有上传本机库或进行实际扣款测试。
+
+如需回退，先核对上述发布与备份，恢复原程序软链并撤销本次新增的 `40-bsc-rpc.conf`，执行 `systemctl daemon-reload` 后重启后端；数据库继续保留，不能用旧备份覆盖已发生的正常业务。回退到旧接口会重新出现原 403，操作后必须再次核对扫描进度。

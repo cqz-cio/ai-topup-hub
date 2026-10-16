@@ -1,24 +1,24 @@
 {
-  "checked_at": "2026-10-16T19:22:28.799817+08:00",
+  "checked_at": "2026-10-16T20:01:01.177661+08:00",
   "production_url": "https://www.qzweb.cloud/",
-  "documented_release_id": "20261016-190912",
-  "verified_release_id": "20261016-190912",
-  "previous_release_id": "20261015-160016",
-  "source_commit": "b9459c9e493588ce943289f4349a3b2a27762512",
+  "documented_release_id": "20261016-194753",
+  "verified_release_id": "20261016-194753",
+  "previous_release_id": "20261016-190912",
+  "source_commit": "969505b226cb6b29443d8a395b98276254e43eb4",
   "source_branch": "main",
   "server_git_commit_verified": true,
-  "source_tag": "production/paid-order-deadlock-20261016-190912",
+  "source_tag": "production/bsc-rpc-recovery-20261016-194753",
   "production": {
-    "release_path": "/srv/zhixiang/releases/20261016-190912",
-    "running_executable": "/srv/zhixiang/releases/20261016-190912/zhixiang-shop",
-    "binary_bytes": 90886306,
-    "binary_sha256": "e224f3d6f7f6dc540a101230b39975be657493d99196b7f1458ab7c628ab6c0b",
-    "running_binary_sha256": "e224f3d6f7f6dc540a101230b39975be657493d99196b7f1458ab7c628ab6c0b",
-    "manifest_binary_sha256": "e224f3d6f7f6dc540a101230b39975be657493d99196b7f1458ab7c628ab6c0b",
+    "release_path": "/srv/zhixiang/releases/20261016-194753",
+    "running_executable": "/srv/zhixiang/releases/20261016-194753/zhixiang-shop",
+    "binary_bytes": 90894498,
+    "binary_sha256": "ec3df039b8fc62649144b568acca0611c61675767bc5597e0841b2b33110eae7",
+    "running_binary_sha256": "ec3df039b8fc62649144b568acca0611c61675767bc5597e0841b2b33110eae7",
+    "manifest_binary_sha256": "ec3df039b8fc62649144b568acca0611c61675767bc5597e0841b2b33110eae7",
     "build_info": {
       "go_version": "go1.26.5",
-      "source_commit": "b9459c9e493588ce943289f4349a3b2a27762512",
-      "vcs_revision": "b9459c9e493588ce943289f4349a3b2a27762512",
+      "source_commit": "969505b226cb6b29443d8a395b98276254e43eb4",
+      "vcs_revision": "969505b226cb6b29443d8a395b98276254e43eb4",
       "vcs_modified": false,
       "git_metadata_pinned": true,
       "tags": "release,fullstack"
@@ -32,21 +32,23 @@
       "stock_sync_timer": "active"
     },
     "redis_preserved_without_restart": true,
-    "backup": "/srv/zhixiang/backups/before-paid-order-deadlock-20261016-190912",
+    "backup": "/srv/zhixiang/backups/before-bsc-rpc-recovery-20261016-194753",
     "database_backup_quick_check": "ok",
-    "report_path": "/srv/zhixiang/shared/reports/paid-order-deadlock-20261016-190912.json",
-    "configuration_unchanged": true,
+    "report_path": "/srv/zhixiang/shared/reports/bsc-rpc-recovery-20261016-194753.json",
+    "configuration_unchanged": false,
     "nginx_configuration_preserved": true,
     "source_dirty": false,
     "private_configuration_unchanged": true,
-    "configuration_changes": [],
-    "source_commit": "b9459c9e493588ce943289f4349a3b2a27762512",
+    "configuration_changes": [
+      "Added 40-bsc-rpc.conf with BNB official headers/receipts and 48 Club event queries."
+    ],
+    "source_commit": "969505b226cb6b29443d8a395b98276254e43eb4",
     "configuration_except_tron_preserved": true,
     "settings_changes": [],
     "nginx_configuration_source_commit": "c1791c57d73a0526244343eba5f766309107c8bd",
     "nginx_change_scope": "No Nginx changes in this backend-only release; existing retirement and redirect rules preserved.",
     "pids": {
-      "zhixiang-shop": "3046771",
+      "zhixiang-shop": "3064890",
       "zhixiang-redis": "52983"
     },
     "last_api_recovery": {
@@ -77,7 +79,8 @@
         }
       ]
     },
-    "paid_order_deadlock_fixed_in_release": "20261016-190912"
+    "paid_order_deadlock_fixed_in_release": "20261016-190912",
+    "bsc_rpc_recovered_in_release": "20261016-194753"
   },
   "payment": {
     "bep20": {
@@ -274,7 +277,7 @@
     "Unified-wallet local review was verified with service/HTTP/component fixtures; the daily local financial declaration remained unsigned. Broader Go suite has existing Windows logger lock, CGO-disabled SQLite fixture and Linux-permission selfupdate test limitations; affected wallet/order/payment/affiliate/reseller checks passed. No real payout or procurement was performed.",
     "The upstream check is a balance snapshot, not a reservation. Previously copied payment instructions cannot be revoked; local mock scenarios do not constitute real-funds acceptance.",
     "20261016-190912 fixes the paid-order database deadlock. One existing paid customer order recovered through authorized automatic procurement; this was not a test purchase.",
-    "BSC main RPC returned HTTP 403 during post-release read-only checks and the scan cursor remains at 2026-10-16T16:23:12+08:00. Payment monitoring APIs responding does not establish that all chains are scanning successfully."
+    "The BSC HTTP 403 issue recorded for release 20261016-190912 was resolved by 20261016-194753; catch-up and continued confirmed-block scanning were verified without a real-money test."
   ],
   "procurement_verification": {
     "mock_end_to_end_scenarios_passed": 12,
@@ -344,7 +347,7 @@
     "content_preserved_by_release": "20261012-153531"
   },
   "source_identity_verification": {
-    "source_commit": "b9459c9e493588ce943289f4349a3b2a27762512",
+    "source_commit": "969505b226cb6b29443d8a395b98276254e43eb4",
     "source_branch": "main",
     "source_dirty": false,
     "binary_build_info_commit_matches": true,
@@ -974,7 +977,7 @@
     "real_payment_or_purchase_submitted": false,
     "verification_directory": "work/codex-runtime/register-captcha-preview-20261013/"
   },
-  "previous_verification_checked_at": "2026-10-16T07:09:48.772746+00:00",
+  "previous_verification_checked_at": "2026-10-16T19:22:28.799817+08:00",
   "sale_email": {
     "release": "20261013-162050",
     "source_commit": "2bbb4e0b802114dd3bda394b28cddcf83639228a",
@@ -2894,11 +2897,46 @@
       "scan_cursor_last_updated": "2026-10-16T16:23:12+08:00",
       "same_rpc_error_seen_before_release": true,
       "payment_configuration_changed": false,
-      "all_payment_chains_verified": false
+      "all_payment_chains_verified": false,
+      "resolved_in_release": "20261016-194753",
+      "currently_resolved": true
     },
     "private_evidence": "deployment/local/deadlock-release/verified-report.json",
     "documentation": "docs/paid-order-deadlock.md",
     "rolled_back_attempt": "20261016-190008",
     "rollback_reason": "Deployment verifier used code instead of status_code; corrected before successful restage."
+  },
+  "bsc_rpc_recovery": {
+    "checked_at": "2026-10-16T20:01:01.177661+08:00",
+    "release": "20261016-194753",
+    "source_commit": "969505b226cb6b29443d8a395b98276254e43eb4",
+    "source_tag": "production/bsc-rpc-recovery-20261016-194753",
+    "backup": "/srv/zhixiang/backups/before-bsc-rpc-recovery-20261016-194753",
+    "primary_rpc": "https://bsc-dataseed.bnbchain.org",
+    "logs_rpc": "https://rpc.48.club",
+    "receipt_rpc": "https://bsc-dataseed.bnbchain.org",
+    "previous_cursor": 127945720,
+    "next_block": 127974731,
+    "confirmed_target": 127974747,
+    "blocks_behind": 17,
+    "cursor_age_seconds": 7.81,
+    "caught_up_samples": 3,
+    "new_listener_errors": {},
+    "backend_regression_passed": 1811,
+    "backend_regression_skipped": [
+      "TestReadOnlyMainnetProtocol",
+      "TestBackfillGuestCredentialHashesOnPostgres"
+    ],
+    "local_rebuilt_and_verified": true,
+    "tables_compared": 69,
+    "protected_data_preserved": true,
+    "frontend_files_preserved": 8599,
+    "nginx_files_preserved": 57,
+    "redis_process_preserved": true,
+    "stock_timer_preserved": true,
+    "actual_charge_test_performed": false,
+    "local_database_uploaded": false,
+    "documentation": "docs/bsc-rpc-recovery.md",
+    "private_evidence": "deployment/local/bsc-rpc-recovery/verified-report.json"
   }
 }

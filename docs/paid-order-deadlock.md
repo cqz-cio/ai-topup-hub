@@ -35,3 +35,5 @@
 当前发布后未再出现原三条链的数据库等待超时；Plasma/TRON 尚无已初始化的当前扫描游标，不据此宣称真实收款通过。本次没有进行真实资金验收。
 
 私有证据保存在外层 `deployment/local/deadlock-release/`：`verified-report.json`、修复前复现与修复后测试日志、本机核验、部署报告、数据比较、`rpc-diagnostics.json` 及 `runtime-diagnostics.json`。凭据、数据库、卡密和原始业务内容不提交。
+
+后续状态：上述独立 BSC RPC 403 问题已由 `20261016-194753` 修复并追平积压区块，见 [BSC 到账扫描恢复](bsc-rpc-recovery.md)。原死锁修复继续保留；没有执行真实扣款验收。
