@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-16T02:12:32.671791+00:00",
+  "checked_at": "2026-10-16T02:23:39.829199+00:00",
   "production_url": "https://www.qzweb.cloud/",
   "documented_release_id": "20261015-160016",
   "verified_release_id": "20261015-160016",
@@ -188,7 +188,7 @@
     "https://124.220.2.69:18888/login"
   ],
   "verified_asset_sha256": {
-    "user/index.html": "ffc13cc502257736bc594c8c30e45ccd56c7d40abe9db1378445a7c78f900423",
+    "user/index.html": "aec713e3bb25e26f867363237b525c39a8ca75faa2e9528ac7f2643d9499cba5",
     "admin/index.html": "6a2f61b83b4c3cef16ad51d466975d6b770d5668f0c9c1afd8203c5a79f18ccc"
   },
   "public_verification": {
@@ -367,11 +367,11 @@
   "previous_build_verification_at": "2026-10-12T08:19:31.766441+00:00",
   "management_url": "https://admin.qzweb.cloud/login",
   "frontend_gateway": {
-    "checked_at": "2026-10-16T02:12:32.671791+00:00",
+    "checked_at": "2026-10-16T02:23:39.829199+00:00",
     "frontend_host": "124.220.2.69",
     "backend_host": "43.134.141.10",
-    "frontend_release": "20261016-100816",
-    "source_commit": "149b049921245d18cebd05d8b5d7f8a2617166ad",
+    "frontend_release": "20261016-102000",
+    "source_commit": "4b53a82bdd3e39410872cf1c78f0e7048fce881c",
     "static_files_verified": 256,
     "storefront_url": "https://www.qzweb.cloud/",
     "management_url": "https://admin.qzweb.cloud/login",
@@ -388,7 +388,7 @@
     "certificate_renewal_verified": true,
     "certificate_timer": "qzweb-certificates.timer",
     "certificate_renewal_report": "/srv/zhixiang-front/shared/work/renew-final-20261012-1644/status.json",
-    "report_path": "/srv/zhixiang-front/shared/work/product-detail-compact-20261016-100816.json",
+    "report_path": "/srv/zhixiang-front/shared/work/affiliate-rules-20261016-102000.json",
     "backend_report_path": "/srv/zhixiang/shared/reports/prepayment-balance-release-20261015-160016.json",
     "formal_alipay_enabled": false,
     "database_uploaded": false,
@@ -402,10 +402,10 @@
       "browser_current_frontend_confirmed": true,
       "report_path": "/srv/zhixiang-front/shared/work/entry-cache-report.json"
     },
-    "previous_frontend_release": "20261016-100417",
-    "storefront_source_commit": "149b049921245d18cebd05d8b5d7f8a2617166ad",
+    "previous_frontend_release": "20261016-100816",
+    "storefront_source_commit": "4b53a82bdd3e39410872cf1c78f0e7048fce881c",
     "admin_source_commit": "41af36617cd9f267520bd934299394ce74f416e6",
-    "backup": "/srv/zhixiang-front/backups/before-product-detail-compact-20261016-100816",
+    "backup": "/srv/zhixiang-front/backups/before-affiliate-rules-20261016-102000",
     "frontend_only_update": true,
     "previous_hashed_assets_retained": true,
     "verified_services": {
@@ -413,20 +413,19 @@
       "zhixiang-api-tunnel": "active",
       "qzweb-certificates.timer": "active"
     },
-    "release_scope": "Approved product detail option 1; compact independent columns, complete images, existing product content and purchase logic preserved. Includes published product center display.",
+    "release_scope": "Affiliate rules from backend settings; preserve approved product center and product detail releases.",
     "admin_files_verified": 1165,
     "storefront_files_verified": 256,
     "backend_program_preserved": true,
     "backend_setting_changes": [],
-    "frontend_build_source_commit": "149b049921245d18cebd05d8b5d7f8a2617166ad",
+    "frontend_build_source_commit": "4b53a82bdd3e39410872cf1c78f0e7048fce881c",
     "frontend_source_identical_to_backend": false,
     "admin_base": "/",
     "base_repair_backup": "/srv/zhixiang-front/backups/before-xorpay-admin-base-20261013-173020",
-    "frontend_source_difference": "Storefront built from clean 149b049921245d18cebd05d8b5d7f8a2617166ad; backend and admin retain 41af36617cd9f267520bd934299394ce74f416e6.",
+    "frontend_source_difference": "Storefront source 4b53a82bdd3e39410872cf1c78f0e7048fce881c; backend and admin retain 41af36617cd9f267520bd934299394ce74f416e6.",
     "source_dirty": false,
-    "source_tag": "production/product-detail-compact-20261016-100816",
-    "static_verification_scope": "New storefront release files; existing admin and retained resources independently compared before and after.",
-    "retained_files_verified": 7250
+    "source_tag": "production/affiliate-rules-20261016-102000",
+    "static_verification_scope": "New storefront release files; existing admin and retained resources independently compared before and after."
   },
   "alipay": {
     "code_and_official_sandbox_query_verified": true,
@@ -2529,5 +2528,53 @@
     "current_release_includes_catalog_commit": true,
     "current_release_files_verified": 256,
     "current_release_browser_checks": 3
+  },
+  "affiliate_rules": {
+    "passed": true,
+    "checked_at": "2026-10-16T02:23:39.829199+00:00",
+    "release": "20261016-102000",
+    "source_commit": "4b53a82bdd3e39410872cf1c78f0e7048fce881c",
+    "source_tree": "8e0eb0fa48f34d6f7e84a62172699c7650bb15d2",
+    "source_dirty": false,
+    "tests_passed": 143,
+    "typechecked_build": true,
+    "daily_local_verified": true,
+    "configuration_change_verified": {
+      "commission_rate": 3.75,
+      "example_commission": 3.75,
+      "confirm_days": 7,
+      "zero_values_verified": true,
+      "settings_restored": true
+    },
+    "templates": [
+      "classic",
+      "vault"
+    ],
+    "languages": [
+      "zh-CN",
+      "zh-TW",
+      "en-US"
+    ],
+    "viewports": [
+      1920,
+      390,
+      320
+    ],
+    "production_browser_checks": 4,
+    "public_http_checks": 7,
+    "new_storefront_files_verified": 256,
+    "admin_files_preserved": 1165,
+    "backend_release_preserved": "20261015-160016",
+    "backend_and_redis_not_restarted": true,
+    "configuration_and_prices_preserved": true,
+    "database_uploaded": false,
+    "real_payment_or_procurement": false,
+    "local_test_user_removed": true,
+    "shanghai_backup": "/srv/zhixiang-front/backups/before-affiliate-rules-20261016-102000",
+    "singapore_backup": "/srv/zhixiang/backups/before-affiliate-rules-20261016-102000",
+    "public_url": "https://www.qzweb.cloud/me/affiliate",
+    "private_evidence": "work/codex-runtime/affiliate-rules-20261016/",
+    "production_screenshot_limitation": "Chrome screenshot capture timed out; authenticated production DOM, viewport metrics and public asset hashes verified; screenshots captured from identical local release bundle.",
+    "source_tag": "production/affiliate-rules-20261016-102000"
   }
 }
