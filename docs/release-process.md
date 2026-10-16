@@ -38,6 +38,8 @@ GitHub CI 在 `main`、`dev` 推送及 PR 上验证；`v*` 标签触发 GoReleas
 
 ## 已撤下的历史资源
 
-保留历史散列资源时，排除 [旧资源撤下清单](../ops/tencent/frontend-gateway/nginx-retired-assets.conf) 中的 6 个文件。它们含有旧个人联系方式，当前商城已不再引用。清单安装到上海 `/etc/nginx/snippets/qzweb-retired-assets.conf`，由商城 HTTPS 配置引用，对旧地址返回 `410` 与 `Cache-Control: no-store`。后续部署或回滚均保留此规则，不将隔离备份复制回公开目录。更新 Nginx 配置前先安装该清单并通过 `nginx -t`。
+保留历史散列资源时，排除 [旧资源撤下清单](../ops/tencent/frontend-gateway/nginx-retired-assets.conf) 中的全部路径（目前 69 个）。这些历史商城和后台脚本含旧联系方式或私有兑换入口，当前前端已不再引用。清单安装到上海 `/etc/nginx/snippets/qzweb-retired-assets.conf`，由商城、后台域名及后台 IP 配置共同引用，对旧地址返回 `410` 与 `Cache-Control: no-store`。后续部署或回滚均保留此规则，不将隔离备份复制回公开目录。更新 Nginx 配置前先安装该清单并通过 `nginx -t`。
 
 私有备份与当前公开目录分别保留；浏览器或第三方已经下载的历史副本无法由服务器撤回。
+
+发布两套前端后运行 `python -B scripts/audit_public_redemption.py frontend/user/dist frontend/admin/dist`；检查旧源站不得继续提供内嵌旧前端。详见 [兑换入口隐私维护](redemption-privacy.md)。
