@@ -1,24 +1,24 @@
 {
-  "checked_at": "2026-10-16T07:09:48.772746+00:00",
+  "checked_at": "2026-10-16T19:22:28.799817+08:00",
   "production_url": "https://www.qzweb.cloud/",
-  "documented_release_id": "20261015-160016",
-  "verified_release_id": "20261015-160016",
-  "previous_release_id": "20261015-150336",
-  "source_commit": "41af36617cd9f267520bd934299394ce74f416e6",
+  "documented_release_id": "20261016-190912",
+  "verified_release_id": "20261016-190912",
+  "previous_release_id": "20261015-160016",
+  "source_commit": "b9459c9e493588ce943289f4349a3b2a27762512",
   "source_branch": "main",
   "server_git_commit_verified": true,
-  "source_tag": "production/prepayment-balance-20261015-160016",
+  "source_tag": "production/paid-order-deadlock-20261016-190912",
   "production": {
-    "release_path": "/srv/zhixiang/releases/20261015-160016",
-    "running_executable": "/srv/zhixiang/releases/20261015-160016/zhixiang-shop",
-    "binary_bytes": 90816674,
-    "binary_sha256": "1e3814d14000c898863ec6e2afac43a364901cdd17d2cda9da7b1e0537385ded",
-    "running_binary_sha256": "1e3814d14000c898863ec6e2afac43a364901cdd17d2cda9da7b1e0537385ded",
-    "manifest_binary_sha256": "1e3814d14000c898863ec6e2afac43a364901cdd17d2cda9da7b1e0537385ded",
+    "release_path": "/srv/zhixiang/releases/20261016-190912",
+    "running_executable": "/srv/zhixiang/releases/20261016-190912/zhixiang-shop",
+    "binary_bytes": 90886306,
+    "binary_sha256": "e224f3d6f7f6dc540a101230b39975be657493d99196b7f1458ab7c628ab6c0b",
+    "running_binary_sha256": "e224f3d6f7f6dc540a101230b39975be657493d99196b7f1458ab7c628ab6c0b",
+    "manifest_binary_sha256": "e224f3d6f7f6dc540a101230b39975be657493d99196b7f1458ab7c628ab6c0b",
     "build_info": {
       "go_version": "go1.26.5",
-      "source_commit": "41af36617cd9f267520bd934299394ce74f416e6",
-      "vcs_revision": "41af36617cd9f267520bd934299394ce74f416e6",
+      "source_commit": "b9459c9e493588ce943289f4349a3b2a27762512",
+      "vcs_revision": "b9459c9e493588ce943289f4349a3b2a27762512",
       "vcs_modified": false,
       "git_metadata_pinned": true,
       "tags": "release,fullstack"
@@ -32,21 +32,21 @@
       "stock_sync_timer": "active"
     },
     "redis_preserved_without_restart": true,
-    "backup": "/srv/zhixiang/backups/before-prepayment-balance-20261015-160016",
+    "backup": "/srv/zhixiang/backups/before-paid-order-deadlock-20261016-190912",
     "database_backup_quick_check": "ok",
-    "report_path": "/srv/zhixiang/shared/reports/prepayment-balance-release-20261015-160016.json",
+    "report_path": "/srv/zhixiang/shared/reports/paid-order-deadlock-20261016-190912.json",
     "configuration_unchanged": true,
-    "nginx_configuration_preserved": false,
+    "nginx_configuration_preserved": true,
     "source_dirty": false,
     "private_configuration_unchanged": true,
     "configuration_changes": [],
-    "source_commit": "41af36617cd9f267520bd934299394ce74f416e6",
+    "source_commit": "b9459c9e493588ce943289f4349a3b2a27762512",
     "configuration_except_tron_preserved": true,
     "settings_changes": [],
     "nginx_configuration_source_commit": "c1791c57d73a0526244343eba5f766309107c8bd",
-    "nginx_change_scope": "Retire embedded frontend exposure; preserve API/uploads/health proxy behavior",
+    "nginx_change_scope": "No Nginx changes in this backend-only release; existing retirement and redirect rules preserved.",
     "pids": {
-      "zhixiang-shop": "2942544",
+      "zhixiang-shop": "3046771",
       "zhixiang-redis": "52983"
     },
     "last_api_recovery": {
@@ -76,7 +76,8 @@
           "exit": 0
         }
       ]
-    }
+    },
+    "paid_order_deadlock_fixed_in_release": "20261016-190912"
   },
   "payment": {
     "bep20": {
@@ -271,7 +272,9 @@
     "Shanghai HTTPS domain and IP management frontends were verified without placing a production order; official Alipay contracting and payment notification acceptance remain incomplete.",
     "XorPay prepayment rejection was verified in the daily local runtime with a mock-only channel, supplier and SMTP. No local financial declaration was signed and no real XorPay charge, callback or supplier purchase was submitted.",
     "Unified-wallet local review was verified with service/HTTP/component fixtures; the daily local financial declaration remained unsigned. Broader Go suite has existing Windows logger lock, CGO-disabled SQLite fixture and Linux-permission selfupdate test limitations; affected wallet/order/payment/affiliate/reseller checks passed. No real payout or procurement was performed.",
-    "The upstream check is a balance snapshot, not a reservation. Previously copied payment instructions cannot be revoked; local mock scenarios do not constitute real-funds acceptance."
+    "The upstream check is a balance snapshot, not a reservation. Previously copied payment instructions cannot be revoked; local mock scenarios do not constitute real-funds acceptance.",
+    "20261016-190912 fixes the paid-order database deadlock. One existing paid customer order recovered through authorized automatic procurement; this was not a test purchase.",
+    "BSC main RPC returned HTTP 403 during post-release read-only checks and the scan cursor remains at 2026-10-16T16:23:12+08:00. Payment monitoring APIs responding does not establish that all chains are scanning successfully."
   ],
   "procurement_verification": {
     "mock_end_to_end_scenarios_passed": 12,
@@ -341,17 +344,17 @@
     "content_preserved_by_release": "20261012-153531"
   },
   "source_identity_verification": {
-    "source_commit": "41af36617cd9f267520bd934299394ce74f416e6",
+    "source_commit": "b9459c9e493588ce943289f4349a3b2a27762512",
     "source_branch": "main",
     "source_dirty": false,
     "binary_build_info_commit_matches": true,
     "running_binary_sha256_matches": true,
-    "frontend_files_sha256_verified": 456,
-    "frontend_verification_scope": "Full manifest and retained assets verified; six catalog SVG line ending variants preserved byte-for-byte."
+    "frontend_files_sha256_verified": 8599,
+    "frontend_verification_scope": "All 8599 Shanghai files and 57 Nginx files unchanged during backend-only release."
   },
   "previous_release": {
-    "release": "20261015-150336",
-    "source_commit": "7790885dfca33930f03c8b0ce16e0dd2706196b9",
+    "release": "20261015-160016",
+    "source_commit": "41af36617cd9f267520bd934299394ce74f416e6",
     "retained": true
   },
   "domain_verification": {
@@ -401,7 +404,7 @@
   "previous_build_verification_at": "2026-10-12T08:19:31.766441+00:00",
   "management_url": "https://admin.qzweb.cloud/login",
   "frontend_gateway": {
-    "checked_at": "2026-10-16T07:09:48.772746+00:00",
+    "checked_at": "2026-10-16T19:22:28.799817+08:00",
     "frontend_host": "124.220.2.69",
     "backend_host": "43.134.141.10",
     "frontend_release": "20261016-144429",
@@ -423,7 +426,7 @@
     "certificate_timer": "qzweb-certificates.timer",
     "certificate_renewal_report": "/srv/zhixiang-front/shared/work/renew-final-20261012-1644/status.json",
     "report_path": "/srv/zhixiang-front/shared/work/pro-quota-labels-20261016-144429.json",
-    "backend_report_path": "/srv/zhixiang/shared/reports/prepayment-balance-release-20261015-160016.json",
+    "backend_report_path": "/srv/zhixiang/shared/reports/paid-order-deadlock-20261016-190912.json",
     "formal_alipay_enabled": false,
     "database_uploaded": false,
     "legacy_singapore_http_entries_retained": true,
@@ -458,7 +461,7 @@
     "frontend_source_identical_to_backend": false,
     "admin_base": "/",
     "base_repair_backup": "/srv/zhixiang-front/backups/before-xorpay-admin-base-20261013-173020",
-    "frontend_source_difference": "Storefront uses 7f6e10ca014f5c63df01f1ddfe746baa2f0c59f4; admin retains d2dd5f1; backend retains 41af366.",
+    "frontend_source_difference": "Storefront uses 7f6e10ca014f5c63df01f1ddfe746baa2f0c59f4; admin retains d2dd5f1; backend uses b9459c9e493588ce943289f4349a3b2a27762512.",
     "source_dirty": false,
     "source_tag": "production/pro-quota-labels-20261016-144429",
     "static_verification_scope": "348 current storefront build files and all 7035 prior storefront files plus 1360 admin files preserved; browser and public API checks passed.",
@@ -469,7 +472,14 @@
     "legacy_singapore_embedded_frontend_public": false,
     "legacy_singapore_frontend_behavior": "308 to maintained Shanghai storefront/admin; API/uploads/health retained",
     "old_files_preserved": 8395,
-    "admin_files_preserved": 1360
+    "admin_files_preserved": 1360,
+    "backend_only_deadlock_release": {
+      "release": "20261016-190912",
+      "frontend_unchanged": true,
+      "verified_files": 8599,
+      "nginx_files_unchanged": 57,
+      "existing_frontend_release_metadata_preserved": true
+    }
   },
   "alipay": {
     "code_and_official_sandbox_query_verified": true,
@@ -964,7 +974,7 @@
     "real_payment_or_purchase_submitted": false,
     "verification_directory": "work/codex-runtime/register-captcha-preview-20261013/"
   },
-  "previous_verification_checked_at": "2026-10-16T03:59:35.461872+00:00",
+  "previous_verification_checked_at": "2026-10-16T07:09:48.772746+00:00",
   "sale_email": {
     "release": "20261013-162050",
     "source_commit": "2bbb4e0b802114dd3bda394b28cddcf83639228a",
@@ -2841,5 +2851,54 @@
     "production_test_orders_created": false,
     "real_payment_or_purchase_performed": false,
     "private_evidence": "work/codex-runtime/pro-quota-labels-20261016/verified-report.json"
+  },
+  "paid_order_deadlock_fix": {
+    "checked_at": "2026-10-16T19:22:28.799817+08:00",
+    "release": "20261016-190912",
+    "source_commit": "b9459c9e493588ce943289f4349a3b2a27762512",
+    "source_tag": "production/paid-order-deadlock-20261016-190912",
+    "change": "Read affiliate settings before opening the paid-order transaction.",
+    "previous_release": "20261015-160016",
+    "binary_sha256": "e224f3d6f7f6dc540a101230b39975be657493d99196b7f1458ab7c628ab6c0b",
+    "backup": "/srv/zhixiang/backups/before-paid-order-deadlock-20261016-190912",
+    "database_pool": {
+      "max_open_conns": 1,
+      "max_idle_conns": 1
+    },
+    "old_code_reproduction_cases": 4,
+    "critical_regression_passed": 15,
+    "backend_regression_passed": 1771,
+    "backend_regression_skipped": [
+      "TestReadOnlyMainnetProtocol",
+      "TestBackfillGuestCredentialHashesOnPostgres"
+    ],
+    "storefront_tests_passed": 147,
+    "admin_tests_passed": 64,
+    "local_rebuilt_and_verified": true,
+    "tables_compared": 69,
+    "protected_data_preserved": true,
+    "existing_paid_customer_orders_recovered": 1,
+    "procurement_record_count_before_and_after": 7,
+    "duplicate_procurement_found": false,
+    "eligible_affiliate_recovery_backlog": 0,
+    "redis_process_preserved": true,
+    "stock_sync_timer_preserved": true,
+    "frontend_files_preserved": 8599,
+    "nginx_files_preserved": 57,
+    "database_uploaded": false,
+    "production_test_orders_created": false,
+    "active_charge_test_performed": false,
+    "real_customer_automatic_procurement_completed": true,
+    "bsc_rpc_unresolved": {
+      "main_rpc_http_status": 403,
+      "scan_cursor_last_updated": "2026-10-16T16:23:12+08:00",
+      "same_rpc_error_seen_before_release": true,
+      "payment_configuration_changed": false,
+      "all_payment_chains_verified": false
+    },
+    "private_evidence": "deployment/local/deadlock-release/verified-report.json",
+    "documentation": "docs/paid-order-deadlock.md",
+    "rolled_back_attempt": "20261016-190008",
+    "rollback_reason": "Deployment verifier used code instead of status_code; corrected before successful restage."
   }
 }
