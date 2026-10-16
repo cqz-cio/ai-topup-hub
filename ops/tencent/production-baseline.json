@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-16T03:21:24.707574+00:00",
+  "checked_at": "2026-10-16T03:59:35.461872+00:00",
   "production_url": "https://www.qzweb.cloud/",
   "documented_release_id": "20261015-160016",
   "verified_release_id": "20261015-160016",
@@ -369,12 +369,12 @@
   "previous_build_verification_at": "2026-10-12T08:19:31.766441+00:00",
   "management_url": "https://admin.qzweb.cloud/login",
   "frontend_gateway": {
-    "checked_at": "2026-10-16T03:21:24.707574+00:00",
+    "checked_at": "2026-10-16T03:59:35.461872+00:00",
     "frontend_host": "124.220.2.69",
     "backend_host": "43.134.141.10",
-    "frontend_release": "20261016-111238",
-    "source_commit": "c1791c57d73a0526244343eba5f766309107c8bd",
-    "static_files_verified": 377,
+    "frontend_release": "20261016-115609",
+    "source_commit": "d2dd5f19115df612dc522c14586eed4eefbcaabc",
+    "static_files_verified": 458,
     "storefront_url": "https://www.qzweb.cloud/",
     "management_url": "https://admin.qzweb.cloud/login",
     "www_dns_record": "www A 124.220.2.69",
@@ -390,7 +390,7 @@
     "certificate_renewal_verified": true,
     "certificate_timer": "qzweb-certificates.timer",
     "certificate_renewal_report": "/srv/zhixiang-front/shared/work/renew-final-20261012-1644/status.json",
-    "report_path": "/srv/zhixiang-front/backups/before-redemption-privacy-20261016-111238/verified.json",
+    "report_path": "/srv/zhixiang-front/shared/work/support-contacts-20261016-115609.json",
     "backend_report_path": "/srv/zhixiang/shared/reports/prepayment-balance-release-20261015-160016.json",
     "formal_alipay_enabled": false,
     "database_uploaded": false,
@@ -404,10 +404,10 @@
       "browser_current_frontend_confirmed": true,
       "report_path": "/srv/zhixiang-front/shared/work/entry-cache-report.json"
     },
-    "previous_frontend_release": "20261016-104524",
-    "storefront_source_commit": "6aa97dc1d31ea8bd0878554fcbb1b5a03e825d72",
-    "admin_source_commit": "c1791c57d73a0526244343eba5f766309107c8bd",
-    "backup": "/srv/zhixiang-front/backups/before-redemption-privacy-20261016-111238",
+    "previous_frontend_release": "20261016-111238",
+    "storefront_source_commit": "d2dd5f19115df612dc522c14586eed4eefbcaabc",
+    "admin_source_commit": "d2dd5f19115df612dc522c14586eed4eefbcaabc",
+    "backup": "/srv/zhixiang-front/backups/before-support-contacts-20261016-115609",
     "frontend_only_update": true,
     "previous_hashed_assets_retained": true,
     "verified_services": {
@@ -415,25 +415,29 @@
       "zhixiang-api-tunnel": "active",
       "qzweb-certificates.timer": "active"
     },
-    "release_scope": "Admin public redemption removal, historical bundle retirement and origin frontend redirects",
-    "admin_files_verified": 121,
-    "storefront_files_verified": 256,
+    "release_scope": "Add QQ and Telegram to all current customer-support locations",
+    "admin_files_verified": 122,
+    "storefront_files_verified": 336,
     "backend_program_preserved": true,
-    "backend_setting_changes": [],
-    "frontend_build_source_commit": "c1791c57d73a0526244343eba5f766309107c8bd",
+    "backend_setting_changes": [
+      "contact.telegram and customer-support copy only"
+    ],
+    "frontend_build_source_commit": "d2dd5f19115df612dc522c14586eed4eefbcaabc",
     "frontend_source_identical_to_backend": false,
     "admin_base": "/",
     "base_repair_backup": "/srv/zhixiang-front/backups/before-xorpay-admin-base-20261013-173020",
-    "frontend_source_difference": "Storefront files retain clean source 6aa97dc1; admin is built from c1791c5; backend remains 41af366.",
+    "frontend_source_difference": "Both frontend builds use d2dd5f1; backend binary remains 41af366.",
     "source_dirty": false,
-    "source_tag": "production/redemption-privacy-20261016-111238",
-    "static_verification_scope": "121 admin build files and 256 retained storefront build files publicly hash-verified; all 6845 storefront files preserved.",
+    "source_tag": "production/support-contacts-20261016-115609",
+    "static_verification_scope": "458 new build files and all 8105 retained old files verified on server; public browser, API, asset and retired-resource checks passed.",
     "retained_files_preserved": true,
-    "storefront_release": "20261016-104524",
-    "admin_release": "20261016-111238",
-    "storefront_files_preserved": 6845,
+    "storefront_release": "20261016-115609",
+    "admin_release": "20261016-115609",
+    "storefront_files_preserved": 6844,
     "legacy_singapore_embedded_frontend_public": false,
-    "legacy_singapore_frontend_behavior": "308 to maintained Shanghai storefront/admin; API/uploads/health retained"
+    "legacy_singapore_frontend_behavior": "308 to maintained Shanghai storefront/admin; API/uploads/health retained",
+    "old_files_preserved": 8105,
+    "admin_files_preserved": 1261
   },
   "alipay": {
     "code_and_official_sandbox_query_verified": true,
@@ -2685,5 +2689,49 @@
       "singapore": "/srv/zhixiang/backups/before-redemption-privacy-20261016-111238"
     },
     "public_delivery_rule": "Actual redemption destinations are excluded from all current public frontend files and public content responses; order instructions require paid_at and matching customer/guest access."
+  },
+  "support_contacts": {
+    "passed": true,
+    "checked_at": "2026-10-16T03:59:35.461872+00:00",
+    "release": "20261016-115609",
+    "source_commit": "d2dd5f19115df612dc522c14586eed4eefbcaabc",
+    "backend_release": "20261015-160016",
+    "contacts": {
+      "wechat": "Cqz0924ttxk",
+      "qq": "1669268759",
+      "telegram": "@czq_piestar",
+      "telegram_url": "https://t.me/czq_piestar"
+    },
+    "checks": {
+      "user_tests": 146,
+      "admin_tests": 64,
+      "migration_tests": 4,
+      "local_browser": 41,
+      "built_browser": 35,
+      "production_browser": 35,
+      "local_public_api": 25,
+      "production_public_api": 22,
+      "public_asset_hashes": 22,
+      "retired_public_requests": 138,
+      "build_files_verified": 458,
+      "old_files_preserved": 8105,
+      "nginx_files_preserved": 57
+    },
+    "content_fields_updated": 21,
+    "all_other_database_fields_preserved": true,
+    "backend_redis_and_stock_timer_preserved": true,
+    "prices_and_payment_settings_preserved": true,
+    "historical_orders_preserved": true,
+    "no_redemption_destinations_in_current_public_bundles": true,
+    "retired_asset_paths_preserved": 69,
+    "backups": {
+      "shanghai": "/srv/zhixiang-front/backups/before-support-contacts-20261016-115609",
+      "singapore": "/srv/zhixiang/backups/before-support-contacts-20261016-115609",
+      "content": "/srv/zhixiang/backups/before-support-contacts-20261016-115609/before-support-contacts-20261016T035715839334Z.db"
+    },
+    "database_uploaded": false,
+    "production_test_orders_created": false,
+    "real_payment_or_purchase_performed": false,
+    "private_evidence": "work/codex-runtime/support-contacts/verified-report.json"
   }
 }
