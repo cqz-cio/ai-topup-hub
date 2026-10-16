@@ -246,3 +246,36 @@ func TestPurchaseWindowNewSplitOrderContinuesAfterFirstDelivery(t *testing.T) {
 		t.Fatal("remaining new child was blocked or purchased twice")
 	}
 }
+
+func TestPurchaseWindowRecoversAcceptedAfterLocalDeliveryWithoutAnotherPurchase(t *testing.T) {
+	adapter := &acgProcurementAdapter{}
+	db, _, proc, order := acgProcurementFixture(t, constants.OrderStatusDelivered, adapter)
+	cutoff := time.Now().Add(-30 * time.Minute)
+	if err := db.Model(order).Update("paid_at", cutoff.Add(time.Minute)).Error; err != nil {
+		t.Fatal(err)
+	}
+	if err := db.Model(proc).Updates(map[string]any{"status": "accepted", "upstream_order_no": "ALREADY-PAID-FIXTURE", "upstream_payload": "EXISTING-CARD", "created_at": cutoff.Add(time.Minute), "updated_at": cutoff.Add(2 * time.Minute)}).Error; err != nil {
+		t.Fatal(err)
+	}
+	q := &workflowQueue{}
+	options := procurementOptionsForTest(db)
+	options.Queue = q
+	options.PurchaseWindow = &procurementdomain.PurchaseWindow{PaidAfter: cutoff}
+	options.Connections = procurementupstream.New(&acgProcurementProvider{adapter: adapter})
+	svc := procurementapp.NewService(options)
+	if err := svc.RecoverPaidOrders(); err != nil {
+		t.Fatal(err)
+	}
+	if len(q.polls) != 1 || q.polls[0] != proc.ID || len(q.submits) != 0 {
+		t.Fatal("interrupted delivery bookkeeping was not queued for read-only recovery")
+	}
+	if err := svc.PollUpstreamStatus(proc.ID); err != nil {
+		t.Fatal(err)
+	}
+	if err := db.First(proc, proc.ID).Error; err != nil {
+		t.Fatal(err)
+	}
+	if proc.Status != "fulfilled" || adapter.calls.Load() != 0 {
+		t.Fatal("delivery recovery made a second purchase or did not complete")
+	}
+}

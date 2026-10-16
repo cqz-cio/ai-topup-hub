@@ -22,7 +22,7 @@ func (s *Service) CreateForOrder(orderID uint) error {
 	if order == nil {
 		return procurementcontract.ErrOrderNotFound
 	}
-	if allowed, err := s.orderWithinPurchaseWindow(order); err != nil || !allowed {
+	if allowed, err := s.orderWithinPurchaseWindow(order, true); err != nil || !allowed {
 		return err
 	}
 
@@ -54,7 +54,7 @@ func (s *Service) CreateForOrder(orderID uint) error {
 
 // createProcurementForSingleOrder 为单个订单创建采购单
 func (s *Service) createProcurementForSingleOrder(order *procurementdomain.LocalOrder) error {
-	if allowed, err := s.orderWithinPurchaseWindow(order); err != nil || !allowed {
+	if allowed, err := s.orderWithinPurchaseWindow(order, true); err != nil || !allowed {
 		return err
 	}
 	if order.Status != constants.OrderStatusPaid && order.Status != constants.OrderStatusFulfilling {

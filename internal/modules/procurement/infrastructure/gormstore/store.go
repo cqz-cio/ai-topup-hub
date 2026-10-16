@@ -93,7 +93,7 @@ func (s *Store) ClaimSubmission(id uint) (bool, error) {
 
 func (s *Store) FindPaidOrdersMissingProcurement(limit int, window *procurementdomain.PurchaseWindow) ([]uint, error) {
 	var ids []uint
-	err := s.ordersWithinPurchaseWindow(s.db.Table("orders AS o").Select("o.id"), window).
+	err := s.ordersWithinPurchaseWindow(s.db.Table("orders AS o").Select("o.id"), window, true).
 		Where("o.deleted_at IS NULL AND o.status IN ?", []string{"paid", "fulfilling"}).
 		Where("NOT EXISTS (SELECT 1 FROM orders child WHERE child.parent_id=o.id AND child.deleted_at IS NULL)").
 		Where("EXISTS (SELECT 1 FROM order_items i WHERE i.order_id=o.id AND i.deleted_at IS NULL AND i.fulfillment_type='upstream')").
@@ -107,7 +107,8 @@ func (s *Store) ListRecoverable(before time.Time, limit int, window *procurement
 	query := s.active()
 	if window != nil {
 		query = query.Where(s.timeAfterSQL("created_at"), window.PaidAfter).
-			Where("local_order_id IN (?)", s.ordersWithinPurchaseWindow(s.db.Table("orders AS o").Select("o.id"), window))
+			Where("local_order_id IN (?)", s.ordersWithinPurchaseWindow(s.db.Table("orders AS o").Select("o.id"), window, false)).
+			Where("status = 'accepted' OR local_order_id IN (?)", s.ordersWithinPurchaseWindow(s.db.Table("orders AS o").Select("o.id"), window, true))
 	}
 	err := query.Where("status IN ? AND updated_at <= ?", []string{"pending", "failed", "accepted", "submitting"}, before).
 		Where("next_retry_at IS NULL OR next_retry_at <= ?", time.Now()).

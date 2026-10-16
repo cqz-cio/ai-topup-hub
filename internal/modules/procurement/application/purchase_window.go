@@ -8,7 +8,7 @@ import (
 
 // These checks run before creating/resetting/claiming any purchase intent or
 // opening a supplier connection. Excluded history is left completely unchanged.
-func (s *Service) orderWithinPurchaseWindow(order *procurementdomain.LocalOrder) (bool, error) {
+func (s *Service) orderWithinPurchaseWindow(order *procurementdomain.LocalOrder, requirePurchasable bool) (bool, error) {
 	if s.purchaseWindow == nil {
 		return true, nil
 	}
@@ -23,18 +23,20 @@ func (s *Service) orderWithinPurchaseWindow(order *procurementdomain.LocalOrder)
 		return o.Status == constants.OrderStatusPaid || o.Status == constants.OrderStatusFulfilling ||
 			o.Status == constants.OrderStatusPartiallyDelivered || o.Status == constants.OrderStatusPartiallyRefunded
 	}
-	if order.ParentID == nil && len(order.Children) > 0 {
-		return parentActive(order), nil
-	}
-	if (order.Status != constants.OrderStatusPaid && order.Status != constants.OrderStatusFulfilling) || !order.RefundedAmount.Decimal.IsZero() {
-		return false, nil
+	if requirePurchasable {
+		if order.ParentID == nil && len(order.Children) > 0 {
+			return parentActive(order), nil
+		}
+		if (order.Status != constants.OrderStatusPaid && order.Status != constants.OrderStatusFulfilling) || !order.RefundedAmount.Decimal.IsZero() {
+			return false, nil
+		}
 	}
 	if order.ParentID != nil {
 		parent, err := s.orderRepo.GetByID(*order.ParentID)
 		if err != nil {
 			return false, err
 		}
-		return eligible(parent) && parent.ParentID == nil && parentActive(parent), nil
+		return eligible(parent) && parent.ParentID == nil && (!requirePurchasable || parentActive(parent)), nil
 	}
 	return true, nil
 }
@@ -53,5 +55,7 @@ func (s *Service) procurementWithinPurchaseWindow(order *procurementdomain.Order
 	if local == nil {
 		return false, procurementcontract.ErrOrderNotFound
 	}
-	return s.orderWithinPurchaseWindow(local)
+	// An accepted purchase only queues a read-only poll. A crash may leave the
+	// local delivery committed before the procurement's final status is saved.
+	return s.orderWithinPurchaseWindow(local, order.Status != "accepted")
 }
