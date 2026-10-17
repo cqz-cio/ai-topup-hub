@@ -1,3 +1,9 @@
+## 第二家店铺人工导入（2026-10-17）
+
+当前新加坡后端为 `20261017-233133`，源码 `ba49f41bfe5aa5c1d023edb539c29bd69fe482d6`，包含此前邮件、采购边界及支付修复。86GameStore 商户 26113 的全部 11 款接口商品已导入为人工发货、下架；连接及采购映射停用，不影响第一家商户 1039。操作与回退说明见 [人工供货导入](../../docs/manual-supplier-import.md)。
+
+本机先验证后推送/发布。255 项 Go 测试、事务回滚/重复导入、本地后台与正式 API/公网检查通过；正式浏览器读取超时，本次视觉证据仅为本地后台。程序备份 `/srv/zhixiang/backups/before-manual-supplier-20261017-233133`，商品备份 `/srv/zhixiang/backups/before-86gamestore-catalog-20261017T153923Z/shop.db`。没有实际采购扣款或正式验收订单，上海前端、Redis、库存 timer 和私有配置保持。私有证据在 `deployment/local/second-supplier-20261017/verified-report.json`。
+
 ## BSC 到账扫描恢复（2026-10-16）
 
 - 新加坡后端发布 `20261016-194753`，干净源码 `969505b226cb6b29443d8a395b98276254e43eb4`，保留此前已付款订单死锁修复。原 PublicNode 历史日志接口返回 403 并要求归档令牌；改用 BNB 官方节点核对区块/回执、48 Club 公共接口查询日志，无需购买服务。说明见 `docs/bsc-rpc-recovery.md`。
