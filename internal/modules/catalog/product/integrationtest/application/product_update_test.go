@@ -86,6 +86,43 @@ func TestProductServiceUpdateKeepsMappedProductFulfillmentUpstream(t *testing.T)
 	}
 }
 
+func TestProductServiceUpdateKeepsManualMappedProductManual(t *testing.T) {
+	for _, displayType := range []string{"", constants.FulfillmentTypeManual, constants.FulfillmentTypeAuto, constants.FulfillmentTypeUpstream} {
+		t.Run("input="+displayType, func(t *testing.T) {
+			svc, db := newProductServiceForTest(t)
+			category := categorydomain.Category{Slug: "manual-supplier", NameJSON: jsonmap.JSON{"zh-CN": "manual-supplier"}}
+			if err := db.Create(&category).Error; err != nil {
+				t.Fatal(err)
+			}
+			product := productdomain.Product{
+				CategoryID: category.ID, Slug: "manual-mapped", TitleJSON: jsonmap.JSON{"zh-CN": "manual-mapped"},
+				PriceAmount: money.FromDecimal(decimal.NewFromInt(15)), PurchaseType: constants.ProductPurchaseMember,
+				FulfillmentType: constants.FulfillmentTypeManual, IsMapped: true, IsActive: false,
+			}
+			if err := db.Create(&product).Error; err != nil {
+				t.Fatal(err)
+			}
+			active, stock := true, 4
+			id := strconv.FormatUint(uint64(product.ID), 10)
+			_, err := svc.Write.Update(id, productwrite.CreateProductInput{
+				CategoryID: category.ID, Slug: product.Slug, TitleJSON: map[string]interface{}{"zh-CN": "reviewed title"},
+				PriceAmount: decimal.NewFromInt(20), PurchaseType: constants.ProductPurchaseMember,
+				FulfillmentType: displayType, ManualStockTotal: &stock, IsActive: &active,
+			})
+			if err != nil {
+				t.Fatal(err)
+			}
+			reloaded, err := svc.Read.GetAdminByID(id)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if reloaded.FulfillmentType != constants.FulfillmentTypeManual || !reloaded.IsMapped || !reloaded.IsActive || reloaded.ManualStockTotal != stock {
+				t.Fatalf("manual supplier changed mode or lost editable stock: %+v", reloaded)
+			}
+		})
+	}
+}
+
 func TestProductServiceUpdateFiltersUnavailablePaymentChannels(t *testing.T) {
 	svc, db := newProductServiceForTest(t)
 
