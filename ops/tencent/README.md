@@ -1,3 +1,9 @@
+## 旧商品 #4 归档（2026-10-18）
+
+已按用户要求将旧商品 `zxa-4` 从本地和正式商品列表归档移除，仅更新商品归档时间，6 条订单、SKU、付款与交付快照全部保留。常规后台删除的历史订单保护仍生效，维护入口及回退范围见 [旧商品归档](../../docs/retired-product-archive.md)。正式事务核对 69 张表，6 项副本检查与两环境各 6 条历史订单 API 检查通过，正式当前 19 款在售集合未变。
+
+数据库备份 `/srv/zhixiang/backups/before-product-4-archive-20261017T174553875593Z/shop.db`；验收 `deployment/local/product-4-removal-20261018/verified-report.json`。未发布程序、重启后端/Redis/两家库存 timer 或操作订单；后端仍 `20261017-233133`。
+
 ## 第二家人工库存同步（2026-10-18）
 
 用户要求 11 款 86GameStore 人工商品跟随上游库存，已安装独立 `zhixiang-86gamestore-stock-sync.timer`，每轮结束 300 秒后运行。源提交 `1eea08952878a645e194d253e7687908bb3eb396`；脚本安装在 `/srv/zhixiang/shared/scripts/sync-86gamestore-stock.py`，单独部署，不更换后端 `20261017-233133` 或上海前端。后续发布应保留此 shared 脚本与 timer。

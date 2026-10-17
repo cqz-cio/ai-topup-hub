@@ -1,3 +1,9 @@
+## 旧商品 #4 归档（2026-10-18）
+
+- 用户要求移除截图中的 `#4 / zxa-4 / ChatGPT Plus 代充值`。常规删除因历史订单保护被拒绝；已在本地和正式执行保留历史的归档，仅更新该商品 `deleted_at`、`updated_at`，从商品列表移除。6 条关联订单（3 已交付、2 已取消、1 待付款）、SKU、付款及交付记录原样保留。
+- 维护脚本 `scripts/archive-retired-manual-product.py` 只支持明确身份、已下架、未映射上游且无锁定库存的人工商品；常规删除规则未放开。6 项副本检查通过，正式事务核对 69 张表，本地/正式各 6 条历史订单 API 内容一致、商品已隐藏。正式现有 19 款在售、本地 18 款均保持各自集合，不同步用户后续运营操作。
+- 后端仍 `20261017-233133`，前端、后端、Redis 和两家库存 timer 未重启；没有订单操作或扣款测试。正式备份 `/srv/zhixiang/backups/before-product-4-archive-20261017T174553875593Z/shop.db`，私有报告 `deployment/local/product-4-removal-20261018/verified-report.json`；维护见 `docs/retired-product-archive.md`。恢复只能针对该商品归档标记，不能回滚整库。
+
 ## 第二家库存跟随上游（2026-10-18）
 
 - 用户要求第二家库存与上游一致。11 款商品的本地及正式人工库存已同步；独立 `zhixiang-86gamestore-stock-sync.timer` 每轮结束 300 秒后更新上游库存/状态。维护脚本来源 `1eea08952878a645e194d253e7687908bb3eb396`，部署到 `/srv/zhixiang/shared/scripts/sync-86gamestore-stock.py`；后续发布须保留脚本和 timer。
