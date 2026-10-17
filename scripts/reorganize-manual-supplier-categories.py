@@ -1,7 +1,7 @@
-"""Move the eight reviewed manual goods into two new top-level categories.
+"""Maintain the explicitly reviewed manual supplier category assignments.
 
-Only their category_id, the two new categories, and empty retired categories'
-deleted_at may change. Run against each environment's own database; never copy
+The first migration groups eight goods; split_claude_category subsequently moves
+only #56/#58 to Claude. Run against each environment's own database; never copy
 the local database over production. No order or upstream API is called.
 """
 from contextlib import closing
@@ -139,6 +139,85 @@ def apply_categories(database, backup_root, allow_nonempty=()):
         'moved_product_ids': sorted(moved), 'removed_category_ids': sorted(removed),
         'retained_category_references': retained, 'tables_checked': len(protected) + 2,
         'protected_table_hashes': protected, 'other_product_fields_unchanged': True,
+        'public_product_ids_unchanged': public_before,
+    }
+    (backup / 'report.json').write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding='utf-8')
+    return report
+
+
+def split_claude_category(database, backup_root):
+    """Move only #56/#58; preserve current publication, price and fulfillment.
+
+    A new category inherits the current source category's visibility. Existing
+    categories are never changed, including the retired zxa-category-4 record.
+    """
+    targets = {56: '86gamestore-84', 58: '86gamestore-10007'}
+    path = Path(database).resolve(strict=True)
+    stamp = datetime.now(timezone.utc)
+    backup = Path(backup_root) / ('before-claude-category-' + stamp.strftime('%Y%m%dT%H%M%S%fZ'))
+    backup.mkdir(parents=True, mode=0o700, exist_ok=False)
+    with closing(sqlite3.connect(path.as_uri() + '?mode=ro', uri=True)) as source:
+        with closing(sqlite3.connect(backup / 'shop.db')) as saved:
+            source.backup(saved)
+            require(saved.execute('PRAGMA quick_check').fetchone()[0] == 'ok', 'Backup integrity check failed')
+    if os.name != 'nt':
+        os.chmod(backup / 'shop.db', 0o600)
+
+    with closing(sqlite3.connect(path.as_uri() + '?mode=rw', uri=True, timeout=20)) as db:
+        db.row_factory = sqlite3.Row
+        db.execute('PRAGMA foreign_keys=ON')
+        db.execute('BEGIN IMMEDIATE')
+        try:
+            before_products = rows(db, 'products')
+            before_categories = rows(db, 'categories')
+            protected = protected_hashes(db)
+            public_before = public_ids(db)
+            origin = before_categories.get(20)
+            require(origin is not None and origin['slug'] == 'gpt-overwrite-topup'
+                    and origin['parent_id'] == 0 and origin['deleted_at'] is None, 'Source category identity changed')
+            current = next((c for c in before_categories.values() if c['slug'] == 'claude'), None)
+            created = current is None
+            if created:
+                name = json.dumps({'zh-CN': 'Claude'}, ensure_ascii=False).encode('utf-8')
+                cid = db.execute('''INSERT INTO categories
+                    (parent_id,slug,name_json,icon,sort_order,is_active,created_at)
+                    VALUES (0,'claude',?,'',0,?,?)''',
+                    (name, origin['is_active'], stamp.isoformat())).lastrowid
+                current = dict(db.execute('SELECT * FROM categories WHERE id=?', (cid,)).fetchone())
+            else:
+                require(current['deleted_at'] is None and current['parent_id'] == 0
+                        and json.loads(current['name_json']) == {'zh-CN': 'Claude'}, 'Conflicting Claude category')
+                cid = current['id']
+
+            moved = []
+            expected_products = {pid: row.copy() for pid, row in before_products.items()}
+            for pid, slug in targets.items():
+                product = before_products.get(pid)
+                require(product is not None and product['slug'] == slug and product['deleted_at'] is None,
+                        'Reviewed Claude product identity changed: ' + str(pid))
+                require(product['category_id'] in (20, cid), 'Reviewed Claude product was reclassified: ' + str(pid))
+                if product['category_id'] != cid:
+                    db.execute('UPDATE products SET category_id=? WHERE id=?', (cid, pid))
+                    moved.append(pid)
+                expected_products[pid]['category_id'] = cid
+            expected_categories = before_categories.copy()
+            if created:
+                expected_categories[cid] = current
+            require(rows(db, 'products') == expected_products, 'Unexpected product field change')
+            require(rows(db, 'categories') == expected_categories, 'Unexpected existing category change')
+            require(protected_hashes(db) == protected, 'Unexpected change to another table')
+            require(public_ids(db) == public_before, 'Public product set changed')
+            require(db.execute('PRAGMA foreign_key_check').fetchone() is None, 'Foreign key check failed')
+            db.commit()
+        except BaseException:
+            db.rollback()
+            raise
+    report = {
+        'status': 'applied', 'backup': str(backup / 'shop.db'), 'at': stamp.isoformat(),
+        'category_id': cid, 'category_is_active': bool(current['is_active']), 'created': created,
+        'product_assignments': {pid: cid for pid in targets}, 'moved_product_ids': moved,
+        'tables_checked': len(protected) + 2, 'protected_table_hashes': protected,
+        'other_product_fields_unchanged': True, 'existing_categories_unchanged': True,
         'public_product_ids_unchanged': public_before,
     }
     (backup / 'report.json').write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding='utf-8')
