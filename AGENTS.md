@@ -1,3 +1,10 @@
+## Claude 独立一级分类（2026-10-18）
+
+- 用户再次指定将截图两款 Claude 从充值分类中拆出。本地和正式新增一级分类 #21 `Claude`（slug `claude`），只迁移 #56 Claude Pro、#58 Claude Max X5；#20 保留 #55、57、59，#19 Telegram 保留 #60–62。旧 `zxa-category-4` 不恢复或复用。
+- 用户在前次整理后自行启用并上架第二家八件商品、修改售价，不能再用旧导入状态覆盖。正式新 Claude 类已启用，两款售价 152.88、888 元和人工交付保留；正式共 27 款在售、6 类。本地继续保留草稿的停用/下架状态与各自售价。
+- 维护来源 `e388737`，使用 `scripts/reorganize-manual-supplier-categories.py` 的 `split_claude_category`，不要重跑原八件商品迁移。3 项副本检查、本地后台页面、两环境 API 及正式商城分类入口/商品标签读取通过，事务核对 69 张表，仅新增分类及修改两件商品 `category_id`。正式筛选点击后的截图工具超时，未将筛选截图计为通过。
+- 正式备份 `/srv/zhixiang/backups/before-claude-category-20261017T180554990800Z/shop.db`，验收 `deployment/local/claude-category-20261018/verified-report.json`。没有发布程序、重启服务或执行订单/采购，库存同步与原售价、上架、发货模式保持。维护见 `docs/manual-supplier-import.md`。
+
 ## 第二家商品独立一级分类（2026-10-18）
 
 - 用户指定新建一级分类 `Telegram会员链接`（ID 19，slug `telegram-premium-links`），关联 #60–62；新建 `GPT可覆盖充值（ios谷歌支付）`（ID 20，slug `gpt-overwrite-topup`），关联 #55–59，包含用户指定的两款 Claude。本地及正式均已完成，商品仍下架、人工发货，新分类先保持停用；#54 保留各环境已有归属。

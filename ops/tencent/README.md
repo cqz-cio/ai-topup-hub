@@ -1,3 +1,9 @@
+## Claude 商品分类拆分（2026-10-18）
+
+正式新增并启用一级分类 #21 `Claude`（slug `claude`），关联 #56、58；充值分类 #20 保留 #55、57、59，Telegram #19 不变。用户当前已上架两款 Claude，售价 152.88、888 元、人工发货和上游库存同步保留；正式共 27 款在售、6 类。本地只同步分类归属，保留独立草稿状态及售价。
+
+来源 `e388737`，入口 `scripts/reorganize-manual-supplier-categories.py::split_claude_category`；3 项副本检查、本地后台页面、两环境 API 及正式商城分类入口/商品标签已核验。备份 `/srv/zhixiang/backups/before-claude-category-20261017T180554990800Z/shop.db`，验收 `deployment/local/claude-category-20261018/verified-report.json`。69 张表事务内只允许新增分类和两件商品归属变化；没有发布程序、重启后端/Redis/库存 timer 或操作订单采购。
+
 ## 第二家商品一级分类整理（2026-10-18）
 
 本地及正式新增一级分类 #19 `Telegram会员链接`（关联商品 #60–62）和 #20 `GPT可覆盖充值（ios谷歌支付）`（关联 #55–59），商品下架、人工发货，分类先保持停用。正式旧分类 #1、16、17、18 已软删除；本地额外草稿所需的 #1、16、17 保留，仅移除空的 #18。#54 及第一家商品归属不变。
