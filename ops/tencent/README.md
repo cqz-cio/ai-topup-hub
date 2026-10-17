@@ -1,3 +1,11 @@
+## 第二家人工库存同步（2026-10-18）
+
+用户要求 11 款 86GameStore 人工商品跟随上游库存，已安装独立 `zhixiang-86gamestore-stock-sync.timer`，每轮结束 300 秒后运行。源提交 `1eea08952878a645e194d253e7687908bb3eb396`；脚本安装在 `/srv/zhixiang/shared/scripts/sync-86gamestore-stock.py`，单独部署，不更换后端 `20261017-233133` 或上海前端。后续发布应保留此 shared 脚本与 timer。
+
+商品和 SKU 的剩余库存跟随上游并扣除本店锁定数，缺货变 0；保留售价、成本、上下架、人工发货方式、锁定/已售数及第一家的自动采购配置。第二家连接与映射仍停用，库存查询不扣款。首次写入核对 69 张表非库存字段保持不变，10 项测试及本地/正式后台库存检查通过。库存任务以 `zhixiang` 账号在 systemd 限制下执行成功、开机启用；原后端、Redis 和第一家 timer 未重启。
+
+备份 `/srv/zhixiang/backups/before-86gamestore-stock-20261017T160906Z/shop.db`，运行报告 `/srv/zhixiang/shared/reports/merchant26113-stock-sync.json`；验收 `deployment/local/second-supplier-stock-20261018/verified-report.json`。停用用 `systemctl disable --now zhixiang-86gamestore-stock-sync.timer`；如需立即停止正在执行的一轮，再停止同名 service。不要回滚业务数据库。人工转自动采购前必须先停止此任务，详见 [维护说明](../../docs/manual-supplier-import.md)。
+
 ## 第二家店铺人工导入（2026-10-17）
 
 当前新加坡后端为 `20261017-233133`，源码 `ba49f41bfe5aa5c1d023edb539c29bd69fe482d6`，包含此前邮件、采购边界及支付修复。86GameStore 商户 26113 的全部 11 款接口商品已导入为人工发货、下架；连接及采购映射停用，不影响第一家商户 1039。操作与回退说明见 [人工供货导入](../../docs/manual-supplier-import.md)。

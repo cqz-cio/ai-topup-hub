@@ -2951,7 +2951,7 @@
     "supplier_connection_enabled": false,
     "purchase_mappings_enabled": false,
     "automatic_price_sync": false,
-    "manual_inventory": 0,
+    "manual_inventory_at_import": 0,
     "public_products_unchanged": 18,
     "product_ids": [
       52,
@@ -2974,5 +2974,33 @@
     "production_browser_limitation": "Browser tool timed out reading production tabs; local screenshot and authenticated production API/public assets verified.",
     "actual_purchase_test_performed": false,
     "private_evidence": "deployment/local/second-supplier-20261017/verified-report.json"
+  },
+  "manual_supplier_stock_sync": {
+    "source_commit": "1eea08952878a645e194d253e7687908bb3eb396",
+    "merchant_id": 26113,
+    "production_connection_id": 2,
+    "products": 11,
+    "timer": "zhixiang-86gamestore-stock-sync.timer",
+    "timer_enabled": true,
+    "interval_after_completion_seconds": 300,
+    "script": "/srv/zhixiang/shared/scripts/sync-86gamestore-stock.py",
+    "script_sha256": "f3c7b061ea7f4151312f523838bf4820dada33988e76800693f50f0396ba1666",
+    "report": "/srv/zhixiang/shared/reports/merchant26113-stock-sync.json",
+    "manual_stock_source": "upstream_available_minus_local_sku_reservations",
+    "fulfillment": "manual",
+    "published": false,
+    "supplier_connection_enabled": false,
+    "purchase_mappings_enabled": false,
+    "automatic_price_sync": false,
+    "non_stock_fields_preserved": true,
+    "audited_tables": 69,
+    "tests_passed": 10,
+    "production_api_verified": true,
+    "local_api_verified": true,
+    "backend_redis_first_supplier_timer_preserved": true,
+    "purchase_boundary_preserved": true,
+    "actual_purchase_test_performed": false,
+    "database_backup": "/srv/zhixiang/backups/before-86gamestore-stock-20261017T160906Z/shop.db",
+    "private_evidence": "deployment/local/second-supplier-stock-20261018/verified-report.json"
   }
 }

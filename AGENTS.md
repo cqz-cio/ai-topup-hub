@@ -1,3 +1,10 @@
+## 第二家库存跟随上游（2026-10-18）
+
+- 用户要求第二家库存与上游一致。11 款商品的本地及正式人工库存已同步；独立 `zhixiang-86gamestore-stock-sync.timer` 每轮结束 300 秒后更新上游库存/状态。维护脚本来源 `1eea08952878a645e194d253e7687908bb3eb396`，部署到 `/srv/zhixiang/shared/scripts/sync-86gamestore-stock.py`；后续发布须保留脚本和 timer。
+- 商品仍下架、人工发货，第二家连接和采购映射仍停用、自动改价关闭，不扣上游余额。人工可售数为上游库存（受既有库存上限约束）减本店 SKU 锁定数，最低为 0；保留锁定数和已售数。缺货、下架或从完整目录消失时库存为 0，补货后恢复；接口失败或目录不完整时不覆盖，事务失败整批回滚。以后启用第二家自动采购前先停用此人工同步任务。
+- 10 项库存/回滚测试通过；数据库副本、首次本地和正式同步均逐字段核对 69 张表的非库存数据。两个后台 API 的 11 款库存与同步报告一致，公开目录仍为 18 款、3 类。第一家脚本/timer、后端及 Redis 进程、私有配置和固定采购边界 `44` / `2026-10-16T13:31:15.812954Z` 保留；第二家采购单仍为 0。
+- 后端仍为 `20261017-233133`，前端未换；无重启、有效下单或扣款测试。正式备份 `/srv/zhixiang/backups/before-86gamestore-stock-20261017T160906Z/shop.db`，运行报告 `/srv/zhixiang/shared/reports/merchant26113-stock-sync.json`；私有验收及本地 300 秒同步进程状态在 `deployment/local/second-supplier-stock-20261018/`。详见 `docs/manual-supplier-import.md`。
+
 ## 第二家 86GameStore 导入（2026-10-17）
 
 - 已按用户要求对接 `https://faka.redeemgpt.com` 商户 26113，接口可提供的全部 11 款商品已导入本地及正式后台，商品/SKU ID 52–62；正式连接 ID 2、本地连接 ID 3，映射 ID 20–30。分类为停用的 `86GameStore` 树（16–18），公开商城仍为原 18 款、3 类。维护见 `docs/manual-supplier-import.md`。
