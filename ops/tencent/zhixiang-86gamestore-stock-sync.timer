@@ -1,0 +1,11 @@
+[Unit]
+Description=Refresh 86GameStore manual inventory every five minutes
+
+[Timer]
+OnBootSec=60s
+OnUnitInactiveSec=300s
+AccuracySec=5s
+Unit=zhixiang-86gamestore-stock-sync.service
+
+[Install]
+WantedBy=timers.target
