@@ -1,3 +1,10 @@
+## 第二家商品独立一级分类（2026-10-18）
+
+- 用户指定新建一级分类 `Telegram会员链接`（ID 19，slug `telegram-premium-links`），关联 #60–62；新建 `GPT可覆盖充值（ios谷歌支付）`（ID 20，slug `gpt-overwrite-topup`），关联 #55–59，包含用户指定的两款 Claude。本地及正式均已完成，商品仍下架、人工发货，新分类先保持停用；#54 保留各环境已有归属。
+- 正式旧分类 #1、16、17、18 已清空并软删除，历史商品及订单保留。本地有额外草稿 #1、2、3、5、6、52、53、54，保留其旧分类 #1、16、17，只移除已清空的 #18；不把本地草稿还原到正式，不替用户同步其他运营修改。
+- 维护来源 `bd3e3d2`，脚本 `scripts/reorganize-manual-supplier-categories.py`。4 项副本检查、本地后台页面及本地/正式 API 验证通过；事务核对 69 张表，商品仅修改 `category_id`，其他字段、SKU、映射、库存及订单保留。公开商品集合正式 19 款、本地 18 款均未变，库存同步继续独立运行。
+- 没有发布程序、重启后端/Redis/库存 timer 或执行订单采购。正式备份 `/srv/zhixiang/backups/before-manual-categories-20261017T175747595515Z/shop.db`；报告 `deployment/local/category-cleanup-20261018/verified-report.json`，维护见 `docs/manual-supplier-import.md`。回退仅审阅后恢复指定归属与分类标记，不回滚整库。
+
 ## 旧商品 #4 归档（2026-10-18）
 
 - 用户要求移除截图中的 `#4 / zxa-4 / ChatGPT Plus 代充值`。常规删除因历史订单保护被拒绝；已在本地和正式执行保留历史的归档，仅更新该商品 `deleted_at`、`updated_at`，从商品列表移除。6 条关联订单（3 已交付、2 已取消、1 待付款）、SKU、付款及交付记录原样保留。
