@@ -9,6 +9,7 @@ import (
 )
 
 type Config struct {
+	AllowModel        bool   `json:"allow_model"` // Explicit opt-in; omitted means offline.
 	APIKey            string `json:"api_key"`
 	Model             string `json:"model"`
 	MaxOutput         int    `json:"max_output_tokens"`

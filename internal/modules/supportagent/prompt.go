@@ -38,10 +38,12 @@ func makeMessages(locale string, history []Message, input string, sources []Sour
 }
 
 type Reply struct {
-	Text    string `json:"text"`
-	Links   []Link `json:"links,omitempty"`
-	Handoff bool   `json:"handoff,omitempty"`
-	Mode    string `json:"mode"`
+	RuleIDs       []string `json:"rule_ids,omitempty"`
+	PolicyVersion string   `json:"policy_version,omitempty"`
+	Text          string   `json:"text"`
+	Links         []Link   `json:"links,omitempty"`
+	Handoff       bool     `json:"handoff,omitempty"`
+	Mode          string   `json:"mode"`
 }
 
 func validateAnswer(answer ModelAnswer, sources []Source, locale string) (Reply, error) {

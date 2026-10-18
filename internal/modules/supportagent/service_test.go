@@ -49,7 +49,7 @@ func (fakeKnowledge) Sources(_ context.Context, locale, query, slug string) ([]S
 	return baseSources(locale), nil
 }
 func testConfig() Config {
-	return Config{APIKey: "test-only-not-a-real-key", Model: "deepseek-flash", MaxOutput: 800, DailyBudget: 250000000, DailyCalls: 100, SessionDailyCalls: 50, SessionPerMinute: 6, GlobalPerMinute: 20}
+	return Config{AllowModel: true, APIKey: "test-only-not-a-real-key", Model: "deepseek-flash", MaxOutput: 800, DailyBudget: 250000000, DailyCalls: 100, SessionDailyCalls: 50, SessionPerMinute: 6, GlobalPerMinute: 20}
 }
 func fixture(t *testing.T) (*Service, *fakeProvider, *http.Cookie) {
 	t.Helper()

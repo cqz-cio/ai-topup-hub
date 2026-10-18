@@ -11,11 +11,13 @@ import (
 
 func main() {
 	configPath := flag.String("config", "work/codex-runtime/support-agent/private/config.json", "private local configuration")
+	allowModel := flag.Bool("allow-model", false, "explicitly allow paid model calls (disabled by default)")
 	flag.Parse()
 	config, err := supportagent.ReadConfig(*configPath)
 	if err != nil {
 		log.Fatal("support agent: private configuration invalid or unavailable")
 	}
+	config.AllowModel = *allowModel
 	ledger, err := supportagent.OpenLedger(filepath.Join(filepath.Dir(*configPath), "usage.db"))
 	if err != nil {
 		log.Fatal("support agent: usage ledger unavailable")

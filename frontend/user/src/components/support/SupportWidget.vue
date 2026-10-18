@@ -15,7 +15,7 @@
           <div v-for="message in messages" :key="message.id" class="support-message" :class="`support-message-${message.role}`"><p>{{ message.text }}</p><div v-if="message.links?.length" class="support-message-links"><RouterLink v-for="link in message.links" :key="link.to" :to="link.to">{{ link.label }}</RouterLink></div></div>
           <p v-if="busy" class="support-message support-message-assistant">{{ copy.thinking }}</p>
         </div>
-        <button v-if="messages.length && !showTopics && !busy" class="support-more" type="button" @click="showTopics = true">{{ copy.newQuestion }}</button>
+        <button v-if="messages.length && !showTopics && !busy" class="support-more" type="button" @click="resetConversation">{{ copy.newQuestion }}</button>
       </div>
       <form class="support-composer" @submit.prevent="ask(input)">
         <input ref="inputElement" v-model="input" type="text" maxlength="500" autocomplete="off" :placeholder="copy.placeholder" :aria-label="copy.placeholder" :disabled="busy" @keydown.enter="preventComposition" />
@@ -24,6 +24,7 @@
       <footer class="support-footer"><span>{{ copy.footer }}</span><button type="button" :aria-expanded="contactsOpen" @click="contactsOpen = !contactsOpen">{{ copy.human }}</button></footer>
       <section v-if="contactsOpen" class="support-contacts" :aria-label="copy.contactTitle">
         <div class="support-contact-heading"><strong>{{ copy.contactTitle }}</strong><button type="button" class="support-icon" :aria-label="copy.closeContacts" @click="contactsOpen = false"><X :size="16" /></button></div>
+        <p class="support-copy-status">07:00–24:00 · UTC+8</p>
         <div class="support-contact-row"><span>{{ copy.wechat }}<strong>{{ supportContacts.wechat }}</strong></span><button type="button" @click="copyContact(supportContacts.wechat)">{{ copy.copy }}</button></div>
         <div class="support-contact-row"><span>{{ copy.qq }}<strong>{{ supportContacts.qq }}</strong></span><button type="button" @click="copyContact(supportContacts.qq)">{{ copy.copy }}</button></div>
         <a :href="supportContacts.telegramUrl" target="_blank" rel="noopener noreferrer" class="support-telegram">{{ copy.telegram }} · {{ supportContacts.telegram }}<ExternalLink :size="14" /></a>
@@ -120,7 +121,9 @@ async function copyContact(value: string) {
   catch { copyStatus.value = copy.value.copyFailed }
 }
 onMounted(() => { greetingTimer = setTimeout(() => { greetingVisible.value = false }, 8000) })
-watch(() => app.locale, () => { generation++; request?.abort(); busy.value = false; conversationId = crypto.randomUUID(); messages.value = []; animate('idle') })
+function resetConversation() { generation++; request?.abort(); busy.value = false; conversationId = crypto.randomUUID(); messages.value = []; input.value = ''; showTopics.value = false; contactsOpen.value = false; animate('idle') }
+watch(() => app.locale, resetConversation)
+watch(() => route.params.slug, resetConversation)
 onBeforeUnmount(() => { generation++; request?.abort(); clearTimeout(greetingTimer) })
 </script>
 

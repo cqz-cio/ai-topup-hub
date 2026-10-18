@@ -36,6 +36,7 @@ type session struct {
 	minute               []time.Time
 	conversation, locale string
 	history              []Message
+	business             BusinessState
 	cache                map[string]cachedReply
 	cacheOrder           []string
 }
@@ -102,7 +103,7 @@ func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == http.MethodGet && r.URL.Path == "/api/v1/support/health" {
-		writeJSON(w, 200, map[string]any{"ready": true, "local_only": true, "model": s.config.Model})
+		writeJSON(w, 200, map[string]any{"ready": true, "local_only": true, "model": s.config.Model, "model_enabled": s.config.AllowModel, "policy_version": policy.Version})
 		return
 	}
 	if r.Method == http.MethodGet && r.URL.Path == "/api/v1/support/session" {
@@ -179,6 +180,7 @@ func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.active++
 	if current.conversation != input.ConversationID || current.locale != input.Locale {
 		current.history = nil
+		current.business = BusinessState{}
 		current.conversation = input.ConversationID
 		current.locale = input.Locale
 	}
@@ -186,6 +188,15 @@ func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.mu.Unlock()
 	defer func() { s.mu.Lock(); current.busy = false; s.active--; s.mu.Unlock() }()
 	reply, local := localAnswer(input.Message, input.Locale)
+	if local && reply.Handoff {
+		current.business.Stage = 0
+		current.business.Pending = ""
+		current.business.Case = ""
+	}
+	if !local && (!s.config.AllowModel || requiresPolicy(input, current.business)) {
+		reply = businessAnswer(input, &current.business)
+		local = true
+	}
 	if !local {
 		// Protect the upstream key and budget even if a browser disconnects. No retry.
 		ctx, cancel := context.WithTimeout(r.Context(), 45*time.Second)
@@ -198,6 +209,7 @@ func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		sources, catalogErr := s.knowledge.Sources(ctx, input.Locale, query, input.Product)
+		sources = append(confirmedSources(input), sources...)
 		messages, msgErr := makeMessages(input.Locale, history, safeInput, sources, catalogErr == nil)
 		if msgErr != nil {
 			// Keep the current user turn and recent context when an unusually long catalog fills the budget.
@@ -318,7 +330,7 @@ func localAnswer(input, locale string) (Reply, bool) {
 		return Reply{Text: pick(locale, "你好，我是小π AI 客服。想了解哪个商品，或在哪一步遇到问题了？直接说就好。", "Hi, I’m Pi, the store’s AI support assistant. Which product or step would you like help with?", "你好，我是小π AI 客服。想了解哪個商品，或在哪一步遇到問題了？直接說就好。"), Mode: "local"}, true
 	}
 	if normalized == "人工" || normalized == "转人工" || normalized == "轉人工" || normalized == "human" {
-		return Reply{Text: pick(locale, "可以，点击下方“联系人工”查看客服联系方式。请勿发送账号密码或完整卡密。", "Use Contact support below to reach a person. Do not share passwords or full codes.", "可以，點擊下方「聯絡人工」查看客服聯絡方式。請勿傳送密碼或完整卡密。"), Handoff: true, Mode: "local"}, true
+		return Reply{Text: pick(locale, "可以，人工客服时间为北京时间 07:00—24:00。点击下方“联系人工”查看联系方式；不要发送密码或完整卡密。", "Use Contact support below to reach a person. Do not share passwords or full codes.", "可以，點擊下方「聯絡人工」查看客服聯絡方式。請勿傳送密碼或完整卡密。"), Handoff: true, Mode: "local"}, true
 	}
 	return Reply{}, false
 }
