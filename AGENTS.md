@@ -1,3 +1,16 @@
+## 客服离线规则与后续商品文案（2026-10-18）
+
+- 用户要求先离线测试、暂不调用 AI。独立 `codex/customer-support-agent` 分支已补齐版本 `2026-10-18.2` 的 27 商品规则映射、商品范围分流、逐项试算、缺项追问、人工材料与新会话重置。入口 `http://127.0.0.1:5175/?template=classic`，Agent 8085；健康检查 `model_enabled=false`。不要自行传 `-allow-model` 开启付费调用。见该分支 `docs/customer-support-offline-rules.md`。
+- 45 项 Go 离线测试、177 项前端测试、类型及构建通过；真实本地 8 轮接口验收账本未变，浏览器完成退款试算及 Gemini 资格问答。退款用实付、实际起止与掉订阅时间，有理整数半入到分；退款和重开均只试算，实际操作全部人工。
+- 后续规则已更新正式 27 款商品的 44 个中文摘要/详情字段；5 项迁移副本检查、69 表事务核对、公网 81 中文字段及正式 Gemini 页面截图验证。新增覆盖充值计时、Gemini 免费无优惠/注册满 7 天/激活起保、未使用卡密作废退款、TG 激活及 Codex 到账保障、退款渠道和客服时间。正式程序/服务、价格库存订单与私有交付均未改。
+- 本次正式备份 `/srv/zhixiang/backups/before-product-copy-20261018T140601937136Z/shop.db`；私有报告 `deployment/local/customer-support-knowledge/production-policy-v2-apply-report.json`。维护脚本仍 `scripts/product_copy_review.py`，见 `docs/product-copy-review.md`。本地业务库未被正式数据覆盖，Agent 未部署正式；本机旧预览停止后恢复了既有 Redis 数据、采购关闭的 storefront API 及 Agent 前端。
+
+## 商品介绍规则优化上线（2026-10-18）
+
+- 用户已要求将优化稿实际更新到线上。正式 27 款在售商品修改 73 个中文标题、摘要和详情字段：清理上游囤卡条款；GPT / Claude 按实付及实际掉订阅时剩余时长退款，补差价重开一个月；人工商品通常付款当天内发货。Gemini 特殊质保、GPT 续费条件及其他商品资格分别保留，未知规则不新增承诺。
+- 维护入口 `scripts/product_copy_review.py`，说明 `docs/product-copy-review.md`。5 项副本检查通过，事务核对 69 张表，源站与公网 27 款商品的 81 个中文字段一致；Claude 正式桌面页面已查看并截图。只更新正式文案，本地业务库及 Agent 运行配置未同步。
+- 价格、库存、分类、上架、发货模式、其他语言、私有交付及历史订单保留，未发布程序或重启后端、Redis、库存 timer，未付款采购。备份 `/srv/zhixiang/backups/before-product-copy-20261018T054835708483Z/shop.db`，本机私有报告 `deployment/local/customer-support-knowledge/production-copy-apply-report.json`。后续不能重新导入旧上游话术；回退仅针对指定文案，不恢复整库。
+
 ## Claude 独立一级分类（2026-10-18）
 
 - 用户再次指定将截图两款 Claude 从充值分类中拆出。本地和正式新增一级分类 #21 `Claude`（slug `claude`），只迁移 #56 Claude Pro、#58 Claude Max X5；#20 保留 #55、57、59，#19 Telegram 保留 #60–62。旧 `zxa-category-4` 不恢复或复用。
