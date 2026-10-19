@@ -275,3 +275,10 @@ final result: passed。干净构建与批准图在 1821×864 同一输入中并�
 - [x] 无未解决 P0/P1/P2；轻微字体栅格化差异作为 P3 记录。
 
 final result: passed
+
+
+## 浅色玻璃卡片正式验收 20261019-131341
+
+正式截图 `work/codex-runtime/glass-clarity-20261019/production-desktop.png` 与日常和干净构建同为 1821×864；390/320px、深色、首页、搜索和详情检查通过。动态库存按正式数据展示，价格与后台配置指纹一致。共 7 项正式页面检查，无溢出、图片失败或控制台错误。
+
+final result: passed
