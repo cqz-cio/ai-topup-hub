@@ -2,10 +2,14 @@ package bscusdtbootstrap
 
 import (
 	"context"
+	"crypto/md5"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
-	procurementcontract "github.com/dujiao-next/internal/modules/procurement/contract"
+	"net/http"
+	"net/http/httptest"
+	"net/url"
 	"strings"
 	"testing"
 	"time"
@@ -14,8 +18,12 @@ import (
 	jobconsumer "github.com/dujiao-next/internal/app/jobs/consumer"
 	"github.com/dujiao-next/internal/config"
 	"github.com/dujiao-next/internal/constants"
+	affiliateapp "github.com/dujiao-next/internal/modules/affiliate/application"
+	affiliatedomain "github.com/dujiao-next/internal/modules/affiliate/domain"
+	affiliatestore "github.com/dujiao-next/internal/modules/affiliate/infrastructure/gormstore"
 	mappingdomain "github.com/dujiao-next/internal/modules/catalog/mapping/domain"
 	mappingstore "github.com/dujiao-next/internal/modules/catalog/mapping/infrastructure/gormstore"
+	productstore "github.com/dujiao-next/internal/modules/catalog/product/store/gormstore"
 	fulfillmentdomain "github.com/dujiao-next/internal/modules/fulfillment/domain"
 	orderdomain "github.com/dujiao-next/internal/modules/order/domain"
 	orderstore "github.com/dujiao-next/internal/modules/order/infrastructure/gormstore"
@@ -24,18 +32,26 @@ import (
 	"github.com/dujiao-next/internal/modules/payment/application/bscusdt"
 	chaincontract "github.com/dujiao-next/internal/modules/payment/contract/chain"
 	paymentdomain "github.com/dujiao-next/internal/modules/payment/domain"
+	xorpayadapter "github.com/dujiao-next/internal/modules/payment/infrastructure/gateway/adapters/xorpay"
+	paymentstore "github.com/dujiao-next/internal/modules/payment/infrastructure/gormstore"
 	chainstore "github.com/dujiao-next/internal/modules/payment/infrastructure/gormstore/chain"
+	paymentcallback "github.com/dujiao-next/internal/modules/payment/transport/http/callback"
 	procurementapp "github.com/dujiao-next/internal/modules/procurement/application"
+	procurementcontract "github.com/dujiao-next/internal/modules/procurement/contract"
 	procurementdomain "github.com/dujiao-next/internal/modules/procurement/domain"
 	procurementstore "github.com/dujiao-next/internal/modules/procurement/infrastructure/gormstore"
 	procurementmapping "github.com/dujiao-next/internal/modules/procurement/infrastructure/mappingreader"
 	procurementorder "github.com/dujiao-next/internal/modules/procurement/infrastructure/orderreader"
 	procurementupstream "github.com/dujiao-next/internal/modules/procurement/infrastructure/upstreamgateway"
+	settingsapp "github.com/dujiao-next/internal/modules/settings/application"
+	settingsstore "github.com/dujiao-next/internal/modules/settings/infrastructure/gormstore"
+	settingsintegration "github.com/dujiao-next/internal/modules/settings/schema/integration"
 	connectiondomain "github.com/dujiao-next/internal/modules/siteconnection/domain"
 	"github.com/dujiao-next/internal/queue"
 	"github.com/dujiao-next/internal/shared/jsonmap"
 	"github.com/dujiao-next/internal/shared/money"
 	"github.com/dujiao-next/internal/upstream"
+	"github.com/gin-gonic/gin"
 	"github.com/hibiken/asynq"
 	"github.com/shopspring/decimal"
 )
@@ -311,6 +327,183 @@ func TestConfirmedUSDTTransferRunsStorefrontProcurementAndCustomerDelivery(t *te
 				customerOrder := orderpresenter.NewOrderDetail(got)
 				if customerOrder.Fulfillment == nil || customerOrder.Fulfillment.Payload != purchaseFlowCard().Payload || supplier.purchases != 1 {
 					t.Fatal("delivered supplier card is missing from the customer order response")
+				}
+			})
+		}
+	}
+}
+
+type xorpayFlowCallbackService struct{ *paymentapp.PaymentService }
+
+func (xorpayFlowCallbackService) HandleWechatWebhook(paymentcallback.WechatWebhookInput) (*paymentdomain.Payment, string, error) {
+	return nil, "", errors.New("official WeChat webhook is outside this XorPay test")
+}
+
+// Use the real signed HTTP callback, SQL-backed settings, payment transaction,
+// durable procurement and storefront worker. Only the queue and supplier are
+// simulated; this test cannot send payments or real procurement requests.
+func TestXorpayCallbackWithSingleConnectionDeliversWithoutRepurchasing(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	for _, enabled := range []bool{false, true} {
+		name := "affiliate_disabled"
+		if enabled {
+			name = "affiliate_enabled"
+		}
+		for _, scenario := range []string{"immediate_card", "delayed_card", "queue_recovery", "unknown_result"} {
+			t.Run(name+"/"+scenario, func(t *testing.T) {
+				_, db, registry := setupPaymentService(t)
+				raw, _ := db.DB()
+				raw.SetMaxOpenConns(1)
+				t.Cleanup(func() { raw.Close() })
+				if err := db.AutoMigrate(&orderdomain.OrderRefundRecord{}, &settingsstore.SettingRecord{}, &affiliatedomain.Profile{}, &affiliatedomain.Commission{}, &procurementdomain.Order{}, &connectiondomain.Connection{}, &mappingdomain.Mapping{}, &mappingdomain.SKUMapping{}); err != nil {
+					t.Fatal(err)
+				}
+				settings := settingsapp.NewService(settingsstore.New(db))
+				if _, err := settings.UpdateAffiliateSetting(settingsintegration.AffiliateSetting{Enabled: enabled, CommissionRate: 2, ConfirmDays: 30}); err != nil {
+					t.Fatal(err)
+				}
+				ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+				defer cancel()
+				affiliates := affiliateapp.NewService(affiliatestore.New(db), nil, nil, nil, settingsapp.NewService(settingsstore.New(db.WithContext(ctx))))
+				orders := orderstore.New(db, "test-guest-key")
+				paymentRepo := paymentstore.New(db, "test-guest-key")
+				channels := paymentstore.NewChannelStore(db)
+				payments := paymentapp.NewPaymentService(paymentapp.PaymentServiceOptions{OrderStore: orders, PaymentStore: paymentRepo, ChannelStore: channels, ProductRepo: productstore.NewProductStore(db), ProductSKURepo: productstore.NewSKUStore(db), PaymentProviderRegistry: registry, AffiliateService: affiliates})
+				registry.Register(constants.PaymentProviderXorpay, "", xorpayadapter.NewXorpayAdapter())
+				productMap := mappingdomain.Mapping{ConnectionID: 1, LocalProductID: 1, UpstreamProductID: 4, IsActive: true}
+				if err := db.Create(&productMap).Error; err != nil {
+					t.Fatal(err)
+				}
+				if err := db.Create(&mappingdomain.SKUMapping{ProductMappingID: productMap.ID, LocalSKUID: 1, UpstreamSKUID: 4, UpstreamIsActive: true}).Error; err != nil {
+					t.Fatal(err)
+				}
+				supplier := &purchaseFlowSupplier{mode: scenario}
+				queued := &purchaseFlowQueue{unavailable: scenario == "queue_recovery"}
+				procurements := procurementapp.NewService(procurementapp.Options{
+					Repository: procurementstore.New(db), Orders: procurementorder.New(orders),
+					ProductMappings: procurementmapping.NewProducts(mappingstore.NewMappingStore(db)),
+					SKUMappings:     procurementmapping.NewSKUs(mappingstore.NewSKUMappingStore(db)),
+					Connections:     procurementupstream.New(&purchaseFlowProvider{supplier: supplier}), Queue: queued,
+					OrderLifecycle: procurementstore.NewLifecycle(db, nil, nil, config.EmailConfig{}),
+				})
+				payments.SetProcurementService(procurements)
+				expires := time.Now().Add(15 * time.Minute)
+				base := money.FromDecimal(decimal.NewFromInt(115))
+				parent := orderdomain.Order{OrderNo: "MOCK-XORPAY-PARENT", Status: constants.OrderStatusPendingPayment, Currency: "CNY", OriginalAmount: base, TotalAmount: base, ExpiresAt: &expires}
+				if err := db.Create(&parent).Error; err != nil {
+					t.Fatal(err)
+				}
+				child := orderdomain.Order{OrderNo: parent.OrderNo + "-01", ParentID: &parent.ID, Status: constants.OrderStatusPendingPayment, Currency: "CNY", OriginalAmount: base, TotalAmount: base, ExpiresAt: &expires, Items: []orderdomain.OrderItem{{ProductID: 1, SKUID: 1, Quantity: 1, TitleJSON: jsonmap.JSON{"zh-CN": "Synthetic item"}, FulfillmentType: constants.FulfillmentTypeUpstream, CostPrice: money.FromDecimal(decimal.NewFromInt(33))}}}
+				if err := db.Create(&child).Error; err != nil {
+					t.Fatal(err)
+				}
+				channel := paymentdomain.PaymentChannel{Name: "Synthetic WeChat", ProviderType: constants.PaymentProviderXorpay, ChannelType: constants.PaymentChannelTypeWechat, InteractionMode: constants.PaymentInteractionQR, IsActive: true, ConfigJSON: jsonmap.JSON{"aid": "12345", "app_secret": "synthetic-only-secret", "notify_url": "https://shop.example/api/v1/payments/callback"}}
+				if err := db.Create(&channel).Error; err != nil {
+					t.Fatal(err)
+				}
+				payment := paymentdomain.Payment{OrderID: parent.ID, ChannelID: channel.ID, ProviderType: channel.ProviderType, ChannelType: channel.ChannelType, InteractionMode: channel.InteractionMode, Amount: money.FromDecimal(decimal.RequireFromString("116.84")), FeeAmount: money.FromDecimal(decimal.RequireFromString("1.84")), FeePolicy: constants.PaymentFeePolicyCustomerSurcharge, Currency: "CNY", Status: constants.PaymentStatusPending, ProviderRef: "mock-aoid", GatewayOrderNo: "MOCK-DJP", ExpiredAt: &expires}
+				if err := db.Create(&payment).Error; err != nil {
+					t.Fatal(err)
+				}
+				handler := paymentcallback.NewHandler(xorpayFlowCallbackService{payments}, paymentRepo, channels, nil)
+				notify := func(price string, valid bool) *httptest.ResponseRecorder {
+					values := url.Values{"aoid": {payment.ProviderRef}, "order_id": {payment.GatewayOrderNo}, "pay_price": {price}, "pay_time": {time.Now().Format("2006-01-02 15:04:05")}}
+					digest := md5.Sum([]byte(values.Get("aoid") + values.Get("order_id") + price + values.Get("pay_time") + "synthetic-only-secret"))
+					values.Set("sign", hex.EncodeToString(digest[:]))
+					if !valid {
+						values.Set("sign", strings.Repeat("0", 32))
+					}
+					req := httptest.NewRequest(http.MethodPost, "/api/v1/payments/callback", strings.NewReader(values.Encode()))
+					req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+					w := httptest.NewRecorder()
+					c, _ := gin.CreateTestContext(w)
+					c.Request = req
+					handler.PaymentCallback(c)
+					return w
+				}
+				if notify("116.84", false).Code == 200 || notify("116.83", true).Code == 200 {
+					t.Fatal("invalid payment accepted")
+				}
+				var count int64
+				if err := db.Model(&procurementdomain.Order{}).Count(&count).Error; err != nil || count != 0 {
+					t.Fatal("invalid callback created procurement", err)
+				}
+				for range 2 {
+					w := notify("116.84", true)
+					if w.Code != 200 || w.Body.String() != "ok" {
+						t.Fatalf("callback failed: HTTP %d %s", w.Code, w.Body.String())
+					}
+				}
+				if err := db.First(&parent, parent.ID).Error; err != nil || !parent.AffiliateCommissionProcessed {
+					t.Fatalf("callback left affiliate hook blocked or unfinished: %v", err)
+				}
+				var procurement procurementdomain.Order
+				if err := db.First(&procurement, "local_order_id = ?", child.ID).Error; err != nil || supplier.calls != 0 {
+					t.Fatal("callback did not persist safe procurement intent", err)
+				}
+				if scenario == "queue_recovery" {
+					queued.unavailable = false
+					if err := db.Model(&procurement).Update("updated_at", time.Now().Add(-3*time.Minute)).Error; err != nil {
+						t.Fatal(err)
+					}
+					if err := procurements.RecoverPaidOrders(); err != nil {
+						t.Fatal(err)
+					}
+				}
+				if len(queued.submit) != 1 {
+					t.Fatalf("expected one queued purchase, got %d", len(queued.submit))
+				}
+				mux := asynq.NewServeMux()
+				jobconsumer.New(&container.Container{ProcurementOrderService: procurements}).RegisterStorefront(mux)
+				work := func(taskType string) {
+					t.Helper()
+					payload, _ := json.Marshal(queue.ProcurementSubmitPayload{ProcurementOrderID: procurement.ID})
+					task := asynq.NewTask(taskType, payload)
+					h, pattern := mux.Handler(task)
+					if pattern != taskType {
+						t.Fatal("missing worker")
+					}
+					if err := h.ProcessTask(context.Background(), task); err != nil {
+						t.Fatal(err)
+					}
+				}
+				work(queue.TaskProcurementSubmit)
+				if scenario == "delayed_card" {
+					work(queue.TaskProcurementPollStatus)
+				}
+				work(queue.TaskProcurementSubmit)
+				if w := notify("116.84", true); w.Code != 200 {
+					t.Fatal("duplicate callback rejected")
+				}
+				if err := procurements.RecoverPaidOrders(); err != nil {
+					t.Fatal(err)
+				}
+				work(queue.TaskProcurementSubmit)
+				if supplier.calls != 1 || supplier.purchases != 1 {
+					t.Fatalf("duplicate supplier request/charge: %d/%d", supplier.calls, supplier.purchases)
+				}
+				if err := db.Model(&procurementdomain.Order{}).Where("local_order_id = ?", child.ID).Count(&count).Error; err != nil || count != 1 {
+					t.Fatal("duplicate procurement record", count, err)
+				}
+				got, err := orders.GetByID(parent.ID)
+				if err != nil {
+					t.Fatal(err)
+				}
+				if err := db.First(&procurement, procurement.ID).Error; err != nil {
+					t.Fatal(err)
+				}
+				if err := db.Model(&fulfillmentdomain.Fulfillment{}).Where("order_id = ?", child.ID).Count(&count).Error; err != nil {
+					t.Fatal(err)
+				}
+				if scenario == "unknown_result" {
+					if procurement.Status != "manual_review" || count != 0 {
+						t.Fatal("unknown supplier outcome was retried or falsely delivered")
+					}
+					return
+				}
+				detail := orderpresenter.NewOrderDetail(got)
+				if count != 1 || got.Status != constants.OrderStatusDelivered || len(detail.Children) != 1 || detail.Children[0].Fulfillment == nil || detail.Children[0].Fulfillment.Payload != purchaseFlowCard().Payload {
+					t.Fatal("customer cannot retrieve exactly one delivered card")
 				}
 			})
 		}

@@ -42,6 +42,7 @@
           <div class="purchase-help">
             <ClipboardList :size="21" aria-hidden="true" /><h3>{{ t('shopUi.helpTitle') }}</h3><p>{{ t('shopUi.helpDescription') }}</p>
             <template v-if="supportWechat"><span>{{ t('shopUi.wechat') }}</span><button type="button" class="wechat-copy" @click="copyWechat">{{ supportWechat }}<Copy :size="13" aria-hidden="true" /></button><span v-if="copyMessage" role="status">{{ copyMessage }}</span></template>
+            <SupportContacts />
           </div>
         </aside>
         <div class="catalog-main">
@@ -59,34 +60,13 @@
           </div>
           <template v-else>
           <template v-for="group in visibleProductGroups" :key="group.category">
-          <CodexCreditsSection :products="group.credits" />
+          <CodexCreditsSection :products="group.credits" catalog>
+            <template #card="{ product }">
+              <StorefrontProductCard v-bind="cardProps(product)" credits @image-error="failedImages.add(product.slug)" />
+            </template>
+          </CodexCreditsSection>
           <div v-if="group.other.length" class="product-grid">
-            <article v-for="product in group.other" :key="product.slug" class="catalog-card">
-              <RouterLink :to="productPath(product)" class="product-image-link" :aria-label="t('shopUi.detailsLabel', { name: productTitle(product) })">
-                <img v-if="productImage(product) && !failedImages.has(product.slug)" :src="productImage(product)" :alt="productTitle(product)" loading="lazy" decoding="async" @error="failedImages.add(product.slug)" />
-                <div v-else class="product-image-placeholder"><PackageOpen :size="36" aria-hidden="true" /></div>
-                <span class="image-category">{{ productCategory(product) }}</span>
-              </RouterLink>
-              <div class="product-body">
-                <h3><RouterLink :to="productPath(product)">{{ productTitle(product) }}</RouterLink></h3>
-                <dl v-if="displayDetails(product)" class="product-facts">
-                  <div><dt>{{ t('shopUi.serviceType') }}</dt><dd>{{ displayDetails(product)?.deliveryType }}</dd></div>
-                  <div><dt>{{ displayDetails(product)?.periodLabel }}</dt><dd>{{ displayDetails(product)?.period }}</dd></div>
-                  <div><dt>{{ t('shopUi.warranty') }}</dt><dd>{{ displayDetails(product)?.warranty }}</dd></div>
-                </dl>
-                <dl v-else class="product-facts">
-                  <div><dt>{{ t('shopUi.deliveryMethod') }}</dt><dd>{{ t(product.fulfillment_type === 'auto' ? 'shopUi.automatic' : 'shopUi.manual') }}</dd></div>
-                  <div><dt>{{ t('shopUi.purchaseMethod') }}</dt><dd>{{ t(product.purchase_type === 'member' ? 'shopUi.memberOnly' : 'shopUi.guestAvailable') }}</dd></div>
-                  <div><dt>{{ t('shopUi.usageWarranty') }}</dt><dd>{{ t('shopUi.checkDetails') }}</dd></div>
-                </dl>
-                <div class="product-price"><strong>{{ formattedPrice(product) }}</strong><small v-if="(product.skus?.length || 0) > 1">{{ t('shopUi.from') }}</small><span class="stock-label" :class="{ 'is-out': !canPurchase(product) }">{{ stockLabel(product) }}</span></div>
-                <div class="product-actions">
-                  <RouterLink v-if="canPurchase(product)" :to="productPath(product)" class="store-button is-primary" :aria-label="t('shopUi.buyLabel', { name: productTitle(product) })">{{ t('shopUi.buy') }}<ArrowUpRight :size="14" aria-hidden="true" /></RouterLink>
-                  <button v-else type="button" class="store-button is-primary" disabled>{{ t('shopUi.unavailable') }}</button>
-                  <RouterLink :to="productPath(product)" class="store-text-link">{{ t('shopUi.details') }}</RouterLink>
-                </div>
-              </div>
-            </article>
+            <StorefrontProductCard v-for="product in group.other" :key="product.slug" v-bind="cardProps(product)" @image-error="failedImages.add(product.slug)" />
           </div>
           </template>
           </template>
@@ -108,6 +88,7 @@
 </template>
 
 <script setup lang="ts">
+import SupportContacts from '../components/SupportContacts.vue'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { ArrowUpRight, ArrowRight, Check, Copy, Info, PackageOpen, Search, ShoppingBag, ClipboardList } from 'lucide-vue-next'
@@ -118,6 +99,7 @@ import { useUserAuthStore } from '../stores/userAuth'
 import { usePageSeo } from '../composables/usePageSeo'
 import AnnouncementModal from '../components/AnnouncementModal.vue'
 import CodexCreditsSection from '../components/commerce/CodexCreditsSection.vue'
+import StorefrontProductCard from '../components/commerce/StorefrontProductCard.vue'
 import { splitCodexCredits } from '../utils/codexCredits'
 import { matchesProductSearch } from '../utils/productSearch'
 import { useAnnouncement, type HomeAnnouncement } from '../composables/useAnnouncement'
@@ -220,8 +202,6 @@ const visibleProductGroups = computed(() =>
     }))
     .filter((group) => group.credits.length || group.other.length),
 )
-const productPath = (product: StorefrontProduct) =>
-  `/products/${encodeURIComponent(product.slug)}`
 const canPurchase = (product: StorefrontProduct) =>
   !loadFailed.value && canPurchaseStorefrontProduct(product)
 const stockLabel = (product: StorefrontProduct) => {
@@ -263,6 +243,20 @@ const formattedPrice = (product: StorefrontProduct) => {
     return `${amount} ${currency}`
   }
 }
+// Both ordinary and points products use the same presentation and live pricing.
+const cardProps = (product: StorefrontProduct) => ({
+  slug: product.slug,
+  title: productTitle(product),
+  category: productCategory(product),
+  image: failedImages.value.has(product.slug) ? '' : productImage(product),
+  details: displayDetails(product),
+  fulfillmentType: product.fulfillment_type,
+  purchaseType: product.purchase_type,
+  price: formattedPrice(product),
+  stock: stockLabel(product),
+  purchasable: canPurchase(product),
+  multipleSkus: (product.skus?.length || 0) > 1,
+})
 const clearFilters = () => {
   selectCategory('')
   search.value = ''
@@ -412,28 +406,6 @@ onUnmounted(() => {
 .delivery-notice > svg { color: var(--ui-success); flex-shrink: 0; }
 .product-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
 .product-grid + .codex-credits, .product-grid + .product-grid { margin-top: 32px; }
-.catalog-card { display: flex; flex-direction: column; border: 1px solid var(--ui-border); border-radius: 13px; overflow: hidden; background: var(--ui-bg-elevated); transition: border-color .2s, box-shadow .2s; }
-.catalog-card:hover { border-color: var(--ui-border-strong); box-shadow: var(--ui-shadow-soft); }
-.product-image-link { position: relative; display: block; aspect-ratio: 5/3; background: var(--ui-bg-soft); overflow: hidden; }
-.product-image-link img { display: block; height: 100%; width: 100%; object-fit: contain; object-position: center; }
-.image-category { position: absolute; top: 10px; left: 10px; max-width: calc(100% - 20px); background: #ffffffed; color: #384338; padding: 4px 8px; border-radius: 5px; font-size: 10px; line-height: 1.5; overflow-wrap: anywhere; }
-.product-image-placeholder { height: 100%; display: flex; align-items: center; justify-content: center; color: var(--ui-text-muted); }
-.product-body { min-width: 0; padding: 18px; flex: 1; display: flex; flex-direction: column; }
-.product-body h3 { font-size: 16px; line-height: 1.6; min-height: 3.2em; font-weight: 650; margin-bottom: 14px; overflow-wrap: anywhere; }
-.product-body h3 a { color: var(--ui-text-primary); }
-.product-facts { display: grid; gap: 8px; font-size: 12px; line-height: 1.65; margin-bottom: 22px; }
-.product-facts > div { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); align-items: start; gap: 10px; }
-.product-facts dt { color: var(--ui-text-muted); overflow-wrap: anywhere; }
-.product-facts dd { min-width: 0; color: var(--ui-text-secondary); text-align: right; overflow-wrap: anywhere; }
-.product-price { margin-top: auto; display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; margin-bottom: 16px; }
-.product-price strong { font-size: 26px; font-weight: 700; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
-.product-price small { font-size: 10px; color: var(--ui-text-muted); }
-.stock-label { font-size: 12px; color: var(--ui-text-secondary); margin-left: auto; overflow-wrap: anywhere; }
-.stock-label.is-out { color: var(--ui-warning); }
-.product-actions { display: flex; gap: 12px; align-items: center; }
-.product-actions .store-button { min-width: 0; flex: 1; padding: 10px 12px; min-height: 44px; gap: 8px; font-size: 12px; }
-.product-actions .store-button svg { flex-shrink: 0; }
-.product-actions .store-text-link { min-height: 44px; flex-shrink: 0; font-size: 12px; }
 .catalog-note { font-size: 10px; color: var(--ui-text-muted); margin: 20px 0 0; }
 .catalog-empty { border: 1px dashed var(--ui-border-strong); border-radius: 13px; padding: 60px 24px; display: flex; align-items: center; flex-direction: column; gap: 14px; color: var(--ui-text-muted); text-align: center; }
 .catalog-empty h3 { font-size: 18px; color: var(--ui-text-primary); }
@@ -486,18 +458,6 @@ onUnmounted(() => {
   .delivery-notice { font-size: 12px; align-items: flex-start; margin-bottom: 15px; }
   .delivery-notice svg { margin-top: 3px; }
   .product-grid { gap: 12px; }
-  .catalog-card { border-radius: 10px; }
-  .product-body { padding: 16px 14px; }
-  .product-body h3 { font-size: 14px; line-height: 1.6; margin-bottom: 12px; }
-  .product-facts { font-size: 11px; gap: 7px; }
-  .product-facts > div { gap: 8px; }
-  .image-category { top: 8px; left: 8px; font-size: 10px; padding: 3px 7px; }
-  .product-price strong { font-size: 22px; }
-  .product-price { flex-wrap: wrap; }
-  .stock-label { display: block; margin-left: 0; width: 100%; }
-  .product-actions { flex-direction: column; align-items: stretch; gap: 9px; }
-  .product-actions .store-button { min-height: 44px; }
-  .product-actions .store-text-link { min-height: 36px; }
   .order-lookup { margin-top: 30px; padding: 23px; flex-direction: column; align-items: stretch; }
   .lookup-copy h2 { font-size: 22px; }
   .lookup-actions .store-button { flex: 1; gap: 8px; }
@@ -505,13 +465,6 @@ onUnmounted(() => {
 }
 @media (max-width: 479px) {
   .product-grid { grid-template-columns: minmax(0, 1fr); }
-  .product-body { padding: 18px; }
-  .product-body h3 { font-size: 16px; min-height: auto; }
-  .product-facts { font-size: 12px; }
-  .product-price strong { font-size: 26px; }
-  .stock-label { width: auto; margin-left: auto; }
-  .product-actions { flex-direction: row; align-items: center; gap: 12px; }
-  .product-actions .store-text-link { min-height: 44px; }
 }
 @media (max-width: 360px) { .hero-copy h1 { font-size: 29px; } .guide-caption { display: none; } }
 </style>

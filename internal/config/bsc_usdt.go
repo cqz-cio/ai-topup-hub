@@ -1,7 +1,8 @@
 package config
 
 // RPC credentials, if any, are supplied only in network-specific server
-// environment variables (BSC_RPC_URL / PLASMA_RPC_URL).
+// environment variables (BSC_RPC_URL / PLASMA_RPC_URL). EVM providers may also
+// use separate *_LOGS_RPC_URL and *_RECEIPT_RPC_URL endpoints.
 type BSCUSDTConfig struct {
 	Enabled       bool   `mapstructure:"enabled"`
 	Recipient     string `mapstructure:"recipient"`

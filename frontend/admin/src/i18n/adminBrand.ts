@@ -9,8 +9,8 @@ export const adminBrandMessages = {
       pricingDescription: '按商品设置会员优惠，按用户维护个人专属单价。',
       pricingAction: '管理会员商品价',
       supportTitle: '客服与兑换指引',
-      supportDescription: '客服微信：{wechat} · 兑换方式以订单说明为准。',
-      supportAction: 'ChatGPT 卡密自助充值',
+      supportDescription: '客服微信：{wechat} · QQ：{qq} · Telegram：{telegram} · 兑换方式以订单说明为准。',
+      supportAction: '查看订单交付',
     },
     systemInfo: {
       button: '系统信息',
@@ -34,8 +34,8 @@ export const adminBrandMessages = {
       pricingDescription: '按商品設定會員優惠，按用戶維護個人專屬單價。',
       pricingAction: '管理會員商品價',
       supportTitle: '客服與兌換指引',
-      supportDescription: '客服微信：{wechat} · 兌換方式以訂單說明為準。',
-      supportAction: 'ChatGPT 卡密自助充值',
+      supportDescription: '客服微信：{wechat} · QQ：{qq} · Telegram：{telegram} · 兌換方式以訂單說明為準。',
+      supportAction: '查看訂單交付',
     },
     systemInfo: {
       button: '系統資訊',
@@ -59,8 +59,8 @@ export const adminBrandMessages = {
       pricingDescription: 'Set member prices per product and personal prices per customer.',
       pricingAction: 'Manage member prices',
       supportTitle: 'Support & redemption',
-      supportDescription: 'WeChat: {wechat} · Follow the redemption instructions in each order.',
-      supportAction: 'Redeem ChatGPT cards',
+      supportDescription: 'WeChat: {wechat} · QQ：{qq} · Telegram：{telegram} · Follow the redemption instructions in each order.',
+      supportAction: 'View order deliveries',
     },
     systemInfo: {
       button: 'System information',

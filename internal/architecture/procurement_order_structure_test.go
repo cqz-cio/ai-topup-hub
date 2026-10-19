@@ -27,17 +27,17 @@ func TestProcurementUsesCompleteVerticalLayout(t *testing.T) {
 	if production != 0 || total != 0 {
 		t.Fatalf("procurement module root must remain structural only, got production=%d total=%d", production, total)
 	}
-	assertDirectoryGoFileBudget(t, applicationRoot, 11) // read-only prepayment funding check and focused tests
+	assertDirectoryGoFileBudget(t, applicationRoot, 12) // funding checks and persistent purchase resumption boundary
 	assertDirectoryGoFileBudget(t, contractRoot, 3)
-	assertDirectoryGoFileBudget(t, domainRoot, 1)
-	assertDirectoryGoFileBudget(t, storeRoot, 2)
+	assertDirectoryGoFileBudget(t, domainRoot, 2)
+	assertDirectoryGoFileBudget(t, storeRoot, 3)
 	assertDirectoryGoFileBudget(t, orderReaderRoot, 1)
 	assertDirectoryGoFileBudget(t, mappingReaderRoot, 1)
 	assertDirectoryGoFileBudget(t, upstreamGatewayRoot, 1)
 	assertDirectoryGoFileBudget(t, queueAdapterRoot, 1)
 	assertDirectoryGoFileBudget(t, notificationAdapterRoot, 1)
 	assertDirectoryGoFileBudget(t, transportRoot, 2)
-	assertDirectoryGoFileBudget(t, integrationTestRoot, 6)
+	assertDirectoryGoFileBudget(t, integrationTestRoot, 7)
 
 	assertFileDeclaresTypes(t, filepath.Join(applicationRoot, "service.go"), []string{"Service", "Options"})
 	assertFileDeclaresFunctions(t, filepath.Join(applicationRoot, "service.go"), []string{"NewService"})
@@ -51,6 +51,7 @@ func TestProcurementUsesCompleteVerticalLayout(t *testing.T) {
 		"ReferencedOrderConnection", "SingleSubmissionConnection",
 	})
 	assertFileDeclaresTypes(t, filepath.Join(domainRoot, "order.go"), []string{"Order", "LocalOrder", "LocalOrderItem"})
+	assertFileDeclaresTypes(t, filepath.Join(domainRoot, "purchase_window.go"), []string{"PurchaseWindow"})
 	assertFileDeclaresTypes(t, filepath.Join(storeRoot, "store.go"), []string{"Store"})
 	assertFileDeclaresTypes(t, filepath.Join(orderReaderRoot, "reader.go"), []string{"Reader"})
 	assertFileDeclaresTypes(t, filepath.Join(upstreamGatewayRoot, "gateway.go"), []string{"Gateway"})
@@ -62,6 +63,7 @@ func TestProcurementUsesCompleteVerticalLayout(t *testing.T) {
 		"service.go":           {"NewService"},
 		"payment_readiness.go": {"SetBalanceNotifier", "unavailableBalance", "fundingNeeds", "CheckPaymentBalance", "ReadPaymentBalanceNotice"},
 		"recovery.go":          {"RecoverPaidOrders"},
+		"purchase_window.go":   {"orderWithinPurchaseWindow", "procurementWithinPurchaseWindow"},
 		"create.go":            {"CreateForOrder", "createProcurementForSingleOrder", "hasUpstreamItems"},
 		"submit.go": {
 			"SubmitToUpstream", "markProcurementError", "rejectProcurement",

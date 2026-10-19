@@ -1,3 +1,19 @@
+# 商城倍率与地区展示：批准稿实施核验（2026-10-16）
+
+final result: passed
+
+视觉依据为用户最后批准的 `work/codex-runtime/pro-quota-icons-preview-20261016/preview-v4.png`。四张 SVG 与批准稿资产逐字节一致：大号数字 247／750；ChatGPT 27／560；PRO 29／720；备注 25／600；右侧文字坐标和蓝线位置统一。两张 10x 均标注菲区，两张 25x 仅标菲区／智利。
+
+日常入口、最终构建与正式站均在 1920×1080、390×844、320×844 检查首页、商品中心和详情；含经典／Vault、简繁英、10x／25x 搜索及地区组合筛选，各 38 项通过，无横向溢出和脚本错误。正式验收拆分为经典 29 项与 Vault 9 项，结果完整保存在本次私有证据目录。
+
+Vault 复核使用正式公开配置的只读快照，仅在浏览器中切换模板选择，商品接口继续读取正式数据；未更改正式模板设置。
+
+实际组件截图：`work/codex-runtime/pro-quota-labels-20261016/production-classic-qzweb-55-card.png`、`production-classic-qzweb-7-card.png`、`production-classic-qzweb-56-card.png`、`production-classic-qzweb-58-card.png`。标题完整显示并保留价格、库存和购买入口。原有绿色品牌、背景、页面布局和购买行为保持一致；地域文字替代渠道编号属于批准范围，未发现需要保留的视觉偏差。
+
+实际发布 `20261016-144429`，构建来源 `7f6e10ca014f5c63df01f1ddfe746baa2f0c59f4`。348 个构建文件、15 项公网资源哈希及 22 项公开 API 验证通过；数据和程序保护结果见 `docs/catalog-presentation.md` 及本次 `verified-report.json`。
+
+---
+
 # 推广返利规则说明（2026-10-16）
 
 结果：通过。用户批准预览位于 `work/codex-runtime/affiliate-rules-preview-20261016/` 的 desktop/mobile/detail 图片；实现截图位于 `work/codex-runtime/affiliate-rules-20261016/` 的 local-final-1920/390/320、built-1920/390/320 和 result-detail。
@@ -179,6 +195,39 @@ Implementation: clean Git archive of `3f9c00349214520784e548ece780163a1b5a6a9e`,
 - [x] Verify responsive layouts, non-U payment and important alternate states.
 
 Follow-up polish: minor font rasterization and existing shared navigation/footer differences are accepted; no blocking visual work remains.
+
+
+## 2026-10-16 Codex 商品卡片统一（批准稿实施）
+
+状态：本机视觉检查通过。批准稿和真实 1920×911 截图在同一次检查中对照：三列卡片约 311.66×485.38px，横图完整，三行信息、价格库存与两个操作位置一致。390px/320px 单列，768px 两列，无横向溢出；所有六档图片完整加载。原站导航登录态、本机独立分类和动态库存按实际环境保留。
+
+已核对分类切换、搜索、刷新、详情往返、GPT/Gemini 卡片回归、明暗主题与语言。截图和逐项结果保存于忽略目录 `work/codex-runtime/codex-card-layout/`。未发现有意义的卡片视觉偏差；没有改动后端业务流程。
+
+
+## Codex 卡片正式发布验收 20261016-103742
+
+final result: passed。批准桌面稿与日常截图、批准手机稿与最终构建截图已分别在同一输入中对照；卡片信息、字号、间距、完整图片和按钮位置一致。保留现有站点导航、底部手机导航及各环境数据。正式截图 `work/codex-runtime/codex-card-layout/production-desktop.jpg` 和 `production-390.jpg`；桌面卡片约 311.66×485.38px，390/320px 为单列，无横向溢出。10 项正式页面检查和 9 项公网入口/静态资源哈希通过，未发现脚本错误，无待处理 P0/P1/P2 问题。正式构建来源 `b0e36c6889a6ccd624bd9c403f0cfd92f7c09e27`，后台与后端保持原版本。
+
+
+---
+
+# 商品详情：用户标注修正（2026-10-16）
+
+final result: passed
+
+最新视觉依据为用户标注图 `D:/Documents/xwechat_files/wxid_x0kaj0ineuhi22_2a2c/temp/RWTemp/2026-10/cabc6efc9b683722049dcf5ce13cc1a8/bbf98e40a0df585d8d9130991c4605f1.png`，并以用户明确实施指令执行。它取代上一版关于不等高卡片及售前兑换链接的选择。
+
+参考图与实际本机截图已合并为同一比较输入并打开检查：`work/codex-runtime/product-detail-alignment-20261016/reference-and-implementation.jpg`。桌面截图保持 1920px 原尺寸；源图登录身份价格 50 元与本机游客 114.80 元属于既有环境/身份差异，未为对图修改价格。
+
+- 两侧卡片顶部和底部坐标相同，宽度均为 576px；规格位于价格右侧，标题、文本、按钮和图片沿用绿色主题及原有素材。
+- 商品说明和资格/质保摘要放入左栏，右栏保留价格、规格、数量及购买按钮。原详细正文按现有标题整理成统一间距的区块，所有文字条款保留。
+- 迭代修正：320px 首次版本的库存与价格折行偏挤，改为纵向布局；原 HTML 连续换行压缩为一次可见换行；正文区块统一齐边。390px 和平板保留合理并排布局。
+- 验证包括 1920/768/390/320px、GPT 开通与续费、Codex、Gemini、iOS 缺货商品、简繁英、深色及 Vault；未出现横向溢出或缺失商品图。实际点击数量 2 并进入结账，刷新后规格和数量仍保留，未提交订单。
+- 售前页面、公开 API、商城发布包不含具体兑换域名；订单交付说明原值保留。关于页共享默认文案的构建残留已修正并重新扫描。
+
+无待处理 P0/P1/P2；不同身份的价格、实时库存和浏览器字体栅格化差异不作为视觉偏差。最终发布产物与线上截图继续记录在同一私有证据目录。
+
+正式复核：发布 `20261016-104524`，7 项页面检查通过，1920/390/320px 无溢出和脚本错误；左右卡片坐标与日常本机一致。正式截图 `production-desktop.jpg`、`production-390.jpg`、`production-320.jpg`、`production-qzweb-73.jpg`、`production-qzweb-50.jpg` 位于同一私有证据目录。final result: passed。
 
 ## 小π悬浮客服本地实现（2026-10-16）
 

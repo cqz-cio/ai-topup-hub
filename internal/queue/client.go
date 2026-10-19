@@ -14,6 +14,8 @@ import (
 const (
 	// DefaultQueue 默认队列名称
 	DefaultQueue = constants.QueueDefault
+	// NotificationQueue has reserved workers, independent of supplier calls.
+	NotificationQueue = "notifications"
 )
 
 // Client 队列客户端封装
@@ -55,6 +57,9 @@ func (c *Client) EnqueueOrderStatusEmail(payload OrderStatusEmailPayload, opts .
 	if !c.Enabled() {
 		return nil
 	}
+	if payload.EnqueuedAt.IsZero() {
+		payload.EnqueuedAt = time.Now().UTC()
+	}
 	task, err := NewOrderStatusEmailTask(payload)
 	if err != nil {
 		return err
@@ -62,7 +67,7 @@ func (c *Client) EnqueueOrderStatusEmail(payload OrderStatusEmailPayload, opts .
 	// 限制重试次数与保留期，避免 SMTP 长时间不可用时邮件任务堆积成雪崩；
 	// 调用方可通过 opts 覆盖。
 	options := append([]asynq.Option{
-		asynq.Queue(c.defaultQueue),
+		asynq.Queue(NotificationQueue),
 		asynq.MaxRetry(3),
 		asynq.Retention(24 * time.Hour),
 	}, opts...)
@@ -123,11 +128,14 @@ func (c *Client) EnqueueNotificationDispatch(payload NotificationDispatchPayload
 	if !c.Enabled() {
 		return nil
 	}
+	if payload.EnqueuedAt.IsZero() {
+		payload.EnqueuedAt = time.Now().UTC()
+	}
 	task, err := NewNotificationDispatchTask(payload)
 	if err != nil {
 		return err
 	}
-	options := append([]asynq.Option{asynq.Queue(c.defaultQueue)}, opts...)
+	options := append([]asynq.Option{asynq.Queue(NotificationQueue), asynq.MaxRetry(5)}, opts...)
 	_, err = c.client.Enqueue(task, options...)
 	return err
 }
@@ -229,12 +237,40 @@ func BuildServerConfig(cfg *config.QueueConfig) (asynq.RedisClientOpt, asynq.Con
 	}
 	queues := map[string]int{DefaultQueue: 1}
 	if cfg != nil && len(cfg.Queues) > 0 {
-		queues = cfg.Queues
+		queues = make(map[string]int, len(cfg.Queues))
+		for name, priority := range cfg.Queues {
+			if name != NotificationQueue {
+				queues[name] = priority
+			}
+		}
+		if len(queues) == 0 {
+			queues[DefaultQueue] = 1
+		}
 	}
 	return opt, asynq.Config{
-		Concurrency: concurrency,
-		Queues:      queues,
+		Concurrency:              concurrency,
+		Queues:                   queues,
+		RetryDelayFunc:           notificationRetryDelay,
+		DelayedTaskCheckInterval: time.Second,
 	}
+}
+
+// BuildNotificationServerConfig reserves capacity without enabling any business
+// or recurring tasks. Legacy email tasks in default remain consumable there.
+func BuildNotificationServerConfig(cfg *config.QueueConfig) (asynq.RedisClientOpt, asynq.Config) {
+	opt, server := BuildServerConfig(cfg)
+	server.Concurrency = 4
+	server.Queues = map[string]int{NotificationQueue: 1}
+	server.TaskCheckInterval = 200 * time.Millisecond
+	return opt, server
+}
+
+func notificationRetryDelay(n int, err error, task *asynq.Task) time.Duration {
+	if task != nil && (task.Type() == TaskNotificationDispatch || task.Type() == TaskOrderStatusEmail) {
+		delays := [...]time.Duration{3 * time.Second, 5 * time.Second, 10 * time.Second, 20 * time.Second, 30 * time.Second}
+		return delays[max(0, min(n, len(delays)-1))]
+	}
+	return asynq.DefaultRetryDelayFunc(n, err, task)
 }
 
 func buildRedisOpt(cfg *config.QueueConfig) asynq.RedisClientOpt {

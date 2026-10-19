@@ -4,6 +4,7 @@ Run against the intended environment after its normal schema migration. The
 catalog contains human-confirmed retail prices; source quotes are costs only.
 This maintenance command makes no network, order, payment or purchase calls.
 """
+from public_redemption import public_copy
 import argparse
 from datetime import datetime, timezone
 from decimal import Decimal
@@ -76,7 +77,7 @@ def apply_catalog(db_path, catalog, backup, local_snapshot=False, publish=False)
         for p in products:
             product_id = insert(db, 'products', {
                 'category_id':category[0], 'slug':p['slug'], 'title_json':encode(p['title']),
-                'description_json':encode(p['description']), 'content_json':encode(p['content']),
+                'description_json':encode(p['description']), 'content_json':encode(public_copy(p['content'])),
                 'instructions_json':encode(p['instructions']), 'seo_meta_json':encode({}),
                 'price_amount':p['retail_price_cny'], 'cost_price_amount':p['supplier_quote_cny'],
                 'wholesale_prices':encode([]), 'images':encode(p['images']), 'tags':encode(['Codex','点数充值']),

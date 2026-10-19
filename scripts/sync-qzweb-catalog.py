@@ -17,6 +17,7 @@ import urllib.parse
 import urllib.request
 
 from redemption_guide import catalog_fields, load_guide
+from catalog_presentation import catalog_fields as presentation_fields, public_copy as presentation_copy
 
 
 def main():
@@ -134,9 +135,10 @@ def main():
         )
         intro = re.search(r"<p(?:\s[^>]*)?>(.*?)</p>", item["content_html"], re.S | re.I)
         summary = html.unescape(re.sub(r"<[^>]*>", "", intro.group(1))).strip() if intro else item["name"]
+        title, description, content, images = presentation_fields(slug, {"zh-CN": item["name"]}, {"zh-CN": summary}, content, [item["local_cover"]])
         sku = {
             "sku_code": f"QZWEB-{item['id']}",
-            "spec_values": {"\u5957\u9910": item["name"]},
+            "spec_values": {"\u5957\u9910": title["zh-CN"]},
             "price_amount": float(price),
             "cost_price_amount": 0,
             "manual_stock_total": 0,
@@ -149,14 +151,14 @@ def main():
             sku["cost_price_amount"] = float(prior["skus"][0].get("cost_price_amount") or 0)
         body = {
             "category_id": category["id"], "slug": slug,
-            "title": {"zh-CN": item["name"]},
-            "description": {"zh-CN": summary},
+            "title": title,
+            "description": description,
             "content": content,
             "instructions": instructions,
             "price_amount": float(price),
             "cost_price_amount": float(prior.get("cost_price_amount") or 0) if prior else 0,
-            "images": [item["local_cover"]],
-            "tags": [source_category["name"]],
+            "images": images,
+            "tags": presentation_copy([source_category["name"]]),
             "purchase_type": "member" if item["only_user"] else "guest",
             "min_purchase_quantity": item["minimum"],
             "max_purchase_quantity": item["maximum"],
@@ -172,11 +174,11 @@ def main():
             body["is_affiliate_enabled"] = prior.get("is_affiliate_enabled", False)
         product = api("PUT", f"/admin/products/{prior['id']}", body)["data"] if prior else api("POST", "/admin/products", body)["data"]
         public = api("GET", f"/public/products/{slug}")["data"]
-        assert public["title"]["zh-CN"] == item["name"]
+        assert public["title"] == title
         assert Decimal(public["price_amount"]) == price
         assert public["content"] == content
         assert product["instructions"] == instructions
-        assert public["images"] == [item["local_cover"]]
+        assert public["images"] == images
         assert Decimal(public["skus"][0]["price_amount"]) == price
         assert public["category_id"] == category["id"]
         assert public["fulfillment_type"] == body["fulfillment_type"]

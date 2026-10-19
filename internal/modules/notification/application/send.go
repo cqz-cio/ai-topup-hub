@@ -129,16 +129,6 @@ func (s *Service) SendTest(ctx context.Context, input contract.TestSendInput) er
 }
 
 func (s *Service) dispatchSingleEvent(ctx context.Context, setting settingsmessaging.NotificationCenterSetting, payload queue.NotificationDispatchPayload) error {
-	if !payload.Force && !isSaleNotification(payload) {
-		ok, err := acquireNotificationDedupe(ctx, setting.DedupeTTLSeconds, payload)
-		if err != nil {
-			logger.Warnw("notification_dedupe_failed", "event_type", payload.EventType, "error", err)
-		}
-		if err == nil && !ok {
-			return nil
-		}
-	}
-
 	locale := format.ResolveLocale(payload.Locale, setting.DefaultLocale)
 	template := setting.Templates.TemplateByEvent(payload.EventType).ResolveLocaleTemplate(locale)
 	variables := format.BuildTemplateVariables(payload)
@@ -160,15 +150,17 @@ func (s *Service) dispatchSingleEvent(ctx context.Context, setting settingsmessa
 	if setting.Channels.Email.Enabled && len(setting.Channels.Email.Recipients) > 0 {
 		for _, recipient := range setting.Channels.Email.Recipients {
 			sendErr := s.sendNotification(ctx, payload, notificationSendAttempt{
-				eventType: payload.EventType,
-				bizType:   payload.BizType,
-				bizID:     payload.BizID,
-				channel:   constants.NotificationChannelEmail,
-				recipient: recipient,
-				locale:    locale,
-				title:     title,
-				body:      body,
-				variables: variables,
+				eventType:        payload.EventType,
+				bizType:          payload.BizType,
+				bizID:            payload.BizID,
+				channel:          constants.NotificationChannelEmail,
+				recipient:        recipient,
+				locale:           locale,
+				title:            title,
+				body:             body,
+				variables:        variables,
+				isTest:           payload.IsTest,
+				dedupeTTLSeconds: setting.DedupeTTLSeconds,
 			}, func() error {
 				if s.emailService == nil {
 					return contract.ErrSendFailed
@@ -193,15 +185,17 @@ func (s *Service) dispatchSingleEvent(ctx context.Context, setting settingsmessa
 		message := format.ComposePlainTextMessage(title, body)
 		for _, recipient := range setting.Channels.Telegram.Recipients {
 			sendErr := s.sendNotification(ctx, payload, notificationSendAttempt{
-				eventType: payload.EventType,
-				bizType:   payload.BizType,
-				bizID:     payload.BizID,
-				channel:   constants.NotificationChannelTelegram,
-				recipient: recipient,
-				locale:    locale,
-				title:     title,
-				body:      body,
-				variables: variables,
+				eventType:        payload.EventType,
+				bizType:          payload.BizType,
+				bizID:            payload.BizID,
+				channel:          constants.NotificationChannelTelegram,
+				recipient:        recipient,
+				locale:           locale,
+				title:            title,
+				body:             body,
+				variables:        variables,
+				isTest:           payload.IsTest,
+				dedupeTTLSeconds: setting.DedupeTTLSeconds,
 			}, func() error {
 				if s.telegramSender == nil {
 					return contract.ErrSendFailed
@@ -226,15 +220,17 @@ func (s *Service) dispatchSingleEvent(ctx context.Context, setting settingsmessa
 		message := format.ComposePlainTextMessage(title, body)
 		for _, recipient := range setting.Channels.Feishu.Recipients {
 			sendErr := s.sendNotification(ctx, payload, notificationSendAttempt{
-				eventType: payload.EventType,
-				bizType:   payload.BizType,
-				bizID:     payload.BizID,
-				channel:   constants.NotificationChannelFeishu,
-				recipient: recipient,
-				locale:    locale,
-				title:     title,
-				body:      body,
-				variables: variables,
+				eventType:        payload.EventType,
+				bizType:          payload.BizType,
+				bizID:            payload.BizID,
+				channel:          constants.NotificationChannelFeishu,
+				recipient:        recipient,
+				locale:           locale,
+				title:            title,
+				body:             body,
+				variables:        variables,
+				isTest:           payload.IsTest,
+				dedupeTTLSeconds: setting.DedupeTTLSeconds,
 			}, func() error {
 				if s.feishuSender == nil {
 					return contract.ErrSendFailed
@@ -263,17 +259,18 @@ func (s *Service) dispatchSingleEvent(ctx context.Context, setting settingsmessa
 }
 
 type notificationSendAttempt struct {
-	eventType string
-	bizType   string
-	bizID     uint
-	channel   string
-	recipient string
-	locale    string
-	title     string
-	body      string
-	variables map[string]interface{}
-	isTest    bool
-	sendErr   error
+	eventType        string
+	bizType          string
+	bizID            uint
+	channel          string
+	recipient        string
+	locale           string
+	title            string
+	body             string
+	variables        map[string]interface{}
+	isTest           bool
+	sendErr          error
+	dedupeTTLSeconds int
 }
 
 func (s *Service) recordSendAttempt(attempt notificationSendAttempt) {

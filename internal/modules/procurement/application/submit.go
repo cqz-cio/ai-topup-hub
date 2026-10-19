@@ -38,6 +38,9 @@ func (s *Service) SubmitToUpstream(procurementOrderID uint) error {
 	if procOrder.Status != "pending" && procOrder.Status != "failed" {
 		return procurementcontract.ErrStatusInvalid
 	}
+	if allowed, err := s.procurementWithinPurchaseWindow(procOrder); err != nil || !allowed {
+		return err
+	}
 	if procOrder.NextRetryAt != nil && time.Now().Before(*procOrder.NextRetryAt) {
 		if s.queue != nil {
 			return s.queue.EnqueueSubmit(procOrder.ID, time.Until(*procOrder.NextRetryAt))

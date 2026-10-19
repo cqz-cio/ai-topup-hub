@@ -21,6 +21,30 @@ import (
 	"github.com/dujiao-next/internal/upstream"
 )
 
+func TestPaidManualMappedOrderDoesNotCreateProcurement(t *testing.T) {
+	db := setupProcurementTestDB(t)
+	order := createProcTestOrder(t, db, "MANUAL-SUPPLIER-PAID", constants.OrderStatusPaid, constants.FulfillmentTypeManual)
+	if err := db.Create(&mappingdomain.Mapping{ConnectionID: 2, LocalProductID: order.Items[0].ProductID, UpstreamProductID: 66, IsActive: true}).Error; err != nil {
+		t.Fatal(err)
+	}
+	q := &workflowQueue{}
+	options := procurementOptionsForTest(db)
+	options.Queue = q
+	svc := procurementapp.NewService(options)
+	for i := 0; i < 2; i++ {
+		if err := svc.CreateForOrder(order.ID); err != nil {
+			t.Fatal(err)
+		}
+	}
+	var count int64
+	if err := db.Model(&procurementdomain.Order{}).Count(&count).Error; err != nil {
+		t.Fatal(err)
+	}
+	if count != 0 || len(q.submits) != 0 {
+		t.Fatal("manual mapped order initiated procurement")
+	}
+}
+
 type workflowQueue struct {
 	submits []uint
 	polls   []uint
@@ -68,7 +92,10 @@ func TestConfirmedBEP20PaymentAutomaticallyPurchasesAndDeliversSplitOrder(t *tes
 	options := procurementOptionsForTest(db)
 	options.Queue = q
 	options.Connections = procurementupstream.New(&acgProcurementProvider{adapter: adapter})
+	options.PurchaseWindow = &procurementdomain.PurchaseWindow{PaidAfter: time.Now().Add(-time.Minute)}
 	procurement := procurementapp.NewService(options)
+	// Mutating the caller's copy must not widen or close a running boundary.
+	options.PurchaseWindow.OrderIDFloor = parent.ID
 	payments := paymentapp.NewPaymentService(paymentapp.PaymentServiceOptions{OrderStore: ordergormstore.New(db, "test-guest-credential-secret-with-32-bytes"), PaymentStore: paymentgormstore.New(db, "test-guest-credential-secret-with-32-bytes"), ChannelStore: paymentgormstore.NewChannelStore(db)})
 	payments.SetProcurementService(procurement)
 	input := paymentapp.PaymentCallbackInput{PaymentID: payment.ID, OrderNo: parent.OrderNo, ChannelID: 1, Status: constants.PaymentStatusSuccess, Amount: parent.TotalAmount, Currency: "CNY", ProviderRef: "fixture-confirmed-chain-transfer"}

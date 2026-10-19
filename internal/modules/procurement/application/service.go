@@ -1,6 +1,9 @@
 package application
 
-import procurementcontract "github.com/dujiao-next/internal/modules/procurement/contract"
+import (
+	procurementcontract "github.com/dujiao-next/internal/modules/procurement/contract"
+	procurementdomain "github.com/dujiao-next/internal/modules/procurement/domain"
+)
 
 type Options struct {
 	Repository         procurementcontract.Repository
@@ -13,6 +16,7 @@ type Options struct {
 	DownstreamCallback procurementcontract.DownstreamCallbackEnqueuer
 	BotNotifier        procurementcontract.BotFulfillmentNotifier
 	Notifications      procurementcontract.FailureNotifier
+	PurchaseWindow     *procurementdomain.PurchaseWindow
 }
 
 type Service struct {
@@ -27,16 +31,22 @@ type Service struct {
 	botNotifier        procurementcontract.BotFulfillmentNotifier
 	notifications      procurementcontract.FailureNotifier
 	balanceNotifier    procurementcontract.BalanceNotifier
+	purchaseWindow     *procurementdomain.PurchaseWindow
 }
 
 var _ procurementcontract.UseCase = (*Service)(nil)
 
 func NewService(options Options) *Service {
+	if options.PurchaseWindow != nil {
+		window := *options.PurchaseWindow
+		options.PurchaseWindow = &window
+	}
 	return &Service{
 		procRepo: options.Repository, orderRepo: options.Orders,
 		mappingRepo: options.ProductMappings, skuMapRepo: options.SKUMappings,
 		connections: options.Connections, queue: options.Queue,
 		orderLifecycle: options.OrderLifecycle, downstreamCallback: options.DownstreamCallback,
 		botNotifier: options.BotNotifier, notifications: options.Notifications,
+		purchaseWindow: options.PurchaseWindow,
 	}
 }

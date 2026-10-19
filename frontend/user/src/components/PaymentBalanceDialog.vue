@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import SupportContacts from './SupportContacts.vue'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { AlertTriangle, MailCheck, Mail, Copy, X } from 'lucide-vue-next'
@@ -39,6 +40,7 @@ const focusConfirm = (event: Event) => { event.preventDefault(); confirmButton.v
           <span>{{ t(`paymentBalance.notice.${block?.notification_status || 'not_sent'}`) }}</span>
         </div>
         <div class="mt-4 flex flex-wrap items-center justify-between gap-2 rounded-xl bg-secondary px-4 py-3.5 text-sm"><span class="text-muted-foreground">{{ t('paymentBalance.contact') }}</span><strong class="select-all font-semibold">{{ contact }}</strong></div>
+        <SupportContacts />
         <p v-if="copyFailed" role="status" class="mt-2 text-xs text-muted-foreground">{{ t('paymentBalance.copyFailed') }}</p>
         <div class="mt-6 grid grid-cols-2 gap-3">
           <DialogClose as-child><Button ref="confirmButton" type="button" variant="outline" class="h-11">{{ t('paymentBalance.confirm') }}</Button></DialogClose>

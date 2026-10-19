@@ -7,6 +7,7 @@ import (
 	"time"
 
 	orderdomain "github.com/dujiao-next/internal/modules/order/domain"
+	settingsintegration "github.com/dujiao-next/internal/modules/settings/schema/integration"
 
 	walletapp "github.com/dujiao-next/internal/modules/wallet/application"
 	walletcontract "github.com/dujiao-next/internal/modules/wallet/contract"
@@ -25,23 +26,30 @@ func (s *Service) HandleOrderPaid(orderID uint) error {
 	if s == nil || s.repo == nil || orderID == 0 {
 		return nil
 	}
+	// Read settings before reserving the transaction connection. Settings use
+	// their own store, so reading them inside this transaction deadlocks a
+	// single-connection database pool (including when affiliates are disabled).
+	var setting settingsintegration.AffiliateSetting
+	if s.settings != nil {
+		var err error
+		setting, err = s.settings.GetAffiliateSetting()
+		if err != nil {
+			return err
+		}
+	}
 	return s.repo.WithinTransaction(func(repo affiliatecontract.Store) error {
 		bound := *s
 		bound.repo = repo
-		if err := bound.handlePaid(orderID); err != nil {
+		if err := bound.handlePaid(orderID, setting); err != nil {
 			return err
 		}
 		return repo.MarkCommissionProcessed(orderID)
 	})
 }
 
-func (s *Service) handlePaid(orderID uint) error {
-	if orderID == 0 || s.repo == nil || s.settings == nil {
+func (s *Service) handlePaid(orderID uint, setting settingsintegration.AffiliateSetting) error {
+	if orderID == 0 || s.repo == nil {
 		return nil
-	}
-	setting, err := s.settings.GetAffiliateSetting()
-	if err != nil {
-		return err
 	}
 	if !setting.Enabled || setting.CommissionRate <= 0 {
 		return nil

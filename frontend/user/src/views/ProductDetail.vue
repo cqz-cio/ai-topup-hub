@@ -59,7 +59,7 @@
                   <h2>{{ t('productDetail.description') }}</h2>
                   <p>{{ getLocalizedText(product.description) }}</p>
                 </section>
-                <ProductRedemptionGuide :slug="product.slug" class="product-redemption" />
+                <ProductPurchaseGuide :slug="product.slug" hide-redemption class="product-conditions product-conditions-desktop" />
               </div>
             </div>
 
@@ -104,7 +104,8 @@
                   </Badge>
                 </div>
 
-                <div class="product-price border-b" ref="priceSection">
+                <div class="product-price-options">
+                <div class="product-price" ref="priceSection">
                   <div class="mb-3 flex flex-wrap items-center gap-2">
                     <span class="text-sm text-muted-foreground">{{ t('products.price') }}</span>
                     <Badge v-if="(selectedSku && hasSkuPromotionPrice(selectedSku)) || (!selectedSku && hasPromotionPrice(product))" variant="danger">
@@ -199,32 +200,6 @@
                   </div>
                 </div>
 
-                <!-- 批发价规则展示 -->
-                <div v-if="selectedSkuWholesaleRules.length" class="mb-8 rounded-xl border border-emerald-200 bg-emerald-50/50 px-4 py-3 dark:border-emerald-800/50 dark:bg-emerald-950/20">
-                  <h2 class="mb-2 flex items-center gap-1.5 text-sm font-bold text-emerald-700 dark:text-emerald-300">
-                    {{ t('products.wholesaleRulesTitle') }}
-                  </h2>
-                  <div class="flex flex-wrap gap-2">
-                    <Badge v-for="tier in selectedSkuWholesaleRules" :key="`${tier.sku_id || tier.sku_code || 'all'}-${tier.min_quantity}`" variant="success" class="rounded-full px-3 py-1 font-medium">
-                      {{ formatWholesaleTier(tier) }}
-                    </Badge>
-                  </div>
-                </div>
-
-                <!-- 活动规则展示 -->
-                <div v-if="hasPromotionRules(product)" class="mb-8 rounded-xl border border-orange-200 dark:border-orange-800/50 bg-orange-50/50 dark:bg-orange-950/20 px-4 py-3">
-                  <h2 class="mb-2 text-sm font-bold text-orange-700 dark:text-orange-300 flex items-center gap-1.5">
-                    <Tag class="w-4 h-4" />
-                    {{ t('products.promotionRulesTitle') }}
-                  </h2>
-                  <ul class="space-y-1">
-                    <li v-for="rule in getPromotionRules(product)" :key="rule.id" class="text-sm text-orange-600 dark:text-orange-300/90 flex items-center gap-1.5">
-                      <span class="w-1 h-1 rounded-full bg-orange-400 dark:bg-orange-500 shrink-0"></span>
-                      <span>{{ formatPromotionRule(rule) }}</span>
-                    </li>
-                  </ul>
-                </div>
-
                 <div v-if="activeSkus.length" class="product-skus">
                   <h2 class="mb-3 text-sm font-bold uppercase tracking-widest text-muted-foreground">
                     {{ t('productDetail.skuTitle') }}
@@ -255,10 +230,41 @@
                     {{ t('productDetail.skuRequired') }}
                   </p>
                 </div>
+                </div>
+
+                <!-- 批发价规则展示 -->
+                <div v-if="selectedSkuWholesaleRules.length" class="mb-8 rounded-xl border border-emerald-200 bg-emerald-50/50 px-4 py-3 dark:border-emerald-800/50 dark:bg-emerald-950/20">
+                  <h2 class="mb-2 flex items-center gap-1.5 text-sm font-bold text-emerald-700 dark:text-emerald-300">
+                    {{ t('products.wholesaleRulesTitle') }}
+                  </h2>
+                  <div class="flex flex-wrap gap-2">
+                    <Badge v-for="tier in selectedSkuWholesaleRules" :key="`${tier.sku_id || tier.sku_code || 'all'}-${tier.min_quantity}`" variant="success" class="rounded-full px-3 py-1 font-medium">
+                      {{ formatWholesaleTier(tier) }}
+                    </Badge>
+                  </div>
+                </div>
+
+                <!-- 活动规则展示 -->
+                <div v-if="hasPromotionRules(product)" class="mb-8 rounded-xl border border-orange-200 dark:border-orange-800/50 bg-orange-50/50 dark:bg-orange-950/20 px-4 py-3">
+                  <h2 class="mb-2 text-sm font-bold text-orange-700 dark:text-orange-300 flex items-center gap-1.5">
+                    <Tag class="w-4 h-4" />
+                    {{ t('products.promotionRulesTitle') }}
+                  </h2>
+                  <ul class="space-y-1">
+                    <li v-for="rule in getPromotionRules(product)" :key="rule.id" class="text-sm text-orange-600 dark:text-orange-300/90 flex items-center gap-1.5">
+                      <span class="w-1 h-1 rounded-full bg-orange-400 dark:bg-orange-500 shrink-0"></span>
+                      <span>{{ formatPromotionRule(rule) }}</span>
+                    </li>
+                  </ul>
+                </div>
+
+
 
               </div>
 
-              <ProductPurchaseGuide :slug="product.slug" hide-redemption class="product-conditions" />
+              <ProductPurchaseGuide :slug="product.slug" hide-redemption class="product-conditions product-conditions-mobile" />
+
+              <ProductRedemptionGuide :slug="product.slug" class="product-delivery-note" />
 
               <!-- Quantity Selector -->
                 <div class="product-quantity">
@@ -332,9 +338,7 @@
             <span class="w-1.5 h-8 bg-primary rounded-full"></span>
             {{ t('productDetail.details') }}
           </h2>
-          <div v-html="processHtmlForDisplay(productRedemptionContent(getLocalizedText(product.content), product.slug))"
-            class="prose prose-gray dark:prose-invert prose-lg max-w-none theme-prose">
-          </div>
+          <ProductDetailContent :html="getLocalizedText(product.content)" />
         </div>
 
         <!-- Related Posts -->
@@ -421,14 +425,13 @@
 <script setup lang="ts">
 import ProductPurchaseGuide from '../components/product/ProductPurchaseGuide.vue'
 import ProductRedemptionGuide from '../components/product/ProductRedemptionGuide.vue'
-import { productRedemptionContent } from '../utils/productPurchaseGuide'
 import ProductInvoiceNotice from '../components/commerce/ProductInvoiceNotice.vue'
 import CheckoutSteps from '../components/checkout/CheckoutSteps.vue'
 import { ref, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ArrowLeft, Lock, Minus, Pencil, Plus, RotateCw, Tag, UserPlus, Zap } from 'lucide-vue-next'
 import { getImageUrl } from '../utils/image'
-import { processHtmlForDisplay } from '../utils/content'
+import ProductDetailContent from '../components/product/ProductDetailContent.vue'
 import { useProductDetail } from '../composables/useProductDetail'
 import ProductImageGallery from '../components/product/ProductImageGallery.vue'
 import ProductMobileBar from '../components/product/ProductMobileBar.vue'
@@ -496,22 +499,27 @@ onUnmounted(() => {
 
 <style scoped>
 .product-overview { margin-bottom: 28px; }
-.product-overview-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; align-items: start; }
+.product-overview-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; align-items: stretch; }
 .product-media-panel { display: contents; }
 .product-media-panel :deep(.product-image-gallery) { min-width: 0; padding: 12px; border: 1px solid var(--ui-border); border-radius: 16px; background: var(--ui-bg-elevated); }
 .product-media-copy { order: 2; min-width: 0; display: grid; gap: 20px; padding: 20px; border: 1px solid var(--ui-border); border-radius: 16px; background: var(--ui-bg-elevated); }
 .product-description h2 { margin-bottom: 10px; font-size: 15px; line-height: 1.5; font-weight: 700; }
 .product-description p { font-size: 15px; line-height: 1.8; color: var(--ui-text-muted); overflow-wrap: anywhere; }
-.product-redemption { border-top: 1px solid var(--ui-border); padding-top: 12px; }
+.product-delivery-note { margin-bottom: 20px; padding: 14px 0; border-bottom: 1px solid var(--ui-border); }
+.product-conditions-desktop { display: none; }
 .product-purchase-panel { order: 1; min-width: 0; padding: 20px; border: 1px solid var(--ui-border); border-radius: 16px; background: var(--ui-bg-elevated); }
 .product-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; margin-bottom: 18px; }
 .product-meta > div { margin: 0; }
 .product-purchase-summary > .mb-4 { margin-bottom: 12px; }
 .product-purchase-summary > .mb-6 { margin-bottom: 20px; }
 .product-title { margin-bottom: 16px; font-size: 25px; font-weight: 750; line-height: 1.3; letter-spacing: -.025em; overflow-wrap: anywhere; }
-.product-price { margin-bottom: 20px; padding-bottom: 20px; }
-.product-price :deep(.theme-price-lg) { font-size: clamp(28px, 6vw, 38px); overflow-wrap: anywhere; }
-.product-skus { margin-bottom: 20px; }
+.product-price-options { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .85fr); gap: 16px; align-items: start; padding-bottom: 20px; margin-bottom: 4px; border-bottom: 1px solid var(--ui-border); }
+.product-price, .product-skus { min-width: 0; }
+.product-price :deep(.theme-price-lg) { font-size: clamp(23px, 5vw, 32px); line-height: 1.3; }
+.product-skus > div { grid-template-columns: minmax(0, 1fr); }
+.product-skus button { width: 100%; overflow-wrap: anywhere; }
+.product-price :deep(.theme-price-lg) { font-size: clamp(23px, 5vw, 32px); overflow-wrap: anywhere; }
+.product-skus { margin-bottom: 0; }
 .product-conditions { margin-bottom: 16px; padding: 14px; border: 0; border-radius: 10px; }
 .product-conditions :deep(ul) { margin-top: 8px; }
 .product-conditions :deep(li + li) { margin-top: 6px; }
@@ -526,16 +534,22 @@ onUnmounted(() => {
   .product-detail-page { padding-top: 106px; }
   .product-detail-page :deep(nav[aria-label]) { margin-bottom: 20px; }
   .product-detail-page :deep(.commerce-steps) { padding-top: 12px; padding-bottom: 12px; margin-bottom: 20px; }
-  .product-overview-layout { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 20px; }
-  .product-media-panel { display: flex; min-width: 0; flex-direction: column; gap: 24px; padding: 16px; border: 1px solid var(--ui-border); border-radius: 16px; background: var(--ui-bg-elevated); }
+  .product-overview-layout { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; }
+  .product-media-panel { display: flex; min-width: 0; flex-direction: column; gap: 20px; padding: 20px; border: 1px solid var(--ui-border); border-radius: 16px; background: var(--ui-bg-elevated); }
   .product-media-panel :deep(.product-image-gallery) { padding: 0; border: 0; border-radius: 0; }
   .product-media-copy { order: initial; padding: 0 0 8px; border: 0; border-radius: 0; }
-  .product-purchase-panel { order: initial; padding: 24px; }
+  .product-purchase-panel { order: initial; padding: 24px; display: flex; flex-direction: column; }
+  .product-quantity { margin-top: auto; padding-top: 12px; }
+  .product-conditions-desktop { display: block; margin-bottom: 0; }
+  .product-conditions-mobile { display: none; }
   .product-title { font-size: 30px; }
-  .product-price :deep(.theme-price-lg) { font-size: 38px; }
+  .product-price :deep(.theme-price-lg) { font-size: 32px; }
 }
 @media (min-width: 1440px) {
   .product-overview-layout { gap: 24px; }
   .product-title { font-size: 32px; }
+}
+@media (max-width: 359px) {
+  .product-price-options { grid-template-columns: minmax(0, 1fr); gap: 20px; }
 }
 </style>

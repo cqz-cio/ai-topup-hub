@@ -1,15 +1,17 @@
 <template>
-  <section v-if="credits.length" class="codex-credits" :aria-label="copy.heading">
-    <header class="credits-heading">
+  <section v-if="credits.length" class="codex-credits" :class="{ 'catalog-credits': catalog }" :aria-label="copy.heading">
+    <header v-if="!catalog" class="credits-heading">
       <div><h2>{{ copy.heading }}</h2><p>{{ copy.subtitle }}</p></div>
       <span class="credits-count">{{ credits.length }} {{ copy.count }}</span>
     </header>
     <div class="credits-notice">
       <Info aria-hidden="true" :size="17" />
-      <div><strong>{{ copy.noticeTitle }}</strong><p>{{ copy.notice }}</p></div>
+      <div><strong>{{ copy.noticeTitle }}</strong><p>{{ copy.notice }}<span v-if="catalog">{{ ' ' + copy.preflight }}</span></p></div>
     </div>
-    <div class="credits-grid">
-      <article v-for="product in credits" :key="product.id" class="credits-card" :class="{ 'is-sold-out': isSoldOut(product) }">
+    <div :class="catalog ? 'catalog-grid' : 'credits-grid'">
+      <template v-for="product in credits" :key="product.id">
+      <slot name="card" :product="product">
+      <article class="credits-card" :class="{ 'is-sold-out': isSoldOut(product) }">
         <RouterLink :to="`/products/${product.slug}`" class="credits-cover" :aria-label="getLocalizedText(product.title)">
           <div class="cover-mark">CODEX <span aria-hidden="true">&gt;_</span></div>
           <div class="cover-value">
@@ -38,15 +40,18 @@
           </div>
         </div>
       </article>
+      </slot>
+      </template>
     </div>
     <footer class="credits-help">
       <div><strong>{{ copy.redeemTitle }}</strong><p>{{ copy.redeem }}</p></div>
-      <div><strong>{{ copy.helpTitle }}</strong><p>{{ copy.help }}</p></div>
+      <div><strong>{{ copy.helpTitle }}</strong><p>{{ copy.help }}</p><SupportContacts /></div>
     </footer>
   </section>
 </template>
 
 <script setup lang="ts">
+import SupportContacts from '../SupportContacts.vue'
 import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useI18n } from 'vue-i18n'
@@ -55,7 +60,7 @@ import { useLocalized, useProductLabels } from '../../composables/useProduct'
 import { codexCreditPoints, exactCreditStock, splitCodexCredits } from '../../utils/codexCredits'
 import { codexCreditsCopy } from '../../i18n/codexCredits'
 
-const props = defineProps<{ products: any[] }>()
+const props = defineProps<{ products: any[]; catalog?: boolean }>()
 const { locale } = useI18n()
 const { getLocalizedText, siteCurrency, formatPrice } = useLocalized()
 const { getPurchaseTypeLabel, getStockStatusLabel, isSoldOut, hasPromotionPrice, getPromotionPriceAmount } = useProductLabels()
@@ -86,4 +91,8 @@ const credits = computed(() => splitCodexCredits(props.products).credits)
 @container(min-width:1150px){.credits-cover{height:209px}.cover-number{font-size:74px}.credits-content{padding:21px}.credits-content h3{font-size:19px}.credits-description{font-size:12px}.credits-grid{gap:22px}}
 @container(max-width:780px){.credits-cover{padding:16px}.cover-number{font-size:50px}.credits-content{padding:15px}.credits-content h3{font-size:15px}.credits-chips{font-size:9px}.credits-chips>span{padding:3px 5px}.credits-chips .credits-stock{margin-left:0}.cover-brand{display:none}.credits-grid{gap:13px}}
 @media(max-width:760px){.credits-heading{margin-bottom:13px}.credits-heading h2{font-size:22px}.credits-heading p{font-size:10px}.credits-count{font-size:9px;padding:5px 7px}.credits-notice{font-size:11px;padding:12px;line-height:1.8;margin-bottom:17px;gap:8px}.credits-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.credits-cover{height:143px;padding:13px 12px}.cover-mark{font-size:9px;letter-spacing:1px}.cover-mark>span{font-size:18px}.cover-number{font-size:40px;letter-spacing:-2px}.cover-number.large-amount{font-size:34px}.cover-unit{font-size:8px;letter-spacing:2px}.cover-bottom{font-size:8px}.credits-content{padding:12px}.credits-channel{font-size:8px}.credits-content h3{font-size:13px;margin:6px 0 9px;letter-spacing:-.3px;min-height:36px}.credits-chips{gap:4px;font-size:8px}.credits-chips>span{padding:3px 4px}.credits-chips .credits-stock{margin-left:0;display:block;flex:1 0 100%;font-size:9px;padding-left:0}.credits-description{font-size:10px;line-height:1.7;margin:9px 0 12px;min-height:34px}.credits-buy{align-items:flex-start;flex-direction:column;gap:10px;padding-top:10px}.credits-price strong{font-size:19px}.credits-details{width:100%;font-size:10px;padding:8px}.credits-price small{font-size:8px}.credits-help{flex-direction:column;gap:8px;font-size:10px;margin-top:19px}.credits-help>div:first-child{max-width:none}}
+.catalog-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+@media(max-width:1050px){.catalog-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:767px){.catalog-grid{gap:12px}}
+@media(max-width:479px){.catalog-grid{grid-template-columns:minmax(0,1fr)}}
 </style>

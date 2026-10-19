@@ -26,8 +26,8 @@ type SubmissionClaimer interface {
 
 // RecoveryReader locates durable paid orders and work lost during queue outages.
 type RecoveryReader interface {
-	FindPaidOrdersMissingProcurement(limit int) ([]uint, error)
-	ListRecoverable(before time.Time, limit int) ([]procurementdomain.Order, error)
+	FindPaidOrdersMissingProcurement(limit int, window *procurementdomain.PurchaseWindow) ([]uint, error)
+	ListRecoverable(before time.Time, limit int, window *procurementdomain.PurchaseWindow) ([]procurementdomain.Order, error)
 }
 
 type OrderRepository interface {

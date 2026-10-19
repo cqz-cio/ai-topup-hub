@@ -1,0 +1,21 @@
+[Unit]
+Description=86GameStore manual inventory synchronization without purchases
+After=network-online.target zhixiang-shop.service
+Wants=network-online.target
+Requires=zhixiang-shop.service
+
+[Service]
+Type=oneshot
+User=zhixiang
+Group=zhixiang
+WorkingDirectory=/srv/zhixiang/shared
+ExecStart=/usr/bin/python3 /srv/zhixiang/shared/scripts/sync-86gamestore-stock.py --base-url http://127.0.0.1 --credentials-file /srv/zhixiang/shared/stock-sync.credentials.json --database /srv/zhixiang/shared/db/shop.db --report-file /srv/zhixiang/shared/reports/merchant26113-stock-sync.json
+Environment=TZ=Asia/Shanghai
+TimeoutStartSec=180
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/srv/zhixiang/shared/db /srv/zhixiang/shared/reports
+

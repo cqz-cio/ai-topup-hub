@@ -96,9 +96,13 @@ func (s *WriteService) Update(id string, input CreateProductInput) (*productdoma
 	if fulfillmentType == "" {
 		return nil, productcontract.ErrFulfillmentInvalid
 	}
-	// 对接商品的真实交付类型必须保持 upstream，后台返回的 auto/manual 仅用于展示。
+	// 保留已配置的对接交付方式。自动采购商品的 auto/manual 返回值只是展示；
+	// 人工处理的对接商品也不能因编辑名称、价格或上架而重新开启自动采购。
 	if product.IsMapped {
 		fulfillmentType = constants.FulfillmentTypeUpstream
+		if product.FulfillmentType == constants.FulfillmentTypeManual {
+			fulfillmentType = constants.FulfillmentTypeManual
+		}
 	}
 	product.FulfillmentType = fulfillmentType
 	if fulfillmentType == constants.FulfillmentTypeManual {

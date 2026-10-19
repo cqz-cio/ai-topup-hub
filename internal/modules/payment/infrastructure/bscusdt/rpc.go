@@ -27,6 +27,7 @@ var addressTopic = chain.AddressTopic
 
 type RPC struct {
 	endpoint        string
+	logsEndpoint    string
 	receiptEndpoint string
 	client          *http.Client
 	network         chain.Network
@@ -44,14 +45,21 @@ func NewRPCWithReceiptEndpoint(endpoint, receiptEndpoint string) (*RPC, error) {
 }
 
 func NewRPCForNetwork(endpoint, receiptEndpoint, networkName string) (*RPC, error) {
+	return NewRPCWithEndpoints(endpoint, "", receiptEndpoint, networkName)
+}
+
+// NewRPCWithEndpoints supports a separate event provider when the header and
+// receipt node does not serve historical logs. Every provider is validated
+// against the same chain and token; the scanner still verifies each event.
+func NewRPCWithEndpoints(endpoint, logsEndpoint, receiptEndpoint, networkName string) (*RPC, error) {
 	network, err := chain.ResolveNetwork(networkName)
 	if err != nil {
 		return nil, err
 	}
-	if !validEndpoint(endpoint) || (receiptEndpoint != "" && !validEndpoint(receiptEndpoint)) {
+	if !validEndpoint(endpoint) || (logsEndpoint != "" && !validEndpoint(logsEndpoint)) || (receiptEndpoint != "" && !validEndpoint(receiptEndpoint)) {
 		return nil, ErrRPC
 	}
-	return &RPC{endpoint: endpoint, receiptEndpoint: receiptEndpoint, network: network, client: &http.Client{Timeout: 12 * time.Second, CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}}, nil
+	return &RPC{endpoint: endpoint, logsEndpoint: logsEndpoint, receiptEndpoint: receiptEndpoint, network: network, client: &http.Client{Timeout: 12 * time.Second, CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}}, nil
 }
 
 func validEndpoint(endpoint string) bool {
@@ -60,6 +68,9 @@ func validEndpoint(endpoint string) bool {
 }
 func (r *RPC) call(ctx context.Context, method string, params interface{}, out interface{}) error {
 	endpoint := r.endpoint
+	if method == "eth_getLogs" && r.logsEndpoint != "" {
+		endpoint = r.logsEndpoint
+	}
 	if method == "eth_getTransactionReceipt" && r.receiptEndpoint != "" {
 		endpoint = r.receiptEndpoint
 	}
@@ -76,6 +87,7 @@ func (r *RPC) callEndpoint(ctx context.Context, endpoint, method string, params 
 		return ErrRPC
 	}
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("User-Agent", "PiStarPaymentMonitor/1.0")
 	resp, err := r.client.Do(req)
 	if err != nil {
 		return ErrRPC
@@ -103,11 +115,15 @@ func (r *RPC) callEndpoint(ctx context.Context, endpoint, method string, params 
 	return nil
 }
 func (r *RPC) Check(ctx context.Context) error {
-	if err := r.checkEndpoint(ctx, r.endpoint); err != nil {
-		return err
-	}
-	if r.receiptEndpoint != "" && r.receiptEndpoint != r.endpoint {
-		return r.checkEndpoint(ctx, r.receiptEndpoint)
+	seen := make(map[string]bool)
+	for _, endpoint := range []string{r.endpoint, r.logsEndpoint, r.receiptEndpoint} {
+		if endpoint == "" || seen[endpoint] {
+			continue
+		}
+		seen[endpoint] = true
+		if err := r.checkEndpoint(ctx, endpoint); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -150,9 +166,32 @@ func (r *RPC) Header(ctx context.Context, tag string) (*chain.Header, error) {
 	return &h, nil
 }
 func (r *RPC) Logs(ctx context.Context, from, to uint64, recipient string) ([]chain.Log, error) {
+	if to < from {
+		return nil, ErrRPC
+	}
 	var logs []chain.Log
-	err := r.call(ctx, "eth_getLogs", []interface{}{map[string]interface{}{"fromBlock": hexBlock(from), "toBlock": hexBlock(to), "address": r.network.Token, "topics": []interface{}{TransferTopic, nil, addressTopic(recipient)}}}, &logs)
-	return logs, err
+	for start := from; ; {
+		end := to
+		// Public event providers may accept only 50 blocks per request.
+		if to-start >= 50 {
+			end = start + 49
+		}
+		var page []chain.Log
+		if err := r.call(ctx, "eth_getLogs", []interface{}{map[string]interface{}{"fromBlock": hexBlock(start), "toBlock": hexBlock(end), "address": r.network.Token, "topics": []interface{}{TransferTopic, nil, addressTopic(recipient)}}}, &page); err != nil {
+			return nil, err // Never expose a partial scan as a successful page.
+		}
+		for _, event := range page {
+			block, err := quantity(event.BlockNumber)
+			if err != nil || block < start || block > end {
+				return nil, ErrRPC
+			}
+		}
+		logs = append(logs, page...)
+		if end == to {
+			return logs, nil
+		}
+		start = end + 1
+	}
 }
 func (r *RPC) Receipt(ctx context.Context, hash string) (*chain.Receipt, error) {
 	var receipt chain.Receipt

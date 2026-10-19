@@ -16,11 +16,13 @@ import (
 
 // Service 异步队列服务
 type Service struct {
-	name      string
-	server    *asynq.Server
-	mux       *asynq.ServeMux
-	scheduler *asynq.Scheduler
-	consumer  *jobconsumer.Consumer
+	name               string
+	server             *asynq.Server
+	mux                *asynq.ServeMux
+	scheduler          *asynq.Scheduler
+	consumer           *jobconsumer.Consumer
+	notificationServer *asynq.Server
+	notificationMux    *asynq.ServeMux
 }
 
 // NewService 创建异步队列服务
@@ -40,13 +42,21 @@ func NewStorefrontService(cfg *config.QueueConfig, consumer *jobconsumer.Consume
 	return newService(cfg, consumer, "storefront")
 }
 
-func newService(cfg *config.QueueConfig, consumer *jobconsumer.Consumer, profile string) (*Service, error) {
+func newService(cfg *config.QueueConfig, consumer *jobconsumer.Consumer, profile string) (service *Service, err error) {
 	if cfg == nil || !cfg.Enabled {
 		return nil, errors.New("queue disabled")
 	}
 	if consumer == nil {
 		return nil, errors.New("consumer is nil")
 	}
+	defer func() {
+		if service != nil && err == nil {
+			mailOpt, mailCfg := queue.BuildNotificationServerConfig(cfg)
+			service.notificationServer = asynq.NewServer(mailOpt, mailCfg)
+			service.notificationMux = asynq.NewServeMux()
+			consumer.RegisterNotifications(service.notificationMux)
+		}
+	}()
 	opt, serverCfg := queue.BuildServerConfig(cfg)
 	server := asynq.NewServer(opt, serverCfg)
 	mux := asynq.NewServeMux()
@@ -178,6 +188,12 @@ func (s *Service) Start(ctx context.Context) error {
 	if s == nil || s.server == nil || s.mux == nil {
 		return errors.New("worker not initialized")
 	}
+	if s.notificationServer != nil {
+		if err := s.notificationServer.Start(s.notificationMux); err != nil {
+			return err
+		}
+		defer s.notificationServer.Shutdown()
+	}
 	if s.scheduler != nil {
 		if err := s.scheduler.Start(); err != nil {
 			logger.Warnw("scheduler_start_failed", "error", err)
@@ -196,5 +212,8 @@ func (s *Service) Stop(ctx context.Context) error {
 		s.scheduler.Shutdown()
 	}
 	s.server.Shutdown()
+	if s.notificationServer != nil {
+		s.notificationServer.Shutdown()
+	}
 	return nil
 }

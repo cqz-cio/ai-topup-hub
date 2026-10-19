@@ -52,3 +52,23 @@ test('failed search pages fail the whole result instead of reporting a partial c
     return { status_code: 0, data: [products[0]!], pagination: { total_page: 2 } }
   }, '20x', 1, 12), /Network unavailable/)
 })
+
+test('corrected 10x and 25x tiers support aliases and remain distinct from 5x', () => {
+  const current = [
+    { title: 'ChatGPT Pro 10x 开通｜菲区' },
+    { title: 'ChatGPT Pro 10x 续费｜菲区' },
+    { title: 'ChatGPT Pro 25x 开通｜菲区' },
+    { title: 'ChatGPT Pro 25x 开通｜智利' },
+    { title: 'ChatGPT Pro 5x 开通｜智利' },
+    { title: 'Codex 25000 点数充值' },
+  ]
+  for (const query of ['10x', '１０Ｘ', '10 X', '10×', '10倍', 'Pro 10']) {
+    assert.equal(current.filter(product => matchesProductSearch(product, query)).length, 2, query)
+  }
+  for (const query of ['25x', '２５Ｘ', '25 X', '25×', '25倍', 'Pro 25']) {
+    assert.equal(current.filter(product => matchesProductSearch(product, query)).length, 2, query)
+  }
+  assert.equal(current.filter(product => matchesProductSearch(product, '25x 智利')).length, 1)
+  assert.equal(current.filter(product => matchesProductSearch(product, '10x 续费')).length, 1)
+  assert.equal(current.filter(product => matchesProductSearch(product, '5x')).length, 1)
+})

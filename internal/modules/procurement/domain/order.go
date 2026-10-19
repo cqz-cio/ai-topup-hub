@@ -72,6 +72,7 @@ type LocalOrder struct {
 	UserID         uint             `json:"user_id,omitempty"`
 	GuestEmail     string           `json:"guest_email,omitempty"`
 	Status         string           `json:"status"`
+	PaidAt         *time.Time       `json:"-"`
 	Currency       string           `json:"currency"`
 	TotalAmount    money.Amount     `json:"total_amount"`
 	RefundedAmount money.Amount     `json:"refunded_amount"`

@@ -60,6 +60,24 @@ func readinessItem(product uint, cost string, quantity int) pd.LocalOrderItem {
 	return pd.LocalOrderItem{ProductID: product, CostPrice: money.FromDecimal(decimal.RequireFromString(cost)), Quantity: quantity, FulfillmentType: constants.FulfillmentTypeUpstream}
 }
 
+func TestManualSupplierDoesNotRequireFundingAlongsideAutomaticSupplier(t *testing.T) {
+	manual := readinessItem(2, "50", 1)
+	manual.FulfillmentType = constants.FulfillmentTypeManual
+	automaticBalance := &readinessBalance{amount: "100", currency: "CNY"}
+	manualBalance := &readinessBalance{amount: "0", currency: "CNY"}
+	order := &pd.LocalOrder{Currency: "CNY", Children: []pd.LocalOrder{
+		{Currency: "CNY", Items: []pd.LocalOrderItem{readinessItem(1, "10", 1)}},
+		{Currency: "CNY", Items: []pd.LocalOrderItem{manual}},
+	}}
+	svc := NewService(Options{Orders: readinessOrders{order: order}, ProductMappings: readinessMappings{1: 1, 2: 2}, Connections: readinessConnections{1: automaticBalance, 2: manualBalance}})
+	if err := svc.CheckPaymentBalance(context.Background(), 1); err != nil {
+		t.Fatal(err)
+	}
+	if automaticBalance.calls != 1 || manualBalance.calls != 0 {
+		t.Fatal("manual supplier balance was queried or first supplier check skipped")
+	}
+}
+
 func TestPaymentBalanceAggregatesLeavesPerSupplier(t *testing.T) {
 	for _, tc := range []struct{ name, balance, code string }{
 		{"insufficient", "119.99", pc.BalanceInsufficient}, {"exact", "120.00", ""}, {"surplus", "120.01", ""},

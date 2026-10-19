@@ -102,7 +102,7 @@ func (s *Service) NotifyBalanceShortage(ctx context.Context, connectionID uint, 
 			"occurred_at": time.Now().In(time.FixedZone("CST", 8*3600)).Format("2006-01-02 15:04:05 -0700"),
 		},
 	}
-	if err := s.queueClient.EnqueueNotificationDispatch(payload, 0); err != nil {
+	if err := s.queueClient.EnqueueNotificationDispatch(payload, 3); err != nil {
 		_ = s.balanceAlertStore().Put(ctx, key, "failed", time.Minute)
 		return "failed"
 	}
@@ -145,7 +145,9 @@ func (s *Service) dispatchBalanceAlert(ctx context.Context, setting settingsmess
 	default:
 		status = "failed"
 	}
-	// Each attempt is logged. A later customer retry can queue a new incident
-	// after the cooldown; never retry a successful recipient under a new ID here.
+	// Retry the same incident promptly, skipping recipients already accepted.
+	if succeeded < len(setting.Channels.Email.Recipients) {
+		return contract.ErrSendFailed
+	}
 	return nil
 }
