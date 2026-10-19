@@ -325,3 +325,10 @@ final result: passed
 最终构建 `work/codex-runtime/thin-glass-20261019/built-desktop.png` 与正式截图 `work/codex-runtime/thin-glass-20261019/production-desktop.png` 均以 1821×864 与日常及批准图核验。构建另外检查 1280/390/320px，正式检查 390/320px 和深色；当前 blur(3px)、不透明内容及反光层均生效。正式 7 项页面检查通过，实际库存按正式数据展示，售价与后端配置指纹一致。
 
 final result: passed
+
+
+## 水母动态正式验收 20261019-163756
+
+以日常批准画面为准，最终构建与正式站按 1920×1080 对照；手机检查 390×844 和 320×740。人物保留站位，水母运动持续变化，背景白色罩层及卡片 blur(3px) 一致。生产截图和浏览器记录位于 `work/codex-runtime/jellyfishing-release-20261019/`。6 项构建与 7 项正式浏览器检查通过，无控制台错误或横向溢出。
+
+final result: passed
