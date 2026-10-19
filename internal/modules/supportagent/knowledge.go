@@ -119,7 +119,7 @@ func baseSources(locale string) []Source {
 		{"guide:purchase", "本站提供 GPT 订阅类、Codex 点数类及 Gemini 等商品；必须区分商品和用途，不把 Codex 点数当 Plus/Pro 订阅。先了解用户用途、已有订阅及商品条件再推荐；不强制用户回复序号。购买前核对当前商品详情、账号条件、质保与库存，结账显示最终售价。不同渠道和套餐不能互相套用条件。", []Link{{pick(locale, "查看商品", "Browse products", "查看商品"), "/products"}}},
 		{"guide:redeem", "购买并付款后，在该笔订单交付说明领取卡密或链接；从该订单的兑换入口操作，按页面要求完成资格预检和提交，再在兑换页确认结果。售前和本客服都不提供具体兑换网址。订单付款、商城发货、兑换成功是不同阶段，不能互相推断。iOS 订阅充值可能覆盖当前套餐且不叠加剩余时长，必须核对该商品明确条件。Gemini、DEMO 不套用 GPT 的兑换地址；Codex 点数不延长 Plus/Pro 订阅。订单已付款但没有交付、兑换失败或结果不变时先询问用户看到的提示（隐藏敏感信息），无法确认就联系人工。不要要求用户在聊天中提供账号密码、登录 token、完整卡密或支付信息。", []Link{{pick(locale, "我的订单", "My orders", "我的訂單"), "/me/orders"}, {pick(locale, "游客查单", "Guest orders", "訪客查單"), "/guest/orders"}}},
 		{"guide:wallet", "商城钱包余额用于本站消费，与 ChatGPT/Codex/Gemini 账号内的权益或点数不同。商城钱包在个人中心的我的钱包进行充值，是否到账以钱包流水为准。本客服无法读取钱包余额或流水。", []Link{{pick(locale, "我的钱包", "My wallet", "我的錢包"), "/me/wallet"}}},
-		{"guide:payment", "付款页列出该订单当前可用渠道、实付金额及手续费。已有微信、USDT 支付的操作指引，但不能承诺每笔订单都有所有渠道。USDT 必须核对网络、地址和精确到账金额，提现费用另付；付款页有币安/欧易教程。以付款页为准，不在聊天生成收款地址、二维码或支付链接，不诱导重复付款。无法核对是否到账；异常需人工核查。", nil},
+		{"guide:payment", strings.Join([]string{policy.Rules["payment_methods"], policy.Rules["payment_fee"], policy.Rules["payment_guides"]}, "\n\n"), paymentGuideLinks()},
 		{"guide:partners", "推广返利在个人中心查看当前规则与记录；没有提供返利比例、结算周期、可提现金额等具体数据，不允许猜测或承诺。开分店可在个人中心提交分销申请，仍需管理员审核；开通费用、域名和合作细则询问人工。", nil},
 		{"guide:human", "人工客服微信 Cqz0924ttxk、QQ 1669268759、Telegram @czq_piestar。小窗的联系人工按钮可查看。退款、重发、异常订单、资格不确定等交由人工；不承诺一定退款、永久质保或已经完成操作。", nil},
 	}

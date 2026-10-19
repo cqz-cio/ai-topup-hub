@@ -124,6 +124,15 @@ func unknown(locale string) Reply {
 	return r
 }
 
+func paymentQuestion(message string) bool {
+	return contains(message, "付款方式", "支付方式", "支付渠道", "付款渠道", "怎么付款", "如何付款", "怎么支付", "如何支付", "怎么付", "手续费", "手續費", "实付", "實付", "usdt", "trc20", "bep20", "plasma", "币安", "欧易", "支付宝", "payment methods", "payment fee") ||
+		(contains(message, "微信", "wechat") && contains(message, "支付", "付款", "扫码", "能", "可以", "支持", "fee"))
+}
+
+func paymentGuideLinks() []Link {
+	return []Link{{Label: "币安 USDT 付款教程", To: "/blog/binance-usdt-payment-guide"}, {Label: "欧易 USDT 付款教程", To: "/blog/okx-usdt-payment-guide"}}
+}
+
 func businessAnswer(in chatInput, state *BusinessState) Reply {
 	m := strings.ToLower(strings.TrimSpace(in.Message))
 	if contains(m, "取消试算", "取消試算", "重新开始", "重新開始", "cancel") {
@@ -175,7 +184,7 @@ func businessAnswer(in chatInput, state *BusinessState) Reply {
 	if contains(m, "人工", "客服时间", "几点", "客服联系方式", "human", "support hours") {
 		return human("hours", "boundary")
 	}
-	if contains(m, "退到", "原路", "退款渠道", "退款方式", "多久退款", "退款多久", "多久到账", "微信退款", "支付宝") {
+	if contains(m, "退到", "原路", "退款渠道", "退款方式", "多久退款", "退款多久", "多久到账", "微信退款") || (contains(m, "支付宝") && contains(m, "退")) {
 		return human("refund_channel")
 	}
 	if contains(m, "填错", "选错", "转到其他", "转移账号", "uid错") {
@@ -195,6 +204,19 @@ func businessAnswer(in chatInput, state *BusinessState) Reply {
 	}
 	if contains(m, "处理中", "没到账", "未到账", "充值中") {
 		return beginCase(state, "pending")
+	}
+	if contains(m, "钱包", "wallet") && contains(m, "充值", "怎么用", "余额", "top up", "balance") && !contains(m, "退") {
+		r := policyReply("wallet", "payment_methods", "payment_fee")
+		r.Links = []Link{{Label: "我的钱包", To: "/me/wallet"}}
+		return r
+	}
+	if paymentQuestion(m) && !contains(m, "退款", "退费", "refund") {
+		r := policyReply("payment_methods", "payment_fee", "payment_guides")
+		if contains(m, "支付宝") {
+			r.Text = "当前公开付款渠道中没有支付宝收款。\n\n" + r.Text
+		}
+		r.Links = paymentGuideLinks()
+		return r
 	}
 	if contains(m, "发货", "什么时候发", "多久发") {
 		if in.Product != "" && strings.HasPrefix(in.Product, "qzweb-") && in.Product != "qzweb-52" && in.Product != "qzweb-53" {
@@ -429,7 +451,7 @@ func requiresPolicy(in chatInput, s BusinessState) bool {
 		return true
 	}
 	m := strings.ToLower(in.Message)
-	return contains(m, "退", "质保", "保修", "补差", "补开", "封号", "封禁", "掉订阅", "掉会员", "覆盖", "叠加", "升级", "降级", "激活", "优惠", "试用", "注册", "资格", "填错", "选错", "报错", "失败", "无效", "已被使用", "处理中", "没到账", "未到账", "发货", "客服", "人工", "试算", "billing", "refund", "warranty")
+	return paymentQuestion(m) || contains(m, "钱包", "wallet") || contains(m, "退", "质保", "保修", "补差", "补开", "封号", "封禁", "掉订阅", "掉会员", "覆盖", "叠加", "升级", "降级", "激活", "优惠", "试用", "注册", "资格", "填错", "选错", "报错", "失败", "无效", "已被使用", "处理中", "没到账", "未到账", "发货", "客服", "人工", "试算", "billing", "refund", "warranty")
 }
 func confirmedSources(in chatInput) []Source {
 	p := policy.Products[in.Product]
@@ -438,7 +460,7 @@ func confirmedSources(in chatInput) []Source {
 			p = named
 		}
 	}
-	ids := []string{"boundary", "hours", "refund_channel", "unused", "error", "payment", "pending", "wrong", "redeem", "manual"}
+	ids := []string{"boundary", "hours", "refund_channel", "unused", "error", "payment", "pending", "wrong", "redeem", "manual", "payment_methods", "payment_fee", "payment_guides", "wallet"}
 	switch family(p) {
 	case "gpt":
 		ids = append(ids, "loss", "reopen")

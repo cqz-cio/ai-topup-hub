@@ -25,7 +25,7 @@ export async function askSupport(message: string, locale: string, conversationId
   const links = Array.isArray(result.links) ? result.links.filter((link: unknown): link is SupportLink => {
     if (!link || typeof link !== 'object') return false
     const value = link as SupportLink
-    return typeof value.label === 'string' && typeof value.to === 'string' && /^(?:\/products(?:\/[a-zA-Z0-9][a-zA-Z0-9_-]{0,119})?|\/me\/(?:orders|wallet)|\/guest\/orders)$/.test(value.to)
+    return typeof value.label === 'string' && typeof value.to === 'string' && /^(?:\/products(?:\/[a-zA-Z0-9][a-zA-Z0-9_-]{0,119})?|\/me\/(?:orders|wallet)|\/guest\/orders|\/blog\/(?:binance|okx)-usdt-payment-guide)$/.test(value.to)
   }).slice(0, 4) : undefined
   return { text: result.text, links, handoff: result.handoff === true, mode: result.mode }
 }

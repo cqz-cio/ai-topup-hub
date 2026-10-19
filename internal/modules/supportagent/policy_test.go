@@ -221,3 +221,37 @@ func TestConfirmedRulesBypassEnabledProvider(t *testing.T) {
 		t.Fatal("policy source missing")
 	}
 }
+
+func TestPaymentKnowledgeAndExceptionPriority(t *testing.T) {
+	cases := []struct {
+		question string
+		want     []string
+		forbid   string
+	}{
+		{"支持哪些支付方式", []string{"微信扫码", "TRC20", "BEP-20", "Plasma", "具体商品可能限制渠道"}, "保证全部渠道"},
+		{"微信手续费怎么算", []string{"1.6%", "向上取整到分", "132.08", "100.59"}, "免手续费"},
+		{"钱包怎么充值", []string{"我的钱包", "只入账本金", "Codex 点数"}, "已经到账"},
+		{"支付宝能付款吗", []string{"没有支付宝收款", "微信扫码"}, "支持支付宝支付"},
+		{"微信支付成功但显示未付款", []string{"支付成功截图", "不能"}, "132.08"},
+		{"微信退款多久到账", []string{"不保证退款方式", "没有固定退款"}, "微信扫码支付"},
+	}
+	for _, item := range cases {
+		t.Run(item.question, func(t *testing.T) {
+			state := BusinessState{}
+			reply := businessAnswer(chatInput{Message: item.question, Locale: "zh-CN"}, &state)
+			for _, text := range item.want {
+				if !strings.Contains(reply.Text, text) {
+					t.Fatalf("missing %q: %s", text, reply.Text)
+				}
+			}
+			if strings.Contains(reply.Text, item.forbid) {
+				t.Fatal(reply.Text)
+			}
+		})
+	}
+	state := BusinessState{}
+	reply := businessAnswer(chatInput{Message: "USDT怎么付款", Locale: "zh-CN"}, &state)
+	if len(reply.Links) != 2 || reply.Links[0].To != "/blog/binance-usdt-payment-guide" || reply.Links[1].To != "/blog/okx-usdt-payment-guide" {
+		t.Fatalf("missing local payment guides: %+v", reply.Links)
+	}
+}

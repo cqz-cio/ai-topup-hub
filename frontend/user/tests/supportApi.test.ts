@@ -37,3 +37,21 @@ test('limit and unknown errors produce useful localized messages without raw err
   assert.match(agentError(new Error('private detail'), 'zh-TW'), /暫時/)
   assert.doesNotMatch(agentError(new Error('private detail'), 'en-US'), /private detail/)
 })
+
+test('support allows the two public payment tutorials and rejects other blog routes', async () => {
+  const original = globalThis.fetch
+  let calls = 0
+  globalThis.fetch = async () => new Response(JSON.stringify(++calls === 1 ? { ready: true } : {
+    text: '付款教程', mode: 'local', links: [
+      { label: '币安', to: '/blog/binance-usdt-payment-guide' },
+      { label: '欧易', to: '/blog/okx-usdt-payment-guide' },
+      { label: '未知文章', to: '/blog/arbitrary' },
+      { label: '外站', to: '//untrusted.example/blog/okx-usdt-payment-guide' },
+      { label: '重定向', to: '/blog/okx-usdt-payment-guide?redirect=https://untrusted.example' },
+    ],
+  }))
+  try {
+    const response = await askSupport('USDT怎么付款', 'zh-CN', crypto.randomUUID(), '', new AbortController().signal)
+    assert.deepEqual(response.links?.map(link => link.to), ['/blog/binance-usdt-payment-guide', '/blog/okx-usdt-payment-guide'])
+  } finally { globalThis.fetch = original }
+})
