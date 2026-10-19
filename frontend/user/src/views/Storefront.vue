@@ -88,6 +88,7 @@
 </template>
 
 <script setup lang="ts">
+import '../styles/storefrontGlass.css'
 import SupportContacts from '../components/SupportContacts.vue'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'

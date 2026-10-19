@@ -1,0 +1,124 @@
+/* Approved thin-glass controls for the classic branded storefront. */
+:root .brand-scene .storefront {
+  --storefront-glass-ink: #143a32;
+  --storefront-glass-secondary: #31574e;
+}
+
+:root .brand-scene .storefront :is(.store-button, .category-nav button.active) {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  color: var(--storefront-glass-ink);
+  border-color: rgba(255, 255, 255, .82);
+  border-radius: 12px;
+  background: linear-gradient(154deg, rgba(255, 255, 255, .46), rgba(255, 255, 255, .12) 45%, rgba(226, 255, 244, .28));
+  -webkit-backdrop-filter: blur(3px) saturate(1.08);
+  backdrop-filter: blur(3px) saturate(1.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .92), inset 0 -1px 0 rgba(255, 255, 255, .65), inset 1px 0 0 rgba(255, 255, 255, .62), inset -1px 0 0 rgba(255, 255, 255, .58), 0 5px 14px -8px rgba(19, 76, 65, .34);
+  font-weight: 700;
+  transition: background .2s, box-shadow .2s, color .2s;
+}
+
+:root .brand-scene .storefront :is(.store-button, .category-nav button.active)::before {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  inset: 2px;
+  border: 1px solid rgba(255, 255, 255, .72);
+  border-radius: 9px;
+  -webkit-mask-image: linear-gradient(135deg, #000, transparent 35%, transparent 65%, #000);
+  mask-image: linear-gradient(135deg, #000, transparent 35%, transparent 65%, #000);
+}
+
+:root .brand-scene .storefront :is(.store-button.is-primary, .category-nav button.active) {
+  background: linear-gradient(150deg, rgba(244, 255, 249, .52), rgba(194, 235, 214, .24) 44%, rgba(243, 255, 249, .35));
+  color: #123c2e;
+}
+
+:root .brand-scene .storefront :is(.store-button:not(:disabled), .category-nav button.active):hover {
+  background: linear-gradient(150deg, rgba(255, 255, 255, .62), rgba(222, 255, 240, .28) 45%, rgba(255, 255, 255, .44));
+  box-shadow: inset 0 1px 0 #fff, inset 0 -1px 0 rgba(255, 255, 255, .8), 0 7px 18px -9px rgba(19, 76, 65, .4);
+}
+
+:root .brand-scene .storefront .category-nav button.active {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .88), inset 0 1px 0 #fff, 0 5px 14px -9px rgba(19, 76, 65, .38);
+}
+:root .brand-scene .storefront .category-nav button.active span { color: #214c3c; opacity: 1; }
+:root .brand-scene .storefront button.store-button:disabled {
+  background: rgba(235, 247, 240, .22);
+  color: #50665b;
+  border-color: rgba(255, 255, 255, .5);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .44);
+  cursor: not-allowed;
+}
+
+:root .brand-scene .storefront .hero-guide {
+  position: relative;
+  isolation: isolate;
+  color: var(--storefront-glass-ink);
+  background: linear-gradient(157deg, rgba(255, 255, 255, .28), rgba(255, 255, 255, .10) 38%, rgba(246, 255, 250, .18) 74%, rgba(255, 255, 255, .30));
+  -webkit-backdrop-filter: blur(3px) saturate(1.04);
+  backdrop-filter: blur(3px) saturate(1.04);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .87), inset 0 1px 0 rgba(255, 255, 255, .96), inset 0 -1px 0 rgba(255, 255, 255, .73), 0 12px 30px -22px rgba(15, 65, 68, .35);
+}
+:root .brand-scene .storefront .hero-guide::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border: 1px solid rgba(255, 255, 255, .7);
+  border-radius: 17px;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(135deg, #000, rgba(0, 0, 0, .1) 25%, transparent 46%, transparent 62%, #000);
+  mask-image: linear-gradient(135deg, #000, rgba(0, 0, 0, .1) 25%, transparent 46%, transparent 62%, #000);
+}
+:root .brand-scene .storefront .hero-guide-heading { border-bottom-color: rgba(26, 74, 62, .18); font-weight: 650; }
+:root .brand-scene .storefront .guide-caption { color: var(--storefront-glass-secondary); font-weight: 550; }
+:root .brand-scene .storefront .hero-guide h2 { color: #12392f; font-weight: 700; }
+:root .brand-scene .storefront .hero-flow strong { color: #143d32; font-weight: 650; }
+:root .brand-scene .storefront .hero-flow p { color: #31574a; font-weight: 550; }
+:root .brand-scene .storefront .hero-flow-number {
+  color: #25503d;
+  font-weight: 650;
+  background: linear-gradient(145deg, rgba(255, 255, 255, .42), rgba(255, 255, 255, .12));
+  border-color: rgba(255, 255, 255, .78);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .7);
+}
+:root .brand-scene .storefront .hero-flow li:last-child { border-top-color: rgba(26, 74, 62, .18); }
+:root .brand-scene .storefront .hero-flow li:last-child .hero-flow-number {
+  color: #163f31;
+  background: linear-gradient(145deg, rgba(222, 251, 222, .65), rgba(209, 245, 222, .24));
+  border-color: rgba(255, 255, 255, .83);
+}
+:root .brand-scene .storefront .hero-flow li:last-child > svg { color: #24543d; }
+
+.dark:root .brand-scene .storefront { --storefront-glass-ink: #eefbf4; --storefront-glass-secondary: #c1d9cc; }
+.dark:root .brand-scene .storefront :is(.store-button, .category-nav button.active, .hero-guide) {
+  color: #edf8f1;
+  background: linear-gradient(150deg, rgba(86, 129, 112, .30), rgba(25, 58, 48, .21) 45%, rgba(63, 102, 86, .31));
+  border-color: rgba(232, 255, 242, .42);
+  box-shadow: inset 0 0 0 1px rgba(232, 255, 242, .30), inset 0 1px 0 rgba(255, 255, 255, .24), 0 6px 20px -10px rgba(0, 0, 0, .3);
+}
+.dark:root .brand-scene .storefront :is(.store-button:not(:disabled), .category-nav button.active):hover { background: rgba(90, 137, 115, .38); }
+.dark:root .brand-scene .storefront :is(.store-button, .category-nav button.active, .hero-guide)::before { opacity: .35; }
+.dark:root .brand-scene .storefront :is(.hero-guide h2, .hero-flow strong, .category-nav button.active span) { color: #effbf2; }
+.dark:root .brand-scene .storefront :is(.hero-flow p, .guide-caption) { color: #cadfd1; }
+.dark:root .brand-scene .storefront :is(.hero-guide-heading, .hero-flow li:last-child) { border-color: rgba(227, 255, 235, .19); }
+.dark:root .brand-scene .storefront .hero-flow-number { color: #e5f6eb; background: rgba(210, 255, 230, .09); border-color: rgba(223, 255, 237, .35); }
+.dark:root .brand-scene .storefront .hero-flow li:last-child .hero-flow-number { color: #e8fff1; background: rgba(153, 217, 172, .18); border-color: rgba(226, 255, 236, .42); }
+.dark:root .brand-scene .storefront .hero-flow li:last-child > svg { color: #d8f8e4; }
+.dark:root .brand-scene .storefront button.store-button:disabled { color: #a6bbb0; background: rgba(122, 144, 128, .12); }
+
+@media (max-width: 767px) {
+  :root .brand-scene .storefront .hero-guide {
+    background: linear-gradient(157deg, rgba(255, 255, 255, .46), rgba(255, 255, 255, .31) 44%, rgba(247, 255, 250, .40));
+    -webkit-backdrop-filter: blur(5px) saturate(1.04);
+    backdrop-filter: blur(5px) saturate(1.04);
+  }
+  :root .brand-scene .storefront .hero-guide::before { border-radius: 11px; }
+  :root .brand-scene .storefront .hero-flow p { font-size: 10px; color: #244537; }
+  .dark:root .brand-scene .storefront .hero-guide { background: linear-gradient(150deg, rgba(41, 73, 60, .54), rgba(20, 49, 38, .42)); }
+  .dark:root .brand-scene .storefront .hero-flow p { color: #cadfd1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root .brand-scene .storefront :is(.store-button, .category-nav button.active) { transition: none; }
+}
