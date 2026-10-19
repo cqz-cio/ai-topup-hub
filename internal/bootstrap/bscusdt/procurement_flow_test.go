@@ -325,8 +325,9 @@ func TestConfirmedUSDTTransferRunsStorefrontProcurementAndCustomerDelivery(t *te
 					t.Fatal("confirmed payment did not deliver exactly one supplier card", err, procurement.Status, got.Status, count)
 				}
 				customerOrder := orderpresenter.NewOrderDetail(got)
-				if customerOrder.Fulfillment == nil || customerOrder.Fulfillment.Payload != purchaseFlowCard().Payload || supplier.purchases != 1 {
-					t.Fatal("delivered supplier card is missing from the customer order response")
+				deliveryResponse := orderpresenter.NewOrderDelivery(got)
+				if customerOrder.Fulfillment == nil || customerOrder.Fulfillment.Payload != "" || deliveryResponse == nil || deliveryResponse.Fulfillment.Payload != purchaseFlowCard().Payload || supplier.purchases != 1 {
+					t.Fatal("delivery must be available only through the explicit response without repurchasing")
 				}
 			})
 		}
@@ -502,7 +503,8 @@ func TestXorpayCallbackWithSingleConnectionDeliversWithoutRepurchasing(t *testin
 					return
 				}
 				detail := orderpresenter.NewOrderDetail(got)
-				if count != 1 || got.Status != constants.OrderStatusDelivered || len(detail.Children) != 1 || detail.Children[0].Fulfillment == nil || detail.Children[0].Fulfillment.Payload != purchaseFlowCard().Payload {
+				deliveryResponse := orderpresenter.NewOrderDelivery(&got.Children[0])
+				if count != 1 || got.Status != constants.OrderStatusDelivered || len(detail.Children) != 1 || detail.Children[0].Fulfillment == nil || detail.Children[0].Fulfillment.Payload != "" || deliveryResponse == nil || deliveryResponse.Fulfillment.Payload != purchaseFlowCard().Payload {
 					t.Fatal("customer cannot retrieve exactly one delivered card")
 				}
 			})

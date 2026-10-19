@@ -128,6 +128,7 @@ async function request(method: string, path: string, bodyOrOptions?: any, option
       headers,
       body: body instanceof FormData ? body : body !== undefined ? JSON.stringify(body) : undefined,
       signal: controller.signal,
+      cache: opts.cache,
     })
   } catch (err: any) {
     clearTimeout(timer)

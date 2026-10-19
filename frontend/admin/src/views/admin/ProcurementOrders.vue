@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import OrderDeliveryAccess from './components/OrderDeliveryAccess.vue'
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useDebounceFn } from '@vueuse/core'
@@ -72,24 +73,7 @@ const detailOrder = ref<ProcurementOrderWithRelations | null>(null)
 const detailLoading = ref(false)
 const retryingId = ref<number | null>(null)
 const cancelingId = ref<number | null>(null)
-const procurementDownloading = ref(false)
 
-const handleDownloadUpstreamPayload = async (orderId: number) => {
-  if (procurementDownloading.value) return
-  procurementDownloading.value = true
-  try {
-    const res = await adminAPI.downloadProcurementUpstreamPayload(orderId)
-    const blob = new Blob([res.data], { type: 'text/plain; charset=utf-8' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `upstream-payload-${orderId}.txt`
-    a.click()
-    URL.revokeObjectURL(url)
-  } catch {} finally {
-    procurementDownloading.value = false
-  }
-}
 
 const statusOptions = [
   { value: '__all__', key: 'procurement.filters.allStatus' },
@@ -870,19 +854,8 @@ onMounted(() => {
           </div>
 
           <!-- Upstream payload -->
-          <div v-if="detailOrder.upstream_payload" class="rounded-lg border border-border">
-            <div class="flex items-center justify-between border-b border-border bg-muted/30 px-4 py-2">
-              <span class="text-xs font-semibold text-muted-foreground uppercase">{{ t('procurement.detail.upstreamPayload') }}</span>
-              <div class="flex items-center gap-2">
-                <span v-if="(detailOrder.upstream_payload_line_count ?? 0) > 100" class="text-xs text-muted-foreground">{{ t('admin.orders.fulfillmentTotalLines', { count: detailOrder.upstream_payload_line_count }) }}</span>
-                <Button v-if="(detailOrder.upstream_payload_line_count ?? 0) > 100" size="xs" variant="outline" :disabled="procurementDownloading" @click="handleDownloadUpstreamPayload(detailOrder.id)">
-                  {{ procurementDownloading ? t('admin.orders.fulfillmentDownloading') : t('admin.orders.fulfillmentDownload') }}
-                </Button>
-              </div>
-            </div>
-            <div class="max-h-48 overflow-y-auto p-4 text-xs font-mono whitespace-pre-wrap break-all text-muted-foreground">
-              {{ detailOrder.upstream_payload }}
-            </div>
+          <div v-if="(detailOrder.upstream_payload_line_count ?? 0) > 0" class="rounded-lg border border-border p-4">
+            <OrderDeliveryAccess :order-id="detailOrder.id" :order-no="detailOrder.local_order_no || String(detailOrder.id)" source="procurement" />
           </div>
 
           <!-- Actions -->

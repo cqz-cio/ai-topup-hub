@@ -179,6 +179,15 @@ func (h *UserHandler) GetOrderByOrderNo(c *gin.Context) {
 
 // DownloadFulfillment 下载订单交付内容（登录用户）
 func (h *UserHandler) DownloadFulfillment(c *gin.Context) {
+	h.readFulfillment(c, true)
+}
+
+func (h *UserHandler) GetFulfillment(c *gin.Context) {
+	h.readFulfillment(c, false)
+}
+
+func (h *UserHandler) readFulfillment(c *gin.Context, download bool) {
+	ginutil.PrivateNoStore(c)
 	uid, ok := ginutil.GetUserID(c)
 	if !ok {
 		return
@@ -201,7 +210,11 @@ func (h *UserHandler) DownloadFulfillment(c *gin.Context) {
 		ginutil.RespondError(c, response.CodeNotFound, "error.order_not_found", nil)
 		return
 	}
-	respondFulfillmentDownload(c, order)
+	if download {
+		respondFulfillmentDownload(c, order)
+	} else {
+		respondOrderDelivery(c, order)
+	}
 }
 
 // GetOrderPaymentChannels 获取当前用户订单可用支付渠道（按金额与商品范围过滤）
@@ -423,13 +436,25 @@ func respondFulfillmentDownload(c *gin.Context, order *orderdomain.Order) {
 	c.Data(200, "text/plain; charset=utf-8", []byte(payload))
 }
 
+func respondOrderDelivery(c *gin.Context, order *orderdomain.Order) {
+	delivery := orderpresenter.NewOrderDelivery(order)
+	if delivery == nil {
+		ginutil.RespondError(c, response.CodeNotFound, "error.fulfillment_not_found", nil)
+		return
+	}
+	response.Success(c, delivery)
+}
+
 func collectFulfillmentPayload(order *orderdomain.Order) string {
-	if order.Fulfillment != nil && order.Fulfillment.Payload != "" {
+	if order == nil || order.PaidAt == nil {
+		return ""
+	}
+	if order.Fulfillment != nil && order.Fulfillment.Status == "delivered" && order.Fulfillment.Payload != "" {
 		return order.Fulfillment.Payload
 	}
 	var parts []string
 	for _, child := range order.Children {
-		if child.Fulfillment != nil && child.Fulfillment.Payload != "" {
+		if child.PaidAt != nil && child.Fulfillment != nil && child.Fulfillment.Status == "delivered" && child.Fulfillment.Payload != "" {
 			parts = append(parts, child.Fulfillment.Payload)
 		}
 	}

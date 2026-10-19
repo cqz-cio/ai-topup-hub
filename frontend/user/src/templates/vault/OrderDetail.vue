@@ -52,6 +52,7 @@
         :order="order"
         variant="user"
         :fulfillment-downloading="fulfillmentDownloading"
+        :load-delivery="loadDelivery" :session-key="deliverySessionKey"
         @download="handleDownloadFulfillment"
       />
     </template>
@@ -70,7 +71,7 @@ import { useOrderDetail } from '../../composables/useOrderDetail'
 const { t } = useI18n()
 
 const {
-  loading, order, debouncedLoadOrder, cancelOrder, fulfillmentDownloading, handleDownloadFulfillment,
+  loading, order, debouncedLoadOrder, cancelOrder, fulfillmentDownloading, handleDownloadFulfillment, loadDelivery, deliverySessionKey,
   statusLabel, statusVariant, formatDate, formatMoney,
 } = useOrderDetail()
 </script>

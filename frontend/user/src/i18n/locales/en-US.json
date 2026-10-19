@@ -1,4 +1,13 @@
 {
+  "deliveryAccess": {
+    "protected": "Delivery content is protected",
+    "description": "View your codes and instructions after order access is verified. Keep them private.",
+    "reveal": "View delivery",
+    "loading": "Verifying…",
+    "retry": "Try again",
+    "failed": "Unable to load delivery. Check your sign-in or order lookup credentials and try again.",
+    "verified": "Order access verified"
+},
   "walletEarnings": {
     "title": "Earnings and withdrawals",
     "rule": "Settled affiliate and reseller earnings enter your wallet for purchases or withdrawals. Recharge, gift and gift-card funds are spendable only and are used first for purchases.",

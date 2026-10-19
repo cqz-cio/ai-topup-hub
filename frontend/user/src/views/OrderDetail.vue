@@ -78,7 +78,7 @@
         </div>
 
         <OrderInvoiceSupport :order="order" />
-        <OrderDelivery :order="order" :downloading="fulfillmentDownloading" @download="handleDownloadFulfillment" />
+        <OrderDelivery :order="order" :downloading="fulfillmentDownloading" :load-delivery="loadDelivery" :session-key="deliverySessionKey" @download="handleDownloadFulfillment" />
 
         <div v-if="order.children && order.children.length > 0"
           class="rounded-2xl border bg-card shadow-sm p-6">
@@ -354,7 +354,7 @@ const {
   refundReasonText, showRefundRecordsCard, refundRecords, showTimeCard,
   orderItemImage, orderItemSkuText, manualSubmissionRows,
   hasItemDiscount, formatItemDiscountTotal, formatItemPaidAmount, resolvedChildStatus,
-  fulfillmentDownloading, handleDownloadFulfillment,
+  fulfillmentDownloading, handleDownloadFulfillment, loadDelivery, deliverySessionKey,
 } = useOrderDetail()
 const deliveryState = computed(() => orderDeliveryState(order.value))
 </script>

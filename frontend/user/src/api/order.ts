@@ -50,7 +50,8 @@ export const userOrderAPI = {
     stats: (params?: any) => userApi.get('/orders/stats', { params }),
     detail: (orderNo: string, options?: any) => userApi.get(`/orders/${encodeURIComponent(orderNo)}`, options),
     cancel: (orderNo: string) => userApi.post(`/orders/${encodeURIComponent(orderNo)}/cancel`),
-    downloadFulfillment: (orderNo: string) => userApi.get(`/orders/${encodeURIComponent(orderNo)}/fulfillment/download`, { blob: true }),
+    delivery: (orderNo: string) => userApi.get(`/orders/${encodeURIComponent(orderNo)}/fulfillment`, { silentBusinessError: true, cache: 'no-store' }),
+    downloadFulfillment: (orderNo: string) => userApi.get(`/orders/${encodeURIComponent(orderNo)}/fulfillment/download`, { blob: true, cache: 'no-store' }),
 }
 
 export const guestOrderAPI = {
@@ -65,8 +66,12 @@ export const guestOrderAPI = {
         const request = withGuestAuth(params, options)
         return userApi.get(`/guest/orders/${encodeURIComponent(orderNo)}`, { ...request.options, params: request.payload })
     },
+    delivery: (orderNo: string, params: GuestAuthInput) => {
+        const request = withGuestAuth(params, { silentBusinessError: true, cache: 'no-store' })
+        return userApi.get(`/guest/orders/${encodeURIComponent(orderNo)}/fulfillment`, request.options)
+    },
     downloadFulfillment: (orderNo: string, params: GuestAuthInput) => {
-        const request = withGuestAuth(params, { blob: true })
+        const request = withGuestAuth(params, { blob: true, cache: 'no-store' })
         return userApi.get(`/guest/orders/${encodeURIComponent(orderNo)}/fulfillment/download`, { ...request.options, params: request.payload })
     },
     createPayment: (data: GuestAuthInput) => {

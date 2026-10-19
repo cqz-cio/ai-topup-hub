@@ -1,4 +1,4 @@
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { guestOrderAPI } from '../api'
@@ -34,14 +34,27 @@ export function useGuestOrderDetail() {
     toast.error(t('shopUi.cardPlatformBalanceInsufficient'), { duration: 8000 })
   })
 
+  const deliverySessionKey = ref(0)
+  watch(auth, () => { deliverySessionKey.value++ }, { deep: true, flush: 'sync' })
+  const loadDelivery = async (orderNo: string) => {
+    const credentials = { ...auth.value }
+    const parentOrderNo = String(route.params.order_no || '')
+    const response = await guestOrderAPI.delivery(orderNo, credentials)
+    if (disposed || parentOrderNo !== String(route.params.order_no || '')
+      || credentials.email !== auth.value.email || credentials.order_password !== auth.value.order_password
+      || response.data.data?.order_no !== orderNo) throw new Error('Delivery access changed')
+    return response.data.data
+  }
+
   const handleDownloadFulfillment = async (orderNo: string) => {
     if (fulfillmentDownloading.value) return
     fulfillmentDownloading.value = true
     try {
-      const res = await guestOrderAPI.downloadFulfillment(orderNo, {
-        email: auth.value.email,
-        order_password: auth.value.order_password,
-      })
+      const credentials = { ...auth.value }
+      const parentOrderNo = String(route.params.order_no || '')
+      const res = await guestOrderAPI.downloadFulfillment(orderNo, credentials)
+      if (disposed || parentOrderNo !== String(route.params.order_no || '')
+        || credentials.email !== auth.value.email || credentials.order_password !== auth.value.order_password) return
       const blob = new Blob([res.data], { type: 'text/plain; charset=utf-8' })
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
@@ -159,6 +172,8 @@ export function useGuestOrderDetail() {
     clearAuth,
     fulfillmentDownloading,
     handleDownloadFulfillment,
+    loadDelivery,
+    deliverySessionKey,
     ...helpers,
   }
 }

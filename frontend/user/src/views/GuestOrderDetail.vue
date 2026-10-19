@@ -61,7 +61,7 @@
         </div>
 
         <OrderInvoiceSupport :order="order" />
-        <OrderDelivery :order="order" :downloading="fulfillmentDownloading" @download="handleDownloadFulfillment" />
+        <OrderDelivery :order="order" :downloading="fulfillmentDownloading" :load-delivery="loadDelivery" :session-key="deliverySessionKey" @download="handleDownloadFulfillment" />
 
         <div v-if="order.children && order.children.length > 0"
           class="rounded-2xl border bg-card shadow-sm p-6">
@@ -328,7 +328,7 @@ const { t } = useI18n()
 
 const {
   order, authError, auth, viewState, handleAuthSubmit, clearAuth,
-  fulfillmentDownloading, handleDownloadFulfillment,
+  fulfillmentDownloading, handleDownloadFulfillment, loadDelivery, deliverySessionKey,
   statusLabel, statusVariant, fulfillmentTypeLabelText,
   formatDate, getLocalizedText, formatMoney, formatDiscountMoney, hasDiscountAmount,
   refundReasonText, showRefundRecordsCard, refundRecords, showTimeCard,

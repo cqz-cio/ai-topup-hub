@@ -9,6 +9,7 @@ func RegisterAdminRoutes(authorized gin.IRoutes, handler *AdminHandler) {
 	}
 	authorized.GET("/orders", handler.AdminListOrders)
 	authorized.GET("/orders/:id", handler.AdminGetOrder)
+	authorized.GET("/orders/:id/fulfillment", handler.AdminGetFulfillment)
 	authorized.PATCH("/orders/:id", handler.AdminUpdateOrderStatus)
 }
 
@@ -39,6 +40,7 @@ func RegisterUserReadRoutes(user gin.IRoutes, handler *UserHandler) {
 	user.GET("/orders", handler.ListOrders)
 	user.GET("/orders/stats", handler.OrderStats)
 	user.GET("/orders/:order_no", handler.GetOrderByOrderNo)
+	user.GET("/orders/:order_no/fulfillment", handler.GetFulfillment)
 	user.GET("/orders/:order_no/fulfillment/download", handler.DownloadFulfillment)
 }
 
@@ -65,6 +67,7 @@ func RegisterGuestReadRoutes(guest gin.IRoutes, handler *GuestHandler) {
 	}
 	guest.GET("/orders", handler.ListGuestOrders)
 	guest.GET("/orders/:order_no", handler.GetGuestOrderByOrderNo)
+	guest.GET("/orders/:order_no/fulfillment", handler.GetGuestFulfillment)
 	guest.GET("/orders/:order_no/fulfillment/download", handler.DownloadGuestFulfillment)
 }
 

@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import OrderDeliveryAccess from './OrderDeliveryAccess.vue'
 import { Package } from 'lucide-vue-next'
 import { adminAPI } from '@/api/admin'
-import type { AdminOrder, AdminOrderItem, AdminFulfillment, AdminProcurementOrder, AdminPayment } from '@/api/types'
+import type { AdminOrder, AdminOrderItem, AdminProcurementOrder, AdminPayment } from '@/api/types'
 import IdCell from '@/components/IdCell.vue'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogScrollContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -363,63 +364,6 @@ const orderItemSkuSpecText = (item: AdminOrderItem & Record<string, unknown>) =>
   const specText = resolveSkuSpecFromSnapshot(item?.sku_snapshot, locale.value)
   if (specText) return specText
   return t('admin.orders.itemSkuSpecEmpty')
-}
-
-const fulfillmentDeliveryLines = (fulfillment: AdminFulfillment & Record<string, unknown>) => {
-  const lines: string[] = []
-  const logistics = (fulfillment?.delivery_data || fulfillment?.logistics) as Record<string, unknown> | undefined
-  if (logistics && typeof logistics === 'object') {
-    const note = String(logistics.note || '').trim()
-    if (note) {
-      lines.push(note)
-    }
-    const entries = Array.isArray(logistics.entries) ? logistics.entries : []
-    entries.forEach((item: Record<string, unknown>) => {
-      const key = String(item?.key || '').trim()
-      const value = String(item?.value || '').trim()
-      if (!key && !value) {
-        return
-      }
-      if (!key) {
-        lines.push(value)
-      } else if (!value) {
-        lines.push(key)
-      } else {
-        lines.push(`${key}: ${value}`)
-      }
-    })
-
-    Object.entries(logistics).forEach(([key, value]) => {
-      if (key === 'note' || key === 'entries') return
-      const text = String(value ?? '').trim()
-      if (!text) return
-      lines.push(`${key}: ${text}`)
-    })
-  }
-  return lines
-}
-
-const fulfillmentDownloading = ref(false)
-
-const isFulfillmentTruncated = (fulfillment: any) => {
-  return fulfillment?.payload_line_count > 100
-}
-
-const handleDownloadFulfillment = async (orderId: number, orderNo: string) => {
-  if (fulfillmentDownloading.value) return
-  fulfillmentDownloading.value = true
-  try {
-    const res = await adminAPI.downloadFulfillment(orderId)
-    const blob = new Blob([res.data], { type: 'text/plain; charset=utf-8' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `fulfillment-${orderNo}.txt`
-    a.click()
-    URL.revokeObjectURL(url)
-  } catch {} finally {
-    fulfillmentDownloading.value = false
-  }
 }
 
 const parseMoneyValue = (value?: string | number) => {
@@ -1019,24 +963,7 @@ watch(
                   <div v-if="child.fulfillment">
                     <div class="text-xs text-muted-foreground">{{ t('admin.orders.detailFulfillmentType') }}：{{ fulfillmentTypeLabel(child.fulfillment.type) }}</div>
                     <div class="text-xs text-muted-foreground">{{ t('admin.orders.detailFulfillmentStatus') }}：{{ fulfillmentStatusLabel(child.fulfillment.status) }}</div>
-                    <div v-if="isFulfillmentTruncated(child.fulfillment)" class="mt-3">
-                      <div class="flex items-center justify-between mb-2">
-                        <span class="text-xs text-muted-foreground">{{ t('admin.orders.fulfillmentTotalLines', { count: child.fulfillment.payload_line_count }) }}</span>
-                        <Button size="xs" variant="outline" :disabled="fulfillmentDownloading" @click="handleDownloadFulfillment(child.id, child.order_no || selectedOrder?.order_no || '')">
-                          {{ fulfillmentDownloading ? t('admin.orders.fulfillmentDownloading') : t('admin.orders.fulfillmentDownload') }}
-                        </Button>
-                      </div>
-                      <div class="mb-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-700 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-400">
-                        {{ t('admin.orders.fulfillmentTruncatedHint') }}
-                      </div>
-                      <div class="rounded-lg border border-border bg-muted/30 p-3 text-xs text-foreground whitespace-pre-wrap break-all max-h-48 overflow-y-auto">{{ child.fulfillment.payload }}</div>
-                    </div>
-                    <div v-else-if="fulfillmentDeliveryLines(child.fulfillment).length" class="mt-3 rounded-lg border border-border bg-muted/30 p-3 text-xs text-foreground space-y-1">
-                      <div v-for="(line, lineIndex) in fulfillmentDeliveryLines(child.fulfillment)" :key="`child-fulfillment-${child.id}-${lineIndex}`" class="break-all">{{ line }}</div>
-                    </div>
-                    <div v-else-if="child.fulfillment.payload" class="mt-3 rounded-lg border border-border bg-muted/30 p-3 text-xs text-foreground whitespace-pre-wrap break-all">
-                      {{ child.fulfillment.payload }}
-                    </div>
+                    <OrderDeliveryAccess v-if="child.fulfillment.status === 'delivered'" :order-id="child.id" :order-no="child.order_no" />
                   </div>
                   <div v-else class="text-xs text-muted-foreground">{{ t('orderDetail.childFulfillmentEmpty') }}</div>
                 </div>
@@ -1047,25 +974,11 @@ watch(
           <div v-if="selectedOrder.fulfillment" class="rounded-xl border border-border bg-muted/20 p-4">
             <div class="flex items-center justify-between mb-3">
               <h3 class="text-sm font-semibold text-foreground">{{ t('admin.orders.detailFulfillmentTitle') }}</h3>
-              <Button v-if="isFulfillmentTruncated(selectedOrder.fulfillment)" size="xs" variant="outline" :disabled="fulfillmentDownloading" @click="handleDownloadFulfillment(selectedOrder.id, selectedOrder.order_no)">
-                {{ fulfillmentDownloading ? t('admin.orders.fulfillmentDownloading') : t('admin.orders.fulfillmentDownload') }}
-              </Button>
+
             </div>
             <div class="text-sm text-muted-foreground">{{ t('admin.orders.detailFulfillmentType') }}：{{ fulfillmentTypeLabel(selectedOrder.fulfillment.type) }}</div>
             <div class="text-sm text-muted-foreground">{{ t('admin.orders.detailFulfillmentStatus') }}：{{ fulfillmentStatusLabel(selectedOrder.fulfillment.status) }}</div>
-            <div v-if="isFulfillmentTruncated(selectedOrder.fulfillment)" class="mt-3">
-              <div class="text-xs text-muted-foreground mb-2">{{ t('admin.orders.fulfillmentTotalLines', { count: selectedOrder.fulfillment.payload_line_count }) }}</div>
-              <div class="mb-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-700 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-400">
-                {{ t('admin.orders.fulfillmentTruncatedHint') }}
-              </div>
-              <div class="rounded-lg border border-border bg-background p-3 text-xs text-muted-foreground whitespace-pre-wrap break-all max-h-64 overflow-y-auto">{{ selectedOrder.fulfillment.payload }}</div>
-            </div>
-            <div v-else-if="fulfillmentDeliveryLines(selectedOrder.fulfillment).length" class="mt-3 rounded-lg border border-border bg-background p-3 text-xs text-muted-foreground space-y-1">
-              <div v-for="(line, lineIndex) in fulfillmentDeliveryLines(selectedOrder.fulfillment)" :key="`fulfillment-${selectedOrder.id}-${lineIndex}`" class="break-all">{{ line }}</div>
-            </div>
-            <div v-else class="mt-3 rounded-lg border border-border bg-background p-3 text-xs text-muted-foreground whitespace-pre-wrap break-all">
-              {{ selectedOrder.fulfillment.payload }}
-            </div>
+            <OrderDeliveryAccess v-if="selectedOrder.fulfillment.status === 'delivered'" :order-id="selectedOrder.id" :order-no="selectedOrder.order_no" />
           </div>
 
           <div v-if="procurementOrder" class="rounded-xl border border-indigo-200 bg-indigo-50/50 p-4">

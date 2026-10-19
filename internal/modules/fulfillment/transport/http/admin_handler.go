@@ -7,6 +7,7 @@ import (
 	fulfillmentdomain "github.com/dujiao-next/internal/modules/fulfillment/domain"
 	orderdomain "github.com/dujiao-next/internal/modules/order/domain"
 
+	"github.com/dujiao-next/internal/logger"
 	"github.com/dujiao-next/internal/platform/http/ginutil"
 	"github.com/dujiao-next/internal/platform/http/response"
 	"github.com/dujiao-next/internal/shared/jsonmap"
@@ -64,6 +65,7 @@ type AdminCreateFulfillmentRequest struct {
 
 // AdminCreateFulfillment 管理端录入交付内容。
 func (h *AdminHandler) AdminCreateFulfillment(c *gin.Context) {
+	ginutil.PrivateNoStore(c)
 	adminID, ok := ginutil.GetAdminID(c)
 	if !ok {
 		return
@@ -102,6 +104,11 @@ func (h *AdminHandler) AdminCreateFulfillment(c *gin.Context) {
 
 // AdminDownloadFulfillment 管理端下载订单交付内容。
 func (h *AdminHandler) AdminDownloadFulfillment(c *gin.Context) {
+	ginutil.PrivateNoStore(c)
+	adminID, ok := ginutil.GetAdminID(c)
+	if !ok {
+		return
+	}
 	orderID, err := ginutil.ParseParamUint(c, "id")
 	if err != nil {
 		ginutil.RespondError(c, response.CodeBadRequest, "error.order_item_invalid", nil)
@@ -118,18 +125,22 @@ func (h *AdminHandler) AdminDownloadFulfillment(c *gin.Context) {
 		return
 	}
 	filename := "fulfillment-" + order.OrderNo + ".txt"
+	logger.Infow("admin_order_delivery_access", "admin_id", adminID, "order_id", orderID, "action", "download")
 	c.Header("Content-Type", "text/plain; charset=utf-8")
 	c.Header("Content-Disposition", "attachment; filename=\""+filename+"\"")
 	c.Data(200, "text/plain; charset=utf-8", []byte(payload))
 }
 
 func collectAdminFulfillmentPayload(order *orderdomain.Order) string {
-	if order.Fulfillment != nil && order.Fulfillment.Payload != "" {
+	if order == nil || order.PaidAt == nil {
+		return ""
+	}
+	if order.Fulfillment != nil && order.Fulfillment.Status == "delivered" && order.Fulfillment.Payload != "" {
 		return order.Fulfillment.Payload
 	}
 	var parts []string
 	for _, child := range order.Children {
-		if child.Fulfillment != nil && child.Fulfillment.Payload != "" {
+		if child.PaidAt != nil && child.Fulfillment != nil && child.Fulfillment.Status == "delivered" && child.Fulfillment.Payload != "" {
 			parts = append(parts, child.Fulfillment.Payload)
 		}
 	}

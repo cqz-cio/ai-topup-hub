@@ -1,7 +1,8 @@
-import { onMounted, onUnmounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { userOrderAPI } from '../api'
+import { useUserAuthStore } from '../stores/userAuth'
 import { debounceAsync } from '../utils/debounce'
 import { useConfirmDialog } from './useConfirmDialog'
 import { toast } from './useToast'
@@ -29,11 +30,26 @@ export function useOrderDetail() {
     toast.error(t('shopUi.cardPlatformBalanceInsufficient'), { duration: 8000 })
   })
 
+  const deliverySessionKey = ref(0)
+  const authStore = useUserAuthStore()
+  watch(() => authStore.token, () => { deliverySessionKey.value++ }, { flush: 'sync' })
+  const loadDelivery = async (orderNo: string) => {
+    const token = authStore.token
+    const parentOrderNo = String(route.params.order_no || '')
+    const response = await userOrderAPI.delivery(orderNo)
+    if (disposed || token !== authStore.token || parentOrderNo !== String(route.params.order_no || '')
+      || response.data.data?.order_no !== orderNo) throw new Error('Delivery access changed')
+    return response.data.data
+  }
+
   const handleDownloadFulfillment = async (orderNo: string) => {
     if (fulfillmentDownloading.value) return
     fulfillmentDownloading.value = true
     try {
+      const token = authStore.token
+      const parentOrderNo = String(route.params.order_no || '')
       const res = await userOrderAPI.downloadFulfillment(orderNo)
+      if (disposed || token !== authStore.token || parentOrderNo !== String(route.params.order_no || '')) return
       const blob = new Blob([res.data], { type: 'text/plain; charset=utf-8' })
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
@@ -113,6 +129,8 @@ export function useOrderDetail() {
     cancelOrder,
     fulfillmentDownloading,
     handleDownloadFulfillment,
+    loadDelivery,
+    deliverySessionKey,
     ...helpers,
   }
 }

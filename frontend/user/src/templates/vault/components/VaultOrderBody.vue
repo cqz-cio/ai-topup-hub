@@ -26,7 +26,7 @@
               :fulfillment="child.fulfillment"
               :items="child.items"
               :order-no="child.order_no || order.order_no"
-              :downloading="fulfillmentDownloading"
+              :downloading="fulfillmentDownloading" :load-delivery="loadDelivery" :session-key="sessionKey"
               @download="emit('download', $event)"
             />
             <div v-else class="text-[13px] text-muted-foreground">{{ t('orderDetail.childFulfillmentEmpty') }}</div>
@@ -42,7 +42,7 @@
         :fulfillment="order.fulfillment"
         :items="order.items"
         :order-no="order.order_no"
-        :downloading="fulfillmentDownloading"
+        :downloading="fulfillmentDownloading" :load-delivery="loadDelivery" :session-key="sessionKey"
         @download="emit('download', $event)"
       />
     </section>
@@ -152,6 +152,8 @@ const props = defineProps<{
   order: any
   variant: 'user' | 'guest'
   fulfillmentDownloading: boolean
+  loadDelivery: (orderNo: string) => Promise<any>
+  sessionKey: string | number
 }>()
 
 const emit = defineEmits<{

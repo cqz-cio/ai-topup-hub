@@ -3,8 +3,11 @@ package procurement_test
 import (
 	"encoding/json"
 	"errors"
+	procurementhttp "github.com/dujiao-next/internal/modules/procurement/transport/http"
+	"github.com/gin-gonic/gin"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 
@@ -470,5 +473,42 @@ func TestCustomerFulfillmentIssueOnlyExposesConfirmedBalanceFailure(t *testing.T
 	}
 	if issue, err := svc.CustomerFulfillmentIssue(999999); err != nil || issue != "" {
 		t.Fatalf("missing purchase: %q %v", issue, err)
+	}
+}
+
+type privateDeliveryFixture struct {
+	procurementhttp.Service
+	order *procurementdomain.Order
+}
+
+func (f privateDeliveryFixture) List(procurementcontract.ListFilter) ([]procurementdomain.Order, int64, error) {
+	return []procurementdomain.Order{*f.order}, 1, nil
+}
+func (f privateDeliveryFixture) GetByID(uint) (*procurementdomain.Order, error) { return f.order, nil }
+func (f privateDeliveryFixture) FillParentOrderNo(*procurementdomain.Order)     {}
+
+func TestProcurementMetadataDoesNotExposeOrMutateDelivery(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	payload := strings.Repeat("TEST-NOT-REDEEMABLE\n", 120)
+	f := privateDeliveryFixture{order: &procurementdomain.Order{ID: 1, UpstreamPayload: payload}}
+	h := procurementhttp.NewAdminHandler(f)
+	r := gin.New()
+	r.GET("/orders", h.GetProcurementOrders)
+	r.GET("/orders/:id", h.GetProcurementOrder)
+	r.GET("/orders/:id/download", h.DownloadProcurementUpstreamPayload)
+	for _, path := range []string{"/orders", "/orders/1"} {
+		w := httptest.NewRecorder()
+		r.ServeHTTP(w, httptest.NewRequest("GET", path, nil))
+		if strings.Contains(w.Body.String(), "TEST-NOT-REDEEMABLE") {
+			t.Fatalf("metadata leaked upstream delivery: %s", path)
+		}
+	}
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, httptest.NewRequest("GET", "/orders/1/download", nil))
+	if w.Body.String() != payload {
+		t.Fatal("metadata query changed subsequent delivery download")
+	}
+	if !strings.Contains(w.Header().Get("Cache-Control"), "no-store") {
+		t.Fatal("delivery download may be cached")
 	}
 }

@@ -67,7 +67,12 @@ func (h *AdminHandler) GetProcurementOrders(c *gin.Context) {
 	}
 
 	pagination := response.BuildPagination(page, pageSize, total)
-	response.SuccessWithPage(c, orders, pagination)
+	// The order dialog also requests this list; never preload upstream card data.
+	items := append([]procurementdomain.Order{}, orders...)
+	for i := range items {
+		items[i].UpstreamPayload = ""
+	}
+	response.SuccessWithPage(c, items, pagination)
 }
 
 // GetProcurementOrderStats 采购单按状态聚合（基于全量数据，仅复用筛选条件）
@@ -115,6 +120,7 @@ func (h *AdminHandler) GetProcurementOrderStats(c *gin.Context) {
 
 // GetProcurementOrder 采购单详情
 func (h *AdminHandler) GetProcurementOrder(c *gin.Context) {
+	ginutil.PrivateNoStore(c)
 	if h.service == nil {
 		ginutil.RespondErrorWithMsg(c, response.CodeInternal, "service not available", nil)
 		return
@@ -137,13 +143,16 @@ func (h *AdminHandler) GetProcurementOrder(c *gin.Context) {
 		ginutil.RespondError(c, response.CodeNotFound, "error.procurement_not_found", nil)
 		return
 	}
-	order.TruncateUpstreamPayload(procurementdomain.PayloadPreviewMaxLines)
-	h.service.FillParentOrderNo(order)
-	response.Success(c, order)
+	metadata := *order
+	metadata.TruncateUpstreamPayload(procurementdomain.PayloadPreviewMaxLines)
+	h.service.FillParentOrderNo(&metadata)
+	metadata.UpstreamPayload = ""
+	response.Success(c, metadata)
 }
 
 // DownloadProcurementUpstreamPayload 下载采购单上游交付内容
 func (h *AdminHandler) DownloadProcurementUpstreamPayload(c *gin.Context) {
+	ginutil.PrivateNoStore(c)
 	if h.service == nil {
 		ginutil.RespondErrorWithMsg(c, response.CodeInternal, "service not available", nil)
 		return

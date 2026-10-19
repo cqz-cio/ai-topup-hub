@@ -121,6 +121,15 @@ func (h *GuestHandler) GetGuestOrderByOrderNo(c *gin.Context) {
 // DownloadGuestFulfillment 下载订单交付内容（游客）
 // 支持父订单或子订单的 order_no
 func (h *GuestHandler) DownloadGuestFulfillment(c *gin.Context) {
+	h.readGuestFulfillment(c, true)
+}
+
+func (h *GuestHandler) GetGuestFulfillment(c *gin.Context) {
+	h.readGuestFulfillment(c, false)
+}
+
+func (h *GuestHandler) readGuestFulfillment(c *gin.Context, download bool) {
+	ginutil.PrivateNoStore(c)
 	email, password, ok := ginutil.GetGuestCredentials(c)
 	if !ok || email == "" || password == "" {
 		ginutil.RespondError(c, response.CodeBadRequest, "error.guest_email_required", nil)
@@ -144,5 +153,9 @@ func (h *GuestHandler) DownloadGuestFulfillment(c *gin.Context) {
 		ginutil.RespondError(c, response.CodeNotFound, "error.guest_order_not_found", nil)
 		return
 	}
-	respondFulfillmentDownload(c, order)
+	if download {
+		respondFulfillmentDownload(c, order)
+	} else {
+		respondOrderDelivery(c, order)
+	}
 }

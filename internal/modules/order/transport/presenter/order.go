@@ -61,7 +61,7 @@ func NewOrderSummaryList(orders []orderdomain.Order) []OrderSummary {
 	return result
 }
 
-// OrderDetail 订单详情响应（完整字段）
+// OrderDetail 订单详情元数据；交付正文只由单独鉴权的 OrderDelivery 返回。
 type OrderDetail struct {
 	OrderNo                  string            `json:"order_no"`
 	GuestEmail               string            `json:"guest_email,omitempty"`
@@ -121,16 +121,15 @@ func NewOrderDetail(o *orderdomain.Order) OrderDetail {
 		CanceledAt:              o.CanceledAt,
 		CreatedAt:               o.CreatedAt,
 	}
-	paid := o.PaidAt != nil
 	for _, item := range o.Items {
 		resp := newOrderItemResp(&item)
-		if !paid {
-			resp.Instructions = nil
-		}
+		resp.Instructions = nil
 		d.Items = append(d.Items, resp)
 	}
 	if o.Fulfillment != nil {
 		fr := newFulfillmentResp(o.Fulfillment)
+		fr.Payload = ""
+		fr.DeliveryData = nil
 		d.Fulfillment = &fr
 	}
 	for i := range o.Children {
@@ -139,7 +138,7 @@ func NewOrderDetail(o *orderdomain.Order) OrderDetail {
 	return d
 }
 
-// NewOrderDetailTruncated 同 NewOrderDetail，但额外截断交付内容。
+// NewOrderDetailTruncated 保留旧调用接口；普通详情不再包含交付正文。
 func NewOrderDetailTruncated(o *orderdomain.Order) OrderDetail {
 	d := NewOrderDetail(o)
 	truncateFulfillment(&d)
@@ -173,7 +172,7 @@ type OrderItemResp struct {
 	ManualFormSchemaSnapshot jsonmap.JSON      `json:"manual_form_schema_snapshot"`
 	ManualFormSubmission     jsonmap.JSON      `json:"manual_form_submission"`
 	// Instructions 交付使用说明（多语言 raw JSON，与 Title 字段契约一致，由前端按 locale 解析）。
-	// 仅在订单已付款时填充，未付款订单会在 NewOrderDetail 中置 nil；列表场景（NewOrderSummary）永远为 nil。
+	// 普通列表与详情永远为 nil；付款且交付后，通过独立交付接口返回。
 	// 注意：渠道 API（channel_order.go）为服务端消费者（如 Telegram Bot），那里返回已按 locale 解析的字符串而非 raw JSON。
 	Instructions jsonmap.JSON `json:"instructions,omitempty"`
 }

@@ -33,6 +33,41 @@ func openOrderTenantScopeTestDB(t *testing.T) *gorm.DB {
 	return db
 }
 
+func TestDeliveryLookupRejectsOtherOwnersAndGuestCredentialsForChildren(t *testing.T) {
+	db := openOrderTenantScopeTestDB(t)
+	store := New(db, "test-guest-credential-secret-with-32-bytes")
+	resellerID := uint(88)
+	parent := seedScopedOrder(t, db, "DELIVERY-PARENT", 17, "", "", constants.OrderStatusPaid, &resellerID, nil)
+	child := seedScopedOrder(t, db, "DELIVERY-CHILD", 17, "", "", constants.OrderStatusPaid, &resellerID, &parent.ID)
+	guestParent := seedScopedOrder(t, db, "DELIVERY-GUEST", 0, "fixture@example.test", "fixture-password", constants.OrderStatusPaid, &resellerID, nil)
+	guestChild := seedScopedOrder(t, db, "DELIVERY-GUEST-CHILD", 0, "fixture@example.test", "fixture-password", constants.OrderStatusPaid, &resellerID, &guestParent.ID)
+	if _, err := store.BackfillGuestCredentialHashes(); err != nil {
+		t.Fatal(err)
+	}
+	scope := ordercontract.TenantScope{ResellerID: &resellerID}
+	for _, no := range []string{parent.OrderNo, child.OrderNo} {
+		for _, uid := range []uint{17, 18} {
+			got, err := store.GetAnyByOrderNoAndUserScoped(no, uid, scope)
+			if err != nil || (got != nil) != (uid == 17) {
+				t.Fatalf("order=%s uid=%d unexpected access: %v", no, uid, err)
+			}
+		}
+	}
+	for _, no := range []string{guestParent.OrderNo, guestChild.OrderNo} {
+		for _, pair := range [][2]string{{"fixture@example.test", "fixture-password"}, {"fixture@example.test", "wrong"}, {"other@example.test", "fixture-password"}} {
+			got, err := store.GetAnyByOrderNoAndGuestScoped(no, pair[0], pair[1], scope)
+			want := pair[0] == "fixture@example.test" && pair[1] == "fixture-password"
+			if err != nil || (got != nil) != want {
+				t.Fatal("guest child credential validation failed")
+			}
+		}
+		got, err := store.GetAnyByOrderNoAndGuestScoped(no, "fixture@example.test", "fixture-password", ordercontract.TenantScope{})
+		if err != nil || got != nil {
+			t.Fatal("guest delivery crossed tenant boundary")
+		}
+	}
+}
+
 func seedScopedOrder(t *testing.T, db *gorm.DB, orderNo string, userID uint, guestEmail string, guestPassword string, status string, resellerID *uint, parentID *uint) orderdomain.Order {
 	t.Helper()
 	order := orderdomain.Order{

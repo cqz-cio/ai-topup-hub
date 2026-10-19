@@ -60,6 +60,7 @@
         :order="order"
         variant="guest"
         :fulfillment-downloading="fulfillmentDownloading"
+        :load-delivery="loadDelivery" :session-key="deliverySessionKey"
         @download="handleDownloadFulfillment"
       />
     </template>
@@ -80,7 +81,7 @@ const { t } = useI18n()
 
 const {
   order, authError, auth, viewState, handleAuthSubmit, clearAuth,
-  fulfillmentDownloading, handleDownloadFulfillment,
+  fulfillmentDownloading, handleDownloadFulfillment, loadDelivery, deliverySessionKey,
   statusLabel, statusVariant, formatDate, formatMoney,
 } = useGuestOrderDetail()
 </script>

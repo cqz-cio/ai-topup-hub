@@ -8,7 +8,9 @@ import (
 
 	paymentdomain "github.com/dujiao-next/internal/modules/payment/domain"
 
+	"github.com/dujiao-next/internal/logger"
 	orderdomain "github.com/dujiao-next/internal/modules/order/domain"
+	orderpresenter "github.com/dujiao-next/internal/modules/order/transport/presenter"
 
 	coupondomain "github.com/dujiao-next/internal/modules/coupon/domain"
 
@@ -207,7 +209,7 @@ func (h *AdminHandler) AdminListOrders(c *gin.Context) {
 			displayName = user.DisplayName
 		}
 		items = append(items, AdminOrderListItem{
-			Order:           order,
+			Order:           orderpresenter.AdminOrderMetadata(order),
 			UserEmail:       email,
 			UserDisplayName: displayName,
 		})
@@ -349,9 +351,8 @@ func (h *AdminHandler) AdminGetOrder(c *gin.Context) {
 		})
 	}
 
-	order.TruncateFulfillmentPayload()
 	response.Success(c, AdminOrderDetail{
-		Order:           *order,
+		Order:           orderpresenter.AdminOrderMetadata(*order),
 		UserEmail:       email,
 		UserDisplayName: displayName,
 		CouponCode:      couponCode,
@@ -430,5 +431,28 @@ func (h *AdminHandler) AdminUpdateOrderStatus(c *gin.Context) {
 		return
 	}
 
-	response.Success(c, order)
+	response.Success(c, orderpresenter.AdminOrderMetadata(*order))
+}
+
+// AdminGetFulfillment uses a separate RBAC permission from viewing order metadata.
+func (h *AdminHandler) AdminGetFulfillment(c *gin.Context) {
+	ginutil.PrivateNoStore(c)
+	adminID, ok := ginutil.GetAdminID(c)
+	if !ok {
+		return
+	}
+	orderID, err := ginutil.ParseParamUint(c, "id")
+	if err != nil {
+		ginutil.RespondError(c, response.CodeBadRequest, "error.order_item_invalid", nil)
+		return
+	}
+	order, err := h.orders.GetOrderForAdmin(orderID)
+	if err != nil || order == nil {
+		ginutil.RespondError(c, response.CodeNotFound, "error.order_not_found", nil)
+		return
+	}
+	if orderpresenter.NewOrderDelivery(order) != nil {
+		logger.Infow("admin_order_delivery_access", "admin_id", adminID, "order_id", orderID, "action", "view")
+	}
+	respondOrderDelivery(c, order)
 }

@@ -137,14 +137,11 @@ func TestOrderDetailHidesInstructionsBeforePayment(t *testing.T) {
 		t.Fatalf("unpaid order must not expose instructions, got %v", unpaid.Items[0].Instructions)
 	}
 
-	// 已付款：instructions 正常返回
+	// 已付款：普通详情仍不返回交付说明
 	now := time.Now()
 	paid := NewOrderDetail(mkOrder(&now))
-	if paid.Items[0].Instructions == nil {
-		t.Fatal("paid order should expose instructions")
-	}
-	if got := paid.Items[0].Instructions["zh-CN"]; got != "账号使用方法：…" {
-		t.Fatalf("instructions mismatch: %v", got)
+	if paid.Items[0].Instructions != nil {
+		t.Fatal("paid order metadata must not expose instructions")
 	}
 
 	// Summary 路径永远不应包含 instructions
@@ -211,8 +208,14 @@ func TestNewOrderDetailTruncated(t *testing.T) {
 		},
 	}
 
-	detail := NewOrderDetailTruncated(order)
-	if detail.Fulfillment == nil {
+	now := time.Now()
+	order.PaidAt = &now
+	metadata := NewOrderDetailTruncated(order)
+	if metadata.Fulfillment.Payload != "" {
+		t.Fatal("ordinary detail exposed delivery preview")
+	}
+	detail := NewOrderDelivery(order)
+	if detail == nil {
 		t.Fatal("expected fulfillment")
 	}
 	if detail.Fulfillment.PayloadLineCount != 200 {
@@ -236,5 +239,53 @@ func TestNewOrderDetailNilSafety(t *testing.T) {
 	}
 	if detail.Items != nil {
 		t.Error("expected nil items")
+	}
+}
+
+func TestDeliverySecretsOnlyAppearInExplicitResponse(t *testing.T) {
+	now := time.Now()
+	child := orderdomain.Order{OrderNo: "FIXTURE-CHILD", PaidAt: &now,
+		Items:       []orderdomain.OrderItem{{InstructionsJSON: jsonmap.JSON{"zh-CN": "PRIVATE-INSTRUCTIONS"}}},
+		Fulfillment: &fulfillmentdomain.Fulfillment{Status: "delivered", Payload: "TEST-NOT-REDEEMABLE", LogisticsJSON: jsonmap.JSON{"note": "PRIVATE-STRUCTURED-DATA"}},
+	}
+	parent := child
+	parent.OrderNo = "FIXTURE-PARENT"
+	parent.Children = []orderdomain.Order{child}
+	for name, response := range map[string]any{
+		"customer list":             NewOrderSummary(&parent),
+		"customer detail":           NewOrderDetail(&parent),
+		"customer truncated detail": NewOrderDetailTruncated(&parent),
+		"admin metadata":            AdminOrderMetadata(parent),
+	} {
+		t.Run(name, func(t *testing.T) {
+			body, err := json.Marshal(response)
+			if err != nil {
+				t.Fatal(err)
+			}
+			for _, secret := range []string{"TEST-NOT-REDEEMABLE", "PRIVATE-STRUCTURED-DATA", "PRIVATE-INSTRUCTIONS"} {
+				if strings.Contains(string(body), secret) {
+					t.Fatalf("%s leaked in ordinary response", secret)
+				}
+			}
+		})
+	}
+	for _, order := range []*orderdomain.Order{&parent, &parent.Children[0]} {
+		delivery := NewOrderDelivery(order)
+		if delivery == nil || delivery.Fulfillment.Payload != "TEST-NOT-REDEEMABLE" || delivery.Items[0].Instructions["zh-CN"] != "PRIVATE-INSTRUCTIONS" || delivery.Fulfillment.DeliveryData["note"] != "PRIVATE-STRUCTURED-DATA" {
+			t.Fatal("explicit response lost delivery, or metadata redaction mutated source")
+		}
+	}
+}
+
+func TestDeliveryUnavailableBeforePaymentAndDelivery(t *testing.T) {
+	now := time.Now()
+	for _, order := range []*orderdomain.Order{
+		nil, {},
+		{Fulfillment: &fulfillmentdomain.Fulfillment{Status: "delivered", Payload: "TEST-UNPAID"}},
+		{PaidAt: &now, Fulfillment: &fulfillmentdomain.Fulfillment{Status: "pending", Payload: "TEST-PENDING"}},
+	} {
+		if NewOrderDelivery(order) != nil {
+			t.Fatal("unavailable delivery was exposed")
+		}
 	}
 }

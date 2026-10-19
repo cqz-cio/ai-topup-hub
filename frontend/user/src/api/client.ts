@@ -102,6 +102,7 @@ function createClient(injectAuth: boolean) {
                 headers,
                 body: body instanceof FormData ? body : body !== undefined ? JSON.stringify(body) : undefined,
                 credentials: opts.credentials,
+                cache: opts.cache,
                 signal: controller.signal,
             })
         } catch (err: any) {
@@ -123,6 +124,12 @@ function createClient(injectAuth: boolean) {
                 const message = getHttpErrorMessage(response.status)
                 console.error('HTTP Error:', message)
                 return Promise.reject(new Error(message))
+            }
+            if ((response.headers.get('content-type') || '').includes('application/json')) {
+                // Business errors use an HTTP 200 JSON envelope. Never save that
+                // envelope as a delivery file or present it as a successful download.
+                const error = await response.json().catch(() => null)
+                return Promise.reject(new Error(error?.msg || t('common.api.requestFailed')))
             }
             const blob = await response.blob()
             return { data: blob }
