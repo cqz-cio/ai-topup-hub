@@ -1,7 +1,7 @@
 <template>
   <article class="catalog-card" :class="{ 'catalog-card-credits': credits }">
     <RouterLink :to="path" class="product-image-link" :aria-label="t('shopUi.detailsLabel', { name: title })">
-      <img v-if="image" :src="image" :alt="title" loading="lazy" decoding="async" @error="$emit('imageError')" />
+      <img v-if="image" :src="displayImage" :class="{ 'is-glass-cover': usingGlassCover }" :alt="title" loading="lazy" decoding="async" @error="handleImageError" />
       <div v-else class="product-image-placeholder"><PackageOpen :size="36" aria-hidden="true" /></div>
       <span v-if="!credits" class="image-category">{{ category }}</span>
     </RouterLink>
@@ -28,11 +28,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { ArrowUpRight, PackageOpen } from 'lucide-vue-next'
 import type { StorefrontDisplayDetails } from '../../data/storefrontCatalog'
+import { useAppStore } from '../../stores/app'
+import { getCatalogGlassCover } from '../../utils/catalogGlass'
 
 const props = defineProps<{
   slug: string
@@ -48,9 +50,19 @@ const props = defineProps<{
   multipleSkus: boolean
   credits?: boolean
 }>()
-defineEmits<{ imageError: [] }>()
+const emit = defineEmits<{ imageError: [] }>()
 const { t } = useI18n()
+const appStore = useAppStore()
 const path = computed(() => `/products/${encodeURIComponent(props.slug)}`)
+const glassCoverFailed = ref(false)
+const glassCover = computed(() => appStore.isResellerTenant ? '' : getCatalogGlassCover(props.image))
+const usingGlassCover = computed(() => !!glassCover.value && !glassCoverFailed.value)
+const displayImage = computed(() => usingGlassCover.value ? glassCover.value : props.image)
+watch(() => props.image, () => { glassCoverFailed.value = false })
+function handleImageError() {
+  if (usingGlassCover.value) glassCoverFailed.value = true
+  else emit('imageError')
+}
 </script>
 
 <style scoped>
@@ -86,6 +98,38 @@ const path = computed(() => `/products/${encodeURIComponent(props.slug)}`)
 
 .catalog-card { min-width: 0; }
 .catalog-card-credits .product-image-link { background: #213d2c; }
+
+/* The illustration is visible through the entire card; content stays opaque. */
+.brand-scene .catalog-card {
+  border-radius: 18px;
+  border-color: rgba(255, 255, 255, .72);
+  background: linear-gradient(145deg, rgba(255, 255, 255, .28), rgba(255, 255, 255, .12) 42%, rgba(255, 255, 255, .24));
+  -webkit-backdrop-filter: blur(5px) saturate(1.05);
+  backdrop-filter: blur(5px) saturate(1.05);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .65), inset 0 -1px 0 rgba(255, 255, 255, .25), 0 10px 28px -16px rgba(13, 59, 62, .28);
+}
+.brand-scene .catalog-card:hover {
+  border-color: rgba(255, 255, 255, .95);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .8), inset 0 -1px 0 rgba(255, 255, 255, .3), 0 14px 32px -14px rgba(13, 59, 62, .3);
+}
+.brand-scene .product-image-link { background: transparent; }
+.brand-scene .image-category {
+  background: rgba(255, 255, 255, .66);
+  border: 1px solid rgba(255, 255, 255, .55);
+  padding: 3px 7px;
+}
+.brand-scene .stock-label.is-out { color: #754000; }
+.dark .brand-scene .catalog-card {
+  border-color: rgba(220, 247, 237, .3);
+  background: linear-gradient(145deg, rgba(20, 43, 37, .58), rgba(14, 33, 31, .38) 42%, rgba(20, 43, 37, .56));
+  box-shadow: inset 0 1px 0 rgba(224, 255, 244, .22), 0 10px 28px -16px rgba(0, 0, 0, .42);
+}
+.dark .brand-scene .is-glass-cover { filter: brightness(0) invert(.94); }
+.dark .brand-scene .stock-label.is-out { color: #ffdc8b; }
+@supports not ((backdrop-filter: blur(5px)) or (-webkit-backdrop-filter: blur(5px))) {
+  .brand-scene .catalog-card { background: rgba(239, 250, 246, .84); }
+  .dark .brand-scene .catalog-card { background: rgba(20, 43, 37, .9); }
+}
 @media (max-width: 767px) {
   .catalog-card { border-radius: 10px; }
   .product-body { padding: 16px 14px; }
