@@ -103,9 +103,9 @@ function handleImageError() {
 .brand-scene .catalog-card {
   border-radius: 18px;
   border-color: rgba(255, 255, 255, .72);
-  background: linear-gradient(145deg, rgba(255, 255, 255, .28), rgba(255, 255, 255, .12) 42%, rgba(255, 255, 255, .24));
-  -webkit-backdrop-filter: blur(5px) saturate(1.05);
-  backdrop-filter: blur(5px) saturate(1.05);
+  background: linear-gradient(160deg, rgba(255, 255, 255, .3), rgba(255, 255, 255, .22) 38%, rgba(255, 255, 255, .38));
+  -webkit-backdrop-filter: blur(7px) saturate(1.02);
+  backdrop-filter: blur(7px) saturate(1.02);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .65), inset 0 -1px 0 rgba(255, 255, 255, .25), 0 10px 28px -16px rgba(13, 59, 62, .28);
 }
 .brand-scene .catalog-card:hover {
@@ -113,6 +113,13 @@ function handleImageError() {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .8), inset 0 -1px 0 rgba(255, 255, 255, .3), 0 14px 32px -14px rgba(13, 59, 62, .3);
 }
 .brand-scene .product-image-link { background: transparent; }
+.brand-scene .product-body h3 { font-size: 17px; line-height: 1.5; min-height: 3em; font-weight: 700; }
+.brand-scene .product-facts { font-size: 13px; line-height: 1.55; font-weight: 550; }
+.brand-scene .product-facts dt, .brand-scene .product-facts dd { color: var(--ui-text-primary); }
+.brand-scene .product-price strong { font-size: 28px; font-weight: 750; color: var(--ui-text-primary); }
+.brand-scene .stock-label { font-size: 13px; font-weight: 500; }
+.brand-scene .product-actions .store-text-link { font-size: 13px; font-weight: 600; }
+
 .brand-scene .image-category {
   background: rgba(255, 255, 255, .66);
   border: 1px solid rgba(255, 255, 255, .55);
@@ -147,6 +154,7 @@ function handleImageError() {
 @media (max-width: 479px) {
   .product-body { padding: 18px; }
   .product-body h3 { font-size: 16px; min-height: auto; }
+  .brand-scene .product-body h3 { font-size: 16px; min-height: auto; }
   .product-facts { font-size: 12px; }
   .product-price strong { font-size: 26px; }
   .stock-label { width: auto; margin-left: auto; }

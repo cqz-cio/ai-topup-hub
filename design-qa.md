@@ -247,3 +247,31 @@ final result: passed（本地实现）。用户批准整张透明玻璃卡片，
 ## 透明玻璃商品卡片正式验收 20261019-115828
 
 final result: passed。干净构建与批准图在 1821×864 同一输入中并排检查，正式截图 `work/codex-runtime/glass-cards-20261019/production-desktop.png` 与本地一致。正式 390/320px、搜索、详情、首页和深色模式通过，无横向溢出或新控制台错误；商品价格库存按正式实时数据展示。32 项公网请求通过，构建来源 `2f8ffac6b0cd1c4ecc03203053a24fb4972e61e7`；暂无阻断项。
+
+
+## 2026-10-19 玻璃卡片文字清晰度与浅色背景
+
+- Source visual truth: `C:/Users/admin/.codex/generated_images/01a15233-f398-7053-9abc-ff5f3dffaa6a/exec-f1d6b3ca-b4cf-45b5-be8d-424bef425875.png`，用户明确要求按该预览上线。
+- Implementation: `D:/卡网/work/codex-runtime/glass-clarity-20261019/daily-desktop-final.png`；日常实际 `http://127.0.0.1:5173/products`。
+- Viewport: 1821×864 CSS px, DPR 1。Source / implementation pixels: {'source': (1821, 864), 'implementation': (65536, 4292542531)}；按相同尺寸直接比较，未缩放或裁切。
+- State: 经典主站、中文、浅色、商品中心顶部、三列商品卡片。预览 Plus 缺货；本机库存变动后为可购买，价格仍为 130；保留真实库存状态，不为截图改数据。
+- Full-view evidence: 已在同一比较输入同时打开批准图与最终截图。Focused-region evidence: 逐项对比首排标题、三行说明、价格、细边和背景；390/320px 近距离截图检查文字和按钮，见 `daily-390-card.png`、`daily-320.png`、`daily-dark-320.png`。
+
+### Findings and comparison history
+
+- 初稿 `daily-desktop.png` [P2]：10px 模糊使人物轮廓过于模糊，小字仍偏弱。修正为 7px 模糊，小字 13px / 550 字重并使用不透明深绿文字；最终截图确认文字区清晰且背景仍透过卡片。
+- Fonts: 保留项目 Inter / PingFang SC / Microsoft YaHei 回退；标题 17px / 700、说明 13px / 550、价格 28px / 750；移动端标题 16px。无裁切或省略商品条件。平台字形及局部一字换行差异属 P3，保留真实网页字体。
+- Layout: 保留现有栏宽、三列间隔、18px 圆角、完整横图和操作入口；首排高度约 489px。768px、390px、320px 无横向溢出，44px 主操作完整。
+- Colors: 原背景图 opacity=1，增加 24% 白色柔化及 0.9 饱和度；卡片透明白色渐变 30%/22%/38%、白色细边和内高光。深色背景取消白色柔化，使用现有暗色处理；文字保持浅色。
+- Assets: 继续使用已有品牌原图和 16 张透明矢量封面，无新增位图、无封面内容改变，无拉伸或图片加载失败。
+- Copy: 名称、价格、说明、库存及交付规则均由现有数据提供。商品和客服文案未改。
+- Interactions: 首页与商品中心、搜索 Go、Codex 六档筛选、详情跳转、明暗切换通过；控制台无 error。
+
+### Implementation checklist
+
+- [x] 与批准图对照并修复 P2 文字 / 模糊差异。
+- [x] 日常入口桌面、平板、390/320px 与深色检查。
+- [x] 147 项现有商城测试通过，未新增镜像样式测试。
+- [x] 无未解决 P0/P1/P2；轻微字体栅格化差异作为 P3 记录。
+
+final result: passed

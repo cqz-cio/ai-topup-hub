@@ -1,6 +1,7 @@
 /* π星卡社：所有购买、付款、查询、交付页面共用同一套品牌样式。 */
 .brand-scene {
   --brand-scene-opacity: 1;
+  --brand-scene-wash: .24;
   position: relative;
   isolation: isolate;
 }
@@ -10,14 +11,16 @@
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background: url('/brand/jellyfishing-background.png') center / cover no-repeat;
+  background: linear-gradient(rgba(255, 255, 255, var(--brand-scene-wash)), rgba(255, 255, 255, var(--brand-scene-wash))), url('/brand/jellyfishing-background.png') center / cover no-repeat;
+  filter: saturate(.9);
   opacity: var(--brand-scene-opacity);
 }
+.dark .brand-scene { --brand-scene-wash: 0; }
 .dark .brand-scene::before { filter: brightness(.4) saturate(.88); }
 .brand-scene .storefront {
-  --ui-text-primary: #142d29;
-  --ui-text-secondary: #203d35;
-  --ui-text-muted: #2d4b45;
+  --ui-text-primary: #102b24;
+  --ui-text-secondary: #1b382f;
+  --ui-text-muted: #28453c;
 }
 .dark .brand-scene .storefront {
   --ui-text-primary: #f1faf5;
