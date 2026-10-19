@@ -99,18 +99,43 @@ function handleImageError() {
 .catalog-card { min-width: 0; }
 .catalog-card-credits .product-image-link { background: #213d2c; }
 
-/* The illustration is visible through the entire card; content stays opaque. */
+/* Thin glass: the surface and rim reflect light without fading the content. */
 .brand-scene .catalog-card {
+  position: relative;
+  isolation: isolate;
   border-radius: 18px;
-  border-color: rgba(255, 255, 255, .72);
-  background: linear-gradient(160deg, rgba(255, 255, 255, .3), rgba(255, 255, 255, .22) 38%, rgba(255, 255, 255, .38));
-  -webkit-backdrop-filter: blur(7px) saturate(1.02);
-  backdrop-filter: blur(7px) saturate(1.02);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .65), inset 0 -1px 0 rgba(255, 255, 255, .25), 0 10px 28px -16px rgba(13, 59, 62, .28);
+  border-color: rgba(255, 255, 255, .88) rgba(255, 255, 255, .7) rgba(255, 255, 255, .84) rgba(255, 255, 255, .78);
+  background: linear-gradient(160deg, rgba(255, 255, 255, .18), rgba(255, 255, 255, .07) 38%, rgba(255, 255, 255, .16) 74%, rgba(255, 255, 255, .24));
+  -webkit-backdrop-filter: blur(3px) saturate(1.04);
+  backdrop-filter: blur(3px) saturate(1.04);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .78), inset 1px 0 0 rgba(255, 255, 255, .3), inset 0 -1px 0 rgba(255, 255, 255, .62), 0 8px 24px -18px rgba(13, 59, 62, .32);
 }
+.brand-scene .catalog-card::before,
+.brand-scene .catalog-card::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  border-radius: inherit;
+}
+.brand-scene .catalog-card::before {
+  z-index: 2;
+  inset: 2px;
+  border: 1px solid rgba(255, 255, 255, .72);
+  border-radius: 15px;
+  -webkit-mask-image: linear-gradient(135deg, #000, rgba(0, 0, 0, .22) 24%, transparent 44%, transparent 62%, rgba(0, 0, 0, .5) 86%, #000);
+  mask-image: linear-gradient(135deg, #000, rgba(0, 0, 0, .22) 24%, transparent 44%, transparent 62%, rgba(0, 0, 0, .5) 86%, #000);
+}
+.brand-scene .catalog-card::after {
+  z-index: 0;
+  inset: 0;
+  background:
+    linear-gradient(45deg, transparent 32%, rgba(255, 255, 255, .95) 42%, rgba(255, 255, 255, .95) 58%, transparent 68%) right 5px top 6px / 11px 9px no-repeat,
+    linear-gradient(154deg, rgba(255, 255, 255, .24), rgba(255, 255, 255, .06) 14%, transparent 28%);
+}
+.brand-scene .catalog-card > * { position: relative; z-index: 1; }
 .brand-scene .catalog-card:hover {
   border-color: rgba(255, 255, 255, .95);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .8), inset 0 -1px 0 rgba(255, 255, 255, .3), 0 14px 32px -14px rgba(13, 59, 62, .3);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .9), inset 1px 0 0 rgba(255, 255, 255, .4), inset 0 -1px 0 rgba(255, 255, 255, .7), 0 12px 28px -18px rgba(13, 59, 62, .36);
 }
 .brand-scene .product-image-link { background: transparent; }
 .brand-scene .product-body h3 { font-size: 17px; line-height: 1.5; min-height: 3em; font-weight: 700; }
@@ -131,6 +156,8 @@ function handleImageError() {
   background: linear-gradient(145deg, rgba(20, 43, 37, .58), rgba(14, 33, 31, .38) 42%, rgba(20, 43, 37, .56));
   box-shadow: inset 0 1px 0 rgba(224, 255, 244, .22), 0 10px 28px -16px rgba(0, 0, 0, .42);
 }
+.dark .brand-scene .catalog-card::before { opacity: .38; }
+.dark .brand-scene .catalog-card::after { opacity: .28; }
 .dark .brand-scene .is-glass-cover { filter: brightness(0) invert(.94); }
 .dark .brand-scene .stock-label.is-out { color: #ffdc8b; }
 @supports not ((backdrop-filter: blur(5px)) or (-webkit-backdrop-filter: blur(5px))) {

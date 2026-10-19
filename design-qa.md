@@ -282,3 +282,39 @@ final result: passed
 正式截图 `work/codex-runtime/glass-clarity-20261019/production-desktop.png` 与日常和干净构建同为 1821×864；390/320px、深色、首页、搜索和详情检查通过。动态库存按正式数据展示，价格与后台配置指纹一致。共 7 项正式页面检查，无溢出、图片失败或控制台错误。
 
 final result: passed
+
+
+## 2026-10-19 清透薄玻璃卡片
+
+- Source visual truth: `C:/Users/admin/.codex/generated_images/01a15233-f398-7053-9abc-ff5f3dffaa6a/exec-8a90b5d4-7021-421b-8756-5227a724f65b.png`。用户明确授权按此图修改、先本地验证再上线。
+- Implementation: `D:/卡网/work/codex-runtime/thin-glass-20261019/daily-desktop.png`，日常 `http://127.0.0.1:5173/products`。
+- Viewport: 1821×864 CSS px，DPR 1；批准图与实现均为 1821×864 pixels，同尺寸比较，没有缩放。State: 中文、浅色、经典主站、商品中心顶部。
+- Full-view comparison: 批准图与本地截图在同一次工具输入中一起打开并比较。Focused evidence: 首排玻璃亮边、角部反光、标题、三行说明、价格与按钮；移动端 `daily-390-card.png`、`daily-320.png`、`daily-dark-320.png` 进一步核对小字和操作区。
+
+### Findings
+
+- 无未解决 P0/P1/P2。卡片整体更透明，细亮外边、内侧渐隐反射及右上角反光与批准稿的薄玻璃方向一致；背景保留现有资产和颜色处理。
+- [P3] 生成稿的部分中文笔画、背景位置与原图有轻微生成偏差，实际页面保留真实字体、品牌原图及动态库存，不复制这些偏差。生成稿库存 9155/9977，本地当前 9177/9978；未改业务数据来匹配截图。
+
+### Five fidelity surfaces
+
+- Fonts / typography: 沿用项目字体及字重。标题 17px/700，手机 16px；说明 13px/550，价格 28px/750。深色文字完全不透明，深色模式浅色文字清晰，未新增裁切和省略。
+- Spacing / layout: 保留三列、311.7px 栏宽、18px 间隔、18px 圆角与约 489px 首排高度；768/390/320px 无横向溢出，主按钮均不小于 44px。
+- Colors / tokens: 玻璃背景模糊从 7px 减为 3px，透明白色渐变降为 18%/7%/16%/24%；外沿、2px 内侧反射和局部斜光补充薄玻璃亮边。原水母背景 opacity=1、24% 白色柔化与 0.9 饱和度保持不变。深色模式保留深绿底和浅色内容，反光减弱。
+- Image / assets: 原 Logo、水母背景、16 张透明 GPT/Codex 矢量封面直接复用，未生成替代图片，无拉伸、白底遮挡或可见图片加载失败。玻璃为组件表面样式，不新增图片资产。
+- Copy / content: 沿用真实商品名、价格、库存、资格提示和客服内容。后端及交易逻辑未改。
+
+### Interaction and comparison history
+
+- 第一轮同尺寸比较未发现需要修正的 P0/P1/P2；没有用构建排障冒充视觉迭代。
+- 亮边和反光层 pointer-events:none；点击选购正常进入 Codex 商品详情，搜索 Go 返回对应两款商品，Codex 显示六档；首页与商品中心共用外观。
+- 390/320px、768px、明暗切换、详情、首页检查通过；浏览器无 error。保留缺少 backdrop-filter 的浏览器原有可读底色回退。
+
+### Implementation checklist
+
+- [x] 同尺寸批准图与实际页面对照。
+- [x] 桌面、平板、手机、深色模式和主要导航验证。
+- [x] 日常与发布工作区 147 项现有商城测试通过。
+- [x] 日常类型检查及生产构建通过；发布产物另外验证后再上线。
+
+final result: passed
