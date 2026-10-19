@@ -2,7 +2,8 @@
   <!-- The root's stable scrollbar gutter already reserves space during body scroll locks. -->
   <ConfigProvider :scroll-body="{ padding: 0, margin: 0 }">
     <div id="app" class="min-h-screen bg-background text-foreground flex flex-col"
-      :class="{ 'brand-scene': !isStandalone && !isVault && !isResellerConsole && !appStore.isResellerTenant }">
+      :class="{ 'brand-scene': hasBrandScene }">
+      <BrandSceneMotion v-if="hasBrandScene" />
       <ErrorBoundary v-if="isStandalone"><RouterView /></ErrorBoundary>
       <!-- vault 模板：自带顶栏/页脚的外壳包裹页面（控制台仍走下方分支） -->
       <VaultLayout v-else-if="isVault && !isResellerConsole">
@@ -58,6 +59,7 @@ import MobileBottomNav from './components/MobileBottomNav.vue'
 
 // vault 外壳按需加载，classic 用户不会拉取其 chunk/样式
 const VaultLayout = defineAsyncComponent(() => import('./templates/vault/layout/VaultLayout.vue'))
+const BrandSceneMotion = defineAsyncComponent(() => import('./components/BrandSceneMotion.vue'))
 
 // config 由 router.beforeEach 统一加载，无需在此重复调用
 const appStore = useAppStore()
@@ -66,6 +68,7 @@ const isResellerConsole = computed(() => route.meta.resellerConsole === true)
 const isStandalone = computed(() => route.meta.standalone === true)
 // getActiveTemplate 读取 appStore.config（响应式），config 加载后会重新计算
 const isVault = computed(() => getActiveTemplate() === 'vault')
+const hasBrandScene = computed(() => !isStandalone.value && !isVault.value && !isResellerConsole.value && !appStore.isResellerTenant)
 </script>
 
 <style>
