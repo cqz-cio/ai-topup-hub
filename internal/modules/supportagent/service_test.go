@@ -22,7 +22,7 @@ type fakeProvider struct {
 	started chan struct{}
 }
 
-func (p *fakeProvider) Complete(ctx context.Context, m []Message) (Completion, error) {
+func (p *fakeProvider) Complete(ctx context.Context, m []Message, _ []ToolDefinition) (Completion, error) {
 	p.mu.Lock()
 	p.calls = append(p.calls, append([]Message(nil), m...))
 	p.mu.Unlock()
@@ -39,7 +39,7 @@ func (p *fakeProvider) Complete(ctx context.Context, m []Message) (Completion, e
 	if p.fail {
 		return Completion{}, errors.New("unknown network result")
 	}
-	return Completion{ModelAnswer{"answer", "请在订单交付说明查看兑换步骤。", []string{"guide:redeem"}}, 120, 40}, nil
+	return Completion{Answer: ModelAnswer{"answer", "请在订单交付说明查看兑换步骤。", []string{"guide:redeem"}}, Input: 120, Output: 40}, nil
 }
 func (p *fakeProvider) count() int { p.mu.Lock(); defer p.mu.Unlock(); return len(p.calls) }
 
@@ -307,7 +307,7 @@ func TestDeepSeekWireContract(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var payload map[string]any
 		json.NewDecoder(r.Body).Decode(&payload)
-		if payload["tools"] != nil || payload["stream"] != false || payload["model"] != "deepseek-flash" || payload["max_tokens"] != float64(800) {
+		if len(payload["tools"].([]any)) != 6 || payload["tool_choice"] != "auto" || payload["stream"] != false || payload["model"] != "deepseek-flash" || payload["max_tokens"] != float64(800) {
 			t.Error("unsafe wire settings")
 		}
 		if payload["thinking"].(map[string]any)["type"] != "disabled" {
@@ -322,7 +322,7 @@ func TestDeepSeekWireContract(t *testing.T) {
 	defer server.Close()
 	provider := NewDeepSeek(testConfig())
 	provider.endpoint = server.URL
-	answer, err := provider.Complete(context.Background(), []Message{{"system", "JSON"}, {"user", "怎么充值"}})
+	answer, err := provider.Complete(context.Background(), []Message{{Role: "system", Content: "JSON"}, {Role: "user", Content: "怎么充值"}}, ToolDefinitions())
 	if err != nil || answer.Input != 123 || answer.Answer.Kind != "answer" {
 		t.Fatal(err, answer)
 	}

@@ -34,6 +34,7 @@ type publicProduct struct {
 	Content     map[string]string `json:"content"`
 	Price       string            `json:"price_amount"`
 	SoldOut     bool              `json:"is_sold_out"`
+	SKUs        []publicSKU       `json:"skus"`
 }
 type Catalog struct {
 	mu       sync.Mutex

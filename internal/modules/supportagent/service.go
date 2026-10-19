@@ -6,9 +6,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
-	"errors"
 	"io"
-	"log"
 	"mime"
 	"net"
 	"net/http"
@@ -34,6 +32,7 @@ type session struct {
 	touched              time.Time
 	busy                 bool
 	minute               []time.Time
+	modelMinute          []time.Time
 	conversation, locale string
 	history              []Message
 	business             BusinessState
@@ -41,14 +40,15 @@ type session struct {
 	cacheOrder           []string
 }
 type Service struct {
-	config    Config
-	provider  Provider
-	knowledge Knowledge
-	ledger    *Ledger
-	mu        sync.Mutex
-	sessions  map[string]*session
-	minute    []time.Time
-	active    int
+	config      Config
+	provider    Provider
+	knowledge   Knowledge
+	ledger      *Ledger
+	mu          sync.Mutex
+	sessions    map[string]*session
+	minute      []time.Time
+	modelMinute []time.Time
+	active      int
 }
 
 func NewService(c Config, p Provider, k Knowledge, l *Ledger) *Service {
@@ -103,7 +103,7 @@ func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == http.MethodGet && r.URL.Path == "/api/v1/support/health" {
-		writeJSON(w, 200, map[string]any{"ready": true, "local_only": true, "model": s.config.Model, "model_enabled": s.config.AllowModel, "policy_version": policy.Version})
+		writeJSON(w, 200, map[string]any{"ready": true, "local_only": true, "model": s.config.Model, "model_enabled": s.config.AllowModel, "policy_version": policy.Version, "tool_count": len(ToolDefinitions()), "max_model_rounds": maxModelRounds, "max_tool_calls": maxToolCalls})
 		return
 	}
 	if r.Method == http.MethodGet && r.URL.Path == "/api/v1/support/session" {
@@ -198,72 +198,26 @@ func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		local = true
 	}
 	if !local {
-		// Protect the upstream key and budget even if a browser disconnects. No retry.
 		ctx, cancel := context.WithTimeout(r.Context(), 45*time.Second)
 		defer cancel()
-		safeInput := emailPattern.ReplaceAllString(input.Message, "[邮箱已隐藏]")
-		query := safeInput
-		for _, m := range history {
-			if m.Role == "user" {
-				query += " " + m.Content
-			}
-		}
-		sources, catalogErr := s.knowledge.Sources(ctx, input.Locale, query, input.Product)
-		sources = append(confirmedSources(input), sources...)
-		messages, msgErr := makeMessages(input.Locale, history, safeInput, sources, catalogErr == nil)
-		if msgErr != nil {
-			// Keep the current user turn and recent context when an unusually long catalog fills the budget.
-			if len(sources) > 15 {
-				sources = sources[:15]
-			}
-			if len(history) > 4 {
-				history = history[len(history)-4:]
-			}
-			messages, msgErr = makeMessages(input.Locale, history, safeInput, sources, false)
-			if msgErr != nil {
-				failure(w, 503, "knowledge_unavailable")
-				return
-			}
-		}
-		encoded, _ := json.Marshal(messages)
-		// UTF-8 bytes + overhead is conservative for byte-tokenized input. Include output maximum.
-		reserve := usageCost(len(encoded)+2048, s.config.MaxOutput)
-		ledgerID := hash(cookie.Value + ":" + input.RequestID)
-		if err := s.ledger.Reserve(ledgerID, hash(cookie.Value), reserve, s.config, now); err != nil {
-			switch {
-			case errors.Is(err, ErrBudget):
-				failure(w, 429, "daily_limit")
-			case errors.Is(err, ErrDuplicate):
-				failure(w, 409, "already_submitted")
-			default:
-				failure(w, 503, "budget_unavailable")
-			}
-			return
-		}
-		completion, providerErr := s.provider.Complete(ctx, messages)
-		// Usage may still be present when an answer is truncated or malformed.
-		if completion.Input > 0 {
-			if err := s.ledger.Settle(ledgerID, completion.Input, completion.Output); err != nil {
-				failure(w, 503, "budget_unavailable")
-				return
-			}
-		}
-		if providerErr != nil {
-			log.Printf("support provider diagnostic: %s", providerErr.Error())
-			failure(w, 502, "model_unavailable")
-			return
-		}
-		reply, err = validateAnswer(completion.Answer, sources, input.Locale)
+		var answer ModelAnswer
+		reply, answer, err = s.modelReply(ctx, input, history, current, cookie.Value)
 		if err != nil {
-			failure(w, 502, "answer_unverified")
+			if problem, ok := err.(modelFailure); ok {
+				if problem.code == "rate_limit" {
+					w.Header().Set("Retry-After", "60")
+				}
+				failure(w, problem.status, problem.code)
+			} else {
+				failure(w, 502, "model_unavailable")
+			}
 			return
 		}
 		s.mu.Lock()
-		if reply.Mode == "model" && completion.Answer.Kind != "out_of_scope" {
-			// Preserve the JSON wire format in assistant history as well as the prompt;
-			// a plain-text assistant example can make follow-up output lose its schema.
-			assistantJSON, _ := json.Marshal(completion.Answer)
-			current.history = append(current.history, Message{"user", safeInput}, Message{"assistant", string(assistantJSON)})
+		if reply.Mode == "model" && answer.Kind != "out_of_scope" {
+			assistantJSON, _ := json.Marshal(answer)
+			safeInput := emailPattern.ReplaceAllString(input.Message, "[邮箱已隐藏]")
+			current.history = append(current.history, Message{Role: "user", Content: safeInput}, Message{Role: "assistant", Content: string(assistantJSON)})
 			for len(current.history) > 12 {
 				current.history = current.history[2:]
 			}

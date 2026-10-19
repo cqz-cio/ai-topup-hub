@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { askSupport, agentError, SupportError } from '../src/components/support/supportApi.ts'
+import { askSupport, agentCopy, agentError, getSupportMode, SupportError } from '../src/components/support/supportApi.ts'
 
 test('support sends only bounded user fields and filters untrusted navigation', async () => {
   const original = globalThis.fetch
@@ -20,6 +20,31 @@ test('support sends only bounded user fields and filters untrusted navigation', 
     assert.equal(body.message, '我拿到码了')
     assert.deepEqual(response.links, [{ label: '订单', to: '/me/orders' }])
   } finally { globalThis.fetch = original }
+})
+
+test('support status follows the service flag without claiming offline mode on failure', async () => {
+  const original = globalThis.fetch
+  try {
+    for (const enabled of [true, false]) {
+      globalThis.fetch = async (url, options) => {
+        assert.equal(url, '/api/v1/support/health')
+        assert.equal(options?.cache, 'no-store')
+        return new Response(JSON.stringify({ ready: true, model_enabled: enabled }))
+      }
+      assert.equal(await getSupportMode(new AbortController().signal), enabled ? 'model' : 'local')
+    }
+    for (const health of [{ ready: false, model_enabled: true }, { ready: true, model_enabled: 'true' }, {}]) {
+      globalThis.fetch = async () => new Response(JSON.stringify(health))
+      assert.equal(await getSupportMode(new AbortController().signal), 'unknown')
+    }
+    globalThis.fetch = async () => { throw new Error('unavailable') }
+    assert.equal(await getSupportMode(new AbortController().signal), 'unknown')
+  } finally { globalThis.fetch = original }
+  for (const locale of ['zh-CN', 'zh-TW', 'en-US']) {
+    assert.match(agentCopy(locale, 'model').subtitle, /AI/)
+    assert.match(agentCopy(locale, 'local').subtitle, /离线|離線|Offline/)
+    assert.doesNotMatch(agentCopy(locale, 'unknown').intro, /不调用|不呼叫|no AI model|Offline trial/)
+  }
 })
 
 test('support never retries failed billable requests', async () => {

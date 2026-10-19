@@ -51,9 +51,10 @@ import type { PetAction } from './petMotion'
 import { getSupportCopy, supportContacts } from './supportDemo'
 import { useSupportDrag } from './useSupportDrag'
 import type { SupportLink } from './supportConversation'
-import { askSupport, agentCopy, agentError } from './supportApi'
+import { askSupport, agentCopy, agentError, getSupportMode, type SupportMode } from './supportApi'
 
-const app = useAppStore(), copy = computed(() => ({ ...getSupportCopy(app.locale), ...agentCopy(app.locale) }))
+const supportMode = ref<SupportMode>('unknown')
+const app = useAppStore(), copy = computed(() => ({ ...getSupportCopy(app.locale), ...agentCopy(app.locale, supportMode.value) }))
 const route = useRoute()
 const open = ref(false), busy = ref(false), input = ref(''), contactsOpen = ref(false), showTopics = ref(false), copyStatus = ref('')
 const launcher = ref<HTMLButtonElement>(), closeButton = ref<HTMLButtonElement>(), inputElement = ref<HTMLInputElement>(), body = ref<HTMLElement>()
@@ -64,6 +65,7 @@ const messages = ref<{ id: number; role: 'user' | 'assistant'; text: string; lin
 let greetingTimer: ReturnType<typeof setTimeout> | undefined, messageId = 0
 let conversationId = crypto.randomUUID()
 let request: AbortController | undefined, generation = 0
+let modeRequest: AbortController | undefined
 const speech = computed(() => busy.value ? copy.value.think : phase.value === 'reply' ? copy.value.reply : phase.value === 'wave' ? copy.value.greeting : copy.value.idle)
 function animate(next: PetAction) { action.value = next; sequence.value++ }
 function close() { open.value = false; contactsOpen.value = false; nextTick(() => launcher.value?.focus({ preventScroll: true })) }
@@ -72,11 +74,18 @@ function activate(event: MouseEvent) { if (allowClick(event)) void toggle() }
 async function toggle() {
   if (open.value) { close(); return }
   open.value = true
+  void refreshMode()
   if (!busy.value) animate('wave')
   await nextTick()
   if (matchMedia('(pointer: fine)').matches) inputElement.value?.focus({ preventScroll: true })
   else closeButton.value?.focus({ preventScroll: true })
   scrollMessages()
+}
+async function refreshMode() {
+  modeRequest?.abort()
+  const controller = modeRequest = new AbortController()
+  const mode = await getSupportMode(controller.signal)
+  if (modeRequest === controller && !controller.signal.aborted) supportMode.value = mode
 }
 function scrollMessages(newReply = false) {
   void nextTick(() => {
@@ -96,12 +105,14 @@ async function ask(question: string) {
   const value = question.trim().slice(0, 500)
   if (!value || busy.value) return
   const locale = app.locale, turn = ++generation
+  void refreshMode()
   request?.abort(); request = new AbortController()
   messages.value.push({ id: ++messageId, role: 'user', text: value }); input.value = ''; busy.value = true; showTopics.value = false; contactsOpen.value = false
   animate('think'); scrollMessages()
   try {
     const response = await askSupport(value, locale, conversationId, typeof route.params.slug === 'string' ? route.params.slug : '', request.signal)
     if (turn !== generation) return
+    if (response.mode === 'model') { modeRequest?.abort(); supportMode.value = 'model' }
     messages.value.push({ id: ++messageId, role: 'assistant', text: response.text, links: response.links })
     contactsOpen.value = response.handoff === true
   } catch (error) {
@@ -124,7 +135,7 @@ onMounted(() => { greetingTimer = setTimeout(() => { greetingVisible.value = fal
 function resetConversation() { generation++; request?.abort(); busy.value = false; conversationId = crypto.randomUUID(); messages.value = []; input.value = ''; showTopics.value = false; contactsOpen.value = false; animate('idle') }
 watch(() => app.locale, resetConversation)
 watch(() => route.params.slug, resetConversation)
-onBeforeUnmount(() => { generation++; request?.abort(); clearTimeout(greetingTimer) })
+onBeforeUnmount(() => { generation++; request?.abort(); modeRequest?.abort(); clearTimeout(greetingTimer) })
 </script>
 
 <style scoped>

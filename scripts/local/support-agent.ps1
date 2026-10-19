@@ -1,4 +1,4 @@
-param([ValidateSet('start','stop','status')][string]$Action='start',[switch]$Build)
+param([ValidateSet('start','stop','status')][string]$Action='start',[switch]$Build,[switch]$AllowModel)
 $ErrorActionPreference='Stop'
 $project=Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 $runtime=Join-Path $project 'work/codex-runtime/support-agent'
@@ -25,7 +25,12 @@ if($Action -eq 'stop'){
  if(Test-Path -LiteralPath $stateFile){Remove-Item -LiteralPath $stateFile}
  Write-Output 'Local support service stopped.';exit
 }
-if($owned){if($Build){throw 'Stop the local support service before rebuilding'};Write-Output 'Local support service is already running.';exit}
+if($owned){
+ if($Build){throw 'Stop the local support service before rebuilding'}
+ $saved=Get-Content -LiteralPath $stateFile -Raw | ConvertFrom-Json
+ if([bool]$saved.modelEnabled -ne $AllowModel.IsPresent){throw 'Stop the local support service before changing model mode.'}
+ Write-Output 'Local support service is already running.';exit
+}
 if(-not(Test-Path -LiteralPath $private)){throw 'Missing private support configuration; see docs/customer-support-deepseek.md'}
 if(Get-NetTCPConnection -LocalPort 8085 -State Listen -ErrorAction SilentlyContinue){throw 'Port 8085 belongs to another process; leaving it unchanged.'}
 if($Build -or -not(Test-Path -LiteralPath $binary)){
@@ -44,8 +49,10 @@ if($Build -or -not(Test-Path -LiteralPath $binary)){
 $stamp=Get-Date -Format 'yyyyMMdd-HHmmss'
 $out=Join-Path $logs ('support-agent-'+$stamp+'.stdout.log')
 $err=Join-Path $logs ('support-agent-'+$stamp+'.stderr.log')
-$process=Start-Process -FilePath $binary -ArgumentList @('-config',('"'+$private+'"')) -WorkingDirectory $project -WindowStyle Hidden -RedirectStandardOutput $out -RedirectStandardError $err -PassThru
-[ordered]@{pid=$process.Id;startedUtcTicks=$process.StartTime.ToUniversalTime().Ticks;binary=$binary;stdout=$out;stderr=$err} | ConvertTo-Json | Set-Content -LiteralPath $stateFile
+$serviceArgs=@('-config',('"'+$private+'"'))
+if($AllowModel){$serviceArgs+='-allow-model'}
+$process=Start-Process -FilePath $binary -ArgumentList $serviceArgs -WorkingDirectory $project -WindowStyle Hidden -RedirectStandardOutput $out -RedirectStandardError $err -PassThru
+[ordered]@{pid=$process.Id;startedUtcTicks=$process.StartTime.ToUniversalTime().Ticks;binary=$binary;stdout=$out;stderr=$err;modelEnabled=$AllowModel.IsPresent} | ConvertTo-Json | Set-Content -LiteralPath $stateFile
 $ready=$false
 for($attempt=0;$attempt -lt 10;$attempt++){
  if($process.HasExited){break}
@@ -53,4 +60,4 @@ for($attempt=0;$attempt -lt 10;$attempt++){
  Start-Sleep -Milliseconds 500
 }
 if(-not $ready){if(-not $process.HasExited){$process.Kill($true);$null=$process.WaitForExit(5000)};throw ('Support service did not become ready; inspect '+$err)}
-Write-Output ('Local support service ready on 127.0.0.1:8085; PID '+$process.Id)
+Write-Output ('Local support service ready on 127.0.0.1:8085; PID '+$process.Id+'; model enabled: '+$health.model_enabled)

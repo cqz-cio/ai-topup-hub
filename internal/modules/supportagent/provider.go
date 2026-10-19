@@ -12,8 +12,10 @@ import (
 )
 
 type Message struct {
-	Role    string `json:"role"`
-	Content string `json:"content"`
+	Role       string     `json:"role"`
+	Content    string     `json:"content"`
+	ToolCalls  []ToolCall `json:"tool_calls,omitempty"`
+	ToolCallID string     `json:"tool_call_id,omitempty"`
 }
 type ModelAnswer struct {
 	Kind      string   `json:"kind"`
@@ -23,9 +25,11 @@ type ModelAnswer struct {
 type Completion struct {
 	Answer        ModelAnswer
 	Input, Output int
+	ToolCalls     []ToolCall
+	Content       string
 }
 type Provider interface {
-	Complete(context.Context, []Message) (Completion, error)
+	Complete(context.Context, []Message, []ToolDefinition) (Completion, error)
 }
 type DeepSeek struct {
 	config   Config
@@ -41,17 +45,25 @@ func NewDeepSeek(c Config) *DeepSeek {
 		CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse },
 	}}
 }
-func (p *DeepSeek) Complete(ctx context.Context, messages []Message) (Completion, error) {
+func (p *DeepSeek) Complete(ctx context.Context, messages []Message, tools []ToolDefinition) (Completion, error) {
 	result := Completion{}
-	// There is deliberately no tools parameter, browser/search API or client-selected model.
+	// Only the server-owned, read-only registry is exposed. There is no arbitrary
+	// URL, SQL, shell, payment execution or client-selected model tool.
 	payload := struct {
-		Model     string            `json:"model"`
-		Messages  []Message         `json:"messages"`
-		MaxTokens int               `json:"max_tokens"`
-		Stream    bool              `json:"stream"`
-		Thinking  map[string]string `json:"thinking"`
-		Format    map[string]string `json:"response_format"`
-	}{p.config.Model, messages, p.config.MaxOutput, false, map[string]string{"type": "disabled"}, map[string]string{"type": "json_object"}}
+		Model      string            `json:"model"`
+		Messages   []Message         `json:"messages"`
+		MaxTokens  int               `json:"max_tokens"`
+		Stream     bool              `json:"stream"`
+		Thinking   map[string]string `json:"thinking"`
+		Format     map[string]string `json:"response_format"`
+		Tools      []ToolDefinition  `json:"tools,omitempty"`
+		ToolChoice string            `json:"tool_choice"`
+	}{Model: p.config.Model, Messages: messages, MaxTokens: p.config.MaxOutput,
+		Thinking: map[string]string{"type": "disabled"}, Format: map[string]string{"type": "json_object"},
+		Tools: tools, ToolChoice: "none"}
+	if len(tools) > 0 {
+		payload.ToolChoice = "auto"
+	}
 	body, _ := json.Marshal(payload)
 	request, err := http.NewRequestWithContext(ctx, http.MethodPost, p.endpoint, bytes.NewReader(body))
 	if err != nil {
@@ -74,8 +86,8 @@ func (p *DeepSeek) Complete(ctx context.Context, messages []Message) (Completion
 	var data struct {
 		Choices []struct {
 			Message struct {
-				Content string            `json:"content"`
-				Tools   []json.RawMessage `json:"tool_calls"`
+				Content string     `json:"content"`
+				Tools   []ToolCall `json:"tool_calls"`
 			} `json:"message"`
 			Finish string `json:"finish_reason"`
 		} `json:"choices"`
@@ -89,6 +101,11 @@ func (p *DeepSeek) Complete(ctx context.Context, messages []Message) (Completion
 	}
 	result.Input = data.Usage.Input
 	result.Output = data.Usage.Output
+	if data.Choices[0].Finish == "tool_calls" && len(data.Choices[0].Message.Tools) > 0 && len(tools) > 0 {
+		result.ToolCalls = data.Choices[0].Message.Tools
+		result.Content = data.Choices[0].Message.Content
+		return result, nil
+	}
 	if data.Choices[0].Finish != "stop" || len(data.Choices[0].Message.Tools) > 0 {
 		return result, errors.New("incomplete provider answer")
 	}

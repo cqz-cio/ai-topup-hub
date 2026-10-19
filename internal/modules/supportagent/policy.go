@@ -40,6 +40,7 @@ type BusinessState struct {
 	Reopen           bool
 	Amount           int64
 	Currency         string
+	NaturalDates     bool
 	Start, End, Loss time.Time
 }
 
@@ -90,7 +91,7 @@ func detectProduct(message string) string {
 	if contains(s, "telegram", "tg会员", "tg會員") {
 		found = append(found, "telegram")
 	}
-	if contains(s, "gpt", "chatgpt") && !contains(s, "codex") {
+	if (contains(s, "gpt", "chatgpt") && !contains(s, "codex")) || plusNamePattern.MatchString(s) {
 		p := "gpt"
 		if contains(s, "可覆盖分类", "可覆盖充值", "可覆蓋儲值") {
 			p = "overwrite"
@@ -107,17 +108,15 @@ func detectProduct(message string) string {
 }
 func policyReply(ids ...string) Reply {
 	parts := []string{}
-	for _, id := range ids {
-		if text := policy.Rules[id]; text != "" {
-			parts = append(parts, text)
-		}
+	for _, rule := range policyRules(ids...) {
+		parts = append(parts, rule.Text)
 	}
 	return Reply{Text: strings.Join(parts, "\n\n"), Mode: "local", RuleIDs: ids, PolicyVersion: policy.Version}
 }
 func clarify(text string) Reply {
 	return Reply{Text: text, Mode: "local", PolicyVersion: policy.Version}
 }
-func human(ids ...string) Reply { r := policyReply(ids...); r.Handoff = true; return r }
+func human(ids ...string) Reply { return handoffReply(ids...) }
 func unknown(locale string) Reply {
 	r := clarify(pick(locale, "这项情况暂时无法按已确认规则判断，请联系人工客服核实。我不会猜测或作承诺。", "This case is not covered by the confirmed rules. Please contact staff for verification; I cannot make a promise.", "這項情況暫時無法按已確認規則判斷，請聯絡人工客服核實，不猜測或作承諾。"))
 	r.Handoff = true
@@ -184,6 +183,9 @@ func businessAnswer(in chatInput, state *BusinessState) Reply {
 	if contains(m, "人工", "客服时间", "几点", "客服联系方式", "human", "support hours") {
 		return human("hours", "boundary")
 	}
+	if asksForPerson(m) {
+		return handoffPreparation("")
+	}
 	if contains(m, "退到", "原路", "退款渠道", "退款方式", "多久退款", "退款多久", "多久到账", "微信退款") || (contains(m, "支付宝") && contains(m, "退")) {
 		return human("refund_channel")
 	}
@@ -206,12 +208,13 @@ func businessAnswer(in chatInput, state *BusinessState) Reply {
 		return beginCase(state, "pending")
 	}
 	if contains(m, "钱包", "wallet") && contains(m, "充值", "怎么用", "余额", "top up", "balance") && !contains(m, "退") {
-		r := policyReply("wallet", "payment_methods", "payment_fee")
-		r.Links = []Link{{Label: "我的钱包", To: "/me/wallet"}}
-		return r
+		return paymentGuidance("wallet")
 	}
 	if paymentQuestion(m) && !contains(m, "退款", "退费", "refund") {
-		r := policyReply("payment_methods", "payment_fee", "payment_guides")
+		if asksAboutWeChatFee(m) {
+			return weChatFeeReply(m)
+		}
+		r := paymentGuidance("order")
 		if contains(m, "支付宝") {
 			r.Text = "当前公开付款渠道中没有支付宝收款。\n\n" + r.Text
 		}
@@ -247,6 +250,9 @@ func businessAnswer(in chatInput, state *BusinessState) Reply {
 	if calculate && (f == "gpt" || f == "claude") {
 		state.Stage = 1
 		state.Reopen = contains(intent, "补", "差价", "重开")
+		if reply, ok := beginNaturalCalculation(in.Message, state); ok {
+			return reply
+		}
 		return clarify("可以按你提供的数据试算，最终由人工核实。请先提供这笔订单实际付款金额和币种，例如：100.00 CNY（不要提供密码或卡密）。")
 	}
 	if contains(intent, "覆盖", "叠加", "升级", "降级", "未到期", "没到期") {
@@ -340,6 +346,9 @@ func parseMoment(s string) (time.Time, error) {
 	if t, e := time.Parse(time.RFC3339, s); e == nil {
 		return t, nil
 	}
+	if normalized, ok := normalizeNaturalDate(s); ok {
+		s = normalized
+	}
 	return time.ParseInLocation("2006-01-02 15:04", s, time.FixedZone("Asia/Shanghai", 8*3600))
 }
 
@@ -365,17 +374,27 @@ func refundCents(paid int64, start, end, loss time.Time) (int64, error) {
 	return quotient.Int64(), nil
 }
 func collectCalculation(m string, s *BusinessState) Reply {
-	dateHint := "请按 YYYY-MM-DD HH:mm 提供准确时间（北京时间），例如 2026-10-01 12:00；不清楚时请人工核实，不估算。"
+	dateHint := "请带上年份、日期和时刻，例如“2026年2月1日0点”（北京时间）；不清楚时请人工核实，不估算。"
 	switch s.Stage {
 	case 1:
+		if s.Amount > 0 && s.Currency == "" {
+			if currency := currencyReply(m); currency != "" {
+				s.Currency = currency
+				s.Stage = 2
+				return calculationStartQuestion(s)
+			}
+		}
 		amount, currency, ok := parseMoney(m)
 		if !ok || amount <= 0 {
+			if s.Amount > 0 && s.Currency == "" {
+				return clarify(fmt.Sprintf("你说的 %s 是这笔订单实际付的人民币金额吗？如果是其他币种，请告诉我币种。", money(s.Amount)))
+			}
 			return clarify("请提供有效实付金额及币种，例如 100.00 CNY，金额最多两位小数。")
 		}
 		s.Amount = amount
 		s.Currency = currency
 		s.Stage = 2
-		return clarify("实际订阅成功开始时间是什么？" + dateHint)
+		return calculationStartQuestion(s)
 	case 2, 3, 4:
 		// RFC3339 parsing expects the original uppercase T/Z.
 		t, e := parseMoment(strings.ReplaceAll(strings.ReplaceAll(m, "t", "T"), "z", "Z"))
@@ -408,29 +427,28 @@ func collectCalculation(m string, s *BusinessState) Reply {
 			}
 		}
 	case 5:
+		s.Reopen = true
 		price, currency, ok := parseMoney(m)
 		if !ok || price <= 0 || currency != s.Currency {
 			return clarify("请提供正数售价与相同币种；不自行换汇，例如 120.00 CNY。")
 		}
-		refund, err := refundCents(s.Amount, s.Start, s.End, s.Loss)
+		estimate, err := calculateAfterSales(*s, price)
 		if err != nil {
-			return human("boundary")
-		}
-		s.Stage = 0
-		if price < refund {
+			s.Stage = 0
 			return human("reopen", "boundary")
 		}
+		s.Stage = 0
 		r := human("reopen")
-		r.Text = fmt.Sprintf("按你提供的数据，应退 %s %s；以你提供的重开售价 %s %s 计算，应补 %s %s。此为试算，最终由人工核实金额和售价后办理。请准备本站订单号和掉订阅截图。", money(refund), currency, money(price), currency, money(price-refund), currency)
+		r.Text = fmt.Sprintf("按你提供的数据，应退 %s %s；以你提供的重开售价 %s %s 计算，应补 %s %s。此为试算，最终由人工核实金额和售价后办理。请准备本站订单号和掉订阅截图。", estimate.Refund, currency, money(price), currency, estimate.Difference, currency)
 		return r
 	}
-	refund, e := refundCents(s.Amount, s.Start, s.End, s.Loss)
+	estimate, e := calculateAfterSales(*s, 0)
 	if e != nil {
 		return human("boundary")
 	}
 	s.Stage = 0
 	r := human("loss")
-	r.Text = fmt.Sprintf("试算：%s %s × 剩余 %d 秒 ÷ 总计 %d 秒＝%s %s（四舍五入两位小数）。依据你提供的实际时间，不按固定 30 天。请准备本站订单号和掉订阅截图，最终资格、时间和金额由人工核实；我未提交退款。", money(s.Amount), s.Currency, s.End.Unix()-s.Loss.Unix(), s.End.Unix()-s.Start.Unix(), money(refund), s.Currency)
+	r.Text = fmt.Sprintf("按你提供的时间，试算可退 %s %s。订阅一共 %s，掉订阅时还剩 %s，按实付 %s %s × 剩余时长 ÷ 总时长计算，金额四舍五入到两位小数。请准备本站订单号和掉订阅截图，最终资格、时间和金额由人工核实；我未提交退款。", estimate.Refund, s.Currency, readableDuration(estimate.TotalSeconds), readableDuration(estimate.RemainingSeconds), money(s.Amount), s.Currency)
 	return r
 }
 
@@ -439,7 +457,7 @@ var orderPattern = regexp.MustCompile(`^[A-Za-z0-9][A-Za-z0-9_-]{3,79}$`)
 func beginCase(s *BusinessState, id string) Reply {
 	s.Case = id
 	s.Order = ""
-	r := human(id)
+	r := troubleshootingReply(id)
 	r.Text += "\n\n如果需要我整理给客服的说明，请先提供本站订单号（不要提供支付密码或完整卡密）。"
 	return r
 }
@@ -451,7 +469,7 @@ func requiresPolicy(in chatInput, s BusinessState) bool {
 		return true
 	}
 	m := strings.ToLower(in.Message)
-	return paymentQuestion(m) || contains(m, "钱包", "wallet") || contains(m, "退", "质保", "保修", "补差", "补开", "封号", "封禁", "掉订阅", "掉会员", "覆盖", "叠加", "升级", "降级", "激活", "优惠", "试用", "注册", "资格", "填错", "选错", "报错", "失败", "无效", "已被使用", "处理中", "没到账", "未到账", "发货", "客服", "人工", "试算", "billing", "refund", "warranty")
+	return asksForPerson(m) || paymentQuestion(m) || contains(m, "钱包", "wallet") || contains(m, "退", "质保", "保修", "补差", "补开", "封号", "封禁", "掉订阅", "掉会员", "覆盖", "叠加", "升级", "降级", "激活", "优惠", "试用", "注册", "资格", "填错", "选错", "报错", "失败", "无效", "已被使用", "处理中", "没到账", "未到账", "发货", "客服", "人工", "试算", "billing", "refund", "warranty")
 }
 func confirmedSources(in chatInput) []Source {
 	p := policy.Products[in.Product]
