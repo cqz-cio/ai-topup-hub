@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "slug": "ellaix-gpt-plus-account-30d",
+  "category_slug": "gpt-ready-accounts",
+  "title": "ChatGPT Plus 成品号｜订阅质保一个月",
+  "description": "包含账号和充值卡密，付款后自动发货，收到后需自行充值，可使用完整订阅周期。订阅质保一个月；请及时换绑邮箱，并按说明保护账号及2FA。",
+  "price_amount": "115.00",
+  "content_file": "ellaix-plus-30d.html",
+  "tags": ["Plus成品号", "账号＋充值卡密", "自动发货", "订阅质保一个月", "需自行充值"],
+  "instructions": "本商品包含账号和充值卡密。发货格式：邮箱号----邮箱密码----2FA验证码获取链接----充值卡密。\n\n1. 在 ChatGPT 官网选择电子邮件地址登录，不要选择“使用 Google 账号继续”；本商品不支持登录谷歌 APP。输入交付的邮箱及密码，注意不要带入多余空格，部分邮箱为 x+y@iCloud 格式。\n2. 打开交付中的 2FA 验证码获取链接，取得六位验证码并完成登录。\n3. 前往 https://cdk.bar/recharge ，输入本次交付的充值卡密，兑换后按页面指引充值。账号和卡密自动交付不代表已经完成充值，请自行完成充值以使用完整订阅周期。\n4. 收到后请及时换绑邮箱，以降低邮箱被找回的风险；后续可按账号条件升级或续订。如果不换绑邮箱，请及时登录、修改2FA并移出其他设备，切勿取消2FA。请妥善保存新的验证信息。\n\n本商品为正规代充 Plus 成品，不是0元试用成品。供货说明称使用 Codex 通常无需验证，但不保证免验证；如遇验证请联系本站客服。订阅质保一个月，问题请提供订单号联系客服。反向代理、爬虫、模型蒸馏、破甲等违规使用可能导致封号，此类违规使用导致的问题不支持退款。\n\n本站客服：微信 Cqz0924ttxk；QQ 1669268759；Telegram https://t.me/czq_piestar 。",
+  "retire_slugs": ["gpt-plus-brazil-account-24h", "gpt-plus-vietnam-account-30d"],
+  "supplier": {
+    "base_url": "https://ellaixshop.com",
+    "merchant_id": "1039",
+    "protocol": "acg-faka",
+    "product_id": 85,
+    "sku_id": 85,
+    "shared_code": "D32C360755D69018",
+    "source_url": "https://ellaixshop.com/item/85",
+    "source_title": "plus会员成品号订阅质保一个月"
+  }
+}
