@@ -1,7 +1,7 @@
 <template>
   <Card
     class="group relative overflow-hidden flex flex-col h-full rounded-2xl transition-all theme-slide-up"
-    :class="isSoldOut(product)
+    :class="soldOut
       ? 'cursor-default opacity-85 grayscale-[0.25] saturate-50 border-destructive/30'
       : 'cursor-pointer hover:-translate-y-1 hover:border-primary/30 hover:shadow-lg'"
     :style="{ animationDelay: `${index * animationStep}ms` }"
@@ -10,13 +10,13 @@
     <div class="aspect-[4/3] overflow-hidden bg-muted relative shrink-0">
       <div
         class="absolute inset-0 z-10 transition-colors duration-300"
-        :class="isSoldOut(product) ? 'bg-black/15' : 'bg-black/15 group-hover:bg-black/5'"
+        :class="soldOut ? 'bg-black/15' : 'bg-black/15 group-hover:bg-black/5'"
       ></div>
       <img v-if="displayImageSrc && !imageErrored" :src="displayImageSrc"
         :alt="getLocalizedText(product.title)" loading="lazy" decoding="async"
         class="w-full h-full object-cover transform transition-transform duration-700 ease-out"
         :class="[
-          isSoldOut(product) ? 'grayscale brightness-75' : 'group-hover:scale-105',
+          soldOut ? 'grayscale brightness-75' : 'group-hover:scale-105',
         ]"
         @error="handleImageError" />
       <div v-else class="w-full h-full flex items-center justify-center text-muted-foreground" role="img"
@@ -24,9 +24,9 @@
         <ImageIcon class="w-8 h-8 md:w-12 md:h-12" :stroke-width="1.5" aria-hidden="true" />
       </div>
 
-      <div v-if="isSoldOut(product)" class="absolute inset-0 z-20 bg-black/45"></div>
+      <div v-if="soldOut" class="absolute inset-0 z-20 bg-black/45"></div>
       <Badge
-        v-if="isSoldOut(product)"
+        v-if="soldOut"
         variant="destructive"
         size="xs"
         class="absolute left-2 top-2 md:left-4 md:top-4 z-30 tracking-wider shadow-sm"
@@ -35,7 +35,7 @@
       </Badge>
 
       <!-- Tags -->
-      <div v-if="!isSoldOut(product) && product.tags && product.tags.length > 0"
+      <div v-if="!soldOut && product.tags && product.tags.length > 0"
         class="absolute top-2 right-2 md:top-4 md:right-4 z-20 flex flex-wrap gap-1 md:gap-2 justify-end">
         <span v-for="(tag, tagIndex) in product.tags.slice(0, maxTags)" :key="tagIndex"
           class="inline-flex items-center rounded-md border border-white/25 bg-black/55 px-2 md:px-3 py-0.5 md:py-1 text-xs font-medium text-white backdrop-blur-sm">
@@ -85,7 +85,7 @@
           {{ getFulfillmentTypeLabel(product.fulfillment_type) }}
         </Badge>
 
-        <Badge class="hidden md:inline-flex" size="xs" :variant="getStockBadgeVariant(product.stock_status)">
+        <Badge v-if="!contactFirst" class="hidden md:inline-flex" size="xs" :variant="getStockBadgeVariant(product.stock_status)">
           {{ getStockStatusLabel(product) }}
         </Badge>
       </div>
@@ -133,14 +133,15 @@
         </div>
 
         <div class="flex items-center gap-2">
+          <ProductContactButton v-if="contactFirst" />
           <!-- Quick buy cart button -->
-          <Button
+          <Button v-else
             type="button"
             variant="outline"
             size="icon"
             class="w-8 h-8 md:w-9 md:h-9"
             :aria-label="t('products.quickBuyAria')"
-            :disabled="isSoldOut(product)"
+            :disabled="soldOut"
             @click.stop="$emit('quickBuy', product)"
           >
             <ShoppingCart class="h-4 w-4" />
@@ -148,10 +149,10 @@
           <!-- Desktop: view details -->
           <span
             class="hidden md:flex text-xs uppercase font-bold transition-colors items-center gap-1"
-            :class="isSoldOut(product)
+            :class="soldOut
               ? 'text-destructive/90'
               : 'text-muted-foreground group-hover:text-foreground'">
-            <ArrowRight class="w-4 h-4 transition-transform" :class="isSoldOut(product) ? '' : 'group-hover:translate-x-1'" />
+            <ArrowRight class="w-4 h-4 transition-transform" :class="soldOut ? '' : 'group-hover:translate-x-1'" />
           </span>
           <!-- Mobile: arrow only -->
           <ChevronRight class="md:hidden w-4 h-4 text-muted-foreground" />
@@ -162,6 +163,8 @@
 </template>
 
 <script setup lang="ts">
+import ProductContactButton from './product/ProductContactButton.vue'
+import { isContactFirstProduct } from '../utils/contactFirstProducts'
 import { useI18n } from 'vue-i18n'
 import { computed, ref, watch } from 'vue'
 import { ArrowRight, ChevronRight, Image as ImageIcon, Lock, Pencil, ShoppingCart, UserPlus, Zap } from 'lucide-vue-next'
@@ -190,6 +193,9 @@ defineEmits<{
 const { t } = useI18n()
 const { getLocalizedText, siteCurrency, formatPrice } = useLocalized()
 const { getPurchaseTypeLabel, getFulfillmentTypeLabel, getStockBadgeVariant, getStockStatusLabel, isSoldOut, hasPromotionPrice, getPromotionPriceAmount, hasPromotionRules, hasWholesalePrices } = useProductLabels()
+
+const contactFirst = computed(() => isContactFirstProduct(props.product?.slug))
+const soldOut = computed(() => !contactFirst.value && isSoldOut(props.product))
 
 const imageErrored = ref(false)
 const attemptIdx = ref(0)

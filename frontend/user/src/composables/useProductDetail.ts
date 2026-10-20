@@ -7,6 +7,8 @@ import { productAPI } from '../api'
 import { getImageUrl } from '../utils/image'
 import { useCartStore } from '../stores/cart'
 import { useBuyNowStore } from '../stores/buyNow'
+import { isContactFirstProduct } from '../utils/contactFirstProducts'
+import { useProductContact } from './useProductContact'
 import { useUserAuthStore } from '../stores/userAuth'
 import { useUserProfileStore } from '../stores/userProfile'
 import { debounceAsync } from '../utils/debounce'
@@ -61,6 +63,8 @@ export function useProductDetail(options: { onLoaded?: () => void } = {}) {
 
   const loading = ref(true)
   const product = ref<any>(null)
+  const contactFirst = computed(() => isContactFirstProduct(product.value?.slug))
+  const { openContact } = useProductContact()
   const relatedPosts = computed<any[]>(() => product.value?.related_posts || [])
   const formatRelatedPostDate = (dateString: string) => {
     if (!dateString) return ''
@@ -312,6 +316,7 @@ export function useProductDetail(options: { onLoaded?: () => void } = {}) {
     return limit < quantityEffectiveMin.value
   })
   const canPurchase = computed(() => {
+    if (contactFirst.value) return false
     if (!product.value) return false
     if (activeSkus.value.length === 0) return false
     if (product.value.is_sold_out) return false
@@ -417,6 +422,7 @@ export function useProductDetail(options: { onLoaded?: () => void } = {}) {
   })
 
   const addToCart = () => {
+    if (contactFirst.value) { openContact(); return }
     if (!product.value) return
     if (!canPurchase.value) return
     purchaseWarning.value = ''
@@ -452,6 +458,7 @@ export function useProductDetail(options: { onLoaded?: () => void } = {}) {
   }
 
   const buyNow = () => {
+    if (contactFirst.value) { openContact(); return }
     purchaseWarning.value = ''
     if (!canPurchase.value) return
     if (!product.value) return
@@ -713,7 +720,7 @@ export function useProductDetail(options: { onLoaded?: () => void } = {}) {
     isSkuPurchasable, skuDisplayText, skuStockText, skuStockBadgeClass,
     quantityEffectiveLimit, quantityEffectiveMin, handleQuantityInput,
     // 购买能力
-    purchaseType, requiresLogin, requiresSKUSelection, canPurchase, cannotPurchaseReason,
+    purchaseType, requiresLogin, requiresSKUSelection, canPurchase, cannotPurchaseReason, contactFirst,
     categoryName, images,
     // 动作
     addToCart, buyNow, goLogin, loadProduct,
