@@ -1,0 +1,10 @@
+{
+  "BSC_RPC_URL": "https://bsc-dataseed.bnbchain.org",
+  "BSC_LOGS_RPC_URL": "https://rpc.48.club",
+  "BSC_RECEIPT_RPC_URL": "https://bsc-dataseed.bnbchain.org",
+  "PLASMA_RPC_URL": "https://rpc.plasma.to",
+  "TRON_RPC_URL": "https://tron-rpc.publicnode.com",
+  "BSC_RPC_FALLBACKS": "[{\"url\":\"https://rpc.48.club\"},{\"url\":\"https://56.rpc.thirdweb.com\"}]",
+  "PLASMA_RPC_FALLBACKS": "[{\"url\":\"https://plasma.gateway.tenderly.co\"},{\"url\":\"https://9745.rpc.thirdweb.com\"}]",
+  "TRON_RPC_FALLBACKS": "[{\"url\":\"https://api.trongrid.io\"}]"
+}

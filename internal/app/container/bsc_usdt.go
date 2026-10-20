@@ -9,11 +9,13 @@ import (
 
 	"github.com/dujiao-next/internal/config"
 	"github.com/dujiao-next/internal/constants"
+	"github.com/dujiao-next/internal/logger"
 	paymentapp "github.com/dujiao-next/internal/modules/payment/application"
 	"github.com/dujiao-next/internal/modules/payment/application/bscusdt"
 	chaincontract "github.com/dujiao-next/internal/modules/payment/contract/chain"
 	"github.com/dujiao-next/internal/modules/payment/domain"
 	bscrpc "github.com/dujiao-next/internal/modules/payment/infrastructure/bscusdt"
+	"github.com/dujiao-next/internal/modules/payment/infrastructure/chainrpc"
 	chainstore "github.com/dujiao-next/internal/modules/payment/infrastructure/gormstore/chain"
 	tronrpc "github.com/dujiao-next/internal/modules/payment/infrastructure/tronusdt"
 	"github.com/dujiao-next/internal/platform/database/gormdb"
@@ -72,6 +74,12 @@ func (c *Container) initChainUSDT(cfg config.BSCUSDTConfig, networkName string) 
 	} else {
 		rpc, err = bscrpc.NewRPCWithEndpoints(endpoint, logsEndpoint, receiptEndpoint, network.Name)
 	}
+	if err != nil {
+		return nil, err
+	}
+	rpc, err = chainrpc.Configure(network.Name, rpc, os.Getenv(prefix+"_RPC_FALLBACKS"), os.Getenv, func(event chainrpc.Event) {
+		logger.Warnw("chain_usdt_rpc_"+event.Kind, "network", network.Name, "from_provider", event.From, "to_provider", event.To)
+	})
 	if err != nil {
 		return nil, err
 	}

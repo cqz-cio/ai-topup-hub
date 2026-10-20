@@ -1,0 +1,68 @@
+# USDT 节点备用与自动切换（本地验证，2026-10-20）
+
+本次只在本机实现、验证并启用；没有发布、推送、修改生产配置或重启线上服务。真实资金收款验收仍未完成。
+
+## 已验证的配置
+
+| 网络 | 主配置 | 备用 1 | 备用 2 |
+| --- | --- | --- | --- |
+| BSC / BEP20 | bsc-dataseed.bnbchain.org 查区块/回执，rpc.48.club 查流水 | rpc.48.club 全部查询 | 56.rpc.thirdweb.com |
+| Plasma / USDT0 | rpc.plasma.to | plasma.gateway.tenderly.co | 9745.rpc.thirdweb.com |
+| TRON / TRC20 | tron-rpc.publicnode.com | api.trongrid.io（本次无密钥只读通过） | 暂未找到第二个通过全部测试的独立免费提供方 |
+
+这些是一次实测结果，不是长期可用性承诺。BSC 的主配置已经使用 48 Club 查流水，备用 1 可以应对主区块节点故障，但不增加流水提供方的独立性；thirdweb 才增加第二个独立流水来源。
+
+筛选不是只测试 HTTP 200：用实际 Go 适配器校验主网身份、官方代币精度、最新/最终确认区块时效、约一天前的公开历史转账、收款地址过滤、区块哈希与交易回执；故意让第一个 reader 失败，确认切换后仍能读到同一笔转账。没有签名、广播交易或调用采购。
+
+被排除的候选：BlockPI 返回 503；dRPC 的候选出现 400/429 或历史接口失败；Envio 要求鉴权；Tatum 部分方法受限；OnFinality 出现限流。BSC PublicNode 的部分历史流水/回执受限。1RPC 的最终确认区块滞后，且组合查询在实际 Go 回执核验时失败，因此最终配置完全不使用 1RPC。
+
+官方来源：
+
+- [TRON 官方 HTTP 接入](https://developers.tron.network/docs/connect-to-the-tron-network)
+- [TronGrid 限流与 API Key 要求](https://developers.tron.network/reference/rate-limits)：无密钥访问可能严格限流或拒绝，正式长期使用应申请自己的免费额度并再次验证。
+- [thirdweb BSC](https://thirdweb.com/binance)、[thirdweb Plasma](https://thirdweb.com/plasma-9745)
+- [Tenderly 的 Plasma 支持记录](https://tenderly.co/blog/2025-recap-blockchain-adoption-chain-operations/)
+- [OnFinality Plasma 公共接口](https://onfinality.io/en/networks/plasma)、[1RPC 网络列表](https://docs.1rpc.io/overview/supported-networks)
+
+## 自动切换规则
+
+- `BSC_RPC_FALLBACKS`、`PLASMA_RPC_FALLBACKS`、`TRON_RPC_FALLBACKS` 为 JSON 数组。每条链最多三个备用；未配置或空数组保留原有单节点行为，不自动启用外部地址。
+- 每个备用项使用 `url`，EVM 可选 `logs_url`、`receipt_url`。各项独立创建适配器；HTTPS 校验保留，不跟随重定向。
+- TRON 的备用项可选 `api_key_env`，例如 `TRON_BACKUP_API_KEY`；只读取显式指定的 `TRON_*_API_KEY`，缺失则拒绝启动。不会把主节点 `TRON_API_KEY` 转发给备用提供方。
+- 使用备用前校验链和代币精度。身份结果缓存五分钟；失败后重新校验。最新区块超过两分钟、最终确认区块超过五分钟或时间明显在未来时，尝试下一备用。
+- 网络错误、超时、HTTP 限流或适配器拒绝响应会触发切换；成功后继续用当前可用节点，不反复抢回主节点。失败节点冷却 30 秒，连续失败延长到最多 8 分钟；当前节点再失败时才考虑冷却结束的其他节点。
+- 单次 reader 操作总时限 40 秒、每个候选最多 20 秒，并按调用方剩余时间给后续候选预留预算。原扫描任务 45 秒总时限保留。节点选择与请求串行，等锁也遵守取消信号。
+- 全部不可用时返回错误，不返回伪造空流水，不推进扫描游标。恢复/重启后从持久化游标补扫。跨节点结果仍通过原扫描器的区块、回执、金额、收款地址、确认数和幂等交付校验；不绕过重组及交易失败保护。
+- 公共 RPC 返回“格式正常但漏数据”无法仅靠切换完全解决，本实现不是多节点投票或全量对账系统。不要把免费备用等同于保证收款服务永不延迟。
+
+日志只记录网络和配置序号（0 为主配置，1/2/3 为备用），事件为 `chain_usdt_rpc_unavailable`、`chain_usdt_rpc_switched`。不记录带密钥的 URL 或提供方原始错误；所有节点不可用仍由 `chain_usdt_listener_pass_failed` 报告。
+
+## 本机运行
+
+公开、无密钥样例：`ops/usdt-rpc-fallbacks.example.json`。它不会自动写入生产配置。
+
+使用新启动入口，并指向已经构建的本机程序：
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/local/start-usdt-failover.ps1 -LocalRoot "D:\卡网" -Binary "D:\卡网\work\codex-runtime\usdt-failover-20261020\local-server.exe"
+```
+
+脚本可从本次独立工作区执行，`-LocalRoot` 指向日常目录；只重启已跟踪的本机 8080 后端，检查本机配置和 Redis，采购固定关闭，前台和后台前端不重启。已有 `scripts/local/stop.ps1` 仍可停止它。再次启动备用配置时仍使用这个新入口；旧 `start.ps1` 不会自动载入本次备用环境变量。
+
+`-SimulatePrimaryFailure` 仅将三个主查询地址替换为本机不可用端口，用真实备用的只读查询验证运行接线。验证后必须不带此参数重启，恢复正常配置。本次已恢复正常运行，模拟标记为 false。
+
+本地故障演练不通过把业务订单标成已付款来验收。支付/发货模拟全部使用临时 SQLite、模拟链和模拟供应商。
+
+## 验证与证据
+
+最终相关 Go 回归 219 项通过（含子测试），2 项需要显式开启的外网探测默认跳过；另外单独完成上述 5 个备用配置的公网只读核验。后端构建通过。本机订单、支付、渠道、设置、商品/SKU、链上账单及转账记录摘要前后一致，仅正常扫描游标推进。
+
+- 单元测试：错误主网、旧区块、超时切换、并发选择、全部失败的冷却恢复、取消信号、配置拒绝、主/备密钥隔离。
+- 三网络临时库：全部节点失败时游标保持；重启后补扫；切换后确认模拟付款并且只交付一次；错误回执和重组仍拒绝。
+- 原有支付、充值、防重复采购与节点协议相关回归。
+- 实际本机 8080 后端：三个主节点同时模拟不可用，三条链均记录从 0 切到 1；8080/5173/5174 返回 200。随后移除故障模拟，保留自动切换配置。
+- 实际公网只读探测需显式设置 `CHAIN_RPC_PROBE_FILE` 并运行 `TestLiveReadOnlyFallbackProfiles`，普通测试默认跳过。
+
+私有证据在日常目录 `work/codex-runtime/usdt-failover-20261020/`；进程日志和有限时长测试日志在 `work/codex-logs/`。本机库备份为 `local-before.db`，禁止上传或当作正式数据库部署。
+
+未来若要上线，应单独从新加坡运行同样的只读可用性检查，备份其配置后显式设置备用变量，再按正式发布流程部署；本机通过不能替代服务器网络的验证。

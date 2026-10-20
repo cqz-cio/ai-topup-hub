@@ -23,6 +23,7 @@ import (
 	"github.com/dujiao-next/internal/modules/payment/application/bscusdt"
 	chaincontract "github.com/dujiao-next/internal/modules/payment/contract/chain"
 	paymentdomain "github.com/dujiao-next/internal/modules/payment/domain"
+	"github.com/dujiao-next/internal/modules/payment/infrastructure/chainrpc"
 	chainstore "github.com/dujiao-next/internal/modules/payment/infrastructure/gormstore/chain"
 	"github.com/dujiao-next/internal/modules/payment/transport/presenter"
 	"github.com/dujiao-next/internal/shared/jsonmap"
@@ -66,7 +67,7 @@ func TestPlasmaConfirmedTransferPaysGuestOrderAndDeliversOneBoundCode(t *testing
 	testConfirmedTransferPaysGuestOrderAndDeliversOneBoundCode(t, "plasma")
 }
 
-func testConfirmedTransferPaysGuestOrderAndDeliversOneBoundCode(t *testing.T, networkName string) {
+func testConfirmedTransferPaysGuestOrderAndDeliversOneBoundCode(t *testing.T, networkName string, failover ...bool) {
 	t.Helper()
 	network, err := chaincontract.ResolveNetwork(networkName)
 	if err != nil {
@@ -86,8 +87,15 @@ func testConfirmedTransferPaysGuestOrderAndDeliversOneBoundCode(t *testing.T, ne
 	}
 	svc.SetAutoRechargeService(recharge)
 	chain := &bscTestChain{head: 100, timestamp: time.Now().UTC().Truncate(time.Second)}
+	var reader chaincontract.Reader = chain
+	if len(failover) > 0 && failover[0] {
+		reader, err = chainrpc.New([]chaincontract.Reader{unavailableLogReader{chain}, chain}, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
 	settlements := 0
-	gateway, err := bscusdt.New(chainstore.New(db), chain, bscusdt.Config{Network: networkName, Recipient: network.DisplayAddress("0x66a8bab15067eab1efc948ac03684f0397c8416f"), CNYPerUSDT: "6.66"}, func(_ context.Context, i paymentdomain.ChainInvoice, transfer paymentdomain.ChainTransfer) error {
+	gateway, err := bscusdt.New(chainstore.New(db), reader, bscusdt.Config{Network: networkName, Recipient: network.DisplayAddress("0x66a8bab15067eab1efc948ac03684f0397c8416f"), CNYPerUSDT: "6.66"}, func(_ context.Context, i paymentdomain.ChainInvoice, transfer paymentdomain.ChainTransfer) error {
 		settlements++
 		_, e := svc.HandleCallback(paymentapp.PaymentCallbackInput{PaymentID: i.PaymentID, Status: constants.PaymentStatusSuccess, Amount: money.FromDecimal(decimal.RequireFromString(i.FiatAmount)), Currency: i.Currency, PaidAt: &transfer.PaidAt, ProviderRef: transfer.TxHash})
 		return e
@@ -144,5 +152,16 @@ func testConfirmedTransferPaysGuestOrderAndDeliversOneBoundCode(t *testing.T, ne
 	db.Model(&fulfillmentdomain.Fulfillment{}).Where("order_id = ?", order.ID).Count(&deliveries)
 	if settlements != 1 || paid.Status != constants.PaymentStatusSuccess || got.Status != constants.OrderStatusDelivered || deliveries != 1 || task.State != "issued" || task.Plan != "chatgptprolite" || task.ConfirmedAt != nil {
 		t.Fatalf("incorrect paid-to-code flow: settlements=%d payment=%s order=%s deliveries=%d task=%s plan=%s", settlements, paid.Status, got.Status, deliveries, task.State, task.Plan)
+	}
+}
+
+type unavailableLogReader struct{ chaincontract.Reader }
+
+func (r unavailableLogReader) Logs(context.Context, uint64, uint64, string) ([]chaincontract.Log, error) {
+	return nil, chaincontract.ErrRPC
+}
+func TestFailoverPaysGuestOrdersAndDeliversOneBoundCode(t *testing.T) {
+	for _, network := range []string{"bsc", "plasma", "tron"} {
+		t.Run(network, func(t *testing.T) { testConfirmedTransferPaysGuestOrderAndDeliversOneBoundCode(t, network, true) })
 	}
 }
