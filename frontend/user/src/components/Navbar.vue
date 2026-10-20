@@ -7,7 +7,7 @@
       <!-- Logo -->
       <router-link to="/" class="brand-wordmark group relative" :title="brandSiteName">
         <span v-if="brandLogo" class="brand-logo-tile">
-          <img :src="brandLogo" :alt="brandSiteName" class="brand-logo-image" />
+          <img :src="brandLogo" :alt="brandSiteName" class="brand-logo-image" fetchpriority="high" decoding="async" />
         </span>
         <div class="brand-wordmark-copy">
           <span class="theme-wordmark-text">{{ brandSiteName }}</span>
@@ -257,7 +257,7 @@ const brandSiteName = computed(() => {
 
 const brandLogo = computed(() => {
   const raw = String(appStore.config?.brand?.site_logo || '').trim()
-  return raw ? getImageUrl(raw) : (appStore.isResellerTenant ? '' : '/brand/patrick-logo.png')
+  return raw ? getImageUrl(raw) : (appStore.isResellerTenant ? '' : getImageUrl('/brand/patrick-logo.png'))
 })
 
 const toggleMobileMenu = () => {

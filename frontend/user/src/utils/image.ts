@@ -1,9 +1,12 @@
 // Transparent variants for these three existing product icons only.
 // Original files and product records remain available for rollback.
 const transparentProductIcons: Record<string, string> = {
-    '/uploads/86gamestore/f0bb72279d34b2b14d08.jpg': '/catalog-products/transparent-icons-20261020/gpt.png',
+    '/uploads/86gamestore/f0bb72279d34b2b14d08.jpg': '/media/storefront-20261020/gpt.webp',
     '/uploads/86gamestore/c779fc65589ae19c7ff2.jpg': '/catalog-products/transparent-icons-20261020/telegram.svg',
-    '/catalog-products/qzweb/aa16fb0f3bb8f6933985a4c8df660946.jpg': '/catalog-products/transparent-icons-20261020/gemini.png',
+    '/catalog-products/qzweb/aa16fb0f3bb8f6933985a4c8df660946.jpg': '/media/storefront-20261020/gemini.webp',
+    '/catalog-products/transparent-icons-20261020/gpt.png': '/media/storefront-20261020/gpt.webp',
+    '/catalog-products/transparent-icons-20261020/gemini.png': '/media/storefront-20261020/gemini.webp',
+    '/brand/patrick-logo.png': '/media/storefront-20261020/patrick-logo.webp',
 }
 
 /**

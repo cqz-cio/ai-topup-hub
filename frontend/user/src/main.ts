@@ -4,7 +4,7 @@ import { createHead } from '@unhead/vue/client'
 import './style.css'
 import App from './App.vue'
 import router, { warmupCommonRoutes } from './router'
-import i18n, { detectLocale, setI18nLocale, warmupLocaleMessages } from './i18n'
+import i18n, { detectLocale, setI18nLocale } from './i18n'
 import { useTelegramMiniAppStore } from './stores/telegramMiniApp'
 import { initTemplateOverride } from './templates/registry'
 import { isRedemptionPath } from './utils/redemption'
@@ -39,5 +39,4 @@ Promise.all([
 
 void router.isReady().then(() => {
     warmupCommonRoutes()
-    warmupLocaleMessages()
 })

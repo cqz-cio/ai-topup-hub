@@ -105,6 +105,8 @@ import { splitCodexCredits } from '../utils/codexCredits'
 import { matchesProductSearch } from '../utils/productSearch'
 import { useAnnouncement, type HomeAnnouncement } from '../composables/useAnnouncement'
 import { getImageUrl } from '../utils/image'
+import { getCatalogGlassCover } from '../utils/catalogGlass'
+import { warmCatalogImages } from '../utils/mediaLoading'
 import { storefrontDisplayDetails } from '../data/storefrontCatalog'
 import {
   canPurchaseStorefrontProduct,
@@ -203,6 +205,10 @@ const visibleProductGroups = computed(() =>
     }))
     .filter((group) => group.credits.length || group.other.length),
 )
+const orderedProducts = computed(() =>
+  visibleProductGroups.value.flatMap(group => [...group.credits, ...group.other]),
+)
+const priorityProducts = computed(() => new Set(orderedProducts.value.slice(0, 3).map(product => product.slug)))
 const canPurchase = (product: StorefrontProduct) =>
   !loadFailed.value && canPurchaseStorefrontProduct(product)
 const stockLabel = (product: StorefrontProduct) => {
@@ -228,6 +234,12 @@ const productImage = (product: StorefrontProduct) => {
     ? getImageUrl(images[0])
     : displayDetails(product)?.image || ''
 }
+watch(() => orderedProducts.value.map(product => {
+  const image = productImage(product)
+  return (!appStore.isResellerTenant && getCatalogGlassCover(image)) || image
+}).join('\n'), (images, _previous, onCleanup) => {
+  onCleanup(warmCatalogImages(images.split('\n')))
+}, { flush: 'post' })
 const formattedPrice = (product: StorefrontProduct) => {
   const amount = storefrontPrice(product)
   if (amount === null) return '—'
@@ -250,6 +262,7 @@ const cardProps = (product: StorefrontProduct) => ({
   title: productTitle(product),
   category: productCategory(product),
   image: failedImages.value.has(product.slug) ? '' : productImage(product),
+  priority: priorityProducts.value.has(product.slug),
   details: displayDetails(product),
   fulfillmentType: product.fulfillment_type,
   purchaseType: product.purchase_type,

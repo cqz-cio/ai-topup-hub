@@ -6,6 +6,7 @@ import { captureAffiliateFromRoute } from '../utils/affiliate'
 import { templateView } from '../templates/registry'
 import { GOOGLE_REDIRECT_FRONTEND_CALLBACK_PATH } from '../utils/googleRedirect'
 import { completedCheckoutReturnPath } from '../utils/checkoutNavigation'
+import { hasSpareBandwidth } from '../utils/mediaLoading'
 
 type RouteComponentLoader = () => Promise<unknown>
 
@@ -23,12 +24,6 @@ const resellerLayoutLoader: RouteComponentLoader = () => import('../views/resell
 const routeWarmupLoaders: RouteComponentLoader[] = [
     productsViewLoader,
     productDetailViewLoader,
-    cartViewLoader,
-    checkoutViewLoader,
-    paymentViewLoader,
-    blogViewLoader,
-    noticeViewLoader,
-    loginViewLoader,
 ]
 
 let hasScheduledRouteWarmup = false
@@ -38,18 +33,7 @@ const shouldWarmupRoutes = () => {
         return false
     }
 
-    const connection = (navigator as Navigator & {
-        connection?: {
-            saveData?: boolean
-            effectiveType?: string
-        }
-    }).connection
-
-    if (connection?.saveData) {
-        return false
-    }
-
-    return connection?.effectiveType !== 'slow-2g' && connection?.effectiveType !== '2g'
+    return hasSpareBandwidth()
 }
 
 const scheduleIdleTask = (task: () => void) => {
@@ -90,7 +74,7 @@ export const warmupCommonRoutes = () => {
     const startWarmup = () => {
         window.setTimeout(() => {
             scheduleIdleTask(() => runRouteWarmupQueue([...routeWarmupLoaders]))
-        }, 1200)
+    }, 5000)
     }
 
     if (document.readyState === 'complete') {

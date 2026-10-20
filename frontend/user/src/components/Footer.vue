@@ -53,7 +53,7 @@ const brandDescription = computed(() => {
 
 const brandLogo = computed(() => {
   const raw = String(config.value?.brand?.site_logo || '').trim()
-  return raw ? getImageUrl(raw) : (appStore.isResellerTenant ? '' : '/brand/patrick-logo.png')
+  return raw ? getImageUrl(raw) : (appStore.isResellerTenant ? '' : getImageUrl('/brand/patrick-logo.png'))
 })
 
 const isListMode = computed(() => config.value?.template_mode === 'list')

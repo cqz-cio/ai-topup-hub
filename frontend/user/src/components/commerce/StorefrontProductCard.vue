@@ -1,7 +1,7 @@
 <template>
   <article class="catalog-card" :class="{ 'catalog-card-credits': credits }">
     <RouterLink :to="path" class="product-image-link" :aria-label="t('shopUi.detailsLabel', { name: title })">
-      <img v-if="image" :src="displayImage" :class="{ 'is-glass-cover': usingGlassCover }" :alt="title" loading="lazy" decoding="async" @error="handleImageError" />
+      <img v-if="image" :src="displayImage" :class="{ 'is-glass-cover': usingGlassCover }" :alt="title" :loading="priority ? 'eager' : 'lazy'" :fetchpriority="priority ? 'high' : 'auto'" decoding="async" @error="handleImageError" />
       <div v-else class="product-image-placeholder"><PackageOpen :size="36" aria-hidden="true" /></div>
       <span v-if="!credits" class="image-category">{{ category }}</span>
     </RouterLink>
@@ -52,6 +52,7 @@ const props = defineProps<{
   purchasable: boolean
   multipleSkus: boolean
   credits?: boolean
+  priority?: boolean
 }>()
 const emit = defineEmits<{ imageError: [] }>()
 const { t } = useI18n()
