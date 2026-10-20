@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-20T20:34:59.547186+08:00",
+  "checked_at": "2026-10-20T21:36:52.450219+08:00",
   "production_url": "https://www.qzweb.cloud/",
   "documented_release_id": "20261020-144132",
   "verified_release_id": "20261020-144132",
@@ -410,12 +410,12 @@
   "previous_build_verification_at": "2026-10-12T08:19:31.766441+00:00",
   "management_url": "https://admin.qzweb.cloud/login",
   "frontend_gateway": {
-    "checked_at": "2026-10-20T20:34:59.547186+08:00",
+    "checked_at": "2026-10-20T21:36:52.450219+08:00",
     "frontend_host": "124.220.2.69",
     "backend_host": "43.134.141.10",
-    "frontend_release": "20261020-202717",
-    "source_commit": "c41a429d643784c76aee16d31576fac356dd21f2",
-    "static_files_verified": 260,
+    "frontend_release": "20261020-213055",
+    "source_commit": "17a1c6df26f3f6b923db8bb317398dc3ae9ed73a",
+    "static_files_verified": 267,
     "storefront_url": "https://www.qzweb.cloud/",
     "management_url": "https://admin.qzweb.cloud/login",
     "www_dns_record": "www A 124.220.2.69",
@@ -431,7 +431,7 @@
     "certificate_renewal_verified": true,
     "certificate_timer": "qzweb-certificates.timer",
     "certificate_renewal_report": "/srv/zhixiang-front/shared/work/renew-final-20261012-1644/status.json",
-    "report_path": "work/codex-runtime/glass-shell-release-20261020/verified-report.json",
+    "report_path": "work/codex-runtime/media-release-20261020/verified-report.json",
     "backend_report_path": "/srv/zhixiang/shared/reports/paid-order-deadlock-20261016-190912.json",
     "formal_alipay_enabled": false,
     "database_uploaded": false,
@@ -445,10 +445,10 @@
       "browser_current_frontend_confirmed": true,
       "report_path": "/srv/zhixiang-front/shared/work/entry-cache-report.json"
     },
-    "previous_frontend_release": "20261020-145408",
-    "storefront_source_commit": "c41a429d643784c76aee16d31576fac356dd21f2",
+    "previous_frontend_release": "20261020-202717",
+    "storefront_source_commit": "17a1c6df26f3f6b923db8bb317398dc3ae9ed73a",
     "admin_source_commit": "297f11deef4d7193081270c55f60c6ba5cdd7295",
-    "backup": "/srv/zhixiang-front/backups/before-glass-shell-20261020-202717",
+    "backup": "/srv/zhixiang-front/backups/before-media-loading-20261020-213055",
     "frontend_only_update": true,
     "previous_hashed_assets_retained": true,
     "verified_services": {
@@ -456,21 +456,21 @@
       "zhixiang-api-tunnel": "active",
       "qzweb-certificates.timer": "active"
     },
-    "release_scope": "Clear glass header, footer and order lookup; stronger typography.",
+    "release_scope": "Lossless original-size media, unchanged motion, prioritized loading, speculative prefetch and immutable media cache",
     "admin_files_verified": 1459,
-    "storefront_files_verified": 260,
+    "storefront_files_verified": 267,
     "backend_program_preserved": true,
     "backend_setting_changes": [],
-    "frontend_build_source_commit": "c41a429d643784c76aee16d31576fac356dd21f2",
+    "frontend_build_source_commit": "17a1c6df26f3f6b923db8bb317398dc3ae9ed73a",
     "frontend_source_identical_to_backend": false,
     "admin_base": "/",
     "base_repair_backup": "/srv/zhixiang-front/backups/before-xorpay-admin-base-20261013-173020",
-    "frontend_source_difference": "Storefront c41a429; backend 58c8569 (20261020-144132); admin 297f11d (20261019-160954).",
+    "frontend_source_difference": "Storefront 17a1c6d; backend 58c8569 (20261020-144132); admin 297f11d (20261019-160954).",
     "source_dirty": false,
-    "source_tag": "production/glass-shell-20261020-202717",
-    "static_verification_scope": "260 new entry/hashed assets verified; 10419 old directory entries inventoried. Existing storefront resources except entry HTML, admin and Nginx preserved; release metadata updated. 41 public requests passed.",
+    "source_tag": "production/media-loading-20261020-213055",
+    "static_verification_scope": "267 published files verified; existing user resources except entry HTML and all admin files retained; 56 public checks including 7 lossless media hashes/cache/304.",
     "retained_files_preserved": true,
-    "storefront_release": "20261020-202717",
+    "storefront_release": "20261020-213055",
     "admin_release": "20261019-160954",
     "legacy_singapore_embedded_frontend_public": false,
     "legacy_singapore_frontend_behavior": "308 to maintained Shanghai storefront/admin; API/uploads/health retained",
@@ -482,8 +482,10 @@
       "nginx_files_unchanged": 57,
       "existing_frontend_release_metadata_preserved": true
     },
-    "storefront_build_files_scanned": 375,
-    "previous_directory_inventory_count": 10419
+    "storefront_build_files_scanned": 382,
+    "previous_directory_inventory_count": 10619,
+    "nginx_configuration_source_commit": "17a1c6df26f3f6b923db8bb317398dc3ae9ed73a",
+    "nginx_change_scope": "Only immutable versioned storefront media location"
   },
   "alipay": {
     "code_and_official_sandbox_query_verified": true,
@@ -3271,5 +3273,27 @@
     "local_database_uploaded": false,
     "real_payment_or_purchase_submitted": false,
     "report_path": "work/codex-runtime/glass-shell-release-20261020/verified-report.json"
+  },
+  "storefront_media_loading_20261020": {
+    "release": "20261020-213055",
+    "source_commit": "17a1c6df26f3f6b923db8bb317398dc3ae9ed73a",
+    "source_tag": "production/media-loading-20261020-213055",
+    "media_bytes_before": 6714440,
+    "media_bytes_after": 4305265,
+    "lossless_visible_pixels_verified": true,
+    "motion_preserved_on_slow_network": true,
+    "immutable_cache_enabled": true,
+    "tests_passed": 171,
+    "build_browser_checks": 3,
+    "production_browser_checks": 7,
+    "public_requests": 56,
+    "published_files_verified": 267,
+    "backend_preserved": true,
+    "admin_preserved": true,
+    "backups": {
+      "frontend": "/srv/zhixiang-front/backups/before-media-loading-20261020-213055",
+      "backend": "/srv/zhixiang/backups/before-media-loading-20261020-213055"
+    },
+    "private_evidence": "work/codex-runtime/media-release-20261020/verified-report.json"
   }
 }
