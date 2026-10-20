@@ -28,6 +28,8 @@
 6. 上线后对照本地验证结果，核对页面、健康、支付渠道、商品说明、售价、Redis、库存定时器和 storefront 任务。订单、凭据及实时库存分别维护，不用本地数据覆盖生产；不主动进行真实付款或采购测试。
 7. 保存核验结果与旧发布，再标记对应发布标签。
 
+库存任务验收必须同时核对 timer active、对应 service 的 `Result=success`、报告时间和映射清单，不能只看 timer 状态。`zhixiang-stock-sync.service` 以 `zhixiang` 用户运行，读取当前发布的 `scripts/sync-ellaixshop-stock.py`；打包/切换发布后，确保 `scripts` 目录为 `root:zhixiang` 0750、该脚本为 `root:zhixiang` 0640，或提供等价的服务用户读取权限。不要将脚本发布为仅 root 可读。上线前用 `runuser -u zhixiang -- test -r <脚本绝对路径>` 核对，并运行原有库存 service 验证最新报告，不另起同步助手或采购 worker。
+
 GitHub CI 在 `main`、`dev` 推送及 PR 上验证；`v*` 标签触发 GoReleaser 发布包。没有自动部署新加坡的 GitHub 工作流，推送主分支或源码基线标签不会替换生产程序。
 
 嵌套或管理工作区构建时显式设置 `GIT_DIR` 为 `git rev-parse --absolute-git-dir` 的结果、`GIT_WORK_TREE` 为当前源码根目录，避免 Go 自动读取外层工作区的 Git 信息。发布前用 `go version -m` 核对 `vcs.revision` 与已验证提交一致，且 `vcs.modified=false`。
