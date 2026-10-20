@@ -1,6 +1,7 @@
 import { JellyWorld } from './simulation.js';
 import * as MarineMotion from './environment.js';
 import { StationaryActors } from './actors.js';
+import { loadSceneArtwork } from './artwork.js';
 const ART_W = 1672, ART_H = 941;
 const configs = [
     { rect: [875, 94, 239, 226], pivot: [83, 80], unit: 1, polygon: [[875, 96], [1034, 94], [1066, 174], [1111, 208], [1114, 305], [1060, 320], [968, 318], [911, 256], [884, 207]] },
@@ -158,27 +159,7 @@ export function mountJellyfishing(canvas, { onReady, onFallback }) {
     function pageHide() { suspended = true; sync(); }
     function pageShow() { suspended = false; sync(); }
     function load(src) {
-        return new Promise((resolve, reject) => {
-            const img = new Image();
-            const finish = (error) => {
-                clearTimeout(timeout);
-                pendingLoads.delete(cancel);
-                img.onload = null;
-                img.onerror = null;
-                if (error) {
-                    img.src = '';
-                    reject(error);
-                }
-                else
-                    resolve(img);
-            };
-            const cancel = () => finish(new Error('Scene disposed'));
-            const timeout = setTimeout(() => finish(new Error('Scene artwork timeout')), 15000);
-            pendingLoads.add(cancel);
-            img.onload = () => finish();
-            img.onerror = () => finish(new Error('Scene artwork unavailable'));
-            img.src = src;
-        });
+        return loadSceneArtwork(src, pendingLoads);
     }
     function resize() {
         if (disposed)

@@ -8,7 +8,6 @@
 <script setup lang="ts">
 import { nextTick, onMounted, onBeforeUnmount, ref } from 'vue'
 import type { JellyfishingScene } from '../utils/jellyfishing/renderer.js'
-import { afterPageLoad, hasSpareBandwidth } from '../utils/mediaLoading'
 
 const canvas = ref<HTMLCanvasElement>()
 const ready = ref(false)
@@ -20,13 +19,9 @@ onMounted(() => {
   const preference = window.matchMedia('(prefers-reduced-motion: reduce)')
   let scene: JellyfishingScene | undefined
   let generation = 0
-  let cancelStart = () => {}
-  const connection = (navigator as Navigator & { connection?: EventTarget }).connection
-  let spareBandwidth = hasSpareBandwidth()
 
   const reset = () => {
     generation++
-    cancelStart()
     ready.value = false
     loadingState.value = 'waiting'
     scene?.dispose()
@@ -34,39 +29,34 @@ onMounted(() => {
     // A disposed WebGL context cannot be reused when motion is enabled again.
     canvasVersion.value++
   }
-  const update = () => {
+  const update = async () => {
     reset()
     if (preference.matches) { loadingState.value = 'reduced-motion'; return }
-    if (!hasSpareBandwidth()) { loadingState.value = 'slow-network'; return }
     const current = generation
-    cancelStart = afterPageLoad(async () => {
-      try {
-        loadingState.value = 'loading'
-        await nextTick()
-        const { mountJellyfishing } = await import('../utils/jellyfishing/renderer.js')
-        if (generation !== current || !canvas.value) return
-        scene = mountJellyfishing(canvas.value, {
-          onReady: () => { ready.value = true; loadingState.value = 'ready' },
-          onFallback: () => { ready.value = false; loadingState.value = 'fallback' },
-        })
-      } catch {
-        // Keep the existing CSS wallpaper if WebGL or the lazy chunk is unavailable.
-        if (generation === current) { ready.value = false; loadingState.value = 'fallback' }
-      }
-    }, 500)
+    try {
+      loadingState.value = 'loading'
+      await nextTick()
+      // Motion is part of the visible scene, regardless of connection speed.
+      // Start its assets without waiting for unrelated page images or idle time.
+      const { mountJellyfishing } = await import('../utils/jellyfishing/renderer.js')
+      if (generation !== current || !canvas.value) return
+      scene = mountJellyfishing(canvas.value, {
+        onReady: () => {
+          if (generation === current) { ready.value = true; loadingState.value = 'ready' }
+        },
+        onFallback: () => {
+          if (generation === current) { ready.value = false; loadingState.value = 'fallback' }
+        },
+      })
+    } catch {
+      // Keep the existing CSS wallpaper if WebGL or the lazy chunk is unavailable.
+      if (generation === current) { ready.value = false; loadingState.value = 'fallback' }
+    }
   }
 
-  const connectionChanged = () => {
-    const next = hasSpareBandwidth()
-    if (next === spareBandwidth) return
-    spareBandwidth = next
-    update()
-  }
   preference.addEventListener('change', update)
-  connection?.addEventListener('change', connectionChanged)
   stop = () => {
     preference.removeEventListener('change', update)
-    connection?.removeEventListener('change', connectionChanged)
     reset()
   }
   void update()

@@ -9,17 +9,36 @@ const destination = path.join(root, 'media/storefront-20261020')
 const files = [
   ['brand/jellyfishing-background.png', 'jellyfishing.webp'],
   ['brand/jellyfishing/clean-plate.png', 'clean-plate.webp'],
-  ['brand/jellyfishing/foreground.png', 'foreground.webp', 0, true],
-  ['brand/patrick-logo.png', 'patrick-logo.webp', 256],
+  ['brand/jellyfishing/foreground.png', 'foreground.webp'],
+  ['brand/patrick-logo.png', 'patrick-logo.webp'],
   ['brand/patrick-logo.png', 'patrick-icon.png', 48],
-  ['catalog-products/transparent-icons-20261020/gemini.png', 'gemini.webp', 960],
-  ['catalog-products/transparent-icons-20261020/gpt.png', 'gpt.webp', 960],
+  ['catalog-products/transparent-icons-20261020/gemini.png', 'gemini.webp'],
+  ['catalog-products/transparent-icons-20261020/gpt.png', 'gpt.webp'],
 ]
+
+async function verifyPixels(source, output, maskOnly) {
+  const decode = file => sharp(file).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
+  const [before, after] = await Promise.all([decode(source), decode(output)])
+  if (before.info.width !== after.info.width || before.info.height !== after.info.height ||
+      before.data.length !== after.data.length) throw new Error(`Image dimensions changed: ${output}`)
+  for (let i = 0; i < before.data.length; i += 4) {
+    if (before.data[i + 3] !== after.data[i + 3]) throw new Error(`Alpha changed: ${output}`)
+    // RGB beneath fully transparent pixels is not visible. The foreground is
+    // used only as an alpha mask; all other visible RGB must be bit-for-bit equal.
+    if (!maskOnly && before.data[i + 3] > 0) {
+      for (let channel = 0; channel < 3; channel++) {
+        if (before.data[i + channel] !== after.data[i + channel]) {
+          throw new Error(`Visible pixel changed: ${output}`)
+        }
+      }
+    }
+  }
+}
 
 async function main() {
   await fs.mkdir(destination, { recursive: true })
   const report = []
-  for (const [source, output, width, lossless] of files) {
+  for (const [source, output, width] of files) {
     let image = sharp(path.join(root, source))
     if (output === 'foreground.webp') {
       // The renderer uses this layer only as a source-in alpha mask.
@@ -31,9 +50,14 @@ async function main() {
     if (width) image = image.resize({ width, withoutEnlargement: true })
     image = output.endsWith('.png')
       ? image.png({ compressionLevel: 9 })
-      : image.webp({ quality: 90, alphaQuality: 100, effort: 6, lossless: !!lossless })
+      : image.webp({ quality: 100, effort: 6, lossless: true })
     const info = await image.toFile(path.join(destination, output))
-    report.push({ source, output, originalBytes: (await fs.stat(path.join(root, source))).size, bytes: info.size, width: info.width, height: info.height })
+    if (!width) await verifyPixels(path.join(root, source), path.join(destination, output), output === 'foreground.webp')
+    report.push({
+      source, output, originalBytes: (await fs.stat(path.join(root, source))).size,
+      bytes: info.size, width: info.width, height: info.height,
+      verification: width ? 'favicon-resized' : output === 'foreground.webp' ? 'alpha-identical' : 'visible-pixels-identical',
+    })
   }
   console.log(JSON.stringify(report, null, 2))
 }
