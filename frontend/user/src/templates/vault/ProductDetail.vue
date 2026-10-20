@@ -46,7 +46,7 @@
           <h1 class="my-2 mb-3 text-[32px] font-extrabold">{{ getLocalizedText(product.title) }}</h1>
 
           <div class="mb-1.5 flex flex-wrap gap-2">
-            <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12.5px] font-semibold" :class="stockPillTone">{{ getStockStatusLabel(product) }}</span>
+            <span v-if="!contactFirst" class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12.5px] font-semibold" :class="stockPillTone">{{ getStockStatusLabel(product) }}</span>
             <span class="inline-flex items-center gap-1.5 rounded-full bg-[color:var(--teal-soft)] px-2.5 py-1 text-[12.5px] font-semibold text-[color:var(--teal-strong)]">
               <component :is="product.fulfillment_type === 'auto' ? Zap : Pencil" class="h-3.5 w-3.5" />
               {{ getFulfillmentTypeLabel(product.fulfillment_type) }}
@@ -133,7 +133,7 @@
           </div>
 
           <!-- 规格 -->
-          <div v-if="activeSkus.length" class="my-5">
+          <div v-if="!contactFirst && activeSkus.length" class="my-5">
             <div class="mb-2.5 text-[13px] font-bold uppercase tracking-[0.04em] text-muted-foreground">{{ t('productDetail.skuTitle') }}</div>
             <div class="flex flex-wrap gap-2.5">
               <button
@@ -158,7 +158,7 @@
           <ProductPurchaseGuide :slug="product.slug" />
 
           <!-- 数量 -->
-          <div class="my-5">
+          <div v-if="!contactFirst" class="my-5">
             <div class="mb-2.5 text-[13px] font-bold uppercase tracking-[0.04em] text-muted-foreground">{{ t('productDetail.quantity') }}</div>
             <div class="inline-flex items-center overflow-hidden rounded-full border-2 border-hairline-strong">
               <button type="button" class="grid h-11 w-[42px] place-items-center bg-card text-foreground disabled:opacity-35" :aria-label="t('productDetail.decreaseQuantity')" :disabled="quantity <= quantityEffectiveMin" @click="quantity = Math.max(quantityEffectiveMin, quantity - 1)"><Minus class="h-[17px] w-[17px]" /></button>
@@ -168,12 +168,13 @@
           </div>
 
           <!-- 提示 -->
-          <div v-if="cannotPurchaseReason" class="my-3.5 rounded-sm bg-destructive/10 px-3.5 py-2.5 text-sm font-semibold text-destructive">{{ cannotPurchaseReason }}</div>
+          <div v-if="!contactFirst && cannotPurchaseReason" class="my-3.5 rounded-sm bg-destructive/10 px-3.5 py-2.5 text-sm font-semibold text-destructive">{{ cannotPurchaseReason }}</div>
           <div v-if="purchaseWarning" class="my-3.5 rounded-sm bg-warning/10 px-3.5 py-2.5 text-sm font-semibold text-warning">{{ purchaseWarning }}</div>
 
           <!-- 操作 -->
           <div ref="purchaseActionsRef" class="mt-[18px] flex flex-wrap gap-3">
-            <Button v-if="requiresLogin" class="h-12 w-full rounded-full text-[17px] font-bold" @click="goLogin">{{ t('productDetail.loginToBuy') }}</Button>
+            <ProductContactButton v-if="contactFirst" class="h-12 w-full" />
+            <Button v-else-if="requiresLogin" class="h-12 w-full rounded-full text-[17px] font-bold" @click="goLogin">{{ t('productDetail.loginToBuy') }}</Button>
             <template v-else>
               <Button class="h-12 flex-1 rounded-full text-[17px] font-bold" :disabled="!canPurchase" @click="buyNow"><Zap /> {{ t('productDetail.buyNow') }}</Button>
               <Button variant="outline" class="h-12 rounded-full text-[17px] font-bold" :disabled="!canPurchase" @click="addToCart"><ShoppingCart /> {{ t('productDetail.addToCart') }}</Button>
@@ -219,6 +220,7 @@
 
       <!-- 移动端固定购买条 -->
       <VaultProductMobileBar
+        :contact-first="contactFirst"
         :visible="showMobileBar && !!product && !loading"
         :requires-login="requiresLogin"
         :can-purchase="canPurchase"
@@ -251,6 +253,7 @@
 
 <script setup lang="ts">
 import ProductPurchaseGuide from '../../components/product/ProductPurchaseGuide.vue'
+import ProductContactButton from '../../components/product/ProductContactButton.vue'
 import ProductInvoiceNotice from '../../components/commerce/ProductInvoiceNotice.vue'
 import { computed, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -299,7 +302,7 @@ const {
   showSelectedSkuMemberBadge,
   isSkuPurchasable, skuDisplayText, skuStockText,
   quantityEffectiveLimit, quantityEffectiveMin, handleQuantityInput,
-  requiresLogin, requiresSKUSelection, canPurchase, cannotPurchaseReason,
+  requiresLogin, requiresSKUSelection, canPurchase, cannotPurchaseReason, contactFirst,
   categoryName, images,
   addToCart, buyNow, goLogin, loadProduct,
   mobileBarShowMemberPrice, mobileBarMemberPriceDisplay,

@@ -28,7 +28,8 @@
           </span>
         </div>
         <!-- Actions -->
-        <Button v-if="requiresLogin" size="lg" class="rounded-xl font-bold" @click="$emit('goLogin')">
+        <ProductContactButton v-if="contactFirst" />
+        <Button v-else-if="requiresLogin" size="lg" class="rounded-xl font-bold" @click="$emit('goLogin')">
           {{ t('productDetail.loginToBuy') }}
         </Button>
         <template v-else>
@@ -47,10 +48,12 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import { Button } from '@/components/ui/button'
+import ProductContactButton from './ProductContactButton.vue'
 
 const { t } = useI18n()
 
 defineProps<{
+  contactFirst?: boolean
   visible: boolean
   requiresLogin: boolean
   canPurchase: boolean

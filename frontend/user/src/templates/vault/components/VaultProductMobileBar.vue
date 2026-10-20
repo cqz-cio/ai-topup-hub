@@ -21,7 +21,8 @@
           <span v-else class="block truncate text-xl font-extrabold tabular-nums text-primary">{{ productPriceDisplay }}</span>
         </div>
         <!-- 操作 -->
-        <Button v-if="requiresLogin" size="lg" class="flex-none rounded-full font-bold" @click="$emit('goLogin')">{{ t('productDetail.loginToBuy') }}</Button>
+        <ProductContactButton v-if="contactFirst" />
+        <Button v-else-if="requiresLogin" size="lg" class="flex-none rounded-full font-bold" @click="$emit('goLogin')">{{ t('productDetail.loginToBuy') }}</Button>
         <template v-else>
           <Button variant="outline" size="lg" class="flex-none rounded-full font-bold" :disabled="!canPurchase" @click="$emit('addToCart')">
             <ShoppingCart /> {{ t('productDetail.addToCart') }}
@@ -39,10 +40,12 @@
 import { useI18n } from 'vue-i18n'
 import { ShoppingCart, Zap } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
+import ProductContactButton from '../../../components/product/ProductContactButton.vue'
 
 const { t } = useI18n()
 
 defineProps<{
+  contactFirst?: boolean
   visible: boolean
   requiresLogin: boolean
   canPurchase: boolean

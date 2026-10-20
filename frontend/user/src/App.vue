@@ -37,6 +37,7 @@
       <Toast />
       <ConfirmDialog />
       <PaymentBalanceDialog />
+      <ProductContactDialog />
     </div>
   </ConfigProvider>
 </template>
@@ -53,6 +54,7 @@ import Loading from './components/Loading.vue'
 import Toast from './components/Toast.vue'
 import ConfirmDialog from './components/ConfirmDialog.vue'
 import PaymentBalanceDialog from './components/PaymentBalanceDialog.vue'
+import ProductContactDialog from './components/product/ProductContactDialog.vue'
 import ErrorBoundary from './components/ErrorBoundary.vue'
 import BackToTop from './components/BackToTop.vue'
 import MobileBottomNav from './components/MobileBottomNav.vue'

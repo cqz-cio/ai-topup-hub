@@ -99,7 +99,7 @@
                     {{ getFulfillmentTypeLabel(product.fulfillment_type) }}
                   </Badge>
 
-                  <Badge :variant="getStockBadgeVariant(product.stock_status)">
+                  <Badge v-if="!contactFirst" :variant="getStockBadgeVariant(product.stock_status)">
                     {{ getStockStatusLabel(product) }}
                   </Badge>
                 </div>
@@ -200,7 +200,7 @@
                   </div>
                 </div>
 
-                <div v-if="activeSkus.length" class="product-skus">
+                <div v-if="!contactFirst && activeSkus.length" class="product-skus">
                   <h2 class="mb-3 text-sm font-bold uppercase tracking-widest text-muted-foreground">
                     {{ t('productDetail.skuTitle') }}
                   </h2>
@@ -267,7 +267,7 @@
               <ProductRedemptionGuide :slug="product.slug" class="product-delivery-note" />
 
               <!-- Quantity Selector -->
-                <div class="product-quantity">
+                <div v-if="!contactFirst" class="product-quantity">
                   <h2 class="mb-3 text-sm font-bold uppercase tracking-widest text-muted-foreground">
                     {{ t('productDetail.quantity') }}
                   </h2>
@@ -304,7 +304,7 @@
 
               <!-- Purchase Actions (Desktop + original position) -->
               <div ref="purchaseActionsRef" class="product-actions space-y-4">
-                <Alert v-if="cannotPurchaseReason" variant="destructive">
+                <Alert v-if="!contactFirst && cannotPurchaseReason" variant="destructive">
                   <AlertDescription class="font-semibold">{{ cannotPurchaseReason }}</AlertDescription>
                 </Alert>
                 <Alert v-if="purchaseWarning" class="border-warning/40 text-warning">
@@ -312,7 +312,8 @@
                 </Alert>
 
                 <div class="space-y-3">
-                  <Button v-if="requiresLogin" class="w-full h-12 font-bold" @click="goLogin">
+                  <ProductContactButton v-if="contactFirst" class="w-full h-12" />
+                  <Button v-else-if="requiresLogin" class="w-full h-12 font-bold" @click="goLogin">
                     {{ t('productDetail.loginToBuy') }}
                   </Button>
                   <div v-else class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -383,6 +384,7 @@
 
         <!-- Mobile Fixed Purchase Bar -->
         <ProductMobileBar
+          :contact-first="contactFirst"
           :visible="showMobileBar && !!product && !loading"
           :requires-login="requiresLogin"
           :can-purchase="canPurchase"
@@ -424,6 +426,7 @@
 
 <script setup lang="ts">
 import ProductPurchaseGuide from '../components/product/ProductPurchaseGuide.vue'
+import ProductContactButton from '../components/product/ProductContactButton.vue'
 import ProductRedemptionGuide from '../components/product/ProductRedemptionGuide.vue'
 import ProductInvoiceNotice from '../components/commerce/ProductInvoiceNotice.vue'
 import CheckoutSteps from '../components/checkout/CheckoutSteps.vue'
@@ -480,7 +483,7 @@ const {
   showSelectedSkuMemberBadge,
   isSkuPurchasable, skuDisplayText, skuStockText, skuStockBadgeClass,
   quantityEffectiveLimit, quantityEffectiveMin, handleQuantityInput,
-  requiresLogin, requiresSKUSelection, canPurchase, cannotPurchaseReason,
+  requiresLogin, requiresSKUSelection, canPurchase, cannotPurchaseReason, contactFirst,
   categoryName, images,
   addToCart, buyNow, goLogin, loadProduct,
   mobileBarShowMemberPrice, mobileBarMemberPriceDisplay,

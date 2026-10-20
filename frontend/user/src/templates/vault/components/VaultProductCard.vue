@@ -28,7 +28,7 @@
         <component :is="product.purchase_type === 'guest' ? UserPlus : Lock" class="h-3 w-3" />
         {{ getPurchaseTypeLabel(product.purchase_type) }}
       </span>
-      <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold" :class="stockPill.tone">
+      <span v-if="!contactFirst" class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold" :class="stockPill.tone">
         <component :is="stockPill.icon" class="h-3 w-3" />
         {{ stockPill.label }}
       </span>
@@ -45,7 +45,8 @@
         </div>
         <span v-if="priceSignal" class="inline-flex w-fit items-center rounded-full px-2 py-0.5 text-[11px] font-semibold" :class="priceSignal.tone">{{ priceSignal.label }}</span>
       </div>
-      <span v-if="soldOut" class="inline-flex flex-none items-center rounded-full border-2 border-hairline-strong px-3.5 py-1.5 text-[13px] font-bold text-foreground" aria-disabled="true">{{ t('products.stockStatus.outOfStock') }}</span>
+      <ProductContactButton v-if="contactFirst" />
+      <span v-else-if="soldOut" class="inline-flex flex-none items-center rounded-full border-2 border-hairline-strong px-3.5 py-1.5 text-[13px] font-bold text-foreground" aria-disabled="true">{{ t('products.stockStatus.outOfStock') }}</span>
       <button
         v-else
         type="button"
@@ -61,6 +62,8 @@
 </template>
 
 <script setup lang="ts">
+import ProductContactButton from '../../../components/product/ProductContactButton.vue'
+import { isContactFirstProduct } from '../../../utils/contactFirstProducts'
 import { computed, ref, type Component } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { AlarmClock, Lock, Package, Pencil, UserPlus, XCircle, Zap } from 'lucide-vue-next'
@@ -90,7 +93,8 @@ const coverClass = computed(() => covers[(props.index ?? 0) % covers.length])
 
 const title = computed(() => getLocalizedText(props.product?.title))
 const categoryName = computed(() => getLocalizedText(props.product?.category?.name))
-const soldOut = computed(() => isSoldOut(props.product))
+const contactFirst = computed(() => isContactFirstProduct(props.product?.slug))
+const soldOut = computed(() => !contactFirst.value && isSoldOut(props.product))
 const promo = computed(() => hasPromotionPrice(props.product))
 
 const imageErrored = ref(false)

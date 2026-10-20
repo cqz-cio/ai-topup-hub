@@ -17,9 +17,10 @@
         <div><dt>{{ t('shopUi.purchaseMethod') }}</dt><dd>{{ t(purchaseType === 'member' ? 'shopUi.memberOnly' : 'shopUi.guestAvailable') }}</dd></div>
         <div><dt>{{ t('shopUi.usageWarranty') }}</dt><dd>{{ t('shopUi.checkDetails') }}</dd></div>
       </dl>
-      <div class="product-price"><strong>{{ price }}</strong><small v-if="multipleSkus">{{ t('shopUi.from') }}</small><span class="stock-label" :class="{ 'is-out': !purchasable }">{{ stock }}</span></div>
+      <div class="product-price"><strong>{{ price }}</strong><small v-if="multipleSkus">{{ t('shopUi.from') }}</small><span v-if="!contactFirst" class="stock-label" :class="{ 'is-out': !purchasable }">{{ stock }}</span></div>
       <div class="product-actions">
-        <RouterLink v-if="purchasable" :to="path" class="store-button is-primary" :aria-label="t('shopUi.buyLabel', { name: title })">{{ t('shopUi.buy') }}<ArrowUpRight :size="14" aria-hidden="true" /></RouterLink>
+        <ProductContactButton v-if="contactFirst" class="store-button is-primary" />
+        <RouterLink v-else-if="purchasable" :to="path" class="store-button is-primary" :aria-label="t('shopUi.buyLabel', { name: title })">{{ t('shopUi.buy') }}<ArrowUpRight :size="14" aria-hidden="true" /></RouterLink>
         <button v-else type="button" class="store-button is-primary" disabled>{{ t('shopUi.unavailable') }}</button>
         <RouterLink :to="path" class="store-text-link">{{ t('shopUi.details') }}</RouterLink>
       </div>
@@ -35,6 +36,8 @@ import { ArrowUpRight, PackageOpen } from 'lucide-vue-next'
 import type { StorefrontDisplayDetails } from '../../data/storefrontCatalog'
 import { useAppStore } from '../../stores/app'
 import { getCatalogGlassCover } from '../../utils/catalogGlass'
+import { isContactFirstProduct } from '../../utils/contactFirstProducts'
+import ProductContactButton from '../product/ProductContactButton.vue'
 
 const props = defineProps<{
   slug: string
@@ -54,6 +57,7 @@ const emit = defineEmits<{ imageError: [] }>()
 const { t } = useI18n()
 const appStore = useAppStore()
 const path = computed(() => `/products/${encodeURIComponent(props.slug)}`)
+const contactFirst = computed(() => isContactFirstProduct(props.slug))
 const glassCoverFailed = ref(false)
 const glassCover = computed(() => appStore.isResellerTenant ? '' : getCatalogGlassCover(props.image))
 const usingGlassCover = computed(() => !!glassCover.value && !glassCoverFailed.value)
