@@ -2,14 +2,14 @@ package domain
 
 import "time"
 
-// ChainInvoice keeps the fiat price and exchange rate immutable. AmountKey is
-// never reused, including after expiry, so late transfers cannot buy a new order.
+// ChainInvoice keeps immutable payment history. AmountKey identifies an invoice;
+// Stream/Units may be reused only after the previous payment window expires.
 type ChainInvoice struct {
 	ID          uint      `gorm:"primaryKey"`
 	PaymentID   uint      `gorm:"uniqueIndex;not null"`
-	Stream      string    `gorm:"size:160;index;not null"`
+	Stream      string    `gorm:"size:160;index;index:idx_chain_invoice_amount_window,priority:1;not null"`
 	AmountKey   string    `gorm:"size:240;uniqueIndex;not null"`
-	Units       string    `gorm:"size:80;not null"`
+	Units       string    `gorm:"size:80;index:idx_chain_invoice_amount_window,priority:2;not null"`
 	Amount      string    `gorm:"size:80;not null"`
 	FiatAmount  string    `gorm:"size:40;not null"`
 	Currency    string    `gorm:"size:8;not null"`

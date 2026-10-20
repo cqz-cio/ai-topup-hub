@@ -85,6 +85,7 @@
         </div>
 
         <!-- 支付区域（仅待支付状态） -->
+        <UsdtPaymentWindowNotice v-if="usdtDeadlineExpired" expired />
         <div v-if="isPending" class="rounded-2xl border bg-card shadow-sm p-6">
           <h2 class="text-lg font-bold mb-4">{{ t('rechargeOrder.paymentTitle') }}</h2>
           <UsdtPaymentGuides :payment="payment" class="mb-5" />
@@ -156,13 +157,14 @@ import { Button } from '@/components/ui/button'
 import EmptyState from '../components/EmptyState.vue'
 import UsdtTransferNotice from '../components/payment/UsdtTransferNotice.vue'
 import UsdtPaymentGuides from '../components/payment/UsdtPaymentGuides.vue'
+import UsdtPaymentWindowNotice from '../components/payment/UsdtPaymentWindowNotice.vue'
 import { useRechargeOrderDetail } from '../composables/useRechargeOrderDetail'
 
 const { t } = useI18n()
 
 const {
   loading, checkingPayment, recharge, payment, walletAddressCopied, qrImageUrl,
-  isPending, payLink, showTelegramPayHint, qrUsingPayLinkFallback, showQRCode,
+  isPending, usdtDeadlineExpired, payLink, showTelegramPayHint, qrUsingPayLinkFallback, showQRCode,
   cryptoWalletAddress, cryptoPaymentDetails, hasCryptoPaymentDetails, customerFeeApplied,
   rechargeStatusText, rechargeStatusVariant, formatMoney, formatDate,
   loadDetail, checkPayment, handleOpenPayLink, handleCopyWalletAddress,

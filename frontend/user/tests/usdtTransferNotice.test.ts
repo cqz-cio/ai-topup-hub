@@ -3,6 +3,10 @@ import assert from 'node:assert/strict'
 import { resolveUsdtTransfer } from '../src/utils/usdtTransferNotice.ts'
 
 test('native USDT channels preserve the exact amount, including old payment precision', () => {
+  for (const provider_type of ['bscusdt', 'plasmausdt', 'tronusdt']) {
+    const token = provider_type === 'plasmausdt' ? 'USDT0' : 'USDT'
+    for (const amount of ['20.0000', '20.0001', '20.0099']) assert.deepEqual(resolveUsdtTransfer({ provider_type, chain_amount: amount }), { amount, token })
+  }
   assert.deepEqual(resolveUsdtTransfer({ provider_type: 'bscusdt', chain_amount: '20.00' }), { amount: '20.00', token: 'USDT' })
   assert.deepEqual(resolveUsdtTransfer({ provider_type: 'plasmausdt', chain_amount: '14.890123' }), { amount: '14.890123', token: 'USDT0' })
   assert.deepEqual(resolveUsdtTransfer({ provider_type: 'tronusdt', chain_amount: '0.010001' }), { amount: '0.010001', token: 'USDT' })

@@ -137,6 +137,7 @@ func setupNetwork(t *testing.T, network string) *testFixture {
 	if err = db.First(&f.invoice, "payment_id = ?", 1).Error; err != nil {
 		t.Fatal(err)
 	}
+	f.chain.timestamp = f.invoice.CreatedAt.UTC().Truncate(time.Second)
 	return f
 }
 func (f *testFixture) event(units string, block uint64, index uint64) Log {
@@ -150,10 +151,10 @@ func (f *testFixture) run(t *testing.T) {
 	}
 }
 
-func TestInvoiceLocksRateAndTwoDecimalAmount(t *testing.T) {
+func TestInvoiceLocksRateAndFourDecimalAmount(t *testing.T) {
 	f := setup(t)
 	amount := decimal.RequireFromString(f.invoice.Amount)
-	if f.invoice.Amount != "20.00" || f.invoice.CNYPerUSDT != "6.66" || f.invoice.Units != amount.Shift(18).BigInt().String() {
+	if f.invoice.Amount != "20.0000" || f.invoice.CNYPerUSDT != "6.66" || f.invoice.Units != amount.Shift(18).BigInt().String() {
 		t.Fatal("incorrect conversion or precision")
 	}
 	f.s.rate = decimal.NewFromInt(9)

@@ -17,7 +17,7 @@ import (
 func TestPlasmaInvoiceUsesSixDecimalTokenAndCorrectInstructions(t *testing.T) {
 	f := setupNetwork(t, "plasma")
 	amount := decimal.RequireFromString(f.invoice.Amount)
-	if f.invoice.Units != amount.Shift(6).BigInt().String() || f.invoice.Amount != "20.00" {
+	if f.invoice.Units != amount.Shift(6).BigInt().String() || f.invoice.Amount != "20.0000" {
 		t.Fatal("wrong Plasma token amount", f.invoice.Units)
 	}
 	r := f.s.invoiceResult(&f.invoice)

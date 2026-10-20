@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { Box, Check, Clock3, Copy, ExternalLink, Headset, Info, RefreshCw, ArrowLeftRight } from 'lucide-vue-next'
 import type { usePayment } from '../../composables/usePayment'
 import { resolveUsdtTransfer } from '../../utils/usdtTransferNotice'
+import UsdtPaymentWindowNotice from './UsdtPaymentWindowNotice.vue'
 import UsdtPaymentGuides from './UsdtPaymentGuides.vue'
 import UsdtTransferNotice from './UsdtTransferNotice.vue'
 import CryptoPaymentDetails from './CryptoPaymentDetails.vue'
@@ -30,6 +31,7 @@ const copy = computed(() => messages[locale.value as keyof typeof messages] || m
 <template>
   <section v-if="p.order && p.paymentResult" class="payment-result" aria-labelledby="payment-method-heading">
     <UsdtPaymentGuides :payment="p.usdtPayment" />
+    <UsdtPaymentWindowNotice v-if="transfer" />
     <div class="payment-layout" :class="{ 'is-transfer': directTransfer }">
       <div class="payment-qr-column">
         <h2 id="payment-method-heading">{{ directTransfer ? `${copy.pay} ${transfer?.token} ${copy.payTail}` : p.paymentResultTitle }}</h2>

@@ -14,9 +14,10 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-// Each quote may use its rounded base through base + 0.99 USDT. Historical
-// reservations remain occupied; exhaustion must never cause an unbounded uplift.
+// Each quote may use its rounded base through base + 0.0099 USDT. Historical
+// reservations remain occupied until expiry; exhaustion must never cause an unbounded uplift.
 const maxAmountCandidates = 100
+const amountDecimalPlaces = 4
 
 var ErrAmountCapacityExhausted = errors.New("chain_unique_amount_capacity_exhausted")
 
@@ -106,20 +107,20 @@ func (s *Service) CreatePayment(ctx context.Context, _ jsonmap.JSON, in contract
 	}
 	// Two fiat decimals remain in payments. Chain precision is stored separately
 	// as an integer string; no float or money.Amount rounding is permitted here.
-	// QuoRem preserves a positive remainder even just above a cent boundary;
+	// QuoRem preserves a positive remainder even just above a four-decimal boundary;
 	// Div's finite precision could round it away before RoundCeil sees it.
-	base, remainder := in.Amount.Decimal.QuoRem(s.rate, 2)
-	cent := decimal.New(1, -2)
+	base, remainder := in.Amount.Decimal.QuoRem(s.rate, amountDecimalPlaces)
+	step := decimal.New(1, -amountDecimalPlaces)
 	if remainder.IsPositive() {
-		base = base.Add(cent)
+		base = base.Add(step)
 	}
 	var invoice domain.ChainInvoice
 	for attempt := int64(0); attempt < maxAmountCandidates; attempt++ {
 		// The store reserves exact units atomically across all orders/recharges
-		// on this stream. Always try the lowest unallocated cent first.
-		amount := base.Add(cent.Mul(decimal.NewFromInt(attempt)))
+		// on this stream. Always try the lowest unallocated amount first.
+		amount := base.Add(step.Mul(decimal.NewFromInt(attempt)))
 		units := amount.Shift(s.network.Decimals).BigInt().String()
-		invoice = domain.ChainInvoice{PaymentID: in.PaymentID, Stream: s.stream, AmountKey: s.stream + "/" + units, Units: units, Amount: amount.StringFixed(2), FiatAmount: in.Amount.String(), Currency: "CNY", CNYPerUSDT: s.rate.String(), Recipient: s.config.Recipient, StartBlock: head + 1, ExpiresAt: *expires, State: "pending"}
+		invoice = domain.ChainInvoice{PaymentID: in.PaymentID, Stream: s.stream, AmountKey: fmt.Sprintf("%s/%s/payment/%d", s.stream, units, in.PaymentID), Units: units, Amount: amount.StringFixed(amountDecimalPlaces), FiatAmount: in.Amount.String(), Currency: "CNY", CNYPerUSDT: s.rate.String(), Recipient: s.config.Recipient, StartBlock: head + 1, ExpiresAt: *expires, State: "pending"}
 		created, err := s.store.CreateInvoice(ctx, &invoice, &domain.ChainCursor{Stream: s.stream, NextBlock: head + 1})
 		if err != nil {
 			return nil, err

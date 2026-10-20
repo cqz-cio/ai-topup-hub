@@ -215,6 +215,7 @@ func TestConfirmedUSDTTransferRunsStorefrontProcurementAndCustomerDelivery(t *te
 				if err = db.First(&invoice, "payment_id = ?", payment.Payment.ID).Error; err != nil {
 					t.Fatal(err)
 				}
+				chain.timestamp = invoice.CreatedAt.UTC().Truncate(time.Second)
 				chain.event = &chaincontract.Log{Address: network.Token, Topics: []string{bscusdt.TransferTopic, "0x" + strings.Repeat("0", 24) + strings.Repeat("1", 40), chaincontract.AddressTopic(invoice.Recipient)}, Data: fmt.Sprintf("0x%064x", decimal.RequireFromString(invoice.Units).BigInt()), BlockNumber: "0x65", BlockHash: fmt.Sprintf("0x%064x", 101), TransactionHash: "0x" + strings.Repeat("a", 64), LogIndex: "0x0"}
 				chain.head = 110
 				if err = gateway.RunOnce(context.Background()); err != nil {

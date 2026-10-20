@@ -1,6 +1,9 @@
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { useAppStore } from '../stores/app'
+import { resolveUsdtTransfer } from '../utils/usdtTransferNotice'
+import { paymentDeadlineExpired } from '../utils/usdtPaymentWindow'
 import QRCode from 'qrcode'
 import { walletAPI } from '../api/wallet'
 import { useTelegramMiniAppStore } from '../stores/telegramMiniApp'
@@ -17,6 +20,9 @@ export function useRechargeOrderDetail() {
   const route = useRoute()
   const telegramMiniAppStore = useTelegramMiniAppStore()
 
+  const appStore = useAppStore()
+  const now = ref(appStore.getServerTime())
+  let deadlineTimer: number | undefined
   const loading = ref(true)
   const checkingPayment = ref(false)
   const recharge = ref<any>(null)
@@ -29,7 +35,12 @@ export function useRechargeOrderDetail() {
 
   const rechargeNo = computed(() => String(route.params.recharge_no || '').trim())
 
+  const usdtDeadlineExpired = computed(() => Boolean(resolveUsdtTransfer(payment.value)) &&
+    ['pending', 'initiated', 'expired'].includes(String(recharge.value?.status || '').toLowerCase()) &&
+    paymentDeadlineExpired([payment.value?.expires_at], now.value, true))
+
   const isPending = computed(() => {
+    if (usdtDeadlineExpired.value) return false
     const status = String(recharge.value?.status || '').toLowerCase()
     return status === 'pending' || status === 'initiated'
   })
@@ -226,7 +237,7 @@ export function useRechargeOrderDetail() {
   }
 
   const handleCopyWalletAddress = async () => {
-    if (!cryptoWalletAddress.value) return
+    if (!cryptoWalletAddress.value || usdtDeadlineExpired.value) return
     try {
       await copyText(cryptoWalletAddress.value)
       walletAddressCopied.value = true
@@ -276,6 +287,7 @@ export function useRechargeOrderDetail() {
   watch(() => qrDisplayContent.value, () => { void renderQRCodeImage() }, { immediate: true })
 
   onMounted(async () => {
+    deadlineTimer = window.setInterval(() => { now.value = appStore.getServerTime() }, 1000)
     await loadDetail()
     if (isPending.value) {
       startPolling()
@@ -287,6 +299,7 @@ export function useRechargeOrderDetail() {
   })
 
   onUnmounted(() => {
+    if (deadlineTimer !== undefined) window.clearInterval(deadlineTimer)
     stopPolling()
     if (walletAddressCopiedTimer.value) {
       window.clearTimeout(walletAddressCopiedTimer.value)
@@ -302,6 +315,7 @@ export function useRechargeOrderDetail() {
     walletAddressCopied,
     qrImageUrl,
     isPending,
+    usdtDeadlineExpired,
     payLink,
     showTelegramPayHint,
     qrUsingPayLinkFallback,

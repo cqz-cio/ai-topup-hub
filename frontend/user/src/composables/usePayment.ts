@@ -23,6 +23,7 @@ import {
 } from '../utils/paymentResumePolicy'
 import { rememberPaymentBlockFocus, showPaymentBlock } from './usePaymentBlock'
 import { readPaymentBlock } from '../utils/paymentBlock'
+import { paymentDeadlineExpired, usdtPaymentWindowMessage } from '../utils/usdtPaymentWindow'
 import QRCode from 'qrcode'
 import { type PageAlert } from '../utils/alerts'
 import { loadGuestOrderAuth, saveGuestOrderAuth } from '../utils/guestOrderAuth'
@@ -36,7 +37,7 @@ export function usePayment() {
   const router = useRouter()
   const appStore = useAppStore()
   const telegramMiniAppStore = useTelegramMiniAppStore()
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
 
   const loading = ref(true)
   const submitting = ref(false)
@@ -347,12 +348,9 @@ export function usePayment() {
     return ts
   })
 
-  const orderExpired = computed(() => {
-    if (!order.value?.expires_at) return false
-    const ts = new Date(order.value.expires_at).getTime()
-    if (Number.isNaN(ts)) return false
-    return ts <= appStore.getServerTime()
-  })
+  const orderExpired = computed(() => paymentDeadlineExpired(
+    [paymentResult.value?.expires_at, order.value?.expires_at], now.value, Boolean(usdtPayment.value)
+  ))
   const orderCanceled = computed(() => order.value?.status === 'canceled')
   const paymentAlert = computed<PageAlert | null>(() => {
     if (redirecting.value) {
@@ -364,13 +362,13 @@ export function usePayment() {
     if (orderCanceled.value) {
       return {
         level: 'error' as const,
-        message: t('payment.orderCanceled'),
+        message: orderExpired.value && usdtPayment.value ? usdtPaymentWindowMessage(locale.value, true) : t('payment.orderCanceled'),
       }
     }
     if (orderExpired.value) {
       return {
         level: 'error' as const,
-        message: t('payment.orderExpired'),
+        message: usdtPayment.value ? usdtPaymentWindowMessage(locale.value, true) : t('payment.orderExpired'),
       }
     }
     if (error.value) {
@@ -742,7 +740,7 @@ export function usePayment() {
   }
 
   const handleCopyCryptoAmount = async () => {
-    if (!cryptoChainAmount.value) return
+    if (!cryptoChainAmount.value || orderExpired.value || orderCanceled.value) return
     try {
       await copyText(cryptoChainAmount.value)
       cryptoAmountCopied.value = true
@@ -759,7 +757,7 @@ export function usePayment() {
   }
 
   const handleCopyWalletAddress = async () => {
-    if (!cryptoWalletAddress.value) return
+    if (!cryptoWalletAddress.value || orderExpired.value || orderCanceled.value) return
     try {
       await copyText(cryptoWalletAddress.value)
       walletAddressCopied.value = true

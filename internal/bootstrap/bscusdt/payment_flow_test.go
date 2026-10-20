@@ -130,6 +130,7 @@ func testConfirmedTransferPaysGuestOrderAndDeliversOneBoundCode(t *testing.T, ne
 	if tasks != 0 {
 		t.Fatal("unpaid order issued a code")
 	}
+	chain.timestamp = invoice.CreatedAt.UTC().Truncate(time.Second)
 	chain.event = &chaincontract.Log{Address: network.Token, Topics: []string{bscusdt.TransferTopic, "0x" + strings.Repeat("0", 24) + strings.Repeat("1", 40), chaincontract.AddressTopic(invoice.Recipient)}, Data: fmt.Sprintf("0x%064x", decimal.RequireFromString(invoice.Units).BigInt()), BlockNumber: "0x65", BlockHash: fmt.Sprintf("0x%064x", 101), TransactionHash: "0x" + strings.Repeat("a", 64), LogIndex: "0x0"}
 	chain.head = 120
 	for i := 0; i < 2; i++ {

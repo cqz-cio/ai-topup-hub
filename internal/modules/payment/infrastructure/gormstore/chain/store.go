@@ -62,6 +62,29 @@ func (s *Store) CreateInvoice(ctx context.Context, invoice *domain.ChainInvoice,
 		if err := tx.Clauses(clause.OnConflict{DoNothing: true}).Create(cursor).Error; err != nil {
 			return err
 		}
+		// Serialize reservations with the persisted stream row. The no-op write
+		// locks across processes too; a Go mutex would not protect other workers.
+		if err := tx.Model(&domain.ChainCursor{}).Where("stream = ?", cursor.Stream).
+			UpdateColumn("next_block", gorm.Expr("next_block")).Error; err != nil {
+			return err
+		}
+		now := time.Now().UTC()
+		if !invoice.ExpiresAt.After(now) {
+			return errors.New("chain_invoice_expired")
+		}
+		var reservations []domain.ChainInvoice
+		if err := tx.Select("expires_at").Where("stream = ? AND units = ?", invoice.Stream, invoice.Units).
+			Find(&reservations).Error; err != nil {
+			return err
+		}
+		// Compare parsed instants, not SQLite timestamp strings: legacy rows
+		// may contain a different UTC offset. All states reserve until expiry.
+		for _, reservation := range reservations {
+			if reservation.ExpiresAt.After(now) {
+				return nil
+			}
+		}
+		invoice.CreatedAt = now
 		r := tx.Clauses(clause.OnConflict{DoNothing: true}).Create(invoice)
 		created = r.RowsAffected > 0
 		return r.Error
@@ -91,19 +114,35 @@ func (s *Store) ApplyScan(ctx context.Context, cursor domain.ChainCursor, end ui
 			if insert.RowsAffected == 0 {
 				continue
 			}
-			var invoice domain.ChainInvoice
-			if err := tx.Where("amount_key = ?", cursor.Stream+"/"+v.Units).First(&invoice).Error; err != nil {
-				if errors.Is(err, gorm.ErrRecordNotFound) {
-					continue
-				}
+			// Match the chain timestamp, never the time this scanner happens to
+			// see the transfer. Chain timestamps have whole-second precision.
+			var candidates []domain.ChainInvoice
+			if err := tx.Where("stream = ? AND units = ? AND start_block <= ?",
+				cursor.Stream, v.Units, v.Block).
+				Find(&candidates).Error; err != nil {
 				return err
 			}
+			var matches []domain.ChainInvoice
+			for _, candidate := range candidates {
+				// Half-open [start,end) windows prevent a boundary second from
+				// belonging to both invoices. Legacy rows require no rewrite.
+				if v.PaidAt.Unix() >= candidate.CreatedAt.Unix() && v.PaidAt.Unix() < candidate.ExpiresAt.Unix() {
+					matches = append(matches, candidate)
+				}
+			}
+			if len(matches) > 1 {
+				return errors.New("chain_payment_windows_overlap")
+			}
+			if len(matches) == 0 {
+				v.State, v.Reason = "manual_review", "outside_payment_window_or_amount"
+				if err := tx.Save(v).Error; err != nil {
+					return err
+				}
+				continue
+			}
+			invoice := matches[0]
 			v.PaymentID = invoice.PaymentID
-			if v.Block < invoice.StartBlock {
-				v.Reason = "before_invoice"
-			} else if v.PaidAt.After(invoice.ExpiresAt) {
-				v.Reason = "paid_after_expiry"
-			} else if invoice.State != "pending" {
+			if invoice.State != "pending" {
 				v.Reason = "duplicate_payment"
 			} else {
 				r := tx.Model(&domain.ChainInvoice{}).Where("id = ? AND state = ?", invoice.ID, "pending").Updates(map[string]interface{}{"state": "confirmed", "transfer_key": v.Key})

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import UsdtPaymentWindowNotice from './UsdtPaymentWindowNotice.vue'
 import { TriangleAlert } from 'lucide-vue-next'
 import { resolveUsdtTransfer, type UsdtPaymentSource } from '../../utils/usdtTransferNotice'
 
@@ -43,6 +44,7 @@ const copy = computed(() => messages[locale.value as keyof typeof messages] || m
       <TriangleAlert aria-hidden="true" />
       <strong>{{ copy.title }}</strong>
     </div>
+    <UsdtPaymentWindowNotice />
     <p v-if="transfer.amount">
       {{ copy.amountLead }} <strong>{{ transfer.amount }} {{ transfer.token }}</strong>{{ copy.amountTail }}
     </p>
