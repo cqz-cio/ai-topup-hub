@@ -92,3 +92,5 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/local/start-usdt
 新加坡备份 `/srv/zhixiang/backups/before-usdt-payments-20261020-144132`；上海备份 `/srv/zhixiang-front/backups/before-usdt-payments-20261020-144132`。65 张业务表在发布窗口核对一致，Redis 保持原进程，库存定时器恢复；上海 373 个商城当前文件和 1459 个后台文件核验一致，旧文件与 57 个 Nginx 文件保留。
 
 线上仅新增 `/srv/zhixiang/shared/usdt-rpc-fallbacks.env` 与 `/etc/systemd/system/zhixiang-shop.service.d/90-usdt-rpc-fallbacks.conf` 接入备用配置，原主节点、私有配置和渠道设置不覆盖。后续发布保留这两项。发布后活跃扫描游标推进，无新查账失败记录。证据：`work/usdt-release-20261020/verified-report.json`。
+
+接续发布核验：另一个已授权的成品号客服入口更新随后发布上海商城 20261020-145408，源码 3bfa311841899aa293b308cb28eb1c18190d3082，包含本次支付代码。新加坡后端仍为 20261020-144132。当前最新页面另做两模板 × 三网络共 6 项付款模拟，四位金额复制、到期隐藏和页面脚本均通过；两项功能均保留。最终商城 161 项测试及 375 个构建文件由接续发布完成核验。主线已合并双方记录。
