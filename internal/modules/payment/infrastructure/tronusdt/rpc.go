@@ -27,6 +27,9 @@ type RPC struct {
 	client           *http.Client
 	checkMu          sync.Mutex
 	checkedAt        time.Time
+	requestInterval  time.Duration
+	requestGate      chan struct{}
+	nextRequest      time.Time
 }
 type block struct {
 	ID     string `json:"blockID"`
@@ -57,13 +60,51 @@ type transactionInfo struct {
 }
 
 func NewRPC(endpoint, apiKey string) (*RPC, error) {
+	return NewRPCWithInterval(endpoint, apiKey, 0)
+}
+
+// NewRPCWithInterval optionally spaces HTTP requests for a rate-limited backup.
+// Waiting is cancellable and never extends the caller's scan deadline.
+func NewRPCWithInterval(endpoint, apiKey string, interval time.Duration) (*RPC, error) {
+	if interval < 0 || interval > 5*time.Second {
+		return nil, chain.ErrRPC
+	}
 	u, err := url.Parse(endpoint)
 	if err != nil || u.Scheme != "https" || u.Hostname() == "" || u.User != nil || u.Fragment != "" || u.RawQuery != "" {
 		return nil, chain.ErrRPC
 	}
-	return &RPC{endpoint: strings.TrimRight(endpoint, "/"), apiKey: apiKey, client: &http.Client{Timeout: 12 * time.Second, CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}}, nil
+	return &RPC{requestInterval: interval, requestGate: make(chan struct{}, 1), endpoint: strings.TrimRight(endpoint, "/"), apiKey: apiKey, client: &http.Client{Timeout: 12 * time.Second, CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}}, nil
 }
+func (r *RPC) waitRequest(ctx context.Context) error {
+	if r.requestInterval == 0 {
+		return ctx.Err()
+	}
+	select {
+	case r.requestGate <- struct{}{}:
+	case <-ctx.Done():
+		return ctx.Err()
+	}
+	defer func() { <-r.requestGate }()
+	if wait := time.Until(r.nextRequest); wait > 0 {
+		timer := time.NewTimer(wait)
+		defer timer.Stop()
+		select {
+		case <-timer.C:
+		case <-ctx.Done():
+			return ctx.Err()
+		}
+	}
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	r.nextRequest = time.Now().Add(r.requestInterval)
+	return nil
+}
+
 func (r *RPC) call(ctx context.Context, path string, input, output any) error {
+	if err := r.waitRequest(ctx); err != nil {
+		return err
+	}
 	data, err := json.Marshal(input)
 	if err != nil {
 		return chain.ErrRPC

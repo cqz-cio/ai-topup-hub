@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io"
 	"strings"
+	"time"
 
 	"github.com/dujiao-next/internal/modules/payment/contract/chain"
 	evm "github.com/dujiao-next/internal/modules/payment/infrastructure/bscusdt"
@@ -13,10 +14,11 @@ import (
 // Endpoint describes one provider, optionally using separate EVM APIs for
 // logs/receipts. APIKeyEnv is TRON-only and never inherited from the primary.
 type Endpoint struct {
-	URL        string `json:"url"`
-	LogsURL    string `json:"logs_url,omitempty"`
-	ReceiptURL string `json:"receipt_url,omitempty"`
-	APIKeyEnv  string `json:"api_key_env,omitempty"`
+	URL                  string `json:"url"`
+	LogsURL              string `json:"logs_url,omitempty"`
+	ReceiptURL           string `json:"receipt_url,omitempty"`
+	APIKeyEnv            string `json:"api_key_env,omitempty"`
+	MinRequestIntervalMS int    `json:"min_request_interval_ms,omitempty"`
 }
 
 // Configure is opt-in: absent fallbacks preserve the original reader.
@@ -42,6 +44,9 @@ func Configure(network string, primary chain.Reader, raw string, getenv func(str
 	seen := map[string]bool{}
 	for _, e := range endpoints {
 		e.URL = strings.TrimSpace(e.URL)
+		if e.MinRequestIntervalMS < 0 || e.MinRequestIntervalMS > 5000 {
+			return nil, chain.ErrRPC
+		}
 		if seen[e.URL] {
 			return nil, chain.ErrRPC
 		}
@@ -63,9 +68,9 @@ func Configure(network string, primary chain.Reader, raw string, getenv func(str
 					return nil, chain.ErrRPC
 				}
 			}
-			r, err = tron.NewRPC(e.URL, key)
+			r, err = tron.NewRPCWithInterval(e.URL, key, time.Duration(e.MinRequestIntervalMS)*time.Millisecond)
 		} else {
-			if e.APIKeyEnv != "" {
+			if e.APIKeyEnv != "" || e.MinRequestIntervalMS != 0 {
 				return nil, chain.ErrRPC
 			}
 			r, err = evm.NewRPCWithEndpoints(e.URL, e.LogsURL, e.ReceiptURL, network)

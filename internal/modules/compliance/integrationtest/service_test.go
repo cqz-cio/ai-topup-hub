@@ -8,9 +8,9 @@ import (
 	complianceapp "github.com/dujiao-next/internal/modules/compliance/application"
 	compliancecontract "github.com/dujiao-next/internal/modules/compliance/contract"
 	"github.com/dujiao-next/internal/shared/jsonmap"
+	"github.com/glebarez/sqlite"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 

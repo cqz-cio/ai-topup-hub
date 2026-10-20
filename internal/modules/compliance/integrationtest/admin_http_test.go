@@ -14,9 +14,9 @@ import (
 	compliancetransport "github.com/dujiao-next/internal/modules/compliance/transport/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/glebarez/sqlite"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 

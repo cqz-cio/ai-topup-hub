@@ -6,5 +6,5 @@
   "TRON_RPC_URL": "https://tron-rpc.publicnode.com",
   "BSC_RPC_FALLBACKS": "[{\"url\":\"https://rpc.48.club\"},{\"url\":\"https://56.rpc.thirdweb.com\"}]",
   "PLASMA_RPC_FALLBACKS": "[{\"url\":\"https://plasma.gateway.tenderly.co\"},{\"url\":\"https://9745.rpc.thirdweb.com\"}]",
-  "TRON_RPC_FALLBACKS": "[{\"url\":\"https://api.trongrid.io\"}]"
+  "TRON_RPC_FALLBACKS": "[{\"url\":\"https://api.trongrid.io\",\"min_request_interval_ms\":750}]"
 }

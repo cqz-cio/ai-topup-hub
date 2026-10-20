@@ -97,6 +97,23 @@ func TestLiveReadOnlyFallbackProfiles(t *testing.T) {
 			if !found || switches != 1 {
 				t.Fatal("missing transfer or failover", switches)
 			}
+			if profile.Network == "tron" && number >= 9 {
+				// Exercise a complete ten-block batch, including pacing of
+				// every underlying block/receipt HTTP request.
+				batch, e := reader.Logs(ctx, number-9, number, recipient)
+				if e != nil {
+					t.Fatal("ten-block historical scan", e)
+				}
+				included := false
+				for _, l := range batch {
+					if l.TransactionHash == tx && l.LogIndex == event.LogIndex {
+						included = true
+					}
+				}
+				if !included {
+					t.Fatal("ten-block batch lost sample transfer")
+				}
+			}
 			t.Log("identity, fresh finality, historical header, recipient logs, receipt and forced failover verified")
 		})
 	}

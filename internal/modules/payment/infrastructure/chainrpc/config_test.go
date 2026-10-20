@@ -15,6 +15,8 @@ import (
 func TestConfigurationRejectsUnsafeOrAmbiguousFallbacks(t *testing.T) {
 	for _, raw := range []string{
 		`[{"url":"http://node.example"}]`,
+		`[{"url":"https://node.example","min_request_interval_ms":-1}]`,
+		`[{"url":"https://node.example","min_request_interval_ms":5001}]`,
 		`[{"url":"https://user:secret@node.example"}]`,
 		`[{"url":"https://node.example","unknown":true}]`,
 		`[{"url":"https://node.example"}] {}`,
