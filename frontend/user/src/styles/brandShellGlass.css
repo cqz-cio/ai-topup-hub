@@ -1,0 +1,111 @@
+/* The classic brand shell shares the storefront's thin-glass finish.
+   Load globally so direct visits to inner pages have the same navigation. */
+.brand-scene {
+  --brand-shell-glass: linear-gradient(157deg, rgba(255, 255, 255, .17), rgba(255, 255, 255, .045) 38%, rgba(246, 255, 250, .09) 74%, rgba(255, 255, 255, .20));
+  --brand-shell-glass-scrolled: linear-gradient(157deg, rgba(255, 255, 255, .24), rgba(246, 255, 250, .12) 48%, rgba(255, 255, 255, .20));
+  --brand-shell-edge: rgba(255, 255, 255, .94);
+  --brand-shell-reflection: rgba(255, 255, 255, .72);
+  --brand-shell-glint: rgba(255, 255, 255, .32);
+  --brand-shell-text-shadow: 0 1px 0 rgba(255, 255, 255, .72);
+  --brand-shell-divider: rgba(26, 74, 62, .22);
+  --brand-shell-ink: #0d2c25;
+  --brand-shell-muted: #183d32;
+}
+
+.brand-scene > :is(.brand-navbar, .brand-footer) {
+  --ui-text-primary: var(--brand-shell-ink);
+  --ui-text-secondary: var(--brand-shell-muted);
+  --ui-text-muted: var(--brand-shell-muted);
+  isolation: isolate;
+  color: var(--ui-text-primary);
+  text-shadow: var(--brand-shell-text-shadow);
+  -webkit-font-smoothing: auto;
+  background: var(--brand-shell-glass);
+  border-color: var(--brand-shell-edge);
+  -webkit-backdrop-filter: blur(1.5px) saturate(1.08);
+  backdrop-filter: blur(1.5px) saturate(1.08);
+  /* Override the navbar's existing shadow reset and scrolling utility. */
+  box-shadow: inset 0 1px 0 var(--brand-shell-edge), inset 0 -1px 0 var(--brand-shell-reflection), 0 2px 5px -4px rgba(14, 63, 57, .28) !important;
+}
+
+.brand-scene > .brand-footer { position: relative; }
+.brand-scene > .brand-navbar.shadow-lg {
+  background: var(--brand-shell-glass-scrolled);
+  /* Defocus passing product titles so they cannot look like doubled nav text. */
+  -webkit-backdrop-filter: blur(4px) saturate(1.08);
+  backdrop-filter: blur(4px) saturate(1.08);
+}
+
+.brand-scene > :is(.brand-navbar, .brand-footer)::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-block: 1px solid var(--brand-shell-reflection);
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(110deg, #000, transparent 35%, transparent 65%, #000);
+  mask-image: linear-gradient(110deg, #000, transparent 35%, transparent 65%, #000);
+}
+
+/* Keep the reflection at the edges so the centre stays optically clear. */
+.brand-scene > :is(.brand-navbar, .brand-footer)::after {
+  content: '';
+  position: absolute;
+  inset: 1px 0;
+  z-index: -1;
+  background: linear-gradient(to bottom, var(--brand-shell-glint), transparent 12px, transparent calc(100% - 12px), var(--brand-shell-glint));
+  pointer-events: none;
+}
+
+.brand-scene > .brand-navbar .brand-logo-tile {
+  background: var(--brand-shell-glass);
+  box-shadow: inset 0 0 0 1px var(--brand-shell-reflection);
+}
+.brand-scene > .brand-navbar :is(a:not(.brand-wordmark), button, .text-xs) { font-size: 13px; font-weight: 600; }
+.brand-scene > .brand-navbar .brand-tagline { font-size: 12px; font-weight: 600; }
+.brand-scene > .brand-footer .brand-footer-description { font-size: 13px; font-weight: 600; line-height: 1.8; }
+.brand-scene > .brand-footer .brand-footer-links > div,
+.brand-scene > .brand-footer .support-contacts { font-size: 14px; font-weight: 600; }
+.brand-scene > .brand-footer .brand-footer-links h4 { font-size: 12px; font-weight: 700; }
+.brand-scene > .brand-footer .brand-footer-bottom {
+  border-color: var(--brand-shell-divider);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.dark .brand-scene {
+  --brand-shell-glass: linear-gradient(150deg, rgba(86, 129, 112, .20), rgba(25, 58, 48, .12) 45%, rgba(63, 102, 86, .22));
+  --brand-shell-glass-scrolled: linear-gradient(150deg, rgba(41, 73, 60, .36), rgba(20, 49, 38, .28));
+  --brand-shell-edge: rgba(232, 255, 242, .56);
+  --brand-shell-reflection: rgba(232, 255, 242, .32);
+  --brand-shell-glint: rgba(232, 255, 242, .13);
+  --brand-shell-text-shadow: 0 1px 0 rgba(5, 26, 21, .72);
+  --brand-shell-divider: rgba(227, 255, 235, .22);
+  --brand-shell-ink: #eefbf4;
+  --brand-shell-muted: #e1efe7;
+}
+
+@media (max-width: 767px) {
+  .brand-scene {
+    --brand-shell-glass: linear-gradient(157deg, rgba(255, 255, 255, .24), rgba(255, 255, 255, .12) 44%, rgba(247, 255, 250, .19));
+  }
+  .brand-scene > :is(.brand-navbar, .brand-footer) {
+    -webkit-backdrop-filter: blur(2px) saturate(1.08);
+    backdrop-filter: blur(2px) saturate(1.08);
+  }
+  .dark .brand-scene {
+    --brand-shell-glass: linear-gradient(150deg, rgba(41, 73, 60, .30), rgba(20, 49, 38, .22));
+  }
+}
+
+@media (max-width: 479px) {
+  .brand-scene > .brand-footer .brand-footer-links {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+  }
+  .brand-scene > .brand-footer .brand-footer-links > div:nth-child(3) { grid-column: 1 / -1; }
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .brand-scene > :is(.brand-navbar, .brand-navbar.shadow-lg, .brand-footer) { background: rgba(245, 252, 247, .9); }
+  .dark .brand-scene > :is(.brand-navbar, .brand-navbar.shadow-lg, .brand-footer) { background: rgba(20, 43, 34, .94); }
+}

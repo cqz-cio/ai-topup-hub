@@ -91,6 +91,62 @@
 }
 :root .brand-scene .storefront .hero-flow li:last-child > svg { color: #24543d; }
 
+/* Order collection uses the same clear glass as the header and footer. */
+:root .brand-scene .storefront .order-lookup {
+  position: relative;
+  isolation: isolate;
+  color: var(--brand-shell-ink);
+  background: var(--brand-shell-glass);
+  border: 1px solid var(--brand-shell-edge);
+  -webkit-backdrop-filter: blur(1.5px) saturate(1.08);
+  backdrop-filter: blur(1.5px) saturate(1.08);
+  box-shadow: inset 0 1px 0 var(--brand-shell-edge), inset 0 -1px 0 var(--brand-shell-reflection), 0 10px 24px -22px rgba(14, 63, 57, .3);
+  text-shadow: var(--brand-shell-text-shadow);
+  -webkit-font-smoothing: auto;
+}
+:root .brand-scene .storefront .order-lookup::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border: 1px solid var(--brand-shell-reflection);
+  border-radius: 13px;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(135deg, #000, transparent 35%, transparent 65%, #000);
+  mask-image: linear-gradient(135deg, #000, transparent 35%, transparent 65%, #000);
+}
+:root .brand-scene .storefront .order-lookup::after {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(to bottom, var(--brand-shell-glint), transparent 12px, transparent calc(100% - 12px), var(--brand-shell-glint));
+  pointer-events: none;
+}
+:root .brand-scene .storefront .lookup-copy h2 {
+  color: var(--brand-shell-ink);
+  font-size: 26px;
+  font-weight: 750;
+  line-height: 1.4;
+}
+:root .brand-scene .storefront .lookup-copy .commerce-eyebrow {
+  color: var(--brand-shell-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+:root .brand-scene .storefront .lookup-copy > p:last-child {
+  color: var(--brand-shell-ink);
+  font-size: 14px;
+  font-weight: 600;
+}
+:root .brand-scene .storefront .lookup-actions .store-button { font-size: 13px; padding-inline: 12px; white-space: nowrap; }
+:root .brand-scene .storefront .store-service-note {
+  color: var(--brand-shell-ink);
+  font-size: 12px;
+  font-weight: 600;
+  text-shadow: var(--brand-shell-text-shadow);
+}
+
 .dark:root .brand-scene .storefront { --storefront-glass-ink: #eefbf4; --storefront-glass-secondary: #c1d9cc; }
 .dark:root .brand-scene .storefront :is(.store-button, .category-nav button.active, .hero-guide) {
   color: #edf8f1;
@@ -118,6 +174,17 @@
   :root .brand-scene .storefront .hero-flow p { font-size: 10px; color: #244537; }
   .dark:root .brand-scene .storefront .hero-guide { background: linear-gradient(150deg, rgba(41, 73, 60, .54), rgba(20, 49, 38, .42)); }
   .dark:root .brand-scene .storefront .hero-flow p { color: #cadfd1; }
+  :root .brand-scene .storefront .order-lookup {
+    -webkit-backdrop-filter: blur(2px) saturate(1.08);
+    backdrop-filter: blur(2px) saturate(1.08);
+  }
+  :root .brand-scene .storefront .lookup-copy h2 { font-size: 22px; }
+  :root .brand-scene .storefront .store-service-note { align-items: flex-start; line-height: 1.7; }
+  :root .brand-scene .storefront .store-service-note svg { flex-shrink: 0; margin-top: 3px; }
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root .brand-scene .storefront .order-lookup { background: rgba(245, 252, 247, .9); }
+  .dark:root .brand-scene .storefront .order-lookup { background: rgba(20, 43, 34, .94); }
 }
 @media (prefers-reduced-motion: reduce) {
   :root .brand-scene .storefront :is(.store-button, .category-nav button.active) { transition: none; }

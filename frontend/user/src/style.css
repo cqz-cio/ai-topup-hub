@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "./styles/commerce.css";
+@import "./styles/brandShellGlass.css";
 @plugin "@tailwindcss/typography";
 
 /* Release archives may live under an ignored build directory. Register the
