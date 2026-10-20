@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "category": {
+    "slug": "gpt-ready-accounts",
+    "name": {
+      "zh-CN": "GPT成品号"
+    },
+    "icon": "/catalog-products/transparent-icons-20261020/gpt.png",
+    "sort_order": 997
+  },
+  "purchase_flow": "先联系客服确认库存和发货安排，再购买；客服确认后由运营在后台补充可售库存。",
+  "products": [
+    {
+      "slug": "gpt-plus-brazil-account-24h",
+      "title": "GPT Plus 巴西区独享成品号｜24小时质保",
+      "source_title": "PLUS 特殊渠道独享月卡成品号7（巴西区，支持反代，购买24小时内非禁止网络账号问题可免费更换一次）",
+      "price_amount": "90.00",
+      "description": "巴西区 Plus 独享月卡成品号，支持反代，24小时内符合规则的账号问题可免费更换一次。请先联系客服确认，再购买；人工发货。",
+      "content_file": "brazil-24h.html",
+      "tags": [
+        "个人独享",
+        "巴西区",
+        "24小时质保",
+        "支持反代",
+        "先联系客服",
+        "人工发货"
+      ],
+      "sort_order": 20,
+      "instructions": "本商品为人工发货。请联系已确认订单的客服，并提供订单号领取账号和使用说明。微信：Cqz0924ttxk；QQ：1669268759；Telegram：[联系客服](https://t.me/czq_piestar)。\n\n收到账号后直接登录使用，无需修改资料。供应方已修改2FA并清理其他会话。请勿自行更改2FA，以免因操作失误无法登录。巴西区账号不要求使用巴西网络，但必须遵守商品详情中的网络限制。符合规则的账号问题须在购买24小时内反馈，每单最多免费更换一次。桌面端、Codex或反代可能要求手机绑定，接码费用需另行承担。模型不可用或容量提示不属于换号范围。"
+    },
+    {
+      "slug": "gpt-plus-vietnam-account-30d",
+      "title": "越南质保30天 Plus实卡｜个人独享成品号",
+      "source_title": "越南质保30天plus实卡｜个人独享成品号",
+      "price_amount": "115.00",
+      "description": "越南渠道 Plus 个人独享成品号，30天质保，禁止反代。前7天符合规则可免费补号，第8～30天可补差价换号或按剩余质保价值退款。先联系客服确认，再购买；人工发货。",
+      "content_file": "vietnam-30d.html",
+      "tags": [
+        "个人独享",
+        "越南渠道",
+        "30天质保",
+        "禁止反代",
+        "先联系客服",
+        "人工发货"
+      ],
+      "sort_order": 10,
+      "instructions": "本商品为人工发货。请联系已确认订单的客服，并提供订单号领取邮箱、密码和2FA信息。微信：Cqz0924ttxk；QQ：1669268759；Telegram：[联系客服](https://t.me/czq_piestar)。\n\n请移出其他设备；不要修改密码或2FA。账号使用一次性Gmail OTP注册，邮箱无法辅助后续修改或验证，请勿登录邮箱。2FA验证码获取地址：https://2fa.run/ 。账号未接码，需要自行完成手机验证。禁止反代和二次销售。符合规则的账号掉线或封禁，前7天（含第7天）免费补号；第8～30天可补差价换新号，或按实付金额×剩余质保天数÷30退款。"
+    }
+  ],
+  "creation_defaults": {
+    "fulfillment_type": "manual",
+    "manual_stock_total": 0,
+    "purchase_type": "guest",
+    "stock_display_mode": "status",
+    "is_active": true,
+    "images": [
+      "/catalog-products/transparent-icons-20261020/gpt.png"
+    ]
+  },
+  "claim_provenance": {
+    "brazil_ban_rate": "用户提供：实测订阅内封号率低于5%；未独立验证，不作为零风险保证。",
+    "vietnam_ban_rate": "用户提供的供货说明：封禁率低于2%；未独立验证，不作为零风险保证。",
+    "reference_links": "原样保留用户提供的教程和第三方服务链接，未验证其内容或服务效果。"
+  }
+}
