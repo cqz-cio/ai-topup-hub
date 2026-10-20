@@ -339,3 +339,10 @@ final result: passed
 桌面批准稿与实际效果在 1920×911 对照，手机在 390×844 对照，另检查 320×740。布局、按钮尺寸、玻璃描边和文字表现一致，缺货状态已修正优先级；背景动画帧自然不同。10 项日常、4 项构建、8 项正式浏览器检查通过，无控制台错误或横向溢出。证据位于 `work/codex-runtime/glass-controls-release-20261019/`。
 
 final result: passed
+
+
+## 商品图透明底正式验收 20261020-090653
+
+按用户确认的日常本机效果核对正式页面：GPT 内外白底透明，Gemini 白底透明，Telegram 蓝底与飞机完整。桌面、390/320px、深色、搜索、详情及首页检查通过，无控制台错误或横向溢出。证据：`work/codex-runtime/transparent-product-icons-20261020/`。
+
+final result: passed
