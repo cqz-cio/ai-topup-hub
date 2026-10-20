@@ -1,27 +1,29 @@
 {
-  "checked_at": "2026-10-19T16:37:19.265429+08:00",
+  "checked_at": "2026-10-20T14:57:04.889180+08:00",
   "production_url": "https://www.qzweb.cloud/",
-  "documented_release_id": "20261019-160954",
-  "verified_release_id": "20261019-160954",
-  "previous_release_id": "20261017-233133",
-  "source_commit": "297f11deef4d7193081270c55f60c6ba5cdd7295",
+  "documented_release_id": "20261020-144132",
+  "verified_release_id": "20261020-144132",
+  "previous_release_id": "20261019-160954",
+  "source_commit": "58c8569eae46ba10b3949d6c110f6842043d9773",
   "source_branch": "main",
-  "server_git_commit_verified": true,
-  "source_tag": "production/delivery-privacy-20261019-160954",
+  "server_git_commit_verified": false,
+  "source_tag": "production/usdt-payments-20261020-144132",
   "production": {
-    "release_path": "/srv/zhixiang/releases/20261019-160954",
-    "running_executable": "/srv/zhixiang/releases/20261019-160954/zhixiang-shop",
-    "binary_bytes": 91000994,
-    "binary_sha256": "69981b0bf898a968cf3caaa00c95b6d321e65b2649c8a3966fc0bb6a42cefb20",
-    "running_binary_sha256": "69981b0bf898a968cf3caaa00c95b6d321e65b2649c8a3966fc0bb6a42cefb20",
-    "manifest_binary_sha256": "69981b0bf898a968cf3caaa00c95b6d321e65b2649c8a3966fc0bb6a42cefb20",
+    "release_path": "/srv/zhixiang/releases/20261020-144132",
+    "running_executable": "/srv/zhixiang/releases/20261020-144132/zhixiang-shop",
+    "binary_bytes": 94617762,
+    "binary_sha256": "1142c5df16eaeef10ed98fb21b03406a1681da12857c9fbdcccb8682a4a22350",
+    "running_binary_sha256": "1142c5df16eaeef10ed98fb21b03406a1681da12857c9fbdcccb8682a4a22350",
+    "manifest_binary_sha256": "1142c5df16eaeef10ed98fb21b03406a1681da12857c9fbdcccb8682a4a22350",
     "build_info": {
       "go_version": "go1.26.5",
-      "source_commit": "297f11deef4d7193081270c55f60c6ba5cdd7295",
-      "vcs_revision": "297f11deef4d7193081270c55f60c6ba5cdd7295",
-      "vcs_modified": false,
-      "git_metadata_pinned": true,
-      "tags": "release,fullstack"
+      "source_commit": "58c8569eae46ba10b3949d6c110f6842043d9773",
+      "vcs_revision": null,
+      "vcs_modified": null,
+      "git_metadata_pinned": false,
+      "tags": "release,fullstack",
+      "source_verified_by": "clean checkout, manifest, complete binary SHA256",
+      "buildvcs": false
     },
     "runtime_mode": "storefront",
     "upstream_purchase_enabled": true,
@@ -33,22 +35,24 @@
       "manual_supplier_stock_sync_timer": "active"
     },
     "redis_preserved_without_restart": true,
-    "backup": "/srv/zhixiang/backups/before-delivery-privacy-20261019-160954",
+    "backup": "/srv/zhixiang/backups/before-usdt-payments-20261020-144132",
     "database_backup_quick_check": "ok",
-    "report_path": "/srv/zhixiang/shared/reports/delivery-privacy-20261019-160954.json",
-    "configuration_unchanged": true,
+    "report_path": "/srv/zhixiang/shared/reports/usdt-payments-20261020-144132.json",
+    "configuration_unchanged": false,
     "nginx_configuration_preserved": true,
     "source_dirty": false,
     "private_configuration_unchanged": true,
-    "configuration_changes": [],
-    "source_commit": "297f11deef4d7193081270c55f60c6ba5cdd7295",
+    "configuration_changes": [
+      "Add BSC_RPC_FALLBACKS, PLASMA_RPC_FALLBACKS and TRON_RPC_FALLBACKS through a dedicated systemd environment file."
+    ],
+    "source_commit": "58c8569eae46ba10b3949d6c110f6842043d9773",
     "configuration_except_tron_preserved": true,
     "settings_changes": [],
     "nginx_configuration_source_commit": "c1791c57d73a0526244343eba5f766309107c8bd",
-    "nginx_change_scope": "Temporary IP-restricted transfer location removed; all pre-release Nginx hashes restored before application cutover.",
+    "nginx_change_scope": "No Nginx changes",
     "pids": {
-      "zhixiang-shop": "644166",
-      "zhixiang-redis": "52983"
+      "zhixiang-shop.service": "1206760",
+      "zhixiang-redis.service": "52983"
     },
     "last_api_recovery": {
       "recovered": true,
@@ -406,11 +410,11 @@
   "previous_build_verification_at": "2026-10-12T08:19:31.766441+00:00",
   "management_url": "https://admin.qzweb.cloud/login",
   "frontend_gateway": {
-    "checked_at": "2026-10-20T01:10:40.136083+00:00",
+    "checked_at": "2026-10-20T14:57:04.889180+08:00",
     "frontend_host": "124.220.2.69",
     "backend_host": "43.134.141.10",
-    "frontend_release": "20261020-090653",
-    "source_commit": "6c9fc7d3ec9e394dd662014f7ac5e513e16aab44",
+    "frontend_release": "20261020-144132",
+    "source_commit": "58c8569eae46ba10b3949d6c110f6842043d9773",
     "static_files_verified": 1832,
     "storefront_url": "https://www.qzweb.cloud/",
     "management_url": "https://admin.qzweb.cloud/login",
@@ -427,7 +431,7 @@
     "certificate_renewal_verified": true,
     "certificate_timer": "qzweb-certificates.timer",
     "certificate_renewal_report": "/srv/zhixiang-front/shared/work/renew-final-20261012-1644/status.json",
-    "report_path": "/srv/zhixiang-front/shared/work/transparent-icons-20261020-090653.json",
+    "report_path": "/srv/zhixiang-front/shared/work/usdt-payments-20261020-144132.json",
     "backend_report_path": "/srv/zhixiang/shared/reports/paid-order-deadlock-20261016-190912.json",
     "formal_alipay_enabled": false,
     "database_uploaded": false,
@@ -441,37 +445,40 @@
       "browser_current_frontend_confirmed": true,
       "report_path": "/srv/zhixiang-front/shared/work/entry-cache-report.json"
     },
-    "previous_frontend_release": "20261019-173847",
-    "storefront_source_commit": "6c9fc7d3ec9e394dd662014f7ac5e513e16aab44",
+    "previous_frontend_release": "20261020-090653",
+    "storefront_source_commit": "58c8569eae46ba10b3949d6c110f6842043d9773",
     "admin_source_commit": "297f11deef4d7193081270c55f60c6ba5cdd7295",
-    "backup": "/srv/zhixiang-front/backups/before-transparent-icons-20261020-090653",
-    "frontend_only_update": true,
+    "backup": "/srv/zhixiang-front/backups/before-usdt-payments-20261020-144132",
+    "frontend_only_update": false,
     "previous_hashed_assets_retained": true,
     "verified_services": {
       "nginx": "active",
       "zhixiang-api-tunnel": "active",
       "qzweb-certificates.timer": "active"
     },
-    "release_scope": "Transparent backgrounds for GPT, Telegram and Gemini product icons",
+    "release_scope": "USDT failover, four-decimal amounts and payment windows",
     "admin_files_verified": 1459,
     "storefront_files_verified": 373,
-    "backend_program_preserved": true,
+    "backend_program_preserved": false,
     "backend_setting_changes": [],
-    "frontend_build_source_commit": "6c9fc7d3ec9e394dd662014f7ac5e513e16aab44",
+    "frontend_build_source_commit": "f3f6fb1e822a4f65c936867f87cb1cb020f27d47",
     "frontend_source_identical_to_backend": true,
     "admin_base": "/",
     "base_repair_backup": "/srv/zhixiang-front/backups/before-xorpay-admin-base-20261013-173020",
     "frontend_source_difference": "Storefront uses 6c9fc7d3ec9e394dd662014f7ac5e513e16aab44; admin and backend remain 20261019-160954.",
     "source_dirty": false,
-    "source_tag": "production/transparent-icons-20261020-090653",
+    "source_tag": "production/usdt-payments-20261020-144132",
     "static_verification_scope": "373 storefront build files verified; all previous storefront assets except index, admin files and Nginx preserved. 35 public requests passed.",
     "retained_files_preserved": true,
-    "storefront_release": "20261020-090653",
+    "storefront_release": "20261020-144132",
     "admin_release": "20261019-160954",
     "storefront_files_preserved": 8383,
     "legacy_singapore_embedded_frontend_public": false,
     "legacy_singapore_frontend_behavior": "308 to maintained Shanghai storefront/admin; API/uploads/health retained",
-    "old_files_preserved": 9842,
+    "old_files_preserved": {
+      "user": 8573,
+      "admin": 1458
+    },
     "admin_files_preserved": 1459,
     "backend_only_deadlock_release": {
       "release": "20261016-190912",
@@ -2936,7 +2943,7 @@
     "documentation": "docs/bsc-rpc-recovery.md",
     "private_evidence": "deployment/local/bsc-rpc-recovery/verified-report.json"
   },
-  "backend_checked_at": "2026-10-19T16:37:19.265429+08:00",
+  "backend_checked_at": "2026-10-20T14:57:04.889180+08:00",
   "manual_supplier_import": {
     "release": "20261017-233133",
     "source_commit": "ba49f41bfe5aa5c1d023edb539c29bd69fe482d6",
@@ -3162,5 +3169,78 @@
       "shanghai": "/srv/zhixiang-front/backups/before-transparent-icons-20261020-090653",
       "singapore": "/srv/zhixiang/backups/before-transparent-icons-20261020-090653"
     }
+  },
+  "usdt_payments_20261020": {
+    "verified": true,
+    "checked_at": "2026-10-20T14:57:04.889180+08:00",
+    "release": "20261020-144132",
+    "source_commit": "58c8569eae46ba10b3949d6c110f6842043d9773",
+    "binary_sha256": "1142c5df16eaeef10ed98fb21b03406a1681da12857c9fbdcccb8682a4a22350",
+    "source_pushed": true,
+    "payment_policy": {
+      "decimals": 4,
+      "rounding": "ceiling",
+      "step": "0.0001",
+      "candidates": 100,
+      "maximum_allocation_uplift": "0.0099",
+      "expiry_reuse": true,
+      "legacy_amounts_preserved": true
+    },
+    "fallback_counts": {
+      "bsc": 2,
+      "plasma": 2,
+      "tron": 1
+    },
+    "trongrid_request_interval_ms": 750,
+    "node_profiles_tested": 8,
+    "server_probe_rounds": 2,
+    "node_probe_checks": 16,
+    "user_tests": 159,
+    "admin_tests": 64,
+    "daily_browser_scenarios": 30,
+    "built_browser_scenarios": 18,
+    "production_browser_scenarios": 18,
+    "production_public_checks": 11,
+    "historical_delivery_checks": 12,
+    "protected_business_tables": 65,
+    "business_rows_preserved": true,
+    "private_configuration_preserved": true,
+    "existing_payment_settings_preserved": true,
+    "redis_restarted": false,
+    "stock_timers_restored": true,
+    "runtime_mode": "storefront",
+    "upstream_purchase_enabled": true,
+    "files_verified": {
+      "user": 373,
+      "admin": 1459
+    },
+    "previous_files_preserved": {
+      "user": 8573,
+      "admin": 1458
+    },
+    "admin_all_files_preserved": true,
+    "nginx_files_preserved": 57,
+    "backups": {
+      "singapore": "/srv/zhixiang/backups/before-usdt-payments-20261020-144132",
+      "shanghai": "/srv/zhixiang-front/backups/before-usdt-payments-20261020-144132"
+    },
+    "postrelease_scanner_errors": 0,
+    "active_cursor_progress_verified": true,
+    "database_uploaded": false,
+    "production_test_orders_created": false,
+    "real_transfer_or_procurement_test": false,
+    "resolved_validation_issues": [
+      "Keyless TronGrid burst requests failed on Singapore; explicit 750ms pacing added and both full historical scan rounds passed.",
+      "Windows-only logger cleanup and POSIX permission/lock failures verified on local Ubuntu as an unprivileged user.",
+      "Existing compliance tests used a CGO-only SQLite driver; aligned test fixtures with production pure-Go driver.",
+      "Cross-border transfer interruption recovered by verified prefix resume and full reconstructed binary SHA256.",
+      "Production browser batch hit total deadline; retained completed cases and finished remaining cases; fixed harness teardown with pending font fetch."
+    ],
+    "limitations": [
+      "Simulation and read-only chain checks are not real-funds settlement acceptance.",
+      "Public provider quotas and availability may change.",
+      "Inactive historical scan streams are retained; active cursor progress is checked."
+    ],
+    "private_evidence": "work/usdt-release-20261020/verified-report.json"
   }
 }
