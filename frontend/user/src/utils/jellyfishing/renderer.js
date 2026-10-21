@@ -2,6 +2,7 @@ import { JellyWorld } from './simulation.js';
 import * as MarineMotion from './environment.js';
 import { StationaryActors } from './actors.js';
 import { loadSceneArtwork } from './artwork.js';
+import { actorCamera } from './composition.js';
 const ART_W = 1672, ART_H = 941;
 const configs = [
     { rect: [875, 94, 239, 226], pivot: [83, 80], unit: 1, polygon: [[875, 96], [1034, 94], [1066, 174], [1111, 208], [1114, 305], [1060, 320], [968, 318], [911, 256], [884, 207]] },
@@ -180,9 +181,7 @@ export function mountJellyfishing(canvas, { onReady, onFallback }) {
             return;
         if (last) {
             accumulator += Math.min((now - last) / 1000, .1);
-            const scale = Math.max(width / ART_W, height / ART_H);
-            const ox = (width - ART_W * scale) * (width < 768 ? .75 : .5);
-            const oy = (height - ART_H * scale) / 2;
+            const { scale, ox, oy } = actorCamera(width, height);
             while (accumulator >= 1 / 120) {
                 world.step(1 / 120);
                 environment.step(1 / 120);
@@ -327,7 +326,8 @@ void main(){vec2 p=aPos-uPivot;
                 draw(m, { origin: [j.x, j.y], scale: j.size / m.w, angle: j.angle + Math.PI / 2 + .46, phase: j.phase, period: j.period, deform: true, velocity: [j.vx, j.vy], opacity: .6 + .35 * Math.min(1, j.depth) });
             }
             // Root coordinates stay fixed. Only small upper-body and net gestures change.
-            actorMeshes.forEach((m, i) => { const a = actorField.items[i]; draw(m, { origin: [origin[0] + a.rect[0] * scale, origin[1] + a.rect[1] * scale], scale, actor: a }); });
+            const camera = actorCamera(width, height);
+            actorMeshes.forEach((m, i) => { const a = actorField.items[i]; draw(m, { origin: [camera.ox + a.rect[0] * camera.scale, camera.oy + a.rect[1] * camera.scale], scale: camera.scale, actor: a }); });
         };
         canvas.addEventListener('webglcontextlost', contextLost);
         document.addEventListener('visibilitychange', sync);

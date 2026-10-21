@@ -477,6 +477,10 @@ onUnmounted(() => {
   .lookup-actions .store-button { flex: 1; gap: 8px; }
   .store-service-note { font-size: 9px; }
 }
+/* Leave the approved full-character scene visible beneath the mobile actions. */
+@media (max-width: 767px) and (orientation: portrait) {
+  .hero-guide { margin-top: 260px; }
+}
 @media (max-width: 479px) {
   .product-grid { grid-template-columns: minmax(0, 1fr); }
 }
