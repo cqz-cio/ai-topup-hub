@@ -62,6 +62,7 @@ export function useProductDetail(options: { onLoaded?: () => void } = {}) {
   }
 
   const loading = ref(true)
+  const refreshFailed = ref(false)
   const product = ref<any>(null)
   const contactFirst = computed(() => isContactFirstProduct(product.value?.slug))
   const { openContact } = useProductContact()
@@ -316,6 +317,7 @@ export function useProductDetail(options: { onLoaded?: () => void } = {}) {
     return limit < quantityEffectiveMin.value
   })
   const canPurchase = computed(() => {
+    if (refreshFailed.value) return false
     if (contactFirst.value) return false
     if (!product.value) return false
     if (activeSkus.value.length === 0) return false
@@ -328,6 +330,7 @@ export function useProductDetail(options: { onLoaded?: () => void } = {}) {
   })
   const cannotPurchaseReason = computed(() => {
     if (!product.value) return ''
+    if (refreshFailed.value) return t('common.api.requestFailed')
     if (requiresLogin.value) return ''
     if (requiresSKUSelection.value) return t('productDetail.skuRequired')
     if (stockBelowMinPurchase.value) return t('productDetail.stockBelowMinPurchase', { count: quantityEffectiveMin.value })
@@ -538,29 +541,49 @@ export function useProductDetail(options: { onLoaded?: () => void } = {}) {
 
   let productRequest = 0
   let disposed = false
+  let productRequestPending = false
   let priceRefreshTimer: ReturnType<typeof setInterval> | undefined
   const loadProduct = async () => {
+    if (disposed) return
     const request = ++productRequest
     const token = userAuthStore.token
     const slug = route.params.slug as string
-    loading.value = true
+    // Polling and window focus refresh the existing view in place. Only a new
+    // product/account (or a retry without data) needs the initial skeleton.
+    const initialLoad = !product.value
+    loading.value = initialLoad
+    productRequestPending = true
     try {
       const response = await productAPI.detail(slug)
       if (disposed || request !== productRequest || token !== userAuthStore.token || slug !== route.params.slug) return
       product.value = response.data.data || null
-      if (images.value.length > 0) {
+      refreshFailed.value = false
+      if (!images.value.includes(currentImage.value)) {
         currentImage.value = images.value[0] || ''
       }
       syncSelectedSku()
-      await nextTick()
-      options.onLoaded?.()
     } catch (error) {
       if (disposed || request !== productRequest || token !== userAuthStore.token || slug !== route.params.slug) return
       console.error('Failed to load product:', error)
-      product.value = null
-      selectedSkuId.value = 0
+      refreshFailed.value = true
+      const status = (error as { status?: number })?.status
+      // Keep the last view through transient network failures, but do not offer
+      // purchases until a successful refresh. Explicit removal/access errors
+      // still invalidate the product immediately.
+      if (initialLoad || status === 401 || status === 403 || status === 404 || status === 410) {
+        product.value = null
+        selectedSkuId.value = 0
+        currentImage.value = ''
+      }
     } finally {
-      if (!disposed && request === productRequest) loading.value = false
+      if (!disposed && request === productRequest) {
+        productRequestPending = false
+        loading.value = false
+        if (initialLoad && product.value) {
+          await nextTick()
+          if (!disposed && request === productRequest) options.onLoaded?.()
+        }
+      }
     }
   }
 
@@ -652,11 +675,13 @@ export function useProductDetail(options: { onLoaded?: () => void } = {}) {
   })
 
   const refreshPriceOnFocus = () => {
-    if (document.visibilityState === 'visible') void loadProduct()
+    if (document.visibilityState === 'visible' && !productRequestPending) void loadProduct()
   }
   watch(() => [userAuthStore.token, route.params.slug], () => {
     product.value = null
     selectedSkuId.value = 0
+    currentImage.value = ''
+    refreshFailed.value = false
     void loadProduct()
   })
 

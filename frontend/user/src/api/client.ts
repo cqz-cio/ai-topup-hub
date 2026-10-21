@@ -123,7 +123,7 @@ function createClient(injectAuth: boolean) {
             if (!response.ok) {
                 const message = getHttpErrorMessage(response.status)
                 console.error('HTTP Error:', message)
-                return Promise.reject(new Error(message))
+                return Promise.reject(Object.assign(new Error(message), { status: response.status }))
             }
             if ((response.headers.get('content-type') || '').includes('application/json')) {
                 // Business errors use an HTTP 200 JSON envelope. Never save that
@@ -151,7 +151,7 @@ function createClient(injectAuth: boolean) {
                     }
                 }
                 console.error('HTTP Error:', message)
-                return Promise.reject(new Error(message))
+                return Promise.reject(Object.assign(new Error(message), { status }))
             }
             console.error('API Error: No response data')
             return Promise.reject(new Error(t('common.api.responseMissing')))
@@ -167,7 +167,7 @@ function createClient(injectAuth: boolean) {
                 window.location.href = '/auth/login'
             }
             console.error('HTTP Error:', message)
-            return Promise.reject(new Error(message))
+            return Promise.reject(Object.assign(new Error(message), { status }))
         }
 
         // Business error check
@@ -184,7 +184,8 @@ function createClient(injectAuth: boolean) {
             if (!silentBusinessError) {
                 console.error('API Error:', errorMessage)
             }
-            const businessError = new Error(errorMessage) as Error & { silentBusinessError?: boolean; data?: any }
+            const businessError = new Error(errorMessage) as Error & { silentBusinessError?: boolean; data?: any; status?: number }
+            businessError.status = data.status_code
             businessError.data = data.data
             businessError.silentBusinessError = silentBusinessError
             return Promise.reject(businessError)
