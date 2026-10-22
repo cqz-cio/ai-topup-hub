@@ -101,6 +101,10 @@
     "loadFailed": "Unable to confirm availability. Please refresh and try again."
   },
   "shopUi": {
+    "priceSort": "Sort by price",
+    "categoryPriceSort": "Sort {category} by price",
+    "priceLowToHigh": "Price: low to high",
+    "priceHighToLow": "Price: high to low",
     "brandLine": "DIGITAL GOODS · SELF SERVICE",
     "brandDescription": "Digital services within reach. Shop, pay, track your order and collect your delivery in one place.",
     "toggleTheme": "Switch light or dark theme",

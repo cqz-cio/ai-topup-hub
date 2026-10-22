@@ -101,6 +101,10 @@
     "loadFailed": "暂时无法确认功能状态，请刷新后重试。"
   },
   "shopUi": {
+    "priceSort": "价格排序",
+    "categoryPriceSort": "{category}价格排序",
+    "priceLowToHigh": "价格从低到高",
+    "priceHighToLow": "价格从高到低",
     "brandLine": "数字商品 · 自助交付",
     "brandDescription": "让好用的数字服务触手可及。选购、付款、查单与领取，都在这里完成。",
     "toggleTheme": "切换明暗主题",

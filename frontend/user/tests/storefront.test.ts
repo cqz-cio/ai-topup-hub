@@ -4,6 +4,7 @@ import {
   canPurchaseStorefrontProduct,
   loadStorefrontProducts,
   storefrontPrice,
+  sortStorefrontProducts,
   storefrontStockQuantity,
   type StorefrontProduct,
 } from '../src/utils/storefront.ts'
@@ -18,6 +19,31 @@ const product = (
   is_sold_out: false,
   stock_status: 'in_stock',
   ...changes,
+})
+
+test('price sorting uses numeric displayed prices, includes credits and preserves API input', () => {
+  const rows = [
+    product({ id: 1, price_amount: '100' }),
+    product({ id: 2, price_amount: '9.99' }),
+    product({ id: 3, slug: 'qzweb-78', price_amount: '200', effective_price_amount: '8' }),
+    product({ id: 4, price_amount: '30', promotion_price_amount: '0' }),
+  ]
+  assert.deepEqual(sortStorefrontProducts(rows).map(p => p.id), [4, 3, 2, 1])
+  assert.deepEqual(sortStorefrontProducts(rows, 'desc').map(p => p.id), [1, 2, 3, 4])
+  assert.deepEqual(rows.map(p => p.id), [1, 2, 3, 4])
+})
+
+test('unknown prices stay last in either direction and ties preserve source order', () => {
+  const rows = [
+    product({ id: 1, price_amount: null }),
+    product({ id: 2, price_amount: '10' }),
+    product({ id: 3, price_amount: '10.00', is_sold_out: true }),
+    product({ id: 4, price_amount: 'invalid' }),
+    product({ id: 5, price_amount: '0' }),
+  ]
+  assert.deepEqual(sortStorefrontProducts(rows).map(p => p.id), [5, 2, 3, 1, 4])
+  assert.deepEqual(sortStorefrontProducts(rows, 'desc').map(p => p.id), [2, 3, 5, 1, 4])
+  assert.deepEqual(sortStorefrontProducts([]), [])
 })
 
 test('purchase availability requires current, complete public stock and price data', () => {

@@ -101,6 +101,10 @@
     "loadFailed": "暫時無法確認功能狀態，請重新整理後重試。"
   },
   "shopUi": {
+    "priceSort": "價格排序",
+    "categoryPriceSort": "{category}價格排序",
+    "priceLowToHigh": "價格從低到高",
+    "priceHighToLow": "價格從高到低",
     "brandLine": "數位商品 · 自助交付",
     "brandDescription": "讓好用的數位服務觸手可及。選購、付款、查單與領取，都在這裡完成。",
     "toggleTheme": "切換明暗主題",

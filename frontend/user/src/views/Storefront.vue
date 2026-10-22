@@ -59,16 +59,28 @@
             <button v-if="products.length" type="button" class="store-button" @click="clearFilters">{{ t('shopUi.allProducts') }}</button>
           </div>
           <template v-else>
-          <template v-for="group in visibleProductGroups" :key="group.category">
-          <CodexCreditsSection :products="group.credits" catalog>
-            <template #card="{ product }">
-              <StorefrontProductCard v-bind="cardProps(product)" credits @image-error="failedImages.add(product.slug)" />
+          <section v-for="group in visibleProductGroups" :key="group.category" class="catalog-group" :aria-label="group.category">
+          <header class="catalog-group-heading">
+            <h3>{{ group.category }}<span>{{ t('shopUi.productCount', { count: group.products.length }) }}</span></h3>
+            <label class="catalog-price-sort">
+              <span>{{ t('shopUi.priceSort') }}</span>
+              <select :value="categoryPriceOrders[group.category] || 'asc'" :aria-label="t('shopUi.categoryPriceSort', { category: group.category })" @change="setCategoryPriceOrder(group.category, $event)">
+                <option value="asc">{{ t('shopUi.priceLowToHigh') }}</option>
+                <option value="desc">{{ t('shopUi.priceHighToLow') }}</option>
+              </select>
+            </label>
+          </header>
+          <CodexCreditsSection v-if="group.hasCredits" :products="group.products" catalog>
+            <template #products>
+              <div class="product-grid">
+                <StorefrontProductCard v-for="product in group.products" :key="product.slug" v-bind="cardProps(product)" :credits="codexCreditPoints(product) !== undefined" @image-error="failedImages.add(product.slug)" />
+              </div>
             </template>
           </CodexCreditsSection>
-          <div v-if="group.other.length" class="product-grid">
-            <StorefrontProductCard v-for="product in group.other" :key="product.slug" v-bind="cardProps(product)" @image-error="failedImages.add(product.slug)" />
+          <div v-else class="product-grid">
+            <StorefrontProductCard v-for="product in group.products" :key="product.slug" v-bind="cardProps(product)" @image-error="failedImages.add(product.slug)" />
           </div>
-          </template>
+          </section>
           </template>
           <p class="catalog-note">{{ t('shopUi.catalogHint') }}</p>
         </div>
@@ -101,7 +113,7 @@ import { usePageSeo } from '../composables/usePageSeo'
 import AnnouncementModal from '../components/AnnouncementModal.vue'
 import CodexCreditsSection from '../components/commerce/CodexCreditsSection.vue'
 import StorefrontProductCard from '../components/commerce/StorefrontProductCard.vue'
-import { splitCodexCredits } from '../utils/codexCredits'
+import { codexCreditPoints } from '../utils/codexCredits'
 import { matchesProductSearch } from '../utils/productSearch'
 import { useAnnouncement, type HomeAnnouncement } from '../composables/useAnnouncement'
 import { getImageUrl } from '../utils/image'
@@ -112,9 +124,11 @@ import {
   canPurchaseStorefrontProduct,
   loadStorefrontProducts,
   storefrontPrice,
+  sortStorefrontProducts,
   storefrontStockQuantity,
   storefrontText,
   type StorefrontProduct,
+  type StorefrontPriceOrder,
 } from '../utils/storefront'
 
 // Both entry points render this catalog so card and responsive changes stay in sync.
@@ -145,6 +159,10 @@ const initialLoading = ref(true)
 const refreshing = ref(false)
 const loadFailed = ref(false)
 const selectedCategory = ref('')
+const categoryPriceOrders = ref<Record<string, StorefrontPriceOrder>>({})
+const setCategoryPriceOrder = (category: string, event: Event) => {
+  categoryPriceOrders.value[category] = (event.target as HTMLSelectElement).value === 'desc' ? 'desc' : 'asc'
+}
 const search = ref('')
 const failedImages = ref(new Set<string>())
 const copyMessage = ref('')
@@ -199,14 +217,16 @@ const visibleProductGroups = computed(() =>
   categories.value
     .map((category) => ({
       category,
-      ...splitCodexCredits(
+      products: sortStorefrontProducts(
         visibleProducts.value.filter((product) => productCategory(product) === category),
+        categoryPriceOrders.value[category] || 'asc',
       ),
     }))
-    .filter((group) => group.credits.length || group.other.length),
+    .filter((group) => group.products.length)
+    .map((group) => ({ ...group, hasCredits: group.products.some((product) => codexCreditPoints(product) !== undefined) })),
 )
 const orderedProducts = computed(() =>
-  visibleProductGroups.value.flatMap(group => [...group.credits, ...group.other]),
+  visibleProductGroups.value.flatMap(group => group.products),
 )
 const priorityProducts = computed(() => new Set(orderedProducts.value.slice(0, 3).map(product => product.slug)))
 const canPurchase = (product: StorefrontProduct) =>
@@ -362,7 +382,7 @@ onUnmounted(() => {
 .storefront-products { padding-top: 108px; min-height: 72vh; }
 .storefront-products .catalog-toolbar { padding-top: 0; border-top: 0; }
 .storefront a { text-decoration: none; }
-.storefront :is(a, button, input):focus-visible { outline: 2px solid var(--ui-success); outline-offset: 4px; }
+.storefront :is(a, button, input, select):focus-visible { outline: 2px solid var(--ui-success); outline-offset: 4px; }
 .storefront button, .storefront a { touch-action: manipulation; }
 .skip-link { position: fixed; top: -100px; left: 20px; z-index: 100; padding: 12px; background: var(--ui-bg-elevated); }
 .skip-link:focus { top: 12px; }
@@ -416,6 +436,14 @@ onUnmounted(() => {
 .purchase-help > span { display: block; font-size: 10px; color: var(--ui-text-muted); }
 .wechat-copy { display: flex; gap: 8px; align-items: center; border: none; background: transparent; padding: 4px 0; color: var(--ui-text-primary); font-size: 14px; cursor: pointer; font-weight: 600; word-break: break-all; }
 .catalog-main { min-width: 0; }
+.catalog-group + .catalog-group { margin-top: 32px; }
+.catalog-group-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin: 0 0 16px; }
+.catalog-group-heading h3 { min-width: 0; font-size: 18px; font-weight: 700; overflow-wrap: anywhere; }
+.catalog-group-heading h3 span { display: block; margin-top: 4px; font-size: 12px; font-weight: 500; color: var(--ui-text-muted); }
+.catalog-price-sort { display: flex; align-items: center; gap: 8px; max-width: 100%; color: var(--ui-text-primary); font-size: 13px; font-weight: 600; }
+.catalog-price-sort > span { flex-shrink: 0; }
+.catalog-price-sort select { min-width: 0; max-width: 100%; min-height: 44px; padding: 8px 30px 8px 12px; border: 1px solid var(--ui-border-strong); border-radius: 9px; background-color: var(--ui-bg-elevated); color: var(--ui-text-primary); font: inherit; cursor: pointer; }
+@media(max-width:767px) { .catalog-price-sort { width: 100%; } .catalog-price-sort select { flex: 1; font-size: 16px; } }
 .delivery-notice { display: flex; align-items: flex-start; gap: 8px; color: var(--ui-text-muted); font-size: 12px; line-height: 1.7; margin-bottom: 16px; }
 .delivery-notice > svg { color: var(--ui-success); flex-shrink: 0; }
 .product-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }

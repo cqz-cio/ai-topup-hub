@@ -8,6 +8,7 @@
       <Info aria-hidden="true" :size="17" />
       <div><strong>{{ copy.noticeTitle }}</strong><p>{{ copy.notice }}<span v-if="catalog">{{ ' ' + copy.preflight }}</span></p></div>
     </div>
+    <slot name="products">
     <div :class="catalog ? 'catalog-grid' : 'credits-grid'">
       <template v-for="product in credits" :key="product.id">
       <slot name="card" :product="product">
@@ -43,6 +44,7 @@
       </slot>
       </template>
     </div>
+    </slot>
     <footer class="credits-help">
       <div><strong>{{ copy.redeemTitle }}</strong><p>{{ copy.redeem }}</p></div>
       <div><strong>{{ copy.helpTitle }}</strong><p>{{ copy.help }}</p><SupportContacts /></div>

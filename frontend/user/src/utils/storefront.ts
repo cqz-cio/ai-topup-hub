@@ -52,6 +52,23 @@ export function storefrontPrice(product: StorefrontProduct): number | null {
   return promotion !== null && promotion < base ? promotion : base
 }
 
+export type StorefrontPriceOrder = 'asc' | 'desc'
+
+// Use the same effective price as the card. Missing prices stay last in either
+// direction; equal prices retain their original order without mutating API data.
+export function sortStorefrontProducts<T extends StorefrontProduct>(
+  products: readonly T[],
+  order: StorefrontPriceOrder = 'asc',
+): T[] {
+  return products.map((product) => ({ product, price: storefrontPrice(product) }))
+    .sort((a, b) => {
+      if (a.price === null) return b.price === null ? 0 : 1
+      if (b.price === null) return -1
+      return order === 'desc' ? b.price - a.price : a.price - b.price
+    })
+    .map(({ product }) => product)
+}
+
 export function canPurchaseStorefrontProduct(
   product: StorefrontProduct,
 ): boolean {
