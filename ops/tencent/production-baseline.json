@@ -410,12 +410,12 @@
   "previous_build_verification_at": "2026-10-12T08:19:31.766441+00:00",
   "management_url": "https://admin.qzweb.cloud/login",
   "frontend_gateway": {
-    "checked_at": "2026-10-23T05:56:09.261299+00:00",
+    "checked_at": "2026-10-23T07:00:41.123161+00:00",
     "frontend_host": "124.220.2.69",
     "backend_host": "43.134.141.10",
-    "frontend_release": "20261023-134652",
-    "source_commit": "1912b0ef6ef32c923c050e7647e54bcf68816765",
-    "static_files_verified": 1860,
+    "frontend_release": "20261023-145655",
+    "source_commit": "165cbb40ec966589b8900844fa06107aed7ccbde",
+    "static_files_verified": 1874,
     "storefront_url": "https://www.qzweb.cloud/",
     "management_url": "https://admin.qzweb.cloud/login",
     "www_dns_record": "www A 124.220.2.69",
@@ -431,7 +431,7 @@
     "certificate_renewal_verified": true,
     "certificate_timer": "qzweb-certificates.timer",
     "certificate_renewal_report": "/srv/zhixiang-front/shared/work/renew-final-20261012-1644/status.json",
-    "report_path": "/srv/zhixiang-front/shared/work/ocean-ui-20261023-134652.json",
+    "report_path": "/srv/zhixiang-front/shared/work/ocean-performance-20261023-145655.json",
     "backend_report_path": "/srv/zhixiang/shared/reports/paid-order-deadlock-20261016-190912.json",
     "formal_alipay_enabled": false,
     "database_uploaded": false,
@@ -445,10 +445,10 @@
       "browser_current_frontend_confirmed": true,
       "report_path": "/srv/zhixiang-front/shared/work/entry-cache-report.json"
     },
-    "previous_frontend_release": "20261022-223144",
-    "storefront_source_commit": "1912b0ef6ef32c923c050e7647e54bcf68816765",
+    "previous_frontend_release": "20261023-134652",
+    "storefront_source_commit": "165cbb40ec966589b8900844fa06107aed7ccbde",
     "admin_source_commit": "297f11deef4d7193081270c55f60c6ba5cdd7295",
-    "backup": "/srv/zhixiang-front/backups/before-ocean-ui-20261023-134652",
+    "backup": "/srv/zhixiang-front/backups/before-ocean-performance-20261023-145655",
     "frontend_only_update": true,
     "previous_hashed_assets_retained": true,
     "verified_services": {
@@ -456,21 +456,21 @@
       "zhixiang-api-tunnel": "active",
       "qzweb-certificates.timer": "active"
     },
-    "release_scope": "Approved ocean scenes, bouncing bubbles, controls, mobile layout and reading improvements",
+    "release_scope": "Lossless ocean media, route-scoped preload, animation work reduction and versioned media cache",
     "admin_files_verified": 1459,
-    "storefront_files_verified": 401,
+    "storefront_files_verified": 415,
     "backend_program_preserved": true,
     "backend_setting_changes": [],
-    "frontend_build_source_commit": "1912b0ef6ef32c923c050e7647e54bcf68816765",
+    "frontend_build_source_commit": "165cbb40ec966589b8900844fa06107aed7ccbde",
     "frontend_source_identical_to_backend": false,
     "admin_base": "/",
     "base_repair_backup": "/srv/zhixiang-front/backups/before-xorpay-admin-base-20261013-173020",
-    "frontend_source_difference": "Storefront 1912b0ef6ef32c923c050e7647e54bcf68816765; backend 20261020-144132 and admin 20261019-160954 unchanged.",
+    "frontend_source_difference": "Storefront 165cbb40ec966589b8900844fa06107aed7ccbde; backend 20261020-144132 and admin 20261019-160954 unchanged.",
     "source_dirty": false,
-    "source_tag": "production/ocean-ui-20261023-134652",
+    "source_tag": "production/ocean-performance-20261023-145655",
     "static_verification_scope": "260 files verified; existing assets retained; 56 public checks.",
     "retained_files_preserved": true,
-    "storefront_release": "20261023-134652",
+    "storefront_release": "20261023-145655",
     "admin_release": "20261019-160954",
     "legacy_singapore_embedded_frontend_public": false,
     "legacy_singapore_frontend_behavior": "308 to maintained Shanghai storefront/admin; API/uploads/health retained",
@@ -486,7 +486,7 @@
     "previous_directory_inventory_count": 11201,
     "nginx_configuration_source_commit": "17a1c6df26f3f6b923db8bb317398dc3ae9ed73a",
     "nginx_change_scope": "No Nginx changes",
-    "storefront_files_preserved": 9928,
+    "storefront_files_preserved": 10144,
     "old_files_preserved": 10813
   },
   "alipay": {
@@ -3458,6 +3458,90 @@
       "file_bytes_unchanged": true,
       "scope": "Only newly published public image directories"
     },
+    "database_uploaded": false,
+    "real_payment_or_purchase_performed": false
+  },
+  "ocean_performance_20261023": {
+    "passed": true,
+    "checked_at": "2026-10-23T07:00:41.123161+00:00",
+    "release": "20261023-145655",
+    "source_commit": "165cbb40ec966589b8900844fa06107aed7ccbde",
+    "tests": 187,
+    "typecheck": true,
+    "build": true,
+    "public_scan_files": 415,
+    "localBuildIdentical": true,
+    "frontend": {
+      "status": "complete",
+      "release": "20261023-145655",
+      "source_commit": "165cbb40ec966589b8900844fa06107aed7ccbde",
+      "current": "/srv/zhixiang-front/releases/20261023-145655",
+      "backup": "/srv/zhixiang-front/backups/before-ocean-performance-20261023-145655",
+      "user_files_verified": 415,
+      "admin_files_preserved": 1459,
+      "old_user_files_preserved": 10144,
+      "nginx_files_preserved": 56,
+      "nginx_unchanged": false,
+      "nginx_cache_config": "/etc/nginx/conf.d/qzweb-www.conf",
+      "nginx_sha256": "57fc4adfe494cefac29186b441ad294a8c8ac0aeea440e920030c5db7e7ddc65",
+      "new_public_directories": [
+        "/srv/zhixiang-front/releases/20261023-145655/user/media/ocean-20261023"
+      ],
+      "media_worker_readable": 14,
+      "backend_restarted": false,
+      "database_uploaded": false,
+      "approved_covers_verified": 0
+    },
+    "backup_singapore": "/srv/zhixiang/backups/before-ocean-performance-20261023-145655",
+    "public_checks": 37,
+    "production_browser": {
+      "passed": true,
+      "checks": [
+        {
+          "broken": 0,
+          "overflow": false,
+          "preloads": [],
+          "scene": "ready",
+          "url": "https://www.qzweb.cloud/products/qzweb-4",
+          "width": 1920
+        },
+        {
+          "broken": 0,
+          "overflow": false,
+          "preloads": [],
+          "scene": "ready",
+          "url": "https://www.qzweb.cloud/products/qzweb-4",
+          "width": 390
+        },
+        {
+          "broken": 0,
+          "overflow": false,
+          "preloads": [],
+          "scene": "ready",
+          "url": "https://www.qzweb.cloud/products/qzweb-4",
+          "width": 320
+        },
+        {
+          "broken": 0,
+          "overflow": false,
+          "preloads": [],
+          "scene": "ready",
+          "url": "https://www.qzweb.cloud/products",
+          "width": 320
+        },
+        {
+          "broken": 0,
+          "overflow": false,
+          "preloads": [
+            "/media/storefront-20261020/jellyfishing.webp"
+          ],
+          "url": "https://www.qzweb.cloud/",
+          "width": 320
+        }
+      ],
+      "errors": []
+    },
+    "backend_unchanged": true,
     "database_uploaded": false,
     "real_payment_or_purchase_performed": false
   }
