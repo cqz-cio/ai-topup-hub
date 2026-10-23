@@ -4,6 +4,7 @@
     <div id="app" class="min-h-screen bg-background text-foreground flex flex-col"
       :class="{ 'brand-scene': hasBrandScene, 'brand-product-scene': hasProductScene, 'brand-route-scene': !!pageScene }"
       :data-brand-page-scene="pageScene || undefined">
+      <OceanSceneMotion v-if="hasBrandScene && (hasProductScene || pageScene)" :scene="hasProductScene ? 'detail' : pageScene!" />
       <BrandSceneMotion v-if="hasBrandScene && !hasProductScene && !pageScene" />
       <ErrorBoundary v-if="isStandalone"><RouterView /></ErrorBoundary>
       <!-- vault 模板：自带顶栏/页脚的外壳包裹页面（控制台仍走下方分支） -->
@@ -65,6 +66,7 @@ import MobileBottomNav from './components/MobileBottomNav.vue'
 
 // vault 外壳按需加载，classic 用户不会拉取其 chunk/样式
 const VaultLayout = defineAsyncComponent(() => import('./templates/vault/layout/VaultLayout.vue'))
+const OceanSceneMotion = defineAsyncComponent(() => import('./components/OceanSceneMotion.vue'))
 const BrandSceneMotion = defineAsyncComponent(() => import('./components/BrandSceneMotion.vue'))
 
 // config 由 router.beforeEach 统一加载，无需在此重复调用
