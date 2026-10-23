@@ -7,11 +7,11 @@
   <link rel="icon" type="image/png" href="/media/storefront-20261020/patrick-icon.png" />
   <script data-cfasync="false">
     // Start the primary storefront wallpaper before Vue/config loading.
-    // Other tenants, the standalone redeem page and Vault do not use this art.
+    // Inner pages use their own ocean wallpaper; do not compete for their bandwidth.
     try {
       const template = new URLSearchParams(location.search).get('template') || localStorage.getItem('dj-storefront-template');
       if (['www.qzweb.cloud', 'qzweb.cloud', 'localhost', '127.0.0.1'].includes(location.hostname) &&
-          !/^\/(?:redeem|reseller)(?:\/|$)/.test(location.pathname) && template !== 'vault') {
+          location.pathname === '/' && template !== 'vault') {
         const hint = document.createElement('link');
         hint.rel = 'preload'; hint.as = 'image'; hint.type = 'image/webp'; hint.fetchPriority = 'high';
         hint.href = '/media/storefront-20261020/jellyfishing.webp';

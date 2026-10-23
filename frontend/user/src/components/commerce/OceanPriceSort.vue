@@ -46,7 +46,7 @@ const options = [
 .ocean-sort-trigger, .ocean-sort-menu { color: #103f42; border: 1px solid rgb(255 255 255 / 92%); border-radius: 12px; background-color: rgb(166 231 247 / 66%); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 38%), 0 3px 10px rgb(16 100 130 / 13%); backdrop-filter: blur(12px); }
 .ocean-sort-trigger { position: relative; isolation: isolate; display: flex; align-items: center; gap: 10px; min-width: 190px; max-width: 100%; min-height: 44px; padding: 9px 14px; font: inherit; font-size: 14px; font-weight: 650; cursor: pointer; text-align: start; }
 /* Reuse the approved wave/bubble/shell artwork, framing its transparent margins. */
-.ocean-sort-trigger::before, .ocean-sort-menu::before { content: ''; pointer-events: none; position: absolute; z-index: -1; inset: 0; border-radius: inherit; background: url('/brand/ocean-buttons/add-cart-20261022.png') 45.45% 53.03% / 101.02% 157.39% no-repeat; opacity: .62; }
+.ocean-sort-trigger::before, .ocean-sort-menu::before { content: ''; pointer-events: none; position: absolute; z-index: -1; inset: 0; border-radius: inherit; background: url('/media/ocean-20261023/add-cart-20261022.webp') 45.45% 53.03% / 101.02% 157.39% no-repeat; opacity: .62; }
 .ocean-sort-trigger > svg { flex-shrink: 0; }
 .ocean-sort-value { flex: 1; white-space: nowrap; }
 .ocean-sort-chevron { margin-left: auto; transition: transform .15s ease; }

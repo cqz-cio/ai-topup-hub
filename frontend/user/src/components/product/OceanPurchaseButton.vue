@@ -47,12 +47,12 @@ defineProps<{ action: 'buy' | 'cart'; compact?: boolean }>()
 }
 
 .brand-product-scene .ocean-purchase-button--buy {
-  --ocean-button-art: url('/brand/ocean-buttons/buy-now-20261022.png');
+  --ocean-button-art: url('/media/ocean-20261023/buy-now-20261022.webp');
   --ocean-art-size: 101.02% 157.39%;
   --ocean-art-position: 45.45% 53.03%;
 }
 .brand-product-scene .ocean-purchase-button--cart {
-  --ocean-button-art: url('/brand/ocean-buttons/add-cart-20261022.png');
+  --ocean-button-art: url('/media/ocean-20261023/add-cart-20261022.webp');
   /* Frame the button body within the generated asset's transparent canvas. */
   --ocean-art-size: 101.02% 157.39%;
   --ocean-art-position: 45.45% 53.03%;

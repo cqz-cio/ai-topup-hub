@@ -79,12 +79,11 @@ test('context loss releases resources and falls back exactly once', () => {
   assert.equal(f.callbacks.size, 0); assert.equal(f.stats().released, 5)
 })
 
-test('unavailable WebGL, shader failure, failed image and timeout retain static fallback', () => {
-  for (const kind of ['unavailable', 'shaderFailure', 'image', 'timeout']) {
+test('unavailable WebGL, shader failure, failed image retain static fallback', () => {
+  for (const kind of ['unavailable', 'shaderFailure', 'image']) {
     const f = setup({ unavailable: kind === 'unavailable', shaderFailure: kind === 'shaderFailure' })
     f.mount()
     if (kind === 'image') f.images[0].onerror!()
-    if (kind === 'timeout') [...f.timers.values()][0]()
     assert.equal(f.stats().failed, 1, kind); assert.equal(f.stats().ready, 0, kind)
     assert.equal(f.callbacks.size, 0, kind); assert.equal(f.timers.size, 0, kind)
   }
@@ -93,7 +92,7 @@ test('unavailable WebGL, shader failure, failed image and timeout retain static 
 test('four scenes preserve static mobile crops and limit high-DPI canvas cost', () => {
   for (const [key, alignment] of Object.entries({ garden: .1, street: .85, home: .85, detail: .7 })) {
     const f = setup({ width: 390, height: 844 }), scene = f.mount(key)
-    assert.match(f.images[0].src, /^\/brand\//)
+    assert.match(f.images[0].src, /^\/media\/ocean-20261023\//)
     f.images.forEach(image => image.onload!()); assert.equal(f.uniforms.alignment, alignment); scene.dispose()
   }
   const f = setup({ width: 3840, height: 2160 }), scene = f.mount()
@@ -103,8 +102,8 @@ test('four scenes preserve static mobile crops and limit high-DPI canvas cost', 
 test('clean background and original bubble atlas must both load before revealing animation', () => {
   for (const order of [[0, 1], [1, 0]]) {
     const f = setup(), scene = f.mount('detail');
-    assert.match(f.images[0].src, /detail-clean.png$/);
-    assert.match(f.images[1].src, /detail-bubbles.png$/);
+    assert.match(f.images[0].src, /detail-clean.webp$/);
+    assert.match(f.images[1].src, /detail-bubbles.webp$/);
     f.images[order[0]].onload!();
     assert.equal(f.stats().ready, 0); assert.equal(f.callbacks.size, 0);
     f.images[order[1]].onload!();
@@ -121,5 +120,27 @@ test('a failed or stale atlas keeps the static wallpaper and clears both image h
   assert.equal(f.callbacks.size, 0); assert.equal(f.timers.size, 0);
   for (const image of f.images) {
     assert.equal(image.src, ''); assert.equal(image.onload, null); assert.equal(image.onerror, null);
+  }
+});
+
+test('slow successful images retain motion instead of falling back at an arbitrary deadline', () => {
+  const f = setup(), scene = f.mount();
+  assert.equal(f.timers.size, 0);
+  f.frame(30000);
+  f.images.forEach(image => image.onload!());
+  assert.equal(f.stats().ready, 1); assert.equal(f.stats().failed, 0);
+  scene.dispose();
+});
+
+test('high refresh displays cap GPU paints without slowing elapsed animation time', () => {
+  for (const hz of [60, 120, 144, 240]) {
+    const f = setup(), scene = f.mount();
+    f.images.forEach(image => image.onload!());
+    const before = f.stats().draws;
+    for (let n = 0; n <= hz; n++) f.frame(n * 1000 / hz);
+    const paints = f.stats().draws - before;
+    assert.ok(paints >= 58 && paints <= 64, `${hz}Hz produced ${paints} paints`);
+    assert.ok(Math.abs(Number(f.uniforms.t) - 1) < .02);
+    scene.dispose();
   }
 });

@@ -9,9 +9,9 @@
   --ui-text-secondary: #244c43;
   --ui-text-muted: #335a51;
 }
-.brand-route-scene[data-brand-page-scene='street'] { --scene-image: url('/brand/scenes/krusty-street-20261022.png'); }
-.brand-route-scene[data-brand-page-scene='garden'] { --scene-image: url('/brand/scenes/coral-garden-20261022.png'); }
-.brand-route-scene[data-brand-page-scene='home'] { --scene-image: url('/brand/scenes/pineapple-home-20261022.png'); }
+.brand-route-scene[data-brand-page-scene='street'] { --scene-image: url('/media/ocean-20261023/krusty-street-20261022.webp'); }
+.brand-route-scene[data-brand-page-scene='garden'] { --scene-image: url('/media/ocean-20261023/coral-garden-20261022.webp'); }
+.brand-route-scene[data-brand-page-scene='home'] { --scene-image: url('/media/ocean-20261023/pineapple-home-20261022.webp'); }
 .brand-scene.brand-route-scene::before {
   background-image: linear-gradient(rgb(255 255 255 / var(--brand-scene-wash)), rgb(255 255 255 / var(--brand-scene-wash))), var(--scene-image);
   background-position: center;
@@ -58,7 +58,7 @@
 /* Existing primary actions keep their labels/events; only their skin changes. */
 :root #app.brand-scene.brand-route-scene main :is(.ui-button-primary:not(.ui-button-icon), .store-button.is-primary, .payment-button.is-primary, .about-copy) {
   color: #103f42;
-  background: #d6f0f4 url('/brand/ocean-buttons/buy-now-20261022.png') 45.45% 53.03% / 101.02% 157.39% no-repeat;
+  background: #d6f0f4 url('/media/ocean-20261023/buy-now-20261022.webp') 45.45% 53.03% / 101.02% 157.39% no-repeat;
   border: 1px solid rgb(109 195 215 / 65%);
   border-radius: 12px;
   min-height: 40px;

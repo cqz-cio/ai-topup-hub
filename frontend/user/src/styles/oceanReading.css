@@ -62,7 +62,7 @@
 .ocean-announcement .announcement-footer { border: 0; padding: 14px 24px 18px; }
 .ocean-announcement .announcement-footer .ui-button-primary {
   color: #123e44; border: 1px solid #72cadd;
-  background: #d6f0f4 url('/brand/ocean-buttons/add-cart-20261022.png') 45.45% 53.03% / 101.02% 157.39% no-repeat;
+  background: #d6f0f4 url('/media/ocean-20261023/add-cart-20261022.webp') 45.45% 53.03% / 101.02% 157.39% no-repeat;
   min-width: 104px; min-height: 44px; font-weight: 700;
 }
 .ocean-announcement .announcement-footer .ui-button-link { color: var(--ocean-reading-muted); min-height: 32px; }
@@ -195,7 +195,7 @@
 .ocean-announcement .announcement-footer { position: relative; }
 .ocean-announcement .announcement-footer::before {
   content: ''; position: absolute; pointer-events: none; left: 11px; right: 11px; height: 20px; top: -20px;
-  background: url('/brand/ocean-buttons/add-cart-20261022.png') center calc(100% + 24px) / 100% auto no-repeat;
+  background: url('/media/ocean-20261023/add-cart-20261022.webp') center calc(100% + 24px) / 100% auto no-repeat;
   opacity: .6;
 }
 .dark .ocean-announcement .announcement-footer::before { opacity: .25; }

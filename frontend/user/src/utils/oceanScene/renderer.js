@@ -9,19 +9,19 @@ const scenes = {
 };
 const vertex=`attribute vec2 pos; varying vec2 uv; void main(){ uv=vec2((pos.x+1.)*.5,(1.-pos.y)*.5); gl_Position=vec4(pos,0.,1.); }`;
 const fragment=`precision highp float;
-varying vec2 uv; uniform sampler2D art; uniform float t; uniform vec2 view; uniform vec2 artSize; uniform float alignment; uniform vec4 actors[3]; uniform vec4 hands[2]; uniform float isHome;
+varying vec2 uv; uniform sampler2D art; uniform float t; uniform vec2 view; uniform vec2 artSize; uniform float alignment; uniform vec4 actors[3]; uniform vec4 hands[2]; uniform vec2 actorMotion[3]; uniform vec2 handMotion[2]; uniform float homeSway;
 float area(vec2 p,vec4 r){return 1.-smoothstep(.48,1.,length((p-r.xy)/max(r.zw,vec2(.0001))));}
 void main(){
  float scale=max(view.x/artSize.x,view.y/artSize.y); vec2 size=artSize*scale; vec2 offset=(view-size)*vec2(alignment,.5); vec2 p=(uv*view-offset)/size; vec2 d=vec2(0.);
  for(int i=0;i<3;i++){
-   vec4 a=actors[i]; float phase=float(i)*2.3; float weight=area(p,a); float height=clamp((a.y+a.w-p.y)/(a.w*2.),0.,1.);
-   d.x+=weight*height*(sin(t*.72+phase)*.0017+sin(t*.29+phase)*.0004);
-   d.y+=weight*height*sin(t*1.12+phase)*.0013;
+   vec4 a=actors[i]; float weight=area(p,a); float height=clamp((a.y+a.w-p.y)/(a.w*2.),0.,1.);
+   d.x+=weight*height*actorMotion[i].x;
+   d.y+=weight*height*actorMotion[i].y;
  }
- for(int i=0;i<2;i++){vec4 h=hands[i]; float wave=sin(t*.91+float(i)*2.1)*.5+.5; wave=wave*wave; d.x+=area(p,h)*.0019*wave; d.y+=area(p,h)*.0017*sin(t*.91+float(i)*2.1);}
+ for(int i=0;i<2;i++){float weight=area(p,hands[i]); d+=weight*handMotion[i];}
  float plant=area(p,vec4(.055,.90,.09,.14))+area(p,vec4(.962,.90,.07,.15));
  float root=1.-smoothstep(.84,1.,p.y); d.x+=plant*root*.0045*sin(t*.68-p.y*5.);
- d.x+=isHome*area(p,vec4(.05,.035,.08,.12))*.0018*sin(t*.63);
+ d.x+=area(p,vec4(.05,.035,.08,.12))*homeSway;
  vec3 color=texture2D(art,clamp(p-d,vec2(.001),vec2(.999))).rgb;
  float water=(1.-smoothstep(.05,.65,p.y))*smoothstep(.12,.3,p.x)*(1.-smoothstep(.7,.88,p.x));
  float light=water*.013*(sin(p.x*30.+p.y*8.+t*.19)+sin(p.x*17.-p.y*12.-t*.15));
@@ -29,12 +29,13 @@ void main(){
 }`;
 /** Mount one approved scene. The CSS wallpaper remains visible until ready. */
 export function mountOceanScene(canvas, bubbles, key, { onReady, onFallback }) {
-  let gl, ctx, program, texture, buffer, observer, timer, raf = 0;
-  let disposed = false, ready = false, suspended = false, time = 0, last = null;
+  let gl, ctx, program, texture, buffer, observer, raf = 0;
+  let disposed = false, ready = false, suspended = false, time = 0, last = null, paintAt = null;
   let width = 1, height = 1, world, imagesLoaded = 0;
   const shaders = [], uniforms = {}, image = new Image(), atlas = new Image(), config = scenes[key];
   const actors = config.actors.flat();
   while (actors.length < 12) actors.push(0);
+  const actorMotion = new Float32Array(6), handMotion = new Float32Array(4);
 
 
   function dispose() {
@@ -42,7 +43,6 @@ export function mountOceanScene(canvas, bubbles, key, { onReady, onFallback }) {
     disposed = true;
     ready = false;
     cancelAnimationFrame(raf);
-    clearTimeout(timer);
     observer?.disconnect();
     document.removeEventListener('visibilitychange', sync);
     window.removeEventListener('pagehide', hide);
@@ -71,7 +71,7 @@ export function mountOceanScene(canvas, bubbles, key, { onReady, onFallback }) {
   function show() { suspended = false; sync(); }
   function sync() {
     cancelAnimationFrame(raf);
-    last = null;
+    last = null; paintAt = null;
     if (ready && !disposed && !document.hidden && !suspended) raf = requestAnimationFrame(tick);
   }
   function compile(type, source) {
@@ -88,23 +88,38 @@ export function mountOceanScene(canvas, bubbles, key, { onReady, onFallback }) {
     const rect = canvas.getBoundingClientRect();
     width = Math.max(1, rect.width); height = Math.max(1, rect.height);
     const dpr = Math.min(devicePixelRatio || 1, 1.5, Math.sqrt(2400000 / (width * height)));
-    canvas.width = bubbles.width = Math.max(1, Math.round(width * dpr));
-    canvas.height = bubbles.height = Math.max(1, Math.round(height * dpr));
+    const pixelWidth = Math.max(1, Math.round(width * dpr));
+    const pixelHeight = Math.max(1, Math.round(height * dpr));
+    if (canvas.width !== pixelWidth || canvas.height !== pixelHeight) {
+      canvas.width = bubbles.width = pixelWidth;
+      canvas.height = bubbles.height = pixelHeight;
+    }
     world?.resize(width, height);
     gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.uniform2f(uniforms.view, width, height);
+    gl.uniform2f(uniforms.artSize, image.naturalWidth, image.naturalHeight);
+    // Keep the static fallback's existing mobile crop, including detail's 70%.
+    gl.uniform1f(uniforms.alignment, width < 768 ? (key === 'garden' ? .1 : key === 'detail' ? .7 : .85) : .5);
     if (!document.hidden && !suspended) draw();
   }
   function draw() {
     if (!ready || disposed) return;
     gl.useProgram(program);
     gl.uniform1f(uniforms.t, time);
-    gl.uniform2f(uniforms.view, width, height);
-    gl.uniform2f(uniforms.artSize, image.naturalWidth, image.naturalHeight);
-    // Keep the static fallback's existing mobile crop, including detail's 70%.
-    gl.uniform1f(uniforms.alignment, width < 768 ? (key === 'garden' ? .1 : key === 'detail' ? .7 : .85) : .5);
-    gl.uniform4fv(uniforms['actors[0]'], actors);
-    gl.uniform4fv(uniforms['hands[0]'], config.hands.flat());
-    gl.uniform1f(uniforms.isHome, key === 'home' ? 1 : 0);
+    // Time-only trigonometry is identical for every pixel: calculate once per paint.
+    for (let i = 0; i < 3; i++) {
+      const phase = i * 2.3;
+      actorMotion[i * 2] = Math.sin(time * .72 + phase) * .0017 + Math.sin(time * .29 + phase) * .0004;
+      actorMotion[i * 2 + 1] = Math.sin(time * 1.12 + phase) * .0013;
+    }
+    for (let i = 0; i < 2; i++) {
+      const sway = Math.sin(time * .91 + i * 2.1), wave = sway * .5 + .5;
+      handMotion[i * 2] = .0019 * wave * wave;
+      handMotion[i * 2 + 1] = .0017 * sway;
+    }
+    gl.uniform2fv(uniforms['actorMotion[0]'], actorMotion);
+    gl.uniform2fv(uniforms['handMotion[0]'], handMotion);
+    gl.uniform1f(uniforms.homeSway, key === 'home' ? .0018 * Math.sin(time * .63) : 0);
     gl.drawArrays(gl.TRIANGLES, 0, 6);
     ctx.clearRect(0, 0, bubbles.width, bubbles.height);
     ctx.save(); ctx.scale(bubbles.width / width, bubbles.height / height);
@@ -122,7 +137,14 @@ export function mountOceanScene(canvas, bubbles, key, { onReady, onFallback }) {
       world.step(dt);
     }
     last = now;
-    try { draw(); } catch { fallback(); return; }
+    // Cap GPU painting at 60 Hz on 120/144/240 Hz displays; simulation keeps elapsed time.
+    // Normal 60 Hz devices retain every frame and the existing resolution/motion.
+    const interval = 1000 / 60;
+    if (paintAt === null || now >= paintAt - 0.8) {
+      paintAt = paintAt === null ? now + interval
+        : paintAt + (Math.floor(Math.max(0, now - paintAt) / interval) + 1) * interval;
+      try { draw(); } catch { fallback(); return; }
+    }
     raf = requestAnimationFrame(tick);
   }
   try {
@@ -142,7 +164,9 @@ export function mountOceanScene(canvas, bubbles, key, { onReady, onFallback }) {
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]), gl.STATIC_DRAW);
     const pos = gl.getAttribLocation(program, 'pos');
     gl.enableVertexAttribArray(pos); gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
-    for (const name of ['t','view','artSize','alignment','actors[0]','hands[0]','isHome']) uniforms[name] = gl.getUniformLocation(program, name);
+    for (const name of ['t','view','artSize','alignment','actors[0]','hands[0]','actorMotion[0]','handMotion[0]','homeSway']) uniforms[name] = gl.getUniformLocation(program, name);
+    gl.uniform4fv(uniforms['actors[0]'], actors);
+    gl.uniform4fv(uniforms['hands[0]'], config.hands.flat());
     texture = gl.createTexture();
     if (!texture) throw Error('Scene texture unavailable');
     gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -158,8 +182,7 @@ export function mountOceanScene(canvas, bubbles, key, { onReady, onFallback }) {
     observer.observe(canvas);
     const loaded = () => {
       if (disposed || ++imagesLoaded !== 2) return;
-      clearTimeout(timer);
-      try {
+        try {
         gl.bindTexture(gl.TEXTURE_2D, texture);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
         resize();
@@ -169,9 +192,11 @@ export function mountOceanScene(canvas, bubbles, key, { onReady, onFallback }) {
     };
     image.onload = atlas.onload = loaded;
     image.onerror = atlas.onerror = fallback;
-    timer = setTimeout(fallback, 15000);
-    image.src = `/brand/scenes/bubbles-20261023/${key}-clean.png`;
-    atlas.src = `/brand/scenes/bubbles-20261023/${key}-bubbles.png`;
+    // Slow downloads may finish later; only actual image errors trigger fallback.
+    image.decoding = atlas.decoding = 'async';
+    image.fetchPriority = atlas.fetchPriority = 'low';
+    image.src = `/media/ocean-20261023/${key}-clean.webp`;
+    atlas.src = `/media/ocean-20261023/${key}-bubbles.webp`;
   } catch { fallback(); }
   return { dispose };
 }
