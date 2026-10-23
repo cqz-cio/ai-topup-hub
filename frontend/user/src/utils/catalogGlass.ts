@@ -1,5 +1,6 @@
 // Only the shop's existing vector covers get a transparent catalog variant.
-// Uploaded/custom images and product-detail images retain their original asset.
+// Classic catalog cards and product details share these variants.
+// Uploaded/custom images retain their original asset.
 const glassCoverNames = new Set([
   'go-20261001.svg',
   'plus-20261001.svg',

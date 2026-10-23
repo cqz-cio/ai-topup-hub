@@ -20,6 +20,8 @@ dist/
 *.tsbuildinfo
 frontend/*/*.local
 internal/web/dist/
+__pycache__/
+*.py[cod]
 
 # Editor / local agent configuration
 .vscode/
