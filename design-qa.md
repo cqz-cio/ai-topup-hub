@@ -1,3 +1,90 @@
+# Ocean UI local implementation — 2026-10-23
+
+final result: passed
+
+## Scope and source
+
+User explicitly requested local implementation of the approved mobile and common-component renderings. Runtime: http://localhost:5173/. Worktree: `C:/Users/admin/.codex/worktrees/main-local-preview/卡网`, based on main commit `809423e`. No commit, push, production deployment or business database edits were performed.
+
+Approved images:
+- `exec-5512ec52-4ac8-4d82-a52a-8c8b3730782f.png` (corrected mobile reference; the earlier rejected mobile image is not a specification).
+- `exec-b243a3dd-78b0-42e7-b299-90c83bb216a3.png` (search, reading surface and announcement).
+
+Source images are under `C:/Users/admin/.codex/generated_images/01a16238-d7ef-71b2-8d40-8009a6c2159c/`.
+
+## Evidence and normalization
+
+Private screenshots and normalized comparisons are under `D:/卡网/work/codex-runtime/ui-optimize-20261023/`.
+
+- `home-mobile-comparison.png`, `detail-mobile-comparison.png`, `article-mobile-comparison.png`: actual 390×844 viewport alongside the corresponding reference phone content, normalized to 390×844 (illustrative reference has no browser scrollbar; runtime reserves its scrollbar).
+- `announcement-comparison.png`: focused 640×900 modal region against the reference modal. Reference uses abbreviated sample copy; implementation retains the full existing announcement and scrolls internally.
+- `blog-search-desktop.png`: focused input state in the surrounding 1920px page; computed inner input background is transparent.
+- `detail-desktop.png`: equal-height left and right panels; desktop gallery visible and mobile gallery hidden.
+- Additional 320px home/detail/article/announcement, 768px home and dark detail captures. `local-mobile-preview.png` is the local-result contact sheet.
+
+## Findings corrected through screenshot comparison
+
+1. P1: Original mobile hero and flow card delayed the first product. Converted flow to four compact steps, grouped overflow categories in More, compacted home cards and moved first-group sorting into the catalog title row. Final first-card viewport top: 727px at 390×844 and 715px at 320×800, with scrollY=0.
+2. P1: Compact hero initially covered the two characters. Adjusted portrait actor scale/position while retaining the existing animated artwork and desktop transform. Both character bodies and nets are now visible in the mobile hero gap. Existing motion/camera bounds tests pass.
+3. P1: Detail navigation and purchase bar competed for screen space. Classic branded detail now has a single fixed bottom purchase bar. At 320px it is 65px tall; bottom navigation is hidden on this route below 1024px. Desktop still uses its original purchase panel.
+4. P2: Scoped route styles initially overrode global mobile rules, exposing duplicate descriptions and old metadata. Increased branded stylesheet specificity; the duplicate desktop media copy is hidden on mobile, and mobile gallery is hidden on desktop.
+5. P2: Detail title wrapped unnecessarily and buttons were too narrow. Adjusted mobile title, price/stock spacing and flexible button widths. Title precedes gallery; selection and stock remain real controls/data.
+6. P2: Legacy announcement HTML forced 13px text. Reading surfaces override only the legacy wrapper typography, retain all copy and links, and give headings clear separation.
+7. P2: Blog input had an opaque inner rectangle. Transparent inner input plus pale glass outer field and visible cyan focus outline verified in browser.
+8. P2: Article summary occupied too much of the mobile page. Added three-line summary with working expand/collapse and a compact back link. Full article remains available.
+9. P2: More-category selection left keyboard focus in hidden content. Selecting a category closes the menu and returns focus to its summary. Confirmed selected Telegram category and SUMMARY focus.
+
+## Required fidelity surfaces
+
+- Typography: existing site font stack and deep teal text preserved. Compact mobile titles, 14–16px reading text, clearly separated article headings. Desktop typography outside the requested surfaces preserved.
+- Layout rhythm: mobile hero/flow/catalog sequence, title→gallery→price/spec→description ordering and single purchase bar follow the approved hierarchy. Actual SKU stock badges and longer safety/support copy account for additional vertical space compared with the illustrative mock.
+- Colors/tokens: shared pale ocean glass surfaces, bright thin borders, readable ink, cyan focus and dark-mode equivalents. Announcement outer panel remains transparent, inner pane is stronger for reading.
+- Images: original logos, real product covers, existing animated wallpaper and approved ocean-button raster assets retained. Product cover proportions are preserved instead of replacing them with the decorative mock cover. No generated mock screenshot was embedded as a UI.
+- Copy/content: existing full announcement, tutorials, product conditions, quantities, prices and inventory retained. No new refund guarantee or no-refund clause introduced. Compact home hint and summary controls have Simplified Chinese, Traditional Chinese and English translations.
+
+Intentional differences: the mock omits portions of the real announcement; these remain present in an internally scrollable reading pane. Existing CMS heading markers remain, and SKU options retain visible stock information. The selected ocean artwork is reused rather than redrawn. These do not block the approved local implementation. P3 follow-up only: exact decorative shell/bubble density varies with component width, and the compact first-group sort uses its library icon while exposing the full accessible label and full menu options.
+
+## Validation
+
+- Final typecheck and Vite production build passed: `work/codex-logs/ocean-ui-final-acceptance-20261023-133515.log` (35.74 seconds).
+- 19 existing tests passed: storefront pagination/sorting/pricing/stock, product search, contact-first products, and scene composition. Log: `work/codex-logs/ocean-ui-final-tests-20261023-133518.log`.
+- Browser: mobile category selection and focus return; product search; descending Telegram prices `278, 158, 115`; blog search for Binance returns the matching tutorial; article summary expand/collapse; desktop announcement focus wraps from first to last control; 320px announcement has contained scrolling and reachable footer controls.
+- Inspected captures have no horizontal document overflow. No console errors or warnings were observed on the verification tab.
+- Previous turn's article keyboard links and guest-query initial-state fixes remain in the same worktree.
+- No purchase/order/payment action, authenticated customer data or production environment was used in validation. Checkout/payment is not claimed as verified.
+
+## Implementation checklist
+
+- [x] Mobile layout and reading surfaces implemented locally.
+- [x] Existing navigation, commerce logic, imagery and full announcement content retained.
+- [x] Responsive, dark mode, keyboard and browser checks completed for affected surfaces.
+- [x] Source/render comparisons reviewed and meaningful mismatches corrected.
+- [x] Build and relevant tests passed; local preview left running.
+
+
+---
+
+# 海洋价格排序组件本地替换（2026-10-23）
+
+final result: passed
+
+- 用户明确授权按批准效果稿替换本地。共享 Storefront 的原生 select 换为 OceanPriceSort，沿用既有分类状态、价格排序函数、两种排序方向及翻译。使用项目现有 Reka Select 保持键盘、焦点、Esc、碰撞避让行为，使用现有 Lucide 排序/勾选图标。
+- Source visual truth: `C:/Users/admin/.codex/generated_images/01a16238-d7ef-71b2-8d40-8009a6c2159c/exec-e0b4b3df-e6f4-4248-9676-5f356c4ce1e1.png`，1488×1058，放大组件示意；顶部收起、底部展开。组件已按批准的紧凑实际尺寸呈现，未将示意图中的整页布局替换现有页面。
+- Implementation evidence: `D:/卡网/work/codex-runtime/ocean-sort/desktop-open-final.png` 与 `desktop-closed-final.png`，1920×1080 CSS 视口/截图，密度 1；`component-open-final.png` 为局部截图。`comparison.png` 在同一画布中比较批准图展开区与实际组件；实际组件仅在对照板放大 2 倍，原始页面截图不放大。
+- Full-view comparison: 检查批准图及最终 1920×1080 截图，保留分类标题、商品卡片与分类右侧的排序位置。参考是局部设计板而非整页，未将设计板标题“收起状态/展开状态”作为产品文案。全页背景、商品与现有导航保持原实现。
+- Focused comparison: `comparison.png`。收起按钮 190×44px，菜单 190×106px，间距 6px。两菜单项至少 44px，满足触屏使用；较设计稿留出实际点击空间。
+- Fonts/typography: 保留站点字体 Inter/PingFang SC/Microsoft YaHei，组件 14px/650，标签 13px/600，文字无截断；对应批准图深色中粗字层次。
+- Spacing/layout: 12px 圆角，图标/文字间距 10px，菜单与按钮齐右等宽；手机占据标签右侧可用宽度。390×844 与 320×800 已实测菜单完整，宽度分别 282/212px，菜单右边界 362/292px，没有横向溢出。
+- Colors/tokens: 浅青玻璃、白色细边与轻阴影，深绿文字；菜单提高底色覆盖以避免商品图影响选项辨认。`dark-open-final.png` 核验深色背景与浅色文本。
+- Image/asset fidelity: 复用批准的 `add-cart-20261022.png` 浪花/气泡/贝壳素材。菜单仅在底部显示原比例装饰，避免贝壳纵向拉长；真实文字与图标保持可访问和可选中。
+- Copy/content: 保留“价格排序”“价格从低到高”“价格从高到低”和分类专属可访问名称；价格、库存、购买链接及商品说明未改。
+- Interactions: 本地 Telegram 分类升序 ¥115/¥158/¥278，点击降序变为 ¥278/¥158/¥115，再切回升序恢复；ArrowDown+Enter 可切换到降序，Esc 关闭并返回触发器。控制台 error/warn 为空。
+- Comparison history: 首次弹层未继承 scoped 样式（P1，`desktop-open.png`）；改用专属全局类名后玻璃底色、字体与宽度恢复。随后修正菜单装饰纵向拉伸/中间多余边缘（P2）；最终 `desktop-open-final.png` / `comparison.png` 已确认修正，无未解决 P0/P1/P2。
+- Validation: `tests/storefront.test.ts` 9 项通过；Vue 类型及生产构建通过。日志位于 `D:/卡网/work/codex-logs/ocean-sort-*`。
+- Follow-up polish: 本地预览供用户检查。没有添加无关页面、变更业务数据、部署或推送 GitHub。
+
+---
+
 # 海洋主题 GitHub 提交验证（2026-10-23）
 
 final result: passed

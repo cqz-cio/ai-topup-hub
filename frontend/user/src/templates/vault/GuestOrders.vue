@@ -25,7 +25,7 @@
     </div>
 
     <!-- 空态 -->
-    <div v-if="orders.length === 0 && !loading" class="flex flex-col items-center gap-3 rounded-xl border border-dashed py-16 text-center text-muted-foreground">
+    <div v-if="hasSearched && orders.length === 0 && !loading && !error" class="flex flex-col items-center gap-3 rounded-xl border border-dashed py-16 text-center text-muted-foreground">
       <ClipboardList class="h-10 w-10 opacity-60" />
       <p>{{ emptyMessage }}</p>
     </div>
@@ -78,7 +78,7 @@ const { t } = useI18n()
 
 const {
   savedAuth, email, orderPassword, orderNo, loading, error, orders, pagination,
-  hasSavedAuth, clearSaved, handleSearch, emptyMessage, changePage,
+  hasSavedAuth, hasSearched, clearSaved, handleSearch, emptyMessage, changePage,
   statusLabel, statusVariant, formatMoney, formatDiscountMoney, hasDiscountAmount, hasDiscount, formatDate,
 } = useGuestOrders()
 </script>

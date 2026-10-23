@@ -35,9 +35,19 @@
       <div class="catalog-shell">
         <aside class="catalog-sidebar" :aria-label="t('shopUi.categories')">
           <h3>{{ t('shopUi.categories') }}</h3>
-          <nav class="category-nav" :aria-label="t('shopUi.categories')">
+          <nav class="category-nav desktop-category-nav" :aria-label="t('shopUi.categories')">
             <button type="button" :aria-pressed="selectedCategory === ''" :class="{ active: selectedCategory === '' }" @click="selectCategory('')">{{ t('shopUi.allProducts') }}<span>{{ products.length }}</span></button>
             <button v-for="category in categories" :key="category" type="button" :aria-pressed="selectedCategory === category" :class="{ active: selectedCategory === category }" @click="selectCategory(category)">{{ category }}<ArrowUpRight :size="13" aria-hidden="true" /></button>
+          </nav>
+          <nav class="mobile-category-nav" :aria-label="t('shopUi.categories')">
+            <button type="button" :aria-pressed="!selectedCategory" :class="{ active: !selectedCategory }" @click="selectCategory('')">{{ t('shopUi.allProducts') }}</button>
+            <button v-for="category in categories.slice(0, 2)" :key="category" type="button" :aria-pressed="selectedCategory === category" :class="{ active: selectedCategory === category }" @click="selectCategory(category)" :aria-label="category" :title="category">{{ category.startsWith('GPT（') ? 'GPT' : category }}</button>
+            <details v-if="categories.length > 2" ref="moreCategories" class="more-categories" @keydown.esc="closeMoreCategories">
+              <summary :class="{ active: categories.slice(2).includes(selectedCategory) }">{{ categories.slice(2).includes(selectedCategory) ? selectedCategory : t('shopUi.moreCategories') }}<ChevronDown :size="14" /></summary>
+              <div class="more-category-options">
+                <button v-for="category in categories.slice(2)" :key="category" type="button" :aria-pressed="selectedCategory === category" @click="selectCategory(category); closeMoreCategories()">{{ category }}<Check v-if="selectedCategory === category" :size="14" /></button>
+              </div>
+            </details>
           </nav>
           <div class="purchase-help">
             <ClipboardList :size="21" aria-hidden="true" /><h3>{{ t('shopUi.helpTitle') }}</h3><p>{{ t('shopUi.helpDescription') }}</p>
@@ -46,7 +56,7 @@
           </div>
         </aside>
         <div class="catalog-main">
-          <div class="delivery-notice"><Info :size="15" aria-hidden="true" /><p>{{ t('shopUi.deliveryNotice') }}</p></div>
+          <div class="delivery-notice"><Info :size="15" aria-hidden="true" /><p><span class="full-delivery-hint">{{ t('shopUi.deliveryNotice') }}</span><span class="compact-delivery-hint">{{ t('shopUi.chooseProductHint') }}</span></p></div>
           <div v-if="initialLoading" class="product-grid" :aria-label="t('shopUi.loading')" aria-busy="true">
             <div v-for="index in 6" :key="index" class="product-skeleton"><div></div><p></p><p></p><p></p></div>
           </div>
@@ -62,13 +72,11 @@
           <section v-for="group in visibleProductGroups" :key="group.category" class="catalog-group" :aria-label="group.category">
           <header class="catalog-group-heading">
             <h3>{{ group.category }}<span>{{ t('shopUi.productCount', { count: group.products.length }) }}</span></h3>
-            <label class="catalog-price-sort">
-              <span>{{ t('shopUi.priceSort') }}</span>
-              <select :value="categoryPriceOrders[group.category] || 'asc'" :aria-label="t('shopUi.categoryPriceSort', { category: group.category })" @change="setCategoryPriceOrder(group.category, $event)">
-                <option value="asc">{{ t('shopUi.priceLowToHigh') }}</option>
-                <option value="desc">{{ t('shopUi.priceHighToLow') }}</option>
-              </select>
-            </label>
+            <OceanPriceSort
+              :model-value="categoryPriceOrders[group.category] || 'asc'"
+              :category="group.category"
+              @update:model-value="categoryPriceOrders[group.category] = $event"
+            />
           </header>
           <CodexCreditsSection v-if="group.hasCredits" :products="group.products" catalog>
             <template #products>
@@ -104,7 +112,7 @@ import '../styles/storefrontGlass.css'
 import SupportContacts from '../components/SupportContacts.vue'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
-import { ArrowUpRight, ArrowRight, Check, Copy, Info, PackageOpen, Search, ShoppingBag, ClipboardList } from 'lucide-vue-next'
+import { ArrowUpRight, ArrowRight, ChevronDown, Check, Copy, Info, PackageOpen, Search, ShoppingBag, ClipboardList } from 'lucide-vue-next'
 import { useI18n } from 'vue-i18n'
 import { categoryAPI, productAPI } from '../api/product'
 import { useAppStore } from '../stores/app'
@@ -113,6 +121,7 @@ import { usePageSeo } from '../composables/usePageSeo'
 import AnnouncementModal from '../components/AnnouncementModal.vue'
 import CodexCreditsSection from '../components/commerce/CodexCreditsSection.vue'
 import StorefrontProductCard from '../components/commerce/StorefrontProductCard.vue'
+import OceanPriceSort from '../components/commerce/OceanPriceSort.vue'
 import { codexCreditPoints } from '../utils/codexCredits'
 import { matchesProductSearch } from '../utils/productSearch'
 import { useAnnouncement, type HomeAnnouncement } from '../composables/useAnnouncement'
@@ -159,10 +168,15 @@ const initialLoading = ref(true)
 const refreshing = ref(false)
 const loadFailed = ref(false)
 const selectedCategory = ref('')
-const categoryPriceOrders = ref<Record<string, StorefrontPriceOrder>>({})
-const setCategoryPriceOrder = (category: string, event: Event) => {
-  categoryPriceOrders.value[category] = (event.target as HTMLSelectElement).value === 'desc' ? 'desc' : 'asc'
+const moreCategories = ref<HTMLDetailsElement | null>(null)
+const closeMoreCategories = () => {
+  const menu = moreCategories.value
+  if (!menu) return
+  const restoreFocus = menu.contains(document.activeElement)
+  menu.open = false
+  if (restoreFocus) menu.querySelector('summary')?.focus()
 }
+const categoryPriceOrders = ref<Record<string, StorefrontPriceOrder>>({})
 const search = ref('')
 const failedImages = ref(new Set<string>())
 const copyMessage = ref('')
@@ -192,6 +206,7 @@ const syncCategoryFromRoute = () => {
     : ''
 }
 const selectCategory = (category: string) => {
+  closeMoreCategories()
   selectedCategory.value = category
   if (!catalogOnly) return
   const row = categoryRows.value.find((item) => storefrontText(item.name, appStore.locale) === category)
@@ -440,10 +455,6 @@ onUnmounted(() => {
 .catalog-group-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin: 0 0 16px; }
 .catalog-group-heading h3 { min-width: 0; font-size: 18px; font-weight: 700; overflow-wrap: anywhere; }
 .catalog-group-heading h3 span { display: block; margin-top: 4px; font-size: 12px; font-weight: 500; color: var(--ui-text-muted); }
-.catalog-price-sort { display: flex; align-items: center; gap: 8px; max-width: 100%; color: var(--ui-text-primary); font-size: 13px; font-weight: 600; }
-.catalog-price-sort > span { flex-shrink: 0; }
-.catalog-price-sort select { min-width: 0; max-width: 100%; min-height: 44px; padding: 8px 30px 8px 12px; border: 1px solid var(--ui-border-strong); border-radius: 9px; background-color: var(--ui-bg-elevated); color: var(--ui-text-primary); font: inherit; cursor: pointer; }
-@media(max-width:767px) { .catalog-price-sort { width: 100%; } .catalog-price-sort select { flex: 1; font-size: 16px; } }
 .delivery-notice { display: flex; align-items: flex-start; gap: 8px; color: var(--ui-text-muted); font-size: 12px; line-height: 1.7; margin-bottom: 16px; }
 .delivery-notice > svg { color: var(--ui-success); flex-shrink: 0; }
 .product-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }

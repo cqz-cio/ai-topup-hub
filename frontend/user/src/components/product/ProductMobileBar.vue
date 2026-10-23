@@ -6,7 +6,7 @@
     leave-active-class="transition duration-200 ease-in"
     leave-from-class="translate-y-0 opacity-100"
     leave-to-class="translate-y-full opacity-0">
-    <div v-if="visible"
+    <div v-if="visible" :class="{ 'standalone-purchase-bar': standalone }"
       class="lg:hidden fixed bottom-[calc(3.5rem+env(safe-area-inset-bottom))] left-0 right-0 z-40 bg-card/95 backdrop-blur-xl border-t shadow-2xl">
       <div class="flex items-center gap-3 px-4 py-3">
         <!-- Price -->
@@ -54,6 +54,7 @@ import OceanPurchaseButton from './OceanPurchaseButton.vue'
 const { t } = useI18n()
 
 defineProps<{
+  standalone?: boolean
   contactFirst?: boolean
   visible: boolean
   requiresLogin: boolean

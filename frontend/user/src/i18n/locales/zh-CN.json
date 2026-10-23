@@ -101,6 +101,8 @@
     "loadFailed": "暂时无法确认功能状态，请刷新后重试。"
   },
   "shopUi": {
+    "chooseProductHint": "选择你需要的商品，快速完成下单。",
+    "moreCategories": "更多",
     "priceSort": "价格排序",
     "categoryPriceSort": "{category}价格排序",
     "priceLowToHigh": "价格从低到高",
@@ -409,6 +411,8 @@
     "relatedProducts": "相关商品"
   },
   "blogDetail": {
+    "expandSummary": "展开摘要",
+    "collapseSummary": "收起摘要",
     "backToBlog": "返回博客列表",
     "backToNotice": "返回公告列表",
     "notFound": "文章不存在"

@@ -14,7 +14,7 @@
       <!-- Search Box -->
       <div class="mb-12 max-w-xl mx-auto">
         <div
-          class="relative bg-card backdrop-blur-md border rounded-2xl flex items-center px-5 py-3 transition-all focus-within:shadow-lg focus-within:border-primary">
+          class="ocean-search relative bg-card backdrop-blur-md border rounded-2xl flex items-center px-5 py-3 transition-all focus-within:shadow-lg focus-within:border-primary">
           <Search class="w-5 h-5 text-muted-foreground shrink-0" />
           <input v-model="searchKeyword" type="text" :placeholder="t('blog.searchPlaceholder')"
             class="flex-1 bg-transparent border-none outline-none px-3 text-foreground placeholder:text-muted-foreground" />
@@ -35,8 +35,8 @@
       <div v-else-if="posts.length > 0">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <article v-for="post in posts" :key="post.id"
-            class="group bg-card backdrop-blur-xl border rounded-2xl overflow-hidden shadow-sm hover:bg-muted/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl cursor-pointer flex flex-col"
-            @click="goToPost(post.slug)">
+            class="group relative bg-card backdrop-blur-xl border rounded-2xl overflow-hidden shadow-sm hover:bg-muted/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl cursor-pointer flex flex-col"
+            >
             <!-- Thumbnail -->
             <div v-if="post.thumbnail" class="h-48 overflow-hidden relative">
               <img :src="getImageUrl(post.thumbnail)" :alt="getLocalizedText(post.title)"
@@ -56,7 +56,7 @@
 
               <h2
                 class="text-2xl font-bold mb-4 text-foreground transition-colors line-clamp-2 leading-tight">
-                {{ getLocalizedText(post.title) }}
+                <RouterLink :to="`/blog/${post.slug}`" class="post-card-link">{{ getLocalizedText(post.title) }}</RouterLink>
               </h2>
 
               <p class="text-muted-foreground text-sm mb-8 line-clamp-3 leading-relaxed flex-1">
@@ -92,6 +92,7 @@
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
+import { RouterLink } from 'vue-router'
 import { ArrowRight, BookOpen, Search } from 'lucide-vue-next'
 import { getImageUrl } from '../utils/image'
 import { Badge } from '@/components/ui/badge'
@@ -104,11 +105,17 @@ const { t } = useI18n()
 
 const {
   loading, posts, currentPage, totalPages, searchKeyword,
-  getLocalizedText, formatDate, goToPost, changePage,
+  getLocalizedText, formatDate, changePage,
 } = usePostList('blog', { title: () => t('nav.blog'), canonicalPath: '/blog' })
 </script>
 
 <style scoped>
+/* A real link preserves keyboard activation, open-in-new-tab and link semantics. */
+.post-card-link { color: inherit; text-decoration: none; }
+.post-card-link::after { content: ''; position: absolute; inset: 0; border-radius: 16px; }
+.post-card-link:focus-visible { outline: none; }
+.post-card-link:focus-visible::after { outline: 2px solid var(--ui-text-primary); outline-offset: 4px; }
+
 .line-clamp-2 {
   overflow: hidden;
   display: -webkit-box;

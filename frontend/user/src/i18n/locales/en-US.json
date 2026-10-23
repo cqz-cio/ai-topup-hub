@@ -101,6 +101,8 @@
     "loadFailed": "Unable to confirm availability. Please refresh and try again."
   },
   "shopUi": {
+    "chooseProductHint": "Choose a product to get started.",
+    "moreCategories": "More",
     "priceSort": "Sort by price",
     "categoryPriceSort": "Sort {category} by price",
     "priceLowToHigh": "Price: low to high",
@@ -458,6 +460,8 @@
     "relatedProducts": "Related Products"
   },
   "blogDetail": {
+    "expandSummary": "Expand summary",
+    "collapseSummary": "Collapse summary",
     "backToBlog": "Back to Blog",
     "backToNotice": "Back to Notice",
     "notFound": "Article not found"

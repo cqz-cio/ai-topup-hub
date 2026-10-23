@@ -32,7 +32,7 @@
         </main>
         <Footer v-if="!isResellerConsole" />
         <BackToTop v-if="!isResellerConsole" />
-        <MobileBottomNav v-if="!isResellerConsole" />
+        <MobileBottomNav v-if="!isResellerConsole" :class="{ 'detail-bottom-nav': hasProductScene }" />
       </template>
 
       <Loading :loading="appStore.loading" />
@@ -48,6 +48,7 @@
 import { computed, defineAsyncComponent } from 'vue'
 import './styles/productDetailScene.css'
 import './styles/brandPageScenes.css'
+import './styles/oceanReading.css'
 import { getBrandPageScene } from './utils/brandPageScene'
 import { ConfigProvider } from 'reka-ui'
 import { useRoute } from 'vue-router'

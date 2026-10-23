@@ -29,7 +29,7 @@
       </div>
 
       <EmptyState
-        v-if="orders.length === 0 && !loading"
+        v-if="hasSearched && orders.length === 0 && !loading && !error"
         icon="order"
         :description="emptyMessage"
       />
@@ -99,7 +99,7 @@ const { t } = useI18n()
 
 const {
   savedAuth, email, orderPassword, orderNo, loading, error, orders, pagination,
-  hasSavedAuth, clearSaved, handleSearch, emptyMessage, changePage,
+  hasSavedAuth, hasSearched, clearSaved, handleSearch, emptyMessage, changePage,
   statusLabel, statusVariant, formatMoney, formatDiscountMoney, hasDiscountAmount, hasDiscount, formatDate,
 } = useGuestOrders()
 </script>

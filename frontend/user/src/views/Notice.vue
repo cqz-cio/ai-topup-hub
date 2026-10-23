@@ -21,8 +21,8 @@
       <!-- Notices List -->
       <div v-else-if="notices.length > 0" class="max-w-4xl mx-auto space-y-4">
         <article v-for="notice in notices" :key="notice.id"
-          class="group rounded-2xl border bg-card backdrop-blur-xl p-6 md:p-8 shadow-sm transition-all duration-300 hover:-translate-x-1 hover:shadow-md cursor-pointer flex items-center gap-6"
-          @click="goToNotice(notice.slug)">
+          class="group relative rounded-2xl border bg-card backdrop-blur-xl p-6 md:p-8 shadow-sm transition-all duration-300 hover:-translate-x-1 hover:shadow-md cursor-pointer flex items-center gap-6"
+          >
           <!-- Icon Column -->
           <div
             class="hidden sm:flex flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden bg-secondary border items-center justify-center text-primary group-hover:scale-105 transition-transform">
@@ -44,7 +44,7 @@
 
             <h2
               class="text-xl font-bold text-foreground group-hover:text-primary transition-colors truncate mb-1">
-              {{ getLocalizedText(notice.title) }}
+              <RouterLink :to="`/blog/${notice.slug}`" class="post-card-link">{{ getLocalizedText(notice.title) }}</RouterLink>
             </h2>
 
             <p class="text-muted-foreground text-sm line-clamp-1">
@@ -77,6 +77,7 @@
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
+import { RouterLink } from 'vue-router'
 import { Bell, ChevronRight } from 'lucide-vue-next'
 import { getImageUrl } from '../utils/image'
 import { Badge } from '@/components/ui/badge'
@@ -88,11 +89,17 @@ const { t } = useI18n()
 
 const {
   loading, posts: notices, currentPage, totalPages,
-  getLocalizedText, formatDate, goToPost: goToNotice, changePage,
+  getLocalizedText, formatDate, changePage,
 } = usePostList('notice', { title: () => t('nav.notice'), canonicalPath: '/notice' })
 </script>
 
 <style scoped>
+/* A real link preserves keyboard activation, open-in-new-tab and link semantics. */
+.post-card-link { color: inherit; text-decoration: none; }
+.post-card-link::after { content: ''; position: absolute; inset: 0; border-radius: 16px; }
+.post-card-link:focus-visible { outline: none; }
+.post-card-link:focus-visible::after { outline: 2px solid var(--ui-text-primary); outline-offset: 4px; }
+
 .line-clamp-1 {
   overflow: hidden;
   display: -webkit-box;

@@ -49,6 +49,7 @@
           <div class="product-overview-layout">
             <div class="product-media-panel">
               <ProductImageGallery
+                class="desktop-product-gallery"
                 :images="images"
                 :current-image="currentImage"
                 :product-title="getLocalizedText(product.title)"
@@ -104,6 +105,7 @@
                   </Badge>
                 </div>
 
+                <ProductImageGallery class="mobile-product-gallery" :images="images" :current-image="currentImage" :product-title="getLocalizedText(product.title)" @update:current-image="currentImage = $event" />
                 <div class="product-price-options">
                 <div class="product-price" ref="priceSection">
                   <div class="mb-3 flex flex-wrap items-center gap-2">
@@ -262,9 +264,13 @@
 
               </div>
 
-              <ProductPurchaseGuide :slug="product.slug" hide-redemption class="product-conditions product-conditions-mobile" />
+              <section v-if="getLocalizedText(product.description)" class="mobile-product-description ocean-reading-surface product-description">
+                <h2><FileText :size="19" />{{ t('productDetail.description') }}</h2>
+                <p>{{ getLocalizedText(product.description) }}</p>
+              </section>
+              <ProductPurchaseGuide :slug="product.slug" hide-redemption class="product-conditions product-conditions-mobile ocean-reading-surface" />
 
-              <ProductRedemptionGuide :slug="product.slug" class="product-delivery-note" />
+              <ProductRedemptionGuide :slug="product.slug" class="product-delivery-note ocean-reading-surface" />
 
               <!-- Quantity Selector -->
                 <div v-if="!contactFirst" class="product-quantity">
@@ -303,7 +309,7 @@
                 </div>
 
               <!-- Purchase Actions (Desktop + original position) -->
-              <div ref="purchaseActionsRef" class="product-actions space-y-4">
+              <div class="product-actions space-y-4">
                 <Alert v-if="!contactFirst && cannotPurchaseReason" variant="destructive">
                   <AlertDescription class="font-semibold">{{ cannotPurchaseReason }}</AlertDescription>
                 </Alert>
@@ -385,7 +391,8 @@
         <!-- Mobile Fixed Purchase Bar -->
         <ProductMobileBar
           :contact-first="contactFirst"
-          :visible="showMobileBar && !!product && !loading"
+          :visible="!!product && !loading"
+          standalone
           :requires-login="requiresLogin"
           :can-purchase="canPurchase"
           :show-member-price="mobileBarShowMemberPrice"
@@ -431,9 +438,9 @@ import ProductContactButton from '../components/product/ProductContactButton.vue
 import ProductRedemptionGuide from '../components/product/ProductRedemptionGuide.vue'
 import ProductInvoiceNotice from '../components/commerce/ProductInvoiceNotice.vue'
 import CheckoutSteps from '../components/checkout/CheckoutSteps.vue'
-import { ref, onUnmounted } from 'vue'
+
 import { useI18n } from 'vue-i18n'
-import { ArrowLeft, Lock, Minus, Pencil, Plus, RotateCw, Tag, UserPlus, Zap } from 'lucide-vue-next'
+import { ArrowLeft, FileText, Lock, Minus, Pencil, Plus, RotateCw, Tag, UserPlus, Zap } from 'lucide-vue-next'
 import { getImageUrl } from '../utils/image'
 import ProductDetailContent from '../components/product/ProductDetailContent.vue'
 import { useProductDetail } from '../composables/useProductDetail'
@@ -446,26 +453,6 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 
 const { t } = useI18n()
-
-// 视图专属：移动端固定购买条（IntersectionObserver 监听桌面购买区是否出屏）
-const purchaseActionsRef = ref<HTMLElement | null>(null)
-const showMobileBar = ref(false)
-let observer: IntersectionObserver | null = null
-
-const setupMobileBarObserver = () => {
-  if (observer) observer.disconnect()
-  if (!purchaseActionsRef.value) return
-  observer = new IntersectionObserver(
-    (entries) => {
-      const entry = entries[0]
-      if (entry) {
-        showMobileBar.value = !entry.isIntersecting
-      }
-    },
-    { threshold: 0.1 }
-  )
-  observer.observe(purchaseActionsRef.value)
-}
 
 // 全部业务逻辑由 useProductDetail 提供（与 vault 模板共用，保证功能一致）
 const {
@@ -491,14 +478,8 @@ const {
   mobileBarShowSkuPromotionPrice, mobileBarSkuPromotionPriceDisplay,
   mobileBarShowSkuPrice, mobileBarSkuPriceDisplay,
   mobileBarShowProductPromotionPrice, mobileBarProductPromotionPriceDisplay, mobileBarProductPriceDisplay,
-} = useProductDetail({ onLoaded: () => setupMobileBarObserver() })
+} = useProductDetail()
 
-onUnmounted(() => {
-  if (observer) {
-    observer.disconnect()
-    observer = null
-  }
-})
 </script>
 
 <style scoped>

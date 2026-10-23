@@ -3,6 +3,7 @@ import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import DOMPurify from 'dompurify'
 import { AlertTriangle, CheckCircle2, Info, Megaphone, X } from 'lucide-vue-next'
+import { useAppStore } from '../stores/app'
 import { Button } from '@/components/ui/button'
 import { useLocalized } from '../composables/useProduct'
 import { processHtmlForDisplay } from '../utils/content'
@@ -18,6 +19,7 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+const appStore = useAppStore()
 const { getLocalizedText } = useLocalized()
 const { dismissForever, dismissToday, closeForSession } = useAnnouncement()
 
@@ -77,8 +79,15 @@ const handleDismissForever = () => {
 }
 
 const dialogRef = ref<HTMLElement | null>(null)
+let previousFocus: HTMLElement | null = null
 
 const onKeydown = (e: KeyboardEvent) => {
+  if (e.key === 'Tab' && dialogRef.value) {
+    const items = [...dialogRef.value.querySelectorAll<HTMLElement>('button:not([disabled]), a[href], [tabindex="0"]')].filter(el => el.getClientRects().length)
+    const first = items[0], last = items[items.length - 1]
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus() }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus() }
+  }
   if (e.key === 'Escape') {
     handleClose()
   }
@@ -88,12 +97,14 @@ watch(
   () => props.visible,
   async (isVisible) => {
     if (isVisible) {
+      previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null
       document.addEventListener('keydown', onKeydown)
       await nextTick()
       const firstButton = dialogRef.value?.querySelector('button') as HTMLElement | null
       firstButton?.focus()
     } else {
       document.removeEventListener('keydown', onKeydown)
+      previousFocus?.focus()
     }
   },
   { immediate: true },
@@ -116,10 +127,11 @@ onBeforeUnmount(() => {
     >
       <div
         v-if="visible"
+        :class="{ 'ocean-announcement': !appStore.isResellerTenant }"
         class="fixed inset-0 z-[120] flex items-center justify-center p-4 sm:p-6"
         @click.self="handleClose"
       >
-        <div class="fixed inset-0 bg-black/55 backdrop-blur-md" aria-hidden="true" />
+        <div class="announcement-overlay fixed inset-0 bg-black/55 backdrop-blur-md" aria-hidden="true" @click="handleClose" />
         <Transition
           enter-active-class="transition duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
           enter-from-class="opacity-0 scale-95 translate-y-3"
@@ -134,11 +146,11 @@ onBeforeUnmount(() => {
             role="dialog"
             aria-modal="true"
             aria-labelledby="announcement-modal-title"
-            class="bg-card text-card-foreground relative z-10 flex max-h-[86vh] w-full max-w-lg flex-col overflow-hidden rounded-3xl border"
+            class="announcement-dialog bg-card text-card-foreground relative z-10 flex max-h-[86vh] w-full max-w-lg flex-col overflow-hidden rounded-3xl border"
             style="box-shadow: var(--ui-shadow-card)"
           >
             <!-- Header -->
-            <div class="flex items-center gap-4 px-6 pb-5 pt-6">
+            <div class="announcement-header flex items-center gap-4 px-6 pb-5 pt-6">
               <div
                 class="flex size-12 shrink-0 items-center justify-center rounded-2xl ring-1 ring-inset"
                 :class="typeStyle.iconWrap"
@@ -162,12 +174,12 @@ onBeforeUnmount(() => {
             </div>
 
             <!-- Body -->
-            <div class="min-h-0 flex-1 overflow-y-auto px-6 pb-2">
+            <div class="announcement-body min-h-0 flex-1 overflow-y-auto px-6 pb-2" tabindex="0">
               <div class="theme-prose prose prose-sm max-w-none dark:prose-invert" v-html="sanitizedContent"></div>
             </div>
 
             <!-- Footer -->
-            <div class="flex flex-col gap-3 border-t px-6 pb-5 pt-4 sm:flex-row sm:items-center sm:justify-between">
+            <div class="announcement-footer flex flex-col gap-3 border-t px-6 pb-5 pt-4 sm:flex-row sm:items-center sm:justify-between">
               <div class="flex items-center justify-center gap-2 text-xs sm:justify-start">
                 <Button
                   variant="link"

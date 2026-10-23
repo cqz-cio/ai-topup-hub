@@ -15,7 +15,7 @@
       <!-- Post Content -->
       <article v-else-if="post">
         <!-- Breadcrumb -->
-        <nav class="mb-8 flex items-center space-x-2 text-sm text-muted-foreground font-medium">
+        <nav class="article-breadcrumb mb-8 flex items-center space-x-2 text-sm text-muted-foreground font-medium">
           <router-link to="/" class="text-muted-foreground transition-colors hover:text-foreground">{{ t('nav.home')
           }}</router-link>
           <span>/</span>
@@ -25,8 +25,9 @@
           <span class="text-foreground truncate max-w-[200px]">{{ getLocalizedText(post.title) }}</span>
         </nav>
 
+        <router-link :to="backLink" class="mobile-article-back"><ArrowLeft :size="17" />{{ backText }}</router-link>
         <Card
-          class="backdrop-blur-xl rounded-3xl p-8 md:p-12 shadow-2xl relative overflow-hidden">
+          class="ocean-article-card backdrop-blur-xl rounded-3xl p-8 md:p-12 shadow-2xl relative overflow-hidden">
           <!-- Featured Image -->
           <div v-if="post.thumbnail" class="mb-12 relative h-64 md:h-96 rounded-2xl overflow-hidden group">
             <img :src="getImageUrl(post.thumbnail)" :alt="getLocalizedText(post.title)"
@@ -49,9 +50,10 @@
               {{ getLocalizedText(post.title) }}
             </h1>
 
-            <p v-if="post.summary" class="text-xl text-muted-foreground leading-relaxed font-light">
+            <p v-if="post.summary" id="article-summary" class="article-summary text-xl text-muted-foreground leading-relaxed font-light" :class="{ 'is-expanded': summaryExpanded }">
               {{ getLocalizedText(post.summary) }}
             </p>
+            <button v-if="post.summary" type="button" class="summary-toggle" :aria-expanded="summaryExpanded" aria-controls="article-summary" @click="summaryExpanded = !summaryExpanded">{{ t(summaryExpanded ? 'blogDetail.collapseSummary' : 'blogDetail.expandSummary') }}<ChevronDown :size="16" :class="{ 'rotate-180': summaryExpanded }" /></button>
           </header>
 
           <!-- Post Content -->
@@ -116,8 +118,9 @@
 </template>
 
 <script setup lang="ts">
+import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ArrowLeft, AlertCircle } from 'lucide-vue-next'
+import { ArrowLeft, AlertCircle, ChevronDown } from 'lucide-vue-next'
 import { getImageUrl } from '../utils/image'
 import { processHtmlForDisplay } from '../utils/content'
 import { Badge } from '@/components/ui/badge'
@@ -130,4 +133,6 @@ const { t } = useI18n()
 const {
   loading, post, relatedProducts, getLocalizedText, formatDate, formatPrice, backLink, backText,
 } = useBlogDetail()
+const summaryExpanded = ref(false)
+watch(() => post.value?.id, () => { summaryExpanded.value = false })
 </script>

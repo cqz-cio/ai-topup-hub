@@ -17,6 +17,7 @@ export function useGuestOrders() {
   const orderPassword = ref('')
   const orderNo = ref('')
   const loading = ref(false)
+  const hasSearched = ref(false)
   const error = ref('')
   const orders = ref<any[]>([])
   const pagination = ref({
@@ -44,6 +45,7 @@ export function useGuestOrders() {
   }
 
   const clearSaved = () => {
+    hasSearched.value = false
     clearGuestOrderAuth()
     savedAuth.value = { email: '', order_password: '' }
     email.value = ''
@@ -71,6 +73,7 @@ export function useGuestOrders() {
 
   const loadOrders = async (page: number) => {
     loading.value = true
+    hasSearched.value = false
     try {
       const response = await guestOrderAPI.list({
         email: email.value,
@@ -80,6 +83,7 @@ export function useGuestOrders() {
         page_size: pagination.value.page_size,
       })
       orders.value = response.data.data || []
+      hasSearched.value = true
       pagination.value = response.data.pagination || pagination.value
       if (orderNo.value && orders.value.length === 0) {
         error.value = t('guestOrders.errors.notFound')
@@ -169,6 +173,7 @@ export function useGuestOrders() {
     orderPassword,
     orderNo,
     loading,
+    hasSearched,
     error,
     orders,
     pagination,

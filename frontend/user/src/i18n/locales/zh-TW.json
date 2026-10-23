@@ -101,6 +101,8 @@
     "loadFailed": "暫時無法確認功能狀態，請重新整理後重試。"
   },
   "shopUi": {
+    "chooseProductHint": "選擇你需要的商品，快速完成下單。",
+    "moreCategories": "更多",
     "priceSort": "價格排序",
     "categoryPriceSort": "{category}價格排序",
     "priceLowToHigh": "價格從低到高",
@@ -458,6 +460,8 @@
     "relatedProducts": "相關商品"
   },
   "blogDetail": {
+    "expandSummary": "展開摘要",
+    "collapseSummary": "收起摘要",
     "backToBlog": "返回部落格列表",
     "backToNotice": "返回公告列表",
     "notFound": "文章不存在"
