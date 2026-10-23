@@ -410,12 +410,12 @@
   "previous_build_verification_at": "2026-10-12T08:19:31.766441+00:00",
   "management_url": "https://admin.qzweb.cloud/login",
   "frontend_gateway": {
-    "checked_at": "2026-10-22T22:58:25.649995+08:00",
+    "checked_at": "2026-10-23T05:56:09.261299+00:00",
     "frontend_host": "124.220.2.69",
     "backend_host": "43.134.141.10",
-    "frontend_release": "20261022-223144",
-    "source_commit": "e212df4ae0e25c58625c027a8ac0676b810fed44",
-    "static_files_verified": 260,
+    "frontend_release": "20261023-134652",
+    "source_commit": "1912b0ef6ef32c923c050e7647e54bcf68816765",
+    "static_files_verified": 1860,
     "storefront_url": "https://www.qzweb.cloud/",
     "management_url": "https://admin.qzweb.cloud/login",
     "www_dns_record": "www A 124.220.2.69",
@@ -431,7 +431,7 @@
     "certificate_renewal_verified": true,
     "certificate_timer": "qzweb-certificates.timer",
     "certificate_renewal_report": "/srv/zhixiang-front/shared/work/renew-final-20261012-1644/status.json",
-    "report_path": "work/codex-runtime/price-sort-release-20261022/verified-report.json",
+    "report_path": "/srv/zhixiang-front/shared/work/ocean-ui-20261023-134652.json",
     "backend_report_path": "/srv/zhixiang/shared/reports/paid-order-deadlock-20261016-190912.json",
     "formal_alipay_enabled": false,
     "database_uploaded": false,
@@ -445,10 +445,10 @@
       "browser_current_frontend_confirmed": true,
       "report_path": "/srv/zhixiang-front/shared/work/entry-cache-report.json"
     },
-    "previous_frontend_release": "20261021-223841",
-    "storefront_source_commit": "e212df4ae0e25c58625c027a8ac0676b810fed44",
+    "previous_frontend_release": "20261022-223144",
+    "storefront_source_commit": "1912b0ef6ef32c923c050e7647e54bcf68816765",
     "admin_source_commit": "297f11deef4d7193081270c55f60c6ba5cdd7295",
-    "backup": "/srv/zhixiang-front/backups/before-price-sort-20261022-223144",
+    "backup": "/srv/zhixiang-front/backups/before-ocean-ui-20261023-134652",
     "frontend_only_update": true,
     "previous_hashed_assets_retained": true,
     "verified_services": {
@@ -456,21 +456,21 @@
       "zhixiang-api-tunnel": "active",
       "qzweb-certificates.timer": "active"
     },
-    "release_scope": "Independent category price sorting; preserve existing media loading, animations and product detail refresh.",
+    "release_scope": "Approved ocean scenes, bouncing bubbles, controls, mobile layout and reading improvements",
     "admin_files_verified": 1459,
-    "storefront_files_verified": 260,
+    "storefront_files_verified": 401,
     "backend_program_preserved": true,
     "backend_setting_changes": [],
-    "frontend_build_source_commit": "e212df4ae0e25c58625c027a8ac0676b810fed44",
+    "frontend_build_source_commit": "1912b0ef6ef32c923c050e7647e54bcf68816765",
     "frontend_source_identical_to_backend": false,
     "admin_base": "/",
     "base_repair_backup": "/srv/zhixiang-front/backups/before-xorpay-admin-base-20261013-173020",
-    "frontend_source_difference": "Storefront e212df4; backend 58c8569 (20261020-144132); admin 297f11d (20261019-160954).",
+    "frontend_source_difference": "Storefront 1912b0ef6ef32c923c050e7647e54bcf68816765; backend 20261020-144132 and admin 20261019-160954 unchanged.",
     "source_dirty": false,
-    "source_tag": "production/price-sort-20261022-223144",
+    "source_tag": "production/ocean-ui-20261023-134652",
     "static_verification_scope": "260 files verified; existing assets retained; 56 public checks.",
     "retained_files_preserved": true,
-    "storefront_release": "20261022-223144",
+    "storefront_release": "20261023-134652",
     "admin_release": "20261019-160954",
     "legacy_singapore_embedded_frontend_public": false,
     "legacy_singapore_frontend_behavior": "308 to maintained Shanghai storefront/admin; API/uploads/health retained",
@@ -486,7 +486,7 @@
     "previous_directory_inventory_count": 11201,
     "nginx_configuration_source_commit": "17a1c6df26f3f6b923db8bb317398dc3ae9ed73a",
     "nginx_change_scope": "No Nginx changes",
-    "storefront_files_preserved": 9354,
+    "storefront_files_preserved": 9928,
     "old_files_preserved": 10813
   },
   "alipay": {
@@ -3373,5 +3373,92 @@
     "backend_admin_preserved": true,
     "prices_channels_preserved": true,
     "stock_services_successful": true
+  },
+  "ocean_ui_20261023": {
+    "passed": true,
+    "checked_at": "2026-10-23T05:56:09.261299+00:00",
+    "release": "20261023-134652",
+    "source_commit": "1912b0ef6ef32c923c050e7647e54bcf68816765",
+    "tests": 185,
+    "typecheck": true,
+    "build": true,
+    "public_scan_files": 401,
+    "localBuildIdentical": true,
+    "frontend": {
+      "status": "complete",
+      "release": "20261023-134652",
+      "source_commit": "1912b0ef6ef32c923c050e7647e54bcf68816765",
+      "current": "/srv/zhixiang-front/releases/20261023-134652",
+      "backup": "/srv/zhixiang-front/backups/before-ocean-ui-20261023-134652",
+      "user_files_verified": 401,
+      "admin_files_preserved": 1459,
+      "old_user_files_preserved": 9928,
+      "nginx_files_preserved": 57,
+      "nginx_unchanged": true,
+      "backend_restarted": false,
+      "database_uploaded": false,
+      "approved_covers_verified": 0
+    },
+    "backup_singapore": "/srv/zhixiang/backups/before-ocean-ui-20261023-134652",
+    "public_checks": 43,
+    "production_browser": {
+      "passed": true,
+      "checks": [
+        {
+          "overflow": false,
+          "page": "/products/qzweb-4",
+          "scene": "ready",
+          "width": 320
+        },
+        {
+          "heading": "好用的数字服务，轻松拥有。",
+          "overflow": false,
+          "page": "/",
+          "width": 390
+        },
+        {
+          "page": "/",
+          "interaction": "category descending sort",
+          "passed": true
+        },
+        {
+          "initialPrompt": true,
+          "overflow": false,
+          "page": "/guest/orders",
+          "scene": "ready",
+          "width": 390
+        },
+        {
+          "keyboardNavigation": true,
+          "overflow": false,
+          "page": "/blog/purchase-and-agent-guide",
+          "scene": "ready",
+          "summaryToggle": true,
+          "width": 390
+        },
+        {
+          "broken": 0,
+          "overflow": false,
+          "page": "/products",
+          "scene": "ready",
+          "width": 1920
+        }
+      ],
+      "darkModeVerified": true,
+      "announcementVerified": true,
+      "errors": []
+    },
+    "backend_unchanged": true,
+    "asset_directory_fix": {
+      "changed_directories": {
+        "/srv/zhixiang-front/releases/20261023-134652/user/brand/ocean-buttons": "0o700",
+        "/srv/zhixiang-front/releases/20261023-134652/user/brand/scenes": "0o700",
+        "/srv/zhixiang-front/releases/20261023-134652/user/brand/scenes/bubbles-20261023": "0o700"
+      },
+      "file_bytes_unchanged": true,
+      "scope": "Only newly published public image directories"
+    },
+    "database_uploaded": false,
+    "real_payment_or_purchase_performed": false
   }
 }
