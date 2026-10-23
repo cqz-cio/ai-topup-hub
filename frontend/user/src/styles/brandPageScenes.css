@@ -1,0 +1,96 @@
+/* The approved scene is fixed to the viewport; only content scrolls. */
+.brand-scene.brand-route-scene {
+  --brand-scene-wash: .14;
+  --scene-glass: rgb(255 255 255 / 24%);
+  --scene-glass-soft: rgb(255 255 255 / 16%);
+  --scene-edge: rgb(255 255 255 / 68%);
+  --scene-input: rgb(255 255 255 / 70%);
+  --ui-text-primary: #123b34;
+  --ui-text-secondary: #244c43;
+  --ui-text-muted: #335a51;
+}
+.brand-route-scene[data-brand-page-scene='street'] { --scene-image: url('/brand/scenes/krusty-street-20261022.png'); }
+.brand-route-scene[data-brand-page-scene='garden'] { --scene-image: url('/brand/scenes/coral-garden-20261022.png'); }
+.brand-route-scene[data-brand-page-scene='home'] { --scene-image: url('/brand/scenes/pineapple-home-20261022.png'); }
+.brand-scene.brand-route-scene::before {
+  background-image: linear-gradient(rgb(255 255 255 / var(--brand-scene-wash)), rgb(255 255 255 / var(--brand-scene-wash))), var(--scene-image);
+  background-position: center;
+  filter: none;
+}
+
+/* Keep business/content structure intact and reveal the shared backdrop. */
+.brand-scene.brand-route-scene main :is(.commerce-page, .blog-page, .notice-page, .blog-detail-page, .theme-auth-page, .store-about, .storefront) {
+  background: transparent;
+}
+.brand-scene.brand-route-scene main > .bg-background,
+.brand-scene.brand-route-scene main > div > .bg-background {
+  background: transparent;
+}
+.brand-scene.brand-route-scene main :is(.bg-card, .bg-card\/70, .commerce-steps, .about-card) {
+  background: var(--scene-glass);
+  border-color: var(--scene-edge);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 42%);
+  backdrop-filter: blur(3px);
+}
+.brand-scene.brand-route-scene main :is(.about-service, .about-contact, .about-wechat) {
+  background: var(--scene-glass-soft);
+}
+.brand-scene.brand-route-scene main :is(input:not([type='checkbox']):not([type='radio']), textarea, select) {
+  background-color: var(--scene-input);
+}
+.brand-scene.brand-route-scene .brand-footer {
+  background: rgb(255 255 255 / 12%);
+  border-color: var(--scene-edge);
+  backdrop-filter: blur(3px);
+}
+.brand-scene.brand-route-scene .theme-auth-page { padding-top: 118px; }
+.brand-scene.brand-route-scene .catalog-search input { background: transparent; }
+.brand-scene.brand-route-scene .order-lookup { background: var(--scene-glass); backdrop-filter: blur(3px); }
+@media (min-width: 768px) {
+  .brand-scene.brand-route-scene .catalog-sidebar { background: var(--scene-glass); border: 1px solid var(--scene-edge); border-radius: 16px; padding: 12px; backdrop-filter: blur(3px); }
+}
+
+/* Reserve the side scenery on desktop while keeping the original 1240px cap. */
+@media (min-width: 1100px) {
+  .brand-scene.brand-route-scene main :is(.commerce-page > .container, .storefront, .blog-page > .container, .notice-page > .container) { max-width: min(1240px, 80vw); }
+}
+
+/* Existing primary actions keep their labels/events; only their skin changes. */
+:root #app.brand-scene.brand-route-scene main :is(.ui-button-primary:not(.ui-button-icon), .store-button.is-primary, .payment-button.is-primary, .about-copy) {
+  color: #103f42;
+  background: #d6f0f4 url('/brand/ocean-buttons/buy-now-20261022.png') 45.45% 53.03% / 101.02% 157.39% no-repeat;
+  border: 1px solid rgb(109 195 215 / 65%);
+  border-radius: 12px;
+  min-height: 40px;
+  min-width: 112px;
+  padding-inline: 20px;
+  font-weight: 700;
+  box-shadow: 0 3px 7px rgb(22 93 94 / 14%);
+}
+:root #app.brand-scene.brand-route-scene main .store-button.is-primary::before { display: none; }
+:root #app.brand-scene.brand-route-scene main :is(.ui-button-primary:not(.ui-button-icon), .store-button.is-primary, .payment-button.is-primary, .about-copy):hover:not(:disabled) { filter: brightness(1.035); }
+:root #app.brand-scene.brand-route-scene main :is(.ui-button-primary:not(.ui-button-icon), .store-button.is-primary, .payment-button.is-primary, .about-copy):focus-visible { outline: 2px solid #156579; outline-offset: 3px; }
+:root #app.brand-scene.brand-route-scene main :is(.ui-button-primary:not(.ui-button-icon), .store-button.is-primary, .payment-button.is-primary, .about-copy):disabled { filter: saturate(.35); opacity: .5; }
+
+/* QR graphics remain on their existing opaque white surfaces. */
+.dark .brand-scene.brand-route-scene {
+  --brand-scene-wash: 0;
+  --scene-glass: rgb(14 37 32 / 60%);
+  --scene-glass-soft: rgb(14 37 32 / 36%);
+  --scene-edge: rgb(218 255 239 / 24%);
+  --scene-input: rgb(14 37 32 / 84%);
+  --ui-text-primary: #f1faf5;
+  --ui-text-secondary: #e1efe5;
+  --ui-text-muted: #c6dacf;
+}
+.dark .brand-scene.brand-route-scene::before { filter: brightness(.4) saturate(.88); }
+.dark .brand-scene.brand-route-scene .brand-footer { background: rgb(14 37 32 / 34%); }
+.dark .brand-scene.brand-route-scene main :is(.bg-card, .bg-card\/70, .commerce-steps, .about-card) { box-shadow: inset 0 1px 0 rgb(218 255 239 / 12%); }
+
+@media (max-width: 767px) {
+  .brand-scene.brand-route-scene { --scene-glass: rgb(255 255 255 / 36%); }
+  .brand-scene.brand-route-scene::before { background-position: 85% center; }
+  .brand-route-scene[data-brand-page-scene='garden']::before { background-position: 10% center; }
+  .brand-scene.brand-route-scene .theme-auth-page { padding-top: 104px; }
+  .dark .brand-scene.brand-route-scene { --scene-glass: rgb(14 37 32 / 72%); }
+}

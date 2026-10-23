@@ -317,12 +317,12 @@
                     {{ t('productDetail.loginToBuy') }}
                   </Button>
                   <div v-else class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <Button class="h-12 font-bold" :disabled="!canPurchase" @click="buyNow">
+                    <OceanPurchaseButton action="buy" :disabled="!canPurchase" @click="buyNow">
                       {{ t('productDetail.buyNow') }}
-                    </Button>
-                    <Button variant="outline" class="h-12 font-bold" :disabled="!canPurchase" @click="addToCart">
+                    </OceanPurchaseButton>
+                    <OceanPurchaseButton action="cart" :disabled="!canPurchase" @click="addToCart">
                       {{ t('productDetail.addToCart') }}
-                    </Button>
+                    </OceanPurchaseButton>
                   </div>
                 </div>
 
@@ -426,6 +426,7 @@
 
 <script setup lang="ts">
 import ProductPurchaseGuide from '../components/product/ProductPurchaseGuide.vue'
+import OceanPurchaseButton from '../components/product/OceanPurchaseButton.vue'
 import ProductContactButton from '../components/product/ProductContactButton.vue'
 import ProductRedemptionGuide from '../components/product/ProductRedemptionGuide.vue'
 import ProductInvoiceNotice from '../components/commerce/ProductInvoiceNotice.vue'

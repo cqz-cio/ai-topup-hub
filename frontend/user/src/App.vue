@@ -2,8 +2,9 @@
   <!-- The root's stable scrollbar gutter already reserves space during body scroll locks. -->
   <ConfigProvider :scroll-body="{ padding: 0, margin: 0 }">
     <div id="app" class="min-h-screen bg-background text-foreground flex flex-col"
-      :class="{ 'brand-scene': hasBrandScene }">
-      <BrandSceneMotion v-if="hasBrandScene" />
+      :class="{ 'brand-scene': hasBrandScene, 'brand-product-scene': hasProductScene, 'brand-route-scene': !!pageScene }"
+      :data-brand-page-scene="pageScene || undefined">
+      <BrandSceneMotion v-if="hasBrandScene && !hasProductScene && !pageScene" />
       <ErrorBoundary v-if="isStandalone"><RouterView /></ErrorBoundary>
       <!-- vault 模板：自带顶栏/页脚的外壳包裹页面（控制台仍走下方分支） -->
       <VaultLayout v-else-if="isVault && !isResellerConsole">
@@ -44,6 +45,9 @@
 
 <script setup lang="ts">
 import { computed, defineAsyncComponent } from 'vue'
+import './styles/productDetailScene.css'
+import './styles/brandPageScenes.css'
+import { getBrandPageScene } from './utils/brandPageScene'
 import { ConfigProvider } from 'reka-ui'
 import { useRoute } from 'vue-router'
 import { useAppStore } from './stores/app'
@@ -71,6 +75,8 @@ const isStandalone = computed(() => route.meta.standalone === true)
 // getActiveTemplate 读取 appStore.config（响应式），config 加载后会重新计算
 const isVault = computed(() => getActiveTemplate() === 'vault')
 const hasBrandScene = computed(() => !isStandalone.value && !isVault.value && !isResellerConsole.value && !appStore.isResellerTenant)
+const hasProductScene = computed(() => hasBrandScene.value && route.name === 'product-detail')
+const pageScene = computed(() => hasBrandScene.value ? getBrandPageScene(route.name) : null)
 </script>
 
 <style>

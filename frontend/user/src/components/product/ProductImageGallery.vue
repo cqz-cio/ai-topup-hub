@@ -3,7 +3,8 @@
     <div class="relative group"
       @touchstart="onImageTouchStart"
       @touchend="onImageTouchEnd">
-      <img v-if="currentImage" :src="currentImage" :alt="productTitle"
+      <img v-if="currentImage" :src="displayImage(currentImage)" :alt="productTitle"
+        :class="{ 'is-glass-cover': !!glassCover(currentImage) }" @error="handleImageError(currentImage)"
         class="block w-full aspect-[5/3] object-contain object-center bg-muted rounded-xl border relative z-10" />
       <div v-else
         class="w-full aspect-[5/3] bg-muted rounded-xl border flex items-center justify-center relative z-10">
@@ -16,14 +17,19 @@
       <div v-for="(image, index) in images" :key="index" @click="$emit('update:currentImage', image)"
         class="cursor-pointer rounded-lg overflow-hidden border-2 transition-all duration-300 shrink-0 w-16 h-16 md:w-auto md:h-auto md:aspect-square snap-start"
         :class="currentImage === image ? 'border-primary ring-1 ring-primary/40 opacity-100' : 'border-transparent opacity-60 hover:opacity-100 hover:scale-105'">
-        <img :src="image" :alt="`Image ${index + 1}`" loading="lazy" class="block w-full h-full object-contain object-center bg-muted" />
+        <img :src="displayImage(image)" :alt="`Image ${index + 1}`" loading="lazy"
+          :class="{ 'is-glass-cover': !!glassCover(image) }" @error="handleImageError(image)"
+          class="block w-full h-full object-contain object-center bg-muted" />
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, watch } from 'vue'
 import { Image as ImageIcon } from 'lucide-vue-next'
+import { useAppStore } from '../../stores/app'
+import { getCatalogGlassCover } from '../../utils/catalogGlass'
 
 const props = defineProps<{
   images: string[]
@@ -34,6 +40,23 @@ const props = defineProps<{
 const emit = defineEmits<{
   'update:currentImage': [value: string]
 }>()
+
+const appStore = useAppStore()
+const failedGlassCovers = ref(new Set<string>())
+// Keep original image identities for selection/swiping; only change the rendered asset.
+function glassCover(image: string): string {
+  if (appStore.isResellerTenant) return ''
+  const cover = getCatalogGlassCover(image)
+  return failedGlassCovers.value.has(cover) ? '' : cover
+}
+function displayImage(image: string): string {
+  return glassCover(image) || image
+}
+function handleImageError(image: string) {
+  const cover = glassCover(image)
+  if (cover) failedGlassCovers.value.add(cover)
+}
+watch(() => props.images, () => { failedGlassCovers.value.clear() })
 
 // Image touch swipe
 let touchStartX = 0

@@ -33,12 +33,12 @@
           {{ t('productDetail.loginToBuy') }}
         </Button>
         <template v-else>
-          <Button variant="secondary" size="lg" class="rounded-xl px-3 font-bold" :disabled="!canPurchase" @click="$emit('addToCart')">
+          <OceanPurchaseButton action="cart" compact class="rounded-xl px-3 font-bold" :disabled="!canPurchase" @click="$emit('addToCart')">
             {{ t('productDetail.addToCart') }}
-          </Button>
-          <Button size="lg" class="rounded-xl px-3 font-bold" :disabled="!canPurchase" @click="$emit('buyNow')">
+          </OceanPurchaseButton>
+          <OceanPurchaseButton action="buy" compact class="rounded-xl px-3 font-bold" :disabled="!canPurchase" @click="$emit('buyNow')">
             {{ t('productDetail.buyNow') }}
-          </Button>
+          </OceanPurchaseButton>
         </template>
       </div>
     </div>
@@ -49,6 +49,7 @@
 import { useI18n } from 'vue-i18n'
 import { Button } from '@/components/ui/button'
 import ProductContactButton from './ProductContactButton.vue'
+import OceanPurchaseButton from './OceanPurchaseButton.vue'
 
 const { t } = useI18n()
 

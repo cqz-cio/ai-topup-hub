@@ -1,0 +1,95 @@
+/* Approved local detail-page scene. The homepage keeps its jellyfishing scene. */
+.brand-scene.brand-product-scene {
+  --brand-scene-wash: .14;
+  --detail-glass: rgba(255, 255, 255, .22);
+  --detail-glass-edge: rgba(255, 255, 255, .68);
+  --detail-glass-shadow: inset 0 1px 0 rgba(255, 255, 255, .74);
+}
+
+.brand-scene.brand-product-scene::before {
+  background-image: linear-gradient(rgba(255, 255, 255, var(--brand-scene-wash)), rgba(255, 255, 255, var(--brand-scene-wash))), url('/brand/bikini-bottom-detail-20261022.png');
+  background-position: center;
+  filter: none;
+}
+
+.brand-product-scene :is(.product-detail-page, .brand-navbar, .brand-footer) {
+  --ui-text-primary: #123b34;
+  --ui-text-secondary: #244c43;
+  --ui-text-muted: #335a51;
+}
+
+.brand-scene.brand-product-scene .product-detail-page {
+  background: transparent;
+}
+
+.brand-scene.brand-product-scene :is(.product-media-panel, .product-purchase-panel, .product-content-section, .commerce-steps) {
+  background: var(--detail-glass);
+  border-color: var(--detail-glass-edge);
+  box-shadow: var(--detail-glass-shadow);
+  backdrop-filter: blur(3px);
+}
+
+.brand-scene.brand-product-scene .product-media-copy,
+.brand-scene.brand-product-scene .product-detail-page .product-image-gallery,
+.brand-scene.brand-product-scene .product-image-gallery img {
+  background: transparent;
+}
+
+.brand-scene.brand-product-scene .product-image-gallery img {
+  border-color: transparent;
+}
+
+.brand-scene.brand-product-scene .product-conditions {
+  background: rgba(255, 255, 255, .16);
+}
+
+.brand-scene.brand-product-scene .brand-footer {
+  background: rgba(255, 255, 255, .12);
+  border-top-color: var(--detail-glass-edge);
+  backdrop-filter: blur(3px);
+}
+
+.dark .brand-scene.brand-product-scene {
+  --brand-scene-wash: 0;
+  --detail-glass: rgba(14, 37, 32, .52);
+  --detail-glass-edge: rgba(218, 255, 239, .22);
+  --detail-glass-shadow: inset 0 1px 0 rgba(218, 255, 239, .12);
+}
+
+.dark .brand-scene.brand-product-scene::before {
+  filter: brightness(.4) saturate(.88);
+}
+
+.dark .brand-product-scene :is(.product-detail-page, .brand-navbar, .brand-footer) {
+  --ui-text-primary: #f1faf5;
+  --ui-text-secondary: #e1efe5;
+  --ui-text-muted: #c6dacf;
+}
+
+.dark .brand-scene.brand-product-scene .product-conditions {
+  background: rgba(14, 37, 32, .26);
+}
+
+.dark .brand-scene.brand-product-scene .product-image-gallery img.is-glass-cover {
+  filter: brightness(0) invert(.94);
+}
+
+.dark .brand-scene.brand-product-scene .brand-footer {
+  background: rgba(14, 37, 32, .34);
+}
+
+@media (max-width: 1023px) {
+  .brand-scene.brand-product-scene .product-media-copy,
+  .brand-scene.brand-product-scene .product-detail-page .product-image-gallery {
+    background: var(--detail-glass);
+    border-color: var(--detail-glass-edge);
+    box-shadow: var(--detail-glass-shadow);
+    backdrop-filter: blur(3px);
+  }
+}
+
+@media (max-width: 680px) {
+  .brand-scene.brand-product-scene { --detail-glass: rgba(255, 255, 255, .33); }
+  .brand-scene.brand-product-scene::before { background-position: 70% center; }
+  .dark .brand-scene.brand-product-scene { --detail-glass: rgba(14, 37, 32, .64); }
+}
