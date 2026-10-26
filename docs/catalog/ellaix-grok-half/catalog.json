@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "category_slug": "grok",
+  "items": [
+    {
+      "source_id": 116,
+      "source_code": "ellaix_grok_premium_monthly_half_20261025",
+      "source_title": "Grok Premium 月付 半价｜自动发码",
+      "slug": "ellaix-grok-premium-monthly-half",
+      "title": "Grok Premium 月付半价｜自动发码",
+      "price": "138.00",
+      "description": "Premium 月付半价套餐兑换码，自动发码；账号需具备对应半价优惠资格，不能用于普通全价套餐。",
+      "content_file": "premium-monthly-half.html",
+      "images": [
+        "/uploads/catalog/grok-20261023/grok-premium-monthly.svg"
+      ],
+      "cover_from_slug": "ellaix-grok-premium-monthly",
+      "instructions": "请先显示本订单交付内容，按其中的兑换入口和指引操作。Premium 月付半价套餐兑换码，自动发码；账号需具备对应半价优惠资格，不能用于普通全价套餐。 核对目标账号、套餐与优惠资格后再提交；处理结果以兑换页面为准。异常请提供本站订单号与报错截图，联系微信 Cqz0924ttxk 或 QQ 1669268759。",
+      "tags": [
+        "自动发码",
+        "月付半价",
+        "需优惠资格"
+      ]
+    },
+    {
+      "source_id": 117,
+      "source_code": "ellaix_grok_super_monthly_half_20261025",
+      "source_title": "Grok Super 月付 半价｜自动发码",
+      "slug": "ellaix-grok-super-monthly-half",
+      "title": "Grok Super 月付半价｜自动发码",
+      "price": "398.00",
+      "description": "Super 月付半价套餐兑换码，自动发码；账号需具备对应半价优惠资格，不能用于普通全价套餐。",
+      "content_file": "super-monthly-half.html",
+      "images": [
+        "/uploads/catalog/grok-20261023/grok-super-monthly.svg"
+      ],
+      "cover_from_slug": "ellaix-grok-super-monthly",
+      "instructions": "请先显示本订单交付内容，按其中的兑换入口和指引操作。Super 月付半价套餐兑换码，自动发码；账号需具备对应半价优惠资格，不能用于普通全价套餐。 核对目标账号、套餐与优惠资格后再提交；处理结果以兑换页面为准。异常请提供本站订单号与报错截图，联系微信 Cqz0924ttxk 或 QQ 1669268759。",
+      "tags": [
+        "自动发码",
+        "月付半价",
+        "需优惠资格"
+      ]
+    },
+    {
+      "source_id": 118,
+      "source_code": "ellaix_grok_ultra_monthly_half_20261025",
+      "source_title": "Grok Ultra 月付 半价｜自动发码",
+      "slug": "ellaix-grok-ultra-monthly-half",
+      "title": "Grok Ultra 月付半价｜自动发码",
+      "price": "818.00",
+      "description": "Ultra 月付半价套餐兑换码，自动发码；账号需具备对应半价优惠资格，不能用于普通全价套餐。",
+      "content_file": "ultra-monthly-half.html",
+      "images": [
+        "/uploads/catalog/grok-20261023/grok-ultra-monthly.svg"
+      ],
+      "cover_from_slug": "ellaix-grok-ultra-monthly",
+      "instructions": "请先显示本订单交付内容，按其中的兑换入口和指引操作。Ultra 月付半价套餐兑换码，自动发码；账号需具备对应半价优惠资格，不能用于普通全价套餐。 核对目标账号、套餐与优惠资格后再提交；处理结果以兑换页面为准。异常请提供本站订单号与报错截图，联系微信 Cqz0924ttxk 或 QQ 1669268759。",
+      "tags": [
+        "自动发码",
+        "月付半价",
+        "需优惠资格"
+      ]
+    }
+  ]
+}

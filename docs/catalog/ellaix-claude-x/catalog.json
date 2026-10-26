@@ -1,0 +1,167 @@
+{
+  "version": 1,
+  "retire_slugs": [
+    "86gamestore-84",
+    "86gamestore-10007"
+  ],
+  "excluded_source_ids": [
+    121,
+    123,
+    125,
+    126,
+    127
+  ],
+  "x_category": {
+    "slug": "x-subscriptions",
+    "name": "X（推特）",
+    "sort_order": 80
+  },
+  "items": [
+    {
+      "source_id": 112,
+      "source_code": "ellaix_claude_pro_20261024",
+      "source_title": "看介绍再下单 Claude Pro｜自动发码",
+      "source_category": 34,
+      "slug": "ellaix-claude-pro",
+      "title": "Claude Pro｜自动发码",
+      "description": "自动发兑换码，需已通过 KYC 的 Claude 账号；不保证开通成功，不提供质保，封号风险自行承担。",
+      "price": "168.88",
+      "category_slug": "claude",
+      "content_file": "claude-pro.html",
+      "images": [
+        "/uploads/86gamestore/ce0ee1278d78a4ad6fc8.png"
+      ],
+      "instructions": "请先显示本订单交付内容，按其中的兑换入口与指引操作；核对目标账号、套餐和资格后再提交。收到兑换码不代表订阅已开通，处理结果以兑换页面为准。自动发兑换码，需已通过 KYC 的 Claude 账号；不保证开通成功，不提供质保，封号风险自行承担。 异常请提供本站订单号与报错截图，联系微信 Cqz0924ttxk 或 QQ 1669268759。",
+      "tags": [
+        "自动发码",
+        "需完成KYC",
+        "无质保"
+      ]
+    },
+    {
+      "source_id": 113,
+      "source_code": "ellaix_claude_max_5x_20261024",
+      "source_title": "看介绍再下单 Claude Max 5x｜自动发码",
+      "source_category": 34,
+      "slug": "ellaix-claude-max-5x",
+      "title": "Claude Max 5x｜自动发码",
+      "description": "自动发兑换码，需已通过 KYC 的 Claude 账号；不保证开通成功，不提供质保，封号风险自行承担。",
+      "price": "788.00",
+      "category_slug": "claude",
+      "content_file": "claude-max-5x.html",
+      "images": [
+        "/uploads/86gamestore/ce0ee1278d78a4ad6fc8.png"
+      ],
+      "instructions": "请先显示本订单交付内容，按其中的兑换入口与指引操作；核对目标账号、套餐和资格后再提交。收到兑换码不代表订阅已开通，处理结果以兑换页面为准。自动发兑换码，需已通过 KYC 的 Claude 账号；不保证开通成功，不提供质保，封号风险自行承担。 异常请提供本站订单号与报错截图，联系微信 Cqz0924ttxk 或 QQ 1669268759。",
+      "tags": [
+        "自动发码",
+        "需完成KYC",
+        "无质保"
+      ]
+    },
+    {
+      "source_id": 114,
+      "source_code": "ellaix_claude_max_20x_20261024",
+      "source_title": "看介绍再下单 Claude Max 20x｜自动发码",
+      "source_category": 34,
+      "slug": "ellaix-claude-max-20x",
+      "title": "Claude Max 20x｜自动发码",
+      "description": "自动发兑换码，需已通过 KYC 的 Claude 账号；不保证开通成功，不提供质保，封号风险自行承担。",
+      "price": "1588.00",
+      "category_slug": "claude",
+      "content_file": "claude-max-20x.html",
+      "images": [
+        "/uploads/86gamestore/ce0ee1278d78a4ad6fc8.png"
+      ],
+      "instructions": "请先显示本订单交付内容，按其中的兑换入口与指引操作；核对目标账号、套餐和资格后再提交。收到兑换码不代表订阅已开通，处理结果以兑换页面为准。自动发兑换码，需已通过 KYC 的 Claude 账号；不保证开通成功，不提供质保，封号风险自行承担。 异常请提供本站订单号与报错截图，联系微信 Cqz0924ttxk 或 QQ 1669268759。",
+      "tags": [
+        "自动发码",
+        "需完成KYC",
+        "无质保"
+      ]
+    },
+    {
+      "source_id": 120,
+      "source_code": "ellaix_x_plus_monthly_ng_20261025",
+      "source_title": "X Plus 月付（尼日利亚）｜自动发码",
+      "source_category": 36,
+      "slug": "ellaix-x-plus-monthly-ng",
+      "title": "X Plus 月付（尼日利亚）｜自动发码",
+      "description": "尼日利亚地区月付订阅兑换码，自动发码；需自备符合地区与套餐要求的 X 账号，不是成品账号。",
+      "price": "68.00",
+      "category_slug": "x-subscriptions",
+      "content_file": "x-plus-monthly-ng.html",
+      "images": [
+        "/uploads/ellaix-claude-x-20261026/x-plus-monthly-ng.png"
+      ],
+      "instructions": "请先显示本订单交付内容，按其中的兑换入口与指引操作；核对目标账号、套餐和资格后再提交。收到兑换码不代表订阅已开通，处理结果以兑换页面为准。尼日利亚地区月付订阅兑换码，自动发码；需自备符合地区与套餐要求的 X 账号，不是成品账号。 异常请提供本站订单号与报错截图，联系微信 Cqz0924ttxk 或 QQ 1669268759。",
+      "tags": [
+        "自动发码",
+        "尼日利亚",
+        "月付"
+      ]
+    },
+    {
+      "source_id": 122,
+      "source_code": "ellaix_x_premium_monthly_ng_20261025",
+      "source_title": "X Premium 月付（尼日利亚）｜自动发码",
+      "source_category": 36,
+      "slug": "ellaix-x-premium-monthly-ng",
+      "title": "X Premium 月付（尼日利亚）｜自动发码",
+      "description": "尼日利亚地区月付订阅兑换码，自动发码；需自备符合地区与套餐要求的 X 账号，不是成品账号。",
+      "price": "268.00",
+      "category_slug": "x-subscriptions",
+      "content_file": "x-premium-monthly-ng.html",
+      "images": [
+        "/uploads/ellaix-claude-x-20261026/x-premium-monthly-ng.png"
+      ],
+      "instructions": "请先显示本订单交付内容，按其中的兑换入口与指引操作；核对目标账号、套餐和资格后再提交。收到兑换码不代表订阅已开通，处理结果以兑换页面为准。尼日利亚地区月付订阅兑换码，自动发码；需自备符合地区与套餐要求的 X 账号，不是成品账号。 异常请提供本站订单号与报错截图，联系微信 Cqz0924ttxk 或 QQ 1669268759。",
+      "tags": [
+        "自动发码",
+        "尼日利亚",
+        "月付"
+      ]
+    },
+    {
+      "source_id": 124,
+      "source_code": "ellaix_x_super_monthly_ng_20261025",
+      "source_title": "X Super 月付（尼日利亚）｜自动发码",
+      "source_category": 36,
+      "slug": "ellaix-x-super-monthly-ng",
+      "title": "X Super 月付（尼日利亚）｜自动发码",
+      "description": "尼日利亚地区月付订阅兑换码，自动发码；需自备符合地区与套餐要求的 X 账号，不是成品账号。",
+      "price": "818.00",
+      "category_slug": "x-subscriptions",
+      "content_file": "x-super-monthly-ng.html",
+      "images": [
+        "/uploads/ellaix-claude-x-20261026/x-super-monthly-ng.png"
+      ],
+      "instructions": "请先显示本订单交付内容，按其中的兑换入口与指引操作；核对目标账号、套餐和资格后再提交。收到兑换码不代表订阅已开通，处理结果以兑换页面为准。尼日利亚地区月付订阅兑换码，自动发码；需自备符合地区与套餐要求的 X 账号，不是成品账号。 异常请提供本站订单号与报错截图，联系微信 Cqz0924ttxk 或 QQ 1669268759。",
+      "tags": [
+        "自动发码",
+        "尼日利亚",
+        "月付"
+      ]
+    }
+  ],
+  "assets": [
+    {
+      "file": "x-plus-monthly-ng.png",
+      "path": "/uploads/ellaix-claude-x-20261026/x-plus-monthly-ng.png",
+      "sha256": "d18eb7b41e5973595b525e53933af5c3fc77944d38499f1b3eb676e898eaa5a4",
+      "bytes": 35555
+    },
+    {
+      "file": "x-premium-monthly-ng.png",
+      "path": "/uploads/ellaix-claude-x-20261026/x-premium-monthly-ng.png",
+      "sha256": "bcd6847d8be0c3ede4271329ca4a48beaa9bbb4f89294356ff2064362b21558c",
+      "bytes": 36870
+    },
+    {
+      "file": "x-super-monthly-ng.png",
+      "path": "/uploads/ellaix-claude-x-20261026/x-super-monthly-ng.png",
+      "sha256": "86767dbb2a9330e0db77a2443f1853c8ac6917881955221cfaa68f0fdee1148c",
+      "bytes": 38922
+    }
+  ]
+}
