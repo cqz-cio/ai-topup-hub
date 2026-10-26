@@ -1,5 +1,5 @@
 const zhCN = {
-  name: '小π客服', subtitle: '演示助手 · 选购与使用指引', title: '遇到问题？小π在。', intro: '选购、充值、付款，陪你一步步来。',
+  name: '派总客服', subtitle: '演示助手 · 选购与使用指引', title: '遇到问题？派总在。', intro: '选购、充值、付款，陪你一步步来。',
   topics: ['不会充值', '怎么付款', '了解返利', '开分店'], hints: ['领取卡密与兑换', '渠道与操作指引', '申请与结算规则', '合作方式与咨询'],
   questions: ['买了 GPT，怎么充值？', '有哪些支付方式？', '返利规则在哪里看？', '我想了解开分店。'],
   answers: [
@@ -10,12 +10,12 @@ const zhCN = {
   ],
   unknown: '这个问题暂时不在演示问答范围内。你可以选择上方的充值、付款、返利或开分店问题，也可以联系人工确认。',
   order: '演示助手不能读取或处理你的订单。请通过商城的订单查询入口查看状态，或联系人工并提供订单号；不要发送账号密码。',
-  placeholder: '问问小π…', send: '发送', thinking: '小π正在整理…', footer: '演示问答 · 具体规则以商品及订单说明为准', human: '联系人工',
-  open: '打开小π客服', close: '收起客服小窗', greeting: '嗨！有问题找小π。', think: '让我想一想…', reply: '给你整理好啦。', idle: '随时叫我，小π在。',
+  placeholder: '问问派总…', send: '发送', thinking: '派总正在整理…', footer: '演示问答 · 具体规则以商品及订单说明为准', human: '联系人工',
+  open: '打开派总客服', close: '收起客服小窗', greeting: '嗨！有问题找派总。', think: '让我想一想…', reply: '给你整理好啦。', idle: '随时叫我，派总在。',
   wechat: '微信', qq: 'QQ', telegram: 'Telegram', copy: '复制', copied: '已复制', copyFailed: '请选中联系方式复制', contactTitle: '人工客服', closeContacts: '关闭联系方式', newQuestion: '选择问题',
 }
 const zhTW: typeof zhCN = {
-  name: '小π客服', subtitle: '示範助手 · 選購與使用指引', title: '遇到問題？小π在。', intro: '選購、儲值、付款，陪你一步步來。',
+  name: '派總客服', subtitle: '示範助手 · 選購與使用指引', title: '遇到問題？派總在。', intro: '選購、儲值、付款，陪你一步步來。',
   topics: ['不會儲值', '怎麼付款', '了解返利', '開分店'], hints: ['領取卡密與兌換', '管道與操作指引', '申請與結算規則', '合作方式與諮詢'],
   questions: ['買了 GPT，怎麼儲值？', '有哪些付款方式？', '返利規則在哪裡看？', '我想了解開分店。'],
   answers: [
@@ -26,8 +26,8 @@ const zhTW: typeof zhCN = {
   ],
   unknown: '這個問題暫時不在示範問答範圍內。可以選擇儲值、付款、返利或開分店問題，也可以聯絡人工確認。',
   order: '示範助手不能讀取或處理你的訂單。請透過商城的訂單查詢入口查看狀態，或聯絡人工並提供訂單號；不要傳送帳號密碼。',
-  placeholder: '問問小π…', send: '傳送', thinking: '小π正在整理…', footer: '示範問答 · 具體規則以商品及訂單說明為準', human: '聯絡人工',
-  open: '開啟小π客服', close: '收起客服小窗', greeting: '嗨！有問題找小π。', think: '讓我想一想…', reply: '幫你整理好了。', idle: '隨時叫我，小π在。',
+  placeholder: '問問派總…', send: '傳送', thinking: '派總正在整理…', footer: '示範問答 · 具體規則以商品及訂單說明為準', human: '聯絡人工',
+  open: '開啟派總客服', close: '收起客服小窗', greeting: '嗨！有問題找派總。', think: '讓我想一想…', reply: '幫你整理好了。', idle: '隨時叫我，派總在。',
   wechat: '微信', qq: 'QQ', telegram: 'Telegram', copy: '複製', copied: '已複製', copyFailed: '請選取聯絡方式複製', contactTitle: '人工客服', closeContacts: '關閉聯絡方式', newQuestion: '選擇問題',
 }
 const en: typeof zhCN = {

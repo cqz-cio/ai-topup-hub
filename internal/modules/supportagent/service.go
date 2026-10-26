@@ -281,7 +281,7 @@ func localAnswer(input, locale string) (Reply, bool) {
 	}
 	normalized := strings.ToLower(strings.Trim(input, " ?？!！。"))
 	if normalized == "你好" || normalized == "您好" || normalized == "hi" || normalized == "hello" {
-		return Reply{Text: pick(locale, "你好，我是小π AI 客服。想了解哪个商品，或在哪一步遇到问题了？直接说就好。", "Hi, I’m Pi, the store’s AI support assistant. Which product or step would you like help with?", "你好，我是小π AI 客服。想了解哪個商品，或在哪一步遇到問題了？直接說就好。"), Mode: "local"}, true
+		return Reply{Text: pick(locale, "你好，我是派总，商城的 AI 客服。想了解哪个商品，或在哪一步遇到问题了？直接说就好。", "Hi, I’m Pi, the store’s AI support assistant. Which product or step would you like help with?", "你好，我是派總，商城的 AI 客服。想了解哪個商品，或在哪一步遇到問題了？直接說就好。"), Mode: "local"}, true
 	}
 	if normalized == "人工" || normalized == "转人工" || normalized == "轉人工" || normalized == "human" {
 		return Reply{Text: pick(locale, "可以，人工客服时间为北京时间 07:00—24:00。点击下方“联系人工”查看联系方式；不要发送密码或完整卡密。", "Use Contact support below to reach a person. Do not share passwords or full codes.", "可以，點擊下方「聯絡人工」查看客服聯絡方式。請勿傳送密碼或完整卡密。"), Handoff: true, Mode: "local"}, true

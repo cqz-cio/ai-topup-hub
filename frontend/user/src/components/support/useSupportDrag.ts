@@ -1,4 +1,6 @@
-import { computed, onBeforeUnmount, onMounted, ref, watch, type CSSProperties, type Ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch, type CSSProperties, type Ref } from 'vue'
+
+import { petStorageKey, readPetSettings, savePetSettings } from './petInteraction'
 
 type Point = { x: number; y: number }
 type Box = { x: number; y: number; width: number; height: number }
@@ -9,12 +11,12 @@ const overlaps = (a: Box, b: Box) => a.x < b.x + b.width && a.x + a.width > b.x 
 // Only the launcher starts a drag. The pet's animated pose remains independent.
 export function useSupportDrag(widget: Ref<HTMLElement | undefined>, launcher: Ref<HTMLButtonElement | undefined>, panel: Ref<HTMLElement | undefined>, speech: Ref<HTMLElement | undefined>) {
   const position = ref<Point>()
-  const dragging = ref(false)
+  const dragging = ref(false), tilt = ref(0)
   const panelStyle = ref<CSSProperties>()
   const speechStyle = ref<CSSProperties>()
   const speechSide = ref('left')
   const panelOverlap = ref(false)
-  let gesture: { id: number; pointer: Point; origin: Point } | undefined
+  let gesture: { id: number; pointer: Point; origin: Point; lastX: number } | undefined
   let suppressClick = false
   let layoutFrame = 0
   let observer: ResizeObserver | undefined
@@ -96,7 +98,7 @@ export function useSupportDrag(widget: Ref<HTMLElement | undefined>, launcher: R
     suppressClick = false
     if (event.pointerType === 'touch') return
     const rect = widget.value.getBoundingClientRect()
-    gesture = { id: event.pointerId, pointer: { x: event.clientX, y: event.clientY }, origin: { x: rect.x, y: rect.y } }
+    gesture = { id: event.pointerId, pointer: { x: event.clientX, y: event.clientY }, origin: { x: rect.x, y: rect.y }, lastX: event.clientX }
     launcher.value?.setPointerCapture(event.pointerId)
   }
 
@@ -106,6 +108,8 @@ export function useSupportDrag(widget: Ref<HTMLElement | undefined>, launcher: R
     // Small hand movement remains an ordinary click.
     if (!dragging.value && Math.hypot(dx, dy) < 6) return
     dragging.value = true
+    tilt.value = clamp((event.clientX - gesture.lastX) * .7, -12, 12)
+    gesture.lastX = event.clientX
     suppressClick = true
     position.value = bounded({ x: gesture.origin.x + dx, y: gesture.origin.y + dy })
   }
@@ -114,7 +118,11 @@ export function useSupportDrag(widget: Ref<HTMLElement | undefined>, launcher: R
     if (!gesture || (event && event.pointerId !== gesture.id)) return
     const id = gesture.id
     gesture = undefined
-    dragging.value = false
+    if (dragging.value && position.value && widget.value) {
+      const view = viewport(), rect = widget.value.getBoundingClientRect()
+      savePetSettings({ position: { x: clamp((position.value.x - view.x - gap) / Math.max(1, view.width - rect.width - 2 * gap), 0, 1), y: clamp((position.value.y - view.y - gap) / Math.max(1, view.height - rect.height - 2 * gap), 0, 1) } })
+    }
+    dragging.value = false; tilt.value = 0
     // Pointerup releases capture natively; cancellation and blur need explicit cleanup.
     if (event?.type !== 'pointerup' && launcher.value?.hasPointerCapture(id)) launcher.value.releasePointerCapture(id)
   }
@@ -125,6 +133,10 @@ export function useSupportDrag(widget: Ref<HTMLElement | undefined>, launcher: R
     return true
   }
 
+  function resetPosition() {
+    finish(); position.value = undefined; panelStyle.value = undefined; speechStyle.value = undefined; panelOverlap.value = false
+    savePetSettings({ position: undefined })
+  }
   function cancel() { finish() }
 
   watch(position, schedulePlace, { flush: 'post' })
@@ -135,7 +147,19 @@ export function useSupportDrag(widget: Ref<HTMLElement | undefined>, launcher: R
     place()
   }, { flush: 'post' })
   onMounted(() => {
-    observer = new ResizeObserver(schedulePlace)
+    void nextTick(() => {
+    try {
+      const stored = readPetSettings(localStorage.getItem(petStorageKey)).position
+      if (stored && widget.value && matchMedia('(pointer: fine)').matches) {
+        const view = viewport(), rect = widget.value.getBoundingClientRect()
+        position.value = bounded({ x: view.x + gap + stored.x * Math.max(0, view.width - rect.width - 2 * gap), y: view.y + gap + stored.y * Math.max(0, view.height - rect.height - 2 * gap) })
+      }
+    } catch { /* Storage unavailable: keep the default corner. */ }
+    })
+    observer = new ResizeObserver(() => {
+      if (position.value && widget.value) position.value = bounded(position.value)
+      schedulePlace()
+    })
     for (const element of [widget.value, panel.value, speech.value]) if (element) observer.observe(element)
     window.addEventListener('resize', keepVisible)
     window.addEventListener('blur', cancel)
@@ -152,5 +176,5 @@ export function useSupportDrag(widget: Ref<HTMLElement | undefined>, launcher: R
     window.visualViewport?.removeEventListener('scroll', keepVisible)
   })
 
-  return { widgetStyle, panelStyle, speechStyle, speechSide, panelOverlap, dragging, pointerDown, pointerMove, finish, allowClick }
+  return { widgetStyle, panelStyle, speechStyle, speechSide, panelOverlap, dragging, tilt, resetPosition, pointerDown, pointerMove, finish, allowClick }
 }
