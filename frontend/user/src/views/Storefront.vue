@@ -132,6 +132,7 @@ import { storefrontDisplayDetails } from '../data/storefrontCatalog'
 import {
   canPurchaseStorefrontProduct,
   loadStorefrontProducts,
+  populatedStorefrontCategories,
   storefrontPrice,
   sortStorefrontProducts,
   storefrontStockQuantity,
@@ -164,6 +165,7 @@ const supportWechat = computed(
 )
 const products = ref<StorefrontProduct[]>([])
 const categoryRows = ref<Array<{ name?: unknown; slug?: string }>>([])
+const categoryDirectoryLoaded = ref(false)
 const initialLoading = ref(true)
 const refreshing = ref(false)
 const loadFailed = ref(false)
@@ -188,22 +190,27 @@ const productCategory = (product: StorefrontProduct) =>
   storefrontText(product.category?.name, appStore.locale) ||
   displayDetails(product)?.category ||
   t('shopUi.otherProducts')
-const categories = computed(() => [
-  ...new Set([
-    ...categoryRows.value
-      .map((category) => storefrontText(category?.name, appStore.locale))
-      .filter(Boolean),
-    ...products.value.map(productCategory),
-  ]),
-])
+const categories = computed(() => populatedStorefrontCategories(
+  categoryRows.value.map((category) => storefrontText(category?.name, appStore.locale)),
+  products.value.map(productCategory),
+))
 const syncCategoryFromRoute = () => {
-  if (!catalogOnly) return
+  // Only a complete successful refresh can establish that a category is empty.
+  if (initialLoading.value || loadFailed.value) return
+  if (!catalogOnly) {
+    if (!categories.value.includes(selectedCategory.value)) selectedCategory.value = ''
+    return
+  }
   const category = route.name === 'category-products'
     ? categoryRows.value.find((row) => row.slug === route.params.slug)
     : undefined
-  selectedCategory.value = category
+  const name = category
     ? storefrontText(category.name, appStore.locale)
     : ''
+  selectedCategory.value = categories.value.includes(name) ? name : ''
+  if (route.name === 'category-products' && categoryDirectoryLoaded.value && !selectedCategory.value) {
+    void router.replace({ name: 'products', query: route.query, hash: route.hash })
+  }
 }
 const selectCategory = (category: string) => {
   closeMoreCategories()
@@ -329,20 +336,16 @@ const refreshProducts = async () => {
     ])
     if (disposed || request !== productRequest || token !== authStore.token) return
     products.value = next
-    categoryRows.value = Array.isArray(categoryResponse?.data?.data)
-      ? categoryResponse.data.data
-      : []
-    syncCategoryFromRoute()
+    if (categoryResponse?.data?.status_code === 0 && Array.isArray(categoryResponse.data.data)) {
+      categoryRows.value = categoryResponse.data.data
+      categoryDirectoryLoaded.value = true
+    }
     loadFailed.value = false
-    if (
-      selectedCategory.value &&
-      !categories.value.includes(selectedCategory.value)
-    )
-      selectedCategory.value = ''
+    initialLoading.value = false
+    syncCategoryFromRoute()
   } catch {
     if (disposed || request !== productRequest || token !== authStore.token) return
     products.value = []
-    categoryRows.value = []
     loadFailed.value = true
   } finally {
     if (!disposed && request === productRequest) {

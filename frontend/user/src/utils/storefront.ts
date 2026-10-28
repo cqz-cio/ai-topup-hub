@@ -35,6 +35,16 @@ export function storefrontText(value: unknown, locale = 'zh-CN'): string {
   return ''
 }
 
+// Keep the directory's order, but only show categories represented in the full
+// public catalog. Search and stock availability do not change this directory.
+export function populatedStorefrontCategories(
+  directory: readonly string[],
+  productCategories: readonly string[],
+): string[] {
+  const populated = new Set(productCategories.filter(Boolean))
+  return [...new Set([...directory.filter((name) => populated.has(name)), ...populated])]
+}
+
 const parseAmount = (value: unknown): number | null => {
   if (typeof value !== 'number' && typeof value !== 'string') return null
   if (typeof value === 'string' && !/^\d+(\.\d+)?$/.test(value.trim()))

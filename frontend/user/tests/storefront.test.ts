@@ -3,6 +3,7 @@ import assert from 'node:assert/strict'
 import {
   canPurchaseStorefrontProduct,
   loadStorefrontProducts,
+  populatedStorefrontCategories,
   storefrontPrice,
   sortStorefrontProducts,
   storefrontStockQuantity,
@@ -19,6 +20,32 @@ const product = (
   is_sold_out: false,
   stock_status: 'in_stock',
   ...changes,
+})
+
+test('empty categories disappear while populated categories retain directory order', () => {
+  assert.deepEqual(populatedStorefrontCategories(
+    ['GPT', 'Codex', 'Gemini', '接码', 'X', 'Grok'],
+    ['Grok', 'GPT', 'GPT', 'Gemini'],
+  ), ['GPT', 'Gemini', 'Grok'])
+})
+
+test('categories return when products return, including new and unnamed directory entries', () => {
+  const directory = ['GPT', 'X', 'Grok', 'GPT', '']
+  assert.deepEqual(populatedStorefrontCategories(directory, ['GPT']), ['GPT'])
+  assert.deepEqual(populatedStorefrontCategories(directory, ['X', 'GPT', '新分类', '']), ['GPT', 'X', '新分类'])
+  assert.deepEqual(directory, ['GPT', 'X', 'Grok', 'GPT', ''])
+  assert.deepEqual(populatedStorefrontCategories(directory, []), [])
+})
+
+test('all public product pages contribute categories, including sold-out products', async () => {
+  const rows = await loadStorefrontProducts(async (page) => ({
+    status_code: 0,
+    pagination: { total_page: 2 },
+    data: page === 1
+      ? [product({ category: { name: 'GPT' } })]
+      : [product({ id: 2, slug: 'sold-out', category: { name: 'Gemini' }, is_sold_out: true, stock_status: 'out_of_stock' })],
+  }))
+  assert.deepEqual(populatedStorefrontCategories(['Gemini', 'GPT', 'X'], rows.map((row) => String(row.category?.name))), ['Gemini', 'GPT'])
 })
 
 test('price sorting uses numeric displayed prices, includes credits and preserves API input', () => {
