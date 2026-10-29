@@ -29,3 +29,13 @@
 发布前一致性备份两站数据库、私有配置及程序。Node 自动增加 cards 元数据字段、card_operations 和 audit.actor；商城只增加管理权限规则。不重置订单门槛、采购时间边界、价格、订单或历史交付，不上传本机数据库。
 
 回退不得回灌业务库。存在 revoking/revoked 卡密后不能切回不识别这些状态的旧兑换程序；保留当前兼容的兑换服务和加密主密钥，必要时只回退商城页面/后端。永久销毁状态及待完成操作必须持续生效。
+
+## 2026-10-29 正式发布
+
+- 商城后端、上海独立后台和兑换服务发布号均为 `20261029-181554`，干净程序源码 `0f921846f14c52deae4250598da551c2b3e512a1`，任务分支 `codex/paiplus-binding`；main 保持不变。后台入口 `https://admin.qzweb.cloud/card-secrets`。
+- 45 项兑换站测试、69 项后台测试、相关 Go 模块/权限/架构与完整跨服务模拟通过；日常本机、最终构建和正式 Chrome 页面验证。模拟中未使用卡销毁成功、已使用卡报错、销毁后所有兑换路径被拦截。未真实付款、充值、退款或销毁客户卡密。
+- 正式 154 个静态文件哈希、8 条匿名访问保护路径、138 次历史资源 410 核验通过。保留 10,549 个商城文件、1,459 个既有后台文件和 60 个 Nginx 文件。正式后台无破图、横向溢出或控制台错误。
+- 后端启动窗口核对 72 张表，仅 casbin_rule 新增运营角色的 4 条管理权限。原订单、条目、交付、采购、支付、钱包、库存卡密、售价、采购边界和 PAIPLUS 新订单门槛保留；Redis 未重启。两套原库存服务 Result=success，最新报告 synced，无采购调用。
+- 发布时兑换库 cards / attempts / deliveries / card_operations 均为 0；正式后台空列表正常。今后符合既有 9 商品范围和新订单边界的发货会自动登记，不迁移或重发历史上游原卡。
+- 备份：兑换 `/srv/paiplus/backups/before-management-20261029-181554`；商城后端 `/srv/zhixiang/backups/before-paiplus-management-20261029-181554`；上海静态后台 `/srv/zhixiang-front/backups/before-paiplus-management-20261029-181554`。
+- 私有验收证据在 `redemption-center/runtime/paiplus-management-*.json`；页面截图 `management-production.png`、`management-local-revoked.png`、`management-local-used-failure.png`。打包目录 `runtime/management-release` 含私有配置，不得提交或公开。
