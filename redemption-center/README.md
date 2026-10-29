@@ -117,4 +117,8 @@ go test ./internal/modules/procurement/integrationtest -run 'TestPAIPLUSShipping
 
 同名 16、32、48、180、192、512px PNG 保留真实 alpha；版本化 ICO 与 `public/favicon.ico` 包含 16/32/48px。`index.html` 引用版本化 ICO、32/48px PNG 与 180px Apple Touch 图标，避免复用旧图标缓存。网站页首品牌图保持原样。生成提示与来源记录见 `design/favicon-v3.md`。
 
+已于 2026-10-29 发布静态补丁 `favicon-20261029T090203Z`，干净构建来源 `49ad5d3f1131416545143b3a0a6a72a505a441dc`；源码推送至已授权的 `codex/paiplus-binding` 分支。兑换站程序仍为 `20261029-153938`，本次只新增 9 个图标文件并替换 `dist/client/index.html`。6 个原客户端资源与原 21 个非入口发布文件逐字节保持，60 个 Nginx 文件、私有配置和服务进程保持；没有重启服务或调用充值接口。页面及图标共 10 个 HTTPS 请求的状态、MIME 与 SHA256 核验通过，正式会话接口正常，本地与正式浏览器读到新图标引用，正式 180px 图标可完整加载。
+
+备份 `/srv/paiplus/backups/before-favicon-20261029T090203Z` 包含原发布、私有配置和兑换数据库一致性快照；补丁清单与验收报告在 `/srv/paiplus/static-updates/favicon-20261029T090203Z/`，叠加在原发布清单之上。回退只恢复备份中的 `release/dist/client/index.html`，新增的版本化图标可保留；不恢复业务数据库。后续发布须包含本次图标及引用，避免以旧基础发布覆盖。私有本机证据为 `runtime/paiplus-deploy-favicon-frontend.json`，正式图标截图为 `runtime/favicon-v3-production.png`。
+
 2026-10-29 排查浏览器“不安全”提示：服务器与本机独立 TLS 验证均通过，证书 SAN 为 `cdk.qzweb.cloud`、签发者 Let's Encrypt YE1，到期时间 2027-01-27 06:28:35 UTC；两处证书 SHA256 一致，均协商 TLS 1.3。HTTP 返回 301 至 HTTPS，站点启用 HSTS；页面资源为本站 HTTPS，未发现网络 HTTP 资源。用户反馈手机正常、电脑 Chrome 仍提示不安全，尚未取得 Chrome 安全概览的具体原因，不能把服务器核验通过称为已修复浏览器警告。证据位于 `runtime/paiplus-tls-inspect-frontend.json` 和 `runtime/local-tls-check.json`。
