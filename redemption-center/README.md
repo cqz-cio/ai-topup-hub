@@ -115,6 +115,12 @@ go test ./internal/modules/procurement/integrationtest -run 'TestPAIPLUSShipping
 
 当前为清晰度优化版 **v4**：保留完整人物，采用紧凑的屈肘托举构图、较大的正面脸部和较粗轮廓；去掉透明外边距，并显式提供原生 16px 图标。当前文件为 `public/icons/spongebob-lifting-gary-v4*`，生成提示和尺寸说明见 `design/favicon-v4.md`。下面 v3 为首版上线记录，回退或后续发布时不要误当成当前图标。
 
+v4 已发布为静态补丁 `favicon-20261029T091427Z`，干净构建来源 `a0d8f702277998a86c38bdf80e2b755905626fd2`；原程序仍为 `20261029-153938`。新增 8 个版本化图标，替换入口 HTML 与默认 `favicon.ico`。原 29 个其他发布文件、60 个 Nginx 文件、配置与服务进程保持；10 个公网 HTML/图标请求的状态、MIME 和 SHA256 通过，会话接口正常。已检查本地 16/32/48px 原生尺寸对比，以及正式页面的五条图标引用和无破图、无错误日志。正式站源码位于任务分支 `codex/paiplus-binding`。
+
+v4 备份为 `/srv/paiplus/backups/before-favicon-20261029T091427Z`，补丁清单及报告在 `/srv/paiplus/static-updates/favicon-20261029T091427Z/`。回退本次优化只恢复备份的 `release/dist/client/index.html` 和 `release/dist/client/favicon.ico`，保留历史图标，不恢复业务数据库。私有验收为 `runtime/paiplus-deploy-favicon-v4-frontend.json`，尺寸对比截图为 `runtime/favicon-v4-comparison.png`。本地对比 HTML 仅在忽略目录，未发布到正式站。
+
+Chrome 标签页已刷新。受浏览器工具控制时观察到扩展会将 `rel=icon` 临时替换为带 `data-codex-favicon-badge` 的 SVG，包含 0.3 透明度原图和指针标记；此操作状态图标不作为真实客户显示的验收依据，也不删除或覆盖该标记。正式源文件和无此标记的内置浏览器引用已独立核验。
+
 用户于 2026-10-29 确认全身海绵宝宝双手举起小蜗的透明图标，采用现有街景壁纸中的动画画风。批准原图为 `public/icons/spongebob-lifting-gary-v3.png`，由内置 imagegen 参考 `public/assets/bikini-bottom-afternoon.png` 编辑生成；保留原始 PNG 字节，格式转换只做缩放，未重绘或裁切人物。早期手绘 v1 和 v2 预览未获采用，不应再次用于站点。
 
 同名 16、32、48、180、192、512px PNG 保留真实 alpha；版本化 ICO 与 `public/favicon.ico` 包含 16/32/48px。`index.html` 引用版本化 ICO、32/48px PNG 与 180px Apple Touch 图标，避免复用旧图标缓存。网站页首品牌图保持原样。生成提示与来源记录见 `design/favicon-v3.md`。
