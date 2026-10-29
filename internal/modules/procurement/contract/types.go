@@ -25,6 +25,9 @@ type Fulfillment struct {
 	Payload      string
 	DeliveryData jsonmap.JSON
 	DeliveredAt  *time.Time
+	// InstructionsOverride is trusted customer copy produced by our delivery
+	// adapter, never accepted from supplier JSON. Nil preserves existing orders.
+	InstructionsOverride jsonmap.JSON `json:"-"`
 }
 
 type CreateOrderRequest struct {

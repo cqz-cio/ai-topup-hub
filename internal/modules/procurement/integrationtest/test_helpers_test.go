@@ -1,12 +1,26 @@
 package procurement_test
 
 import (
+	"bufio"
 	"context"
+	"encoding/base64"
+	"encoding/json"
+	"io"
+	"mime"
+	"mime/multipart"
+	"net"
+	"net/mail"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"strings"
 	"sync/atomic"
 
 	"fmt"
 	"github.com/dujiao-next/internal/constants"
+	"github.com/dujiao-next/internal/queue"
 	"github.com/dujiao-next/internal/upstream"
+	"github.com/hibiken/asynq"
 	"testing"
 	"time"
 
@@ -39,6 +53,178 @@ import (
 )
 
 type ListFilter = procurementcontract.ListFilter
+
+type redemptionMailQueue struct {
+	tasks []queue.OrderStatusEmailPayload
+}
+
+func (q *redemptionMailQueue) EnqueueOrderStatusEmail(p queue.OrderStatusEmailPayload, _ ...asynq.Option) error {
+	q.tasks = append(q.tasks, p)
+	return nil
+}
+
+func startRedemptionFixture(t *testing.T, origin string, sources []string) (string, string) {
+	t.Helper()
+	node := os.Getenv("PAIPLUS_TEST_NODE")
+	if node == "" {
+		t.Skip("set PAIPLUS_TEST_NODE to run the real Node/Go shipping-to-redemption integration")
+	}
+	dir := t.TempDir()
+	stats := filepath.Join(dir, "stats.json")
+	script, err := filepath.Abs(filepath.Join("..", "..", "..", "..", "redemption-center", "tests", "shop-fixture.mjs"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	encoded, _ := json.Marshal(sources)
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
+	cmd := exec.CommandContext(ctx, node, script)
+	cmd.Env = append(os.Environ(), "PAIPLUS_FIXTURE_DB="+filepath.Join(dir, "test.db"), "PAIPLUS_FIXTURE_STATS="+stats, "PAIPLUS_FIXTURE_ORIGIN="+origin, "PAIPLUS_FIXTURE_SOURCES="+string(encoded))
+	cmd.Stderr = os.Stderr
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		cancel()
+		t.Fatal(err)
+	}
+	if err = cmd.Start(); err != nil {
+		cancel()
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { cancel(); _ = cmd.Wait() })
+	ready := make(chan string, 1)
+	go func() {
+		scanner := bufio.NewScanner(stdout)
+		if scanner.Scan() {
+			ready <- scanner.Text()
+		} else {
+			ready <- ""
+		}
+	}()
+	select {
+	case url := <-ready:
+		if !strings.HasPrefix(url, "http://127.0.0.1:") {
+			t.Fatal("local redemption fixture did not start")
+		}
+		return url, stats
+	case <-time.After(10 * time.Second):
+		t.Fatal("local redemption fixture startup timed out")
+	}
+	return "", ""
+}
+
+func redemptionStats(t *testing.T, path string) map[string]int {
+	t.Helper()
+	raw, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var result map[string]int
+	if err = json.Unmarshal(raw, &result); err != nil {
+		t.Fatal(err)
+	}
+	return result
+}
+
+// A local SMTP receiver is the only email mock. Rendering, worker reads and
+// attachment encoding run through the real application and SMTP implementation.
+func redemptionSMTP(t *testing.T) (config.EmailConfig, <-chan string) {
+	t.Helper()
+	listener, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = listener.Close() })
+	messages := make(chan string, 10)
+	go func() {
+		for {
+			conn, err := listener.Accept()
+			if err != nil {
+				return
+			}
+			go func() {
+				defer conn.Close()
+				_ = conn.SetDeadline(time.Now().Add(8 * time.Second))
+				reader := bufio.NewReader(conn)
+				_, _ = io.WriteString(conn, "220 localhost fixture\r\n")
+				for {
+					line, err := reader.ReadString('\n')
+					if err != nil {
+						return
+					}
+					switch {
+					case strings.HasPrefix(line, "EHLO"), strings.HasPrefix(line, "HELO"):
+						_, _ = io.WriteString(conn, "250 localhost\r\n")
+					case strings.HasPrefix(line, "MAIL"), strings.HasPrefix(line, "RCPT"):
+						_, _ = io.WriteString(conn, "250 OK\r\n")
+					case strings.HasPrefix(line, "DATA"):
+						_, _ = io.WriteString(conn, "354 body\r\n")
+						var body strings.Builder
+						for {
+							part, err := reader.ReadString('\n')
+							if err != nil {
+								return
+							}
+							if part == ".\r\n" {
+								break
+							}
+							body.WriteString(part)
+						}
+						messages <- body.String()
+						_, _ = io.WriteString(conn, "250 accepted\r\n")
+					case strings.HasPrefix(line, "QUIT"):
+						_, _ = io.WriteString(conn, "221 bye\r\n")
+						return
+					default:
+						_, _ = io.WriteString(conn, "500 unsupported\r\n")
+					}
+				}
+			}()
+		}
+	}()
+	return config.EmailConfig{Enabled: true, Host: "127.0.0.1", Port: listener.Addr().(*net.TCPAddr).Port, From: "sender@example.invalid"}, messages
+}
+
+func decodedRedemptionMail(t *testing.T, raw string) (string, bool) {
+	t.Helper()
+	message, err := mail.ReadMessage(strings.NewReader(raw))
+	if err != nil {
+		t.Fatal(err)
+	}
+	contentType, params, err := mime.ParseMediaType(message.Header.Get("Content-Type"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	decode := func(reader io.Reader, encoding string) string {
+		if strings.EqualFold(encoding, "base64") {
+			reader = base64.NewDecoder(base64.StdEncoding, reader)
+		}
+		data, err := io.ReadAll(reader)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return string(data)
+	}
+	if !strings.HasPrefix(contentType, "multipart/") {
+		return decode(message.Body, message.Header.Get("Content-Transfer-Encoding")), false
+	}
+	reader := multipart.NewReader(message.Body, params["boundary"])
+	var text strings.Builder
+	attachment := false
+	for {
+		part, err := reader.NextPart()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			t.Fatal(err)
+		}
+		if part.FileName() != "" {
+			attachment = true
+		}
+		text.WriteString(decode(part, part.Header.Get("Content-Transfer-Encoding")))
+	}
+	return text.String(), attachment
+}
+
 type ProcurementOrder = procurementdomain.Order
 
 var (

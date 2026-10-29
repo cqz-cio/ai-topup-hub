@@ -1,0 +1,24 @@
+# User-selected domain. Install only after DNS and certificate verification.
+server {
+    listen 443 ssl;
+    server_name cdk.qzweb.cloud;
+    ssl_certificate /etc/letsencrypt/live/cdk.qzweb.cloud/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/cdk.qzweb.cloud/privkey.pem;
+    client_max_body_size 256k;
+    add_header Strict-Transport-Security "max-age=31536000" always;
+    location / {
+        proxy_pass http://127.0.0.1:8190;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_read_timeout 180s;
+        proxy_send_timeout 180s;
+        proxy_buffering off;
+    }
+}
+server {
+    listen 80;
+    server_name cdk.qzweb.cloud;
+    location /.well-known/acme-challenge/ { root /var/lib/letsencrypt; }
+    location / { return 301 https://cdk.qzweb.cloud$request_uri; }
+}

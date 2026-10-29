@@ -17,6 +17,7 @@ type Options struct {
 	BotNotifier        procurementcontract.BotFulfillmentNotifier
 	Notifications      procurementcontract.FailureNotifier
 	PurchaseWindow     *procurementdomain.PurchaseWindow
+	DeliveryRewriter   procurementcontract.DeliveryRewriter
 }
 
 type Service struct {
@@ -32,6 +33,7 @@ type Service struct {
 	notifications      procurementcontract.FailureNotifier
 	balanceNotifier    procurementcontract.BalanceNotifier
 	purchaseWindow     *procurementdomain.PurchaseWindow
+	deliveryRewriter   procurementcontract.DeliveryRewriter
 }
 
 var _ procurementcontract.UseCase = (*Service)(nil)
@@ -47,6 +49,7 @@ func NewService(options Options) *Service {
 		connections: options.Connections, queue: options.Queue,
 		orderLifecycle: options.OrderLifecycle, downstreamCallback: options.DownstreamCallback,
 		botNotifier: options.BotNotifier, notifications: options.Notifications,
-		purchaseWindow: options.PurchaseWindow,
+		purchaseWindow:   options.PurchaseWindow,
+		deliveryRewriter: options.DeliveryRewriter,
 	}
 }

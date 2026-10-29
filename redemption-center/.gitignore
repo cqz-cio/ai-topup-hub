@@ -1,0 +1,10 @@
+node_modules/
+dist/
+runtime/
+.env
+.env.*
+!.env.example
+*.db
+*.db-wal
+*.db-shm
+

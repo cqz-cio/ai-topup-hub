@@ -1,6 +1,33 @@
 package procurement_test
 
 import (
+	"bytes"
+	"context"
+	"encoding/base64"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"github.com/dujiao-next/internal/app/container"
+	"github.com/dujiao-next/internal/app/jobs/consumer"
+	orderwiring "github.com/dujiao-next/internal/bootstrap/order"
+	"github.com/dujiao-next/internal/config"
+	downstreamreader "github.com/dujiao-next/internal/modules/downstreamcallback/infrastructure/orderreader"
+	notificationsmtp "github.com/dujiao-next/internal/modules/notification/infrastructure/smtp"
+	orderapp "github.com/dujiao-next/internal/modules/order/application"
+	ordergormstore "github.com/dujiao-next/internal/modules/order/infrastructure/gormstore"
+	orderhttp "github.com/dujiao-next/internal/modules/order/transport/http"
+	procurementgormstore "github.com/dujiao-next/internal/modules/procurement/infrastructure/gormstore"
+	"github.com/dujiao-next/internal/modules/procurement/infrastructure/redemptionclient"
+	"github.com/dujiao-next/internal/queue"
+	"github.com/dujiao-next/internal/shared/jsonmap"
+	"github.com/gin-gonic/gin"
+	"github.com/hibiken/asynq"
+	"io"
+	"net/http"
+	"net/http/httptest"
+	"regexp"
+	"strings"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -8,7 +35,9 @@ import (
 	orderdomain "github.com/dujiao-next/internal/modules/order/domain"
 
 	"github.com/dujiao-next/internal/constants"
+	procurementapp "github.com/dujiao-next/internal/modules/procurement/application"
 	procurementcontract "github.com/dujiao-next/internal/modules/procurement/contract"
+	procurementdomain "github.com/dujiao-next/internal/modules/procurement/domain"
 )
 
 type procurementCallbackStatusFixture struct {
@@ -242,4 +271,388 @@ func TestHandleUpstreamCallback_Refunded_AfterCompletedKeepsOrderStatus(t *testi
 		expectedProcurementStatus: constants.ProcurementStatusRefunded,
 		expectedOrderStatus:       constants.OrderStatusCompleted,
 	})
+}
+
+type deliveryRewriteFixture struct {
+	fail  bool
+	calls int
+}
+
+func (*deliveryRewriteFixture) RequiresRewrite(*procurementdomain.LocalOrder, uint) bool { return true }
+
+// Starts the real Node issuer, talks to it through the real shop adapter, then
+// uses real order routes, the notification worker and SMTP before redeeming.
+// Only supplier recharging and the receiving SMTP server are test doubles.
+func TestPAIPLUSShippingToRedemptionEndToEnd(t *testing.T) {
+	for _, scenario := range []struct {
+		name     string
+		quantity int
+		account  bool
+	}{{"single", 1, false}, {"bulk", 24, false}, {"account", 1, true}} {
+		t.Run(scenario.name, func(t *testing.T) {
+			var sources []string
+			for i := 0; i < scenario.quantity; i++ {
+				sources = append(sources, fmt.Sprintf("ELLPLUS-TEST%06d-CARD%06d", i, i))
+			}
+			raw := strings.Join(sources, "\n") + "\n兑换地址：https://cdk.bar"
+			if scenario.account {
+				raw = "邮箱号：account@example.invalid邮箱密码：Test-password#1密钥2fa：TESTSEED密钥2fa在线获取：https://auth.example.invalid/2fa 兑换卡密：" + sources[0]
+			}
+			var target string
+			var drop atomic.Bool
+			drop.Store(true)
+			var bindingCalls atomic.Int32
+			transport := &http.Client{Timeout: 10 * time.Second}
+			proxy := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				request, err := http.NewRequestWithContext(r.Context(), r.Method, target+r.URL.RequestURI(), r.Body)
+				if err != nil {
+					t.Error(err)
+					http.Error(w, "fixture request", 500)
+					return
+				}
+				request.Header = r.Header.Clone()
+				response, err := transport.Do(request)
+				if err != nil {
+					t.Error(err)
+					http.Error(w, "fixture transport", 502)
+					return
+				}
+				defer response.Body.Close()
+				body, _ := io.ReadAll(response.Body)
+				if r.URL.Path == "/api/integration/deliver" {
+					bindingCalls.Add(1)
+					if drop.Swap(false) {
+						http.Error(w, "simulated lost response after binding", 502)
+						return
+					}
+				}
+				for k, v := range response.Header {
+					w.Header()[k] = v
+				}
+				w.WriteHeader(response.StatusCode)
+				_, _ = w.Write(body)
+			}))
+			defer proxy.Close()
+			var stats string
+			target, stats = startRedemptionFixture(t, proxy.URL, sources)
+			db := setupProcurementTestDB(t)
+			orders := ordergormstore.New(db, "fixture-guest-secret-at-least-32-characters")
+			paid := time.Now()
+			parent := &orderdomain.Order{OrderNo: "PAI-PARENT-" + scenario.name, Status: constants.OrderStatusFulfilling, Currency: "CNY", PaidAt: &paid, GuestEmail: "buyer@example.invalid", GuestPassword: "fixture-password", GuestLocale: "zh-CN"}
+			if err := orders.Create(parent, nil); err != nil {
+				t.Fatal(err)
+			}
+			child := &orderdomain.Order{OrderNo: "PAI-CHILD-" + scenario.name, ParentID: &parent.ID, Status: constants.OrderStatusFulfilling, Currency: "CNY", PaidAt: &paid, GuestEmail: parent.GuestEmail, GuestPassword: "fixture-password", GuestLocale: "zh-CN"}
+			items := []orderdomain.OrderItem{{ProductID: 30, SKUID: 30, Quantity: scenario.quantity, FulfillmentType: constants.FulfillmentTypeUpstream, TitleJSON: jsonmap.JSON{"zh-CN": "测试充值"}, InstructionsJSON: jsonmap.JSON{"zh-CN": "旧兑换说明 https://cdk.bar " + sources[0], "en-US": "old source " + sources[0]}}}
+			if err := orders.Create(child, items); err != nil {
+				t.Fatal(err)
+			}
+			proc := createTestProcurementOrder(t, db, 1, child.ID, child.OrderNo, "accepted")
+			writer, err := redemptionclient.New(proxy.URL, "fixture-integration-token-not-a-production-secret", []uint{30}, 1, child.ID, paid.Add(-time.Minute))
+			if err != nil {
+				t.Fatal(err)
+			}
+			mailQueue := &redemptionMailQueue{}
+			options := procurementOptionsForTest(db)
+			options.DeliveryRewriter = writer
+			options.OrderLifecycle = procurementgormstore.NewLifecycle(db, mailQueue, nil, config.EmailConfig{})
+			service := procurementapp.NewService(options)
+			if err := service.HandleUpstreamCallback(proc.ID, "delivered", &procurementcontract.Fulfillment{Type: "auto", Status: "delivered", Payload: raw}); err == nil {
+				t.Fatal("lost issuer response should suspend shipping")
+			}
+			var count int64
+			db.Model(&fulfillmentdomain.Fulfillment{}).Count(&count)
+			if count != 0 || len(mailQueue.tasks) != 0 {
+				t.Fatal("unbound card reached delivery or email queue")
+			}
+			if redemptionStats(t, stats)["cards"] != scenario.quantity {
+				t.Fatal("issuer did not bind exactly one local code per source")
+			}
+			// Restarting the shop service retains the pending source and stable reference.
+			service = procurementapp.NewService(options)
+			if err := service.PollUpstreamStatus(proc.ID); err != nil {
+				t.Fatal(err)
+			}
+			if redemptionStats(t, stats)["cards"] != scenario.quantity || bindingCalls.Load() != 2 {
+				t.Fatal("recovery duplicated a binding")
+			}
+			if err := service.HandleUpstreamCallback(proc.ID, "delivered", &procurementcontract.Fulfillment{Type: "auto", Payload: raw}); err != nil {
+				t.Fatal(err)
+			}
+			if bindingCalls.Load() != 2 {
+				t.Fatal("duplicate callback generated another code")
+			}
+			var sourceRecord ProcurementOrder
+			if err := db.First(&sourceRecord, proc.ID).Error; err != nil {
+				t.Fatal(err)
+			}
+			if sourceRecord.UpstreamPayload != raw || sourceRecord.Status != "fulfilled" {
+				t.Fatal("private supplier recovery record lost")
+			}
+			order, err := orders.GetByID(child.ID)
+			if err != nil {
+				t.Fatal(err)
+			}
+			codes := regexp.MustCompile(`PAIPLUS-[A-HJ-NP-Z2-9]{10}-[A-HJ-NP-Z2-9]{10}`).FindAllString(order.Fulfillment.Payload, -1)
+			if len(codes) != scenario.quantity {
+				t.Fatal("incorrect customer code count")
+			}
+			assertPrivate := func(label, output string) {
+				t.Helper()
+				for _, secret := range append(append([]string{}, sources...), "cdk.bar") {
+					if strings.Contains(output, secret) {
+						t.Fatalf("%s leaked supplier data", label)
+					}
+				}
+			}
+			storedJSON, _ := json.Marshal(order)
+			assertPrivate("customer order snapshot", string(storedJSON))
+			if scenario.account && (!strings.Contains(order.Fulfillment.Payload, "account@example.invalid") || !strings.Contains(order.Fulfillment.Payload, "TESTSEED")) {
+				t.Fatal("account delivery fields lost")
+			}
+			projection, err := downstreamreader.New(orders).GetByID(parent.ID)
+			if err != nil {
+				t.Fatal(err)
+			}
+			projectionJSON, _ := json.Marshal(projection)
+			assertPrivate("downstream notification projection", string(projectionJSON))
+			if !strings.Contains(string(projectionJSON), codes[0]) {
+				t.Fatal("downstream projection lost local code")
+			}
+			// Real guest and member read/download handlers, with their actual order store.
+			c := &container.Container{OrderStore: orders, OrderService: orderapp.NewOrderService(orderapp.OrderServiceOptions{OrderStore: orders})}
+			handlers := orderwiring.New(c)
+			gin.SetMode(gin.TestMode)
+			router := gin.New()
+			orderhttp.RegisterGuestReadRoutes(router.Group("/guest"), handlers.Guest)
+			users := router.Group("/user")
+			users.Use(func(ctx *gin.Context) {
+				if ctx.GetHeader("X-Test-User") == "17" {
+					ctx.Set("user_id", uint(17))
+				}
+				ctx.Next()
+			})
+			orderhttp.RegisterUserReadRoutes(users, handlers.User)
+			guestAuth := "Guest " + base64.RawURLEncoding.EncodeToString([]byte(parent.GuestEmail+"\nfixture-password"))
+			read := func(path, auth, user string) *httptest.ResponseRecorder {
+				t.Helper()
+				request := httptest.NewRequest("GET", path, nil)
+				request.Header.Set("Authorization", auth)
+				request.Header.Set("X-Test-User", user)
+				recorder := httptest.NewRecorder()
+				router.ServeHTTP(recorder, request)
+				assertPrivate(path, recorder.Body.String())
+				return recorder
+			}
+			for _, no := range []string{child.OrderNo, parent.OrderNo} {
+				for _, suffix := range []string{"/fulfillment", "/fulfillment/download"} {
+					path := "/guest/orders/" + no + suffix
+					if strings.Contains(read(path, "", "").Body.String(), codes[0]) {
+						t.Fatal("unauthorized guest read local card")
+					}
+					response := read(path, guestAuth, "")
+					// Parent delivery is collected via children; the download is the complete export.
+					if suffix == "/fulfillment/download" || no == child.OrderNo {
+						if response.Code != 200 || !strings.Contains(response.Body.String(), codes[0]) {
+							t.Fatalf("authorized %s missing local delivery (HTTP %d)", suffix, response.Code)
+						}
+					}
+					if !strings.Contains(response.Header().Get("Cache-Control"), "no-store") {
+						t.Fatal("delivery response can be cached")
+					}
+					if suffix == "/fulfillment/download" {
+						for _, code := range codes {
+							if !strings.Contains(response.Body.String(), code) {
+								t.Fatal("download truncated cards")
+							}
+						}
+						if !strings.Contains(response.Header().Get("Content-Disposition"), "attachment") {
+							t.Fatal("download missing attachment header")
+						}
+					}
+				}
+			}
+			// Real notification worker and SMTP, including the bulk .txt attachment.
+			emailConfig, messages := redemptionSMTP(t)
+			c.EmailSender = notificationsmtp.New(&emailConfig)
+			mux := asynq.NewServeMux()
+			consumer.New(c).RegisterNotifications(mux)
+			if len(mailQueue.tasks) != 1 || mailQueue.tasks[0].OrderID != parent.ID {
+				t.Fatal("wrong delivered notification count/order")
+			}
+			task, err := queue.NewOrderStatusEmailTask(mailQueue.tasks[0])
+			if err != nil {
+				t.Fatal(err)
+			}
+			if err = mux.ProcessTask(context.Background(), task); err != nil {
+				t.Fatal(err)
+			}
+			select {
+			case message := <-messages:
+				decoded, attachment := decodedRedemptionMail(t, message)
+				assertPrivate("SMTP body and attachment", decoded)
+				for _, code := range codes {
+					if !strings.Contains(decoded, code) {
+						t.Fatal("email lost local card")
+					}
+				}
+				if (scenario.quantity > 20) != attachment {
+					t.Fatal("wrong bulk email attachment behavior")
+				}
+			case <-time.After(5 * time.Second):
+				t.Fatal("SMTP message not received")
+			}
+			if err := db.Model(&orderdomain.Order{}).Where("id IN ?", []uint{parent.ID, child.ID}).Update("user_id", 17).Error; err != nil {
+				t.Fatal(err)
+			}
+			for _, suffix := range []string{"/fulfillment", "/fulfillment/download"} {
+				path := "/user/orders/" + child.OrderNo + suffix
+				if strings.Contains(read(path, "", "").Body.String(), codes[0]) {
+					t.Fatal("non-owner read local card")
+				}
+				response := read(path, "", "17")
+				if response.Code != 200 || !strings.Contains(response.Body.String(), codes[0]) {
+					t.Fatal("member delivery unavailable")
+				}
+			}
+			// Redeem precisely the codes received from the shop download.
+			boot, err := transport.Get(proxy.URL + "/api/session")
+			if err != nil {
+				t.Fatal(err)
+			}
+			cookie := boot.Cookies()[0]
+			boot.Body.Close()
+			post := func(path string, input any) map[string]any {
+				t.Helper()
+				body, _ := json.Marshal(input)
+				request, _ := http.NewRequest("POST", proxy.URL+"/api/"+path, bytes.NewReader(body))
+				request.Header.Set("Content-Type", "application/json")
+				request.Header.Set("Origin", proxy.URL)
+				request.Header.Set("X-Pai-Request", "1")
+				request.AddCookie(cookie)
+				response, err := transport.Do(request)
+				if err != nil {
+					t.Fatal(err)
+				}
+				defer response.Body.Close()
+				out, _ := io.ReadAll(response.Body)
+				assertPrivate("redemption "+path, string(out))
+				if response.StatusCode != 200 {
+					t.Fatalf("redemption %s HTTP %d", path, response.StatusCode)
+				}
+				var result struct {
+					Data map[string]any `json:"data"`
+				}
+				if err = json.Unmarshal(out, &result); err != nil {
+					t.Fatal(err)
+				}
+				return result.Data
+			}
+			for _, code := range codes {
+				p := post("preview", map[string]any{"code": code})
+				check := post("preflight", map[string]any{"attempt_id": p["attempt_id"], "session": `{"demo":true,"email":"buyer@example.invalid"}`})
+				if check["state"] != "checked" {
+					t.Fatal("account check failed")
+				}
+				input := map[string]any{"attempt_id": p["attempt_id"], "confirmation": check["confirmation"], "confirmed": true}
+				post("redeem", input)
+				post("redeem", input)
+			}
+			deadline := time.Now().Add(12 * time.Second)
+			for _, code := range codes {
+				for {
+					result := post("result-by-code", map[string]any{"code": code})
+					if result["state"] == "completed" {
+						break
+					}
+					if time.Now().After(deadline) {
+						t.Fatal("redemption did not complete")
+					}
+					time.Sleep(200 * time.Millisecond)
+				}
+			}
+			if got := redemptionStats(t, stats); got["cards"] != scenario.quantity || got["submits"] != scenario.quantity || got["deliveries"] != 1 {
+				t.Fatalf("one-to-one/submission invariant failed: %v", got)
+			}
+			t.Logf("verified %d one-to-one bindings, replay/recovery, private order instructions, member/guest downloads, SMTP %t attachment, and completed redemptions", scenario.quantity, scenario.quantity > 20)
+		})
+	}
+}
+
+func (f *deliveryRewriteFixture) Rewrite(_ *procurementdomain.LocalOrder, _ uint, source *procurementcontract.Fulfillment) (*procurementcontract.Fulfillment, error) {
+	f.calls++
+	if f.fail {
+		return nil, errors.New("issuer temporarily unavailable")
+	}
+	copy := *source
+	copy.Payload = "卡密：PAIPLUS-ABCDEFGH23-ABCDEFGH45"
+	copy.InstructionsOverride = jsonmap.JSON{"zh-CN": "请使用 PAIPLUS 卡密在本站兑换"}
+	return &copy, nil
+}
+
+func TestRedemptionIssuerFailureKeepsAcceptedAndRecoveryDeliversOnlyStoreCode(t *testing.T) {
+	db := setupProcurementTestDB(t)
+	order := createProcTestOrder(t, db, "REDEMPTION-DELIVERY", constants.OrderStatusFulfilling, constants.FulfillmentTypeUpstream)
+	proc := createTestProcurementOrder(t, db, 1, order.ID, order.OrderNo, "accepted")
+	raw := "卡密：ELLPLUS-AAAAAAAAAA-BBBBBBBBBB"
+	if err := db.Model(&orderdomain.OrderItem{}).Where("order_id = ?", order.ID).Update("instructions_json", jsonmap.JSON{"zh-CN": "旧说明 https://cdk.bar 卡密：" + raw}).Error; err != nil {
+		t.Fatal(err)
+	}
+	writer := &deliveryRewriteFixture{fail: true}
+	options := procurementOptionsForTest(db)
+	options.DeliveryRewriter = writer
+	service := procurementapp.NewService(options)
+	source := &procurementcontract.Fulfillment{Type: "auto", Status: "delivered", Payload: raw}
+	if err := service.HandleUpstreamCallback(proc.ID, "delivered", source); err == nil {
+		t.Fatal("issuer failure should stop delivery")
+	}
+	var count int64
+	db.Model(&fulfillmentdomain.Fulfillment{}).Count(&count)
+	if count != 0 {
+		t.Fatal("raw card was delivered on issuer failure")
+	}
+	var current ProcurementOrder
+	db.First(&current, proc.ID)
+	if current.Status != "accepted" || current.UpstreamPayload != raw || current.ErrorCode != "paiplus_binding_pending" {
+		t.Fatal("lost supplier result or marked delivery completed")
+	}
+	disabledOptions := options
+	disabledOptions.DeliveryRewriter = nil
+	if err := procurementapp.NewService(disabledOptions).PollUpstreamStatus(proc.ID); err == nil {
+		t.Fatal("disabling the issuer released a pending supplier code")
+	}
+	writer.fail = false
+	if err := service.HandleUpstreamCallback(proc.ID, "delivered", &procurementcontract.Fulfillment{Type: "auto", Payload: "changed-supplier-card"}); err == nil {
+		t.Fatal("conflicting callback replaced original source")
+	}
+	// No supplier connection exists in this fixture: recovery must use the
+	// durable delivery instead of purchasing or fetching another source card.
+	if err := service.PollUpstreamStatus(proc.ID); err != nil {
+		t.Fatal(err)
+	}
+	var delivered fulfillmentdomain.Fulfillment
+	db.Where("order_id=?", order.ID).First(&delivered)
+	if delivered.Payload == raw || delivered.Payload != "卡密：PAIPLUS-ABCDEFGH23-ABCDEFGH45" {
+		t.Fatal("wrong customer delivery")
+	}
+	db.First(&current, proc.ID)
+	if current.UpstreamPayload != raw || current.Status != "fulfilled" || current.ErrorCode != "" {
+		t.Fatal("supplier recovery record changed")
+	}
+	if source.Payload != raw {
+		t.Fatal("rewriter mutated original supplier payload")
+	}
+	var item orderdomain.OrderItem
+	if err := db.Where("order_id = ?", order.ID).First(&item).Error; err != nil {
+		t.Fatal(err)
+	}
+	if item.InstructionsJSON["zh-CN"] != "请使用 PAIPLUS 卡密在本站兑换" {
+		t.Fatal("order instructions still expose supplier delivery")
+	}
+	if err := service.HandleUpstreamCallback(proc.ID, "delivered", source); err != nil {
+		t.Fatal(err)
+	}
+	if writer.calls != 2 {
+		t.Fatal("duplicate fulfilled callback rewrote historical delivery")
+	}
 }

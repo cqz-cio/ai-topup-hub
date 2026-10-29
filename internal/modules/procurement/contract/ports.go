@@ -24,6 +24,12 @@ type SubmissionClaimer interface {
 	ClaimSubmission(id uint) (bool, error)
 }
 
+// DeliveryRecorder saves the first supplier response before contacting an
+// issuer. Conflicting callbacks cannot overwrite the recovery copy.
+type DeliveryRecorder interface {
+	PreserveDelivery(id uint, current, payload, bindingState string) (bool, error)
+}
+
 // RecoveryReader locates durable paid orders and work lost during queue outages.
 type RecoveryReader interface {
 	FindPaidOrdersMissingProcurement(limit int, window *procurementdomain.PurchaseWindow) ([]uint, error)
@@ -57,6 +63,13 @@ type OrderLifecycle interface {
 	CreateUpstreamFulfillment(orderID uint, fulfillment *Fulfillment, now time.Time) error
 	SyncParentStatus(parentID uint, now time.Time) (string, error)
 	EnqueueStatusEmail(orderID uint, status string) (skipped bool, err error)
+}
+
+// DeliveryRewriter optionally exchanges supplier codes for store-owned codes.
+// The original supplier payload remains on the procurement record for recovery.
+type DeliveryRewriter interface {
+	RequiresRewrite(order *procurementdomain.LocalOrder, connectionID uint) bool
+	Rewrite(order *procurementdomain.LocalOrder, connectionID uint, fulfillment *Fulfillment) (*Fulfillment, error)
 }
 
 type DownstreamCallbackEnqueuer interface {
