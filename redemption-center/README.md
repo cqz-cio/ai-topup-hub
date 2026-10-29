@@ -132,3 +132,14 @@ Chrome 标签页已刷新。受浏览器工具控制时观察到扩展会将 `re
 备份 `/srv/paiplus/backups/before-favicon-20261029T090203Z` 包含原发布、私有配置和兑换数据库一致性快照；补丁清单与验收报告在 `/srv/paiplus/static-updates/favicon-20261029T090203Z/`，叠加在原发布清单之上。回退只恢复备份中的 `release/dist/client/index.html`，新增的版本化图标可保留；不恢复业务数据库。后续发布须包含本次图标及引用，避免以旧基础发布覆盖。私有本机证据为 `runtime/paiplus-deploy-favicon-frontend.json`，正式图标截图为 `runtime/favicon-v3-production.png`。
 
 2026-10-29 排查浏览器“不安全”提示：服务器与本机独立 TLS 验证均通过，证书 SAN 为 `cdk.qzweb.cloud`、签发者 Let's Encrypt YE1，到期时间 2027-01-27 06:28:35 UTC；两处证书 SHA256 一致，均协商 TLS 1.3。HTTP 返回 301 至 HTTPS，站点启用 HSTS；页面资源为本站 HTTPS，未发现网络 HTTP 资源。用户反馈手机正常、电脑 Chrome 仍提示不安全，尚未取得 Chrome 安全概览的具体原因，不能把服务器核验通过称为已修复浏览器警告。证据位于 `runtime/paiplus-tls-inspect-frontend.json` 和 `runtime/local-tls-check.json`。
+
+
+## 2026-10-29 兑换站独立导航
+
+按用户要求，兑换站页面不再提供商城跳转：移除首页、商品中心、我的订单、去订单领取卡密及客服弹窗中的商城链接。卡密与使用说明改为直接输入收到的 PAIPLUS；客服提示直接联系提供卡密的客服。页首说明为「卡密兑换 · 自助服务」，保留四个兑换工具、帮助、主题切换、动画、品牌与 v4 图标。后台一对一绑定、状态核验及销毁接口继续保持，不切断商城发货接入。
+
+正式静态补丁为 `standalone-20261029T122008Z`，界面源码 `b5acebb74581bddda7a43805820560a428b2c27d`，任务分支 `codex/paiplus-binding`。仅新增 `assets/index-DdVPQS8k.js` 并原子替换 `dist/client/index.html`；Node 程序仍为 `20261029-181554`，46 个原文件、60 个 Nginx 文件、私有配置和服务进程保持。未写业务数据库、重启服务或调用充值/采购接口；main 未更新。
+
+最终生产构建、本地及正式桌面/390px/320px 浏览器检查通过：四个工具切换、帮助和客服弹窗、手机菜单正常，无页面错误、破图或横向溢出。正式入口、管理页入口、新脚本与 v4 图标的 SHA256 和 MIME 核验通过，正式会话保持 live 且无模拟样例。
+
+备份 `/srv/paiplus/backups/before-standalone-20261029T122008Z/index.html`；补丁清单与报告在 `/srv/paiplus/static-updates/standalone-20261029T122008Z/`。回退仅将此入口文件原子恢复到记录的发布目录，保留新旧版本资源，不恢复服务器代码、配置或数据库。后续完整发布须包含本次独立导航，不能以旧 HTML 覆盖。私有证据为 `runtime/paiplus-standalone-deploy-frontend.json`、`runtime/standalone-browser-checks.json`，正式截图为 `runtime/standalone-production.png`。
