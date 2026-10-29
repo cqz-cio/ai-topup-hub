@@ -1,4 +1,4 @@
-import { Problem, id, newCard, normalizeCard, maskedCard, credential, terminal, safeURL } from './security.mjs';
+import { Problem, id, newCard, normalizeCard, maskedCard, maskedEmail, credential, terminal, safeURL } from './security.mjs';
 import { parseDelivery, customerDelivery } from './delivery.mjs';
 import { CardManagement } from './management.mjs';
 
@@ -35,11 +35,11 @@ export class RedemptionService {
     this.store.run(`UPDATE attempts SET ${Object.keys(patch).map(k=>`${k}=?`).join(',')},revision=revision+1 WHERE id=?`,...Object.values(patch),a.id);
     return this.store.get('SELECT * FROM attempts WHERE id=?',a.id);
   }
-  view(a,owned=true) {
+  view(a,owned=true,showAccount=false) {
     const d=this.data(a), c=this.store.get('SELECT code_enc,status FROM cards WHERE id=?',a.card_id);
     if(['revoked','revoking','invalid'].includes(c.status))return {attempt_id:a.id,state:c.status,code:maskedCard(this.vault.decrypt(c.code_enc)),confirmation:null,submitted:!!a.submitted_at,message:c.status==='revoked'?'该本站卡密已销毁，不能继续兑换。':c.status==='revoking'?'该卡密正在销毁核验，暂不能兑换。':'该卡密已失效，请联系客服。'};
     return {attempt_id:a.id,state:a.state,code:maskedCard(this.vault.decrypt(c.code_enc)),product:d.product||'unknown',plan:d.plan||null,
-      country:d.country||null,currency:d.currency||null,email:d.email||null,current_plan:d.current_plan||null,
+      country:d.country||null,currency:d.currency||null,email:owned&&showAccount?d.email||null:maskedEmail(d.email),current_plan:d.current_plan||null,
       has_active_subscription:d.has_active_subscription??null,blocked:!!d.blocked,
       blocking_reason:d.blocked?'当前账号状态需要人工处理，暂时不能提交充值。':null,
       confirmation:a.state==='checked' && owned && a.confirmation_hash?d.confirmation:null,
@@ -128,7 +128,7 @@ export class RedemptionService {
     const c=this.store.get('SELECT * FROM cards WHERE id=?',a.card_id);
     this.assertUsable(c);
     if(c.status!=='ready')throw new Problem('CARD_IN_USE','该卡密已使用或正在充值，请查询原记录。',409);
-    if(!this.store.run("UPDATE attempts SET state='checking',revision=revision+1 WHERE id=? AND revision=?",a.id,a.revision).changes)throw new Problem('BUSY','账号正在核验，请稍后。',409);
+    if(!this.store.run("UPDATE attempts SET state='checking',session_enc='',preflight_enc='',confirmation_hash='',revision=revision+1 WHERE id=? AND revision=?",a.id,a.revision).changes)throw new Problem('BUSY','账号正在核验，请稍后。',409);
     a=this.store.get('SELECT * FROM attempts WHERE id=?',a.id);
     try {
       const data=await this.partner.call('preflight',{code:this.vault.decrypt(c.source_enc),redemption_token:this.vault.decrypt(a.token_enc),credential:{mode:'session',session}},this.device(a));
@@ -138,7 +138,7 @@ export class RedemptionService {
       const confirmation=id();
       a=this.update(a,blocked?'blocked':'checked',{email:account,current_plan:string(data.currentPlan||data.current_plan,80),has_active_subscription:nullableBoolean(data.has_active_subscription),blocked,confirmation},
         {preflight_enc:blocked?'':this.vault.encrypt(ticket),session_enc:!blocked && product==='grok'?this.vault.encrypt(session):'',confirmation_hash:blocked?'':this.vault.hash('confirmation',confirmation),checked_at:Date.now()});
-      return this.view(a);
+      return this.view(a,true,true);
     } catch(e) { this.update(a,'preview',{}, {preflight_enc:'',session_enc:'',confirmation_hash:''}); throw e; }
   }
   async redeem(attemptID,confirmation,confirmed,device) {
@@ -160,6 +160,9 @@ export class RedemptionService {
     const request={redemption_token:this.vault.decrypt(a.token_enc),client_request_id:a.request_id};
     if(this.data(a).product==='grok')request.credential={mode:'session',session:this.vault.decrypt(a.session_enc)};
     else request.preflight_token=this.vault.decrypt(a.preflight_enc);
+    // The request now owns the short-lived credential; it must not remain on disk
+    // while the upstream is slow, disconnected, or the process is interrupted.
+    this.store.run("UPDATE attempts SET session_enc='',preflight_enc='',confirmation_hash='' WHERE id=?",a.id);
     try {
       const response=await this.partner.call('redeem',request,this.device(a));
       return this.view(this.setResult(a,response));
@@ -231,7 +234,7 @@ export class RedemptionService {
     if(!active(a.state) && !terminal(a.state) && a.device_hash!==this.vault.hash('device',device))throw new Problem('OTHER_BROWSER','请在原浏览器继续核验。',409);
     return this.view(await this.pollRecord(a),a.device_hash===this.vault.hash('device',device));
   }
-  recent(device) { return this.store.all('SELECT * FROM attempts WHERE device_hash=? ORDER BY created_at DESC LIMIT 30',this.vault.hash('device',device)).map(a=>this.view(a)); }
+  recent(device) { return this.store.all('SELECT * FROM attempts WHERE device_hash=? ORDER BY created_at DESC LIMIT 30',this.vault.hash('device',device)).map(a=>({...this.view(a),confirmation:null})); }
   async lookup(values,device) {
     if(!Array.isArray(values) || !values.length || values.length>100)throw new Problem('LOOKUP_LIMIT','每次查询 1–100 张卡密。');
     const results=[], groups=new Map();
@@ -241,7 +244,7 @@ export class RedemptionService {
         if(['disabled','revoked','revoking','invalid'].includes(c.status)) { results[i]={row:i+1,code:normalizeCard(values[i]),status:c.status,used:null,can_resubmit:false}; continue; }
         const d=a?this.device(a):device;
         if(!groups.has(d))groups.set(d,[]); groups.get(d).push({i,c,a});
-      } catch { results[i]={row:i+1,code:String(values[i]||'').slice(0,256),status:'unknown',used:null,can_resubmit:false}; }
+      } catch { let code;try{code=normalizeCard(values[i]);}catch{code='格式不正确';}results[i]={row:i+1,code,status:'unknown',used:null,can_resubmit:false}; }
     }
     for(const [d,items] of groups) {
       try {
@@ -252,7 +255,7 @@ export class RedemptionService {
           const result=data.results[n];
           if(result.cdk_code && result.cdk_code!==sourceCodes[n])throw new Error('Mismatched batch row');
           const localSubmitted=!!a?.submitted_at;
-          results[i]={row:i+1,code:normalizeCard(values[i]),status:localSubmitted?a.state:string(result.status,40)||'unknown',used:nullableBoolean(result.used),can_resubmit:!localSubmitted && result.can_resubmit===true,account_email:email(result.account_email),plan:string(result.plan,80),used_at:dateValue(result.used_at)};
+          results[i]={row:i+1,code:normalizeCard(values[i]),status:localSubmitted?a.state:string(result.status,40)||'unknown',used:nullableBoolean(result.used),can_resubmit:!localSubmitted && result.can_resubmit===true,account_email:maskedEmail(email(result.account_email)),plan:string(result.plan,80),used_at:dateValue(result.used_at)};
         });
       } catch { for(const {i,a} of items)results[i]={row:i+1,code:normalizeCard(values[i]),status:a?.submitted_at?a.state:'unavailable',used:null,can_resubmit:false}; }
     }
@@ -261,11 +264,16 @@ export class RedemptionService {
   async billing({code,session},device) {
     if(!!code===!!session)throw new Problem('BILLING_INPUT','请选择卡密或账号凭证中的一种查询方式。');
     let body,d=device;
-    if(code) { const c=this.card(code), a=c.attempt_id?this.store.get('SELECT * FROM attempts WHERE id=?',c.attempt_id):null; this.assertUsable(c); body={cdk_code:this.vault.decrypt(c.source_enc)}; if(a)d=this.device(a); }
+    if(code) {
+      const c=this.card(code),a=c.attempt_id?this.store.get('SELECT * FROM attempts WHERE id=?',c.attempt_id):null;
+      this.assertUsable(c);
+      if(!a?.submitted_at || a.device_hash!==this.vault.hash('device',device))throw new Problem('BILLING_PROOF_REQUIRED','请在原充值浏览器查询账单，或切换为账号凭证查询。',403);
+      body={cdk_code:this.vault.decrypt(c.source_enc)};d=this.device(a);
+    }
     else body={token_input:credential(session)};
     const data=await this.partner.call('billing',body,d), summary=data.summary||{};
     const payment=p=>p && typeof p==='object'?{amount:amount(p.amount),currency:string(p.currency,12),date:dateValue(p.date??p.paid_at??p.created_at),status:string(p.status,40),invoice_url:safeURL(p.invoice_url||p.hosted_invoice_url||p.url)}:null;
-    return {summary:{email:email(summary.email),plan_type:string(summary.plan_type,80),has_active_subscription:nullableBoolean(summary.has_active_subscription)},last_payment:payment(data.last_payment),invoices:Array.isArray(data.invoices)?data.invoices.slice(0,100).map(payment):null,invoice_url:safeURL(data.invoice_url),invoice_data_available:nullableBoolean(data.invoice_data_available)};
+    return {summary:{email:maskedEmail(email(summary.email)),plan_type:string(summary.plan_type,80),has_active_subscription:nullableBoolean(summary.has_active_subscription)},last_payment:payment(data.last_payment),invoices:Array.isArray(data.invoices)?data.invoices.slice(0,100).map(payment):null,invoice_url:safeURL(data.invoice_url),invoice_data_available:nullableBoolean(data.invoice_data_available)};
   }
   listCards(query='') {
     query=String(query).trim().slice(0,200);

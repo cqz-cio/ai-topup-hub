@@ -1,12 +1,18 @@
+const pendingRequests=new Set();
+export function clearPendingRequests(){for(const controller of pendingRequests)controller.abort();pendingRequests.clear();}
 export async function api(path, body) {
+  const controller=new AbortController();pendingRequests.add(controller);
+  const timeout=setTimeout(()=>controller.abort(),175000);
+  try {
   const response = await fetch(`/api/${path}`, {
     method: body === undefined ? 'GET' : 'POST', credentials: 'same-origin', cache: 'no-store',
     headers: body === undefined ? {} : {'Content-Type':'application/json','X-Pai-Request':'1'},
-    body: body === undefined ? undefined : JSON.stringify(body), signal: AbortSignal.timeout(175000),
+    body: body === undefined ? undefined : JSON.stringify(body), signal: controller.signal,
   });
   let result; try { result = await response.json(); } catch { throw new Error('服务暂时不可用，请稍后查询原记录。'); }
   if(!response.ok || !result.ok) { const error=new Error(result.error?.message||'请求未完成，请稍后再试。');error.code=result.error?.code;throw error; }
   return result.data;
+  } finally {clearTimeout(timeout);pendingRequests.delete(controller);}
 }
 export const active = state => ['submitting','queued','processing','uncertain'].includes(state);
 export const terminal = state => ['completed','declined','failed_precharge','cancelled','failed','revoked','invalid'].includes(state);

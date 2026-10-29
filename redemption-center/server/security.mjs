@@ -16,6 +16,11 @@ export function normalizeCard(value) {
   return code;
 }
 export const maskedCard = code => `${code.slice(0,7)}-••••••••••-••••••${code.slice(-4)}`;
+export function maskedEmail(value) {
+  if(typeof value!=='string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))return null;
+  const [local,domain]=value.split('@');
+  return `${local[0]}***@${domain[0]}***.${domain.split('.').at(-1)}`;
+}
 export function equal(a, b) { const x = Buffer.from(String(a || '')), y = Buffer.from(String(b || '')); return x.length === y.length && timingSafeEqual(x,y); }
 export function vault(key) {
   const secret = Buffer.from(key || '', 'base64');

@@ -1,8 +1,9 @@
 import { createServer } from 'node:http';
-import { readFile, stat } from 'node:fs/promises';
+import { readFile, stat, realpath } from 'node:fs/promises';
 import { resolve, extname, sep } from 'node:path';
 import { isIP } from 'node:net';
 import { Problem, id, equal } from './security.mjs';
+import { abuseProtection, clientNetwork } from './abuse.mjs';
 
 const MIME={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.png':'image/png','.webp':'image/webp','.svg':'image/svg+xml','.ico':'image/x-icon','.woff2':'font/woff2'};
 function cookies(req) { const result={}; for(const entry of String(req.headers.cookie||'').split(';')) { const i=entry.indexOf('='); if(i>0)result[entry.slice(0,i).trim()]=entry.slice(i+1).trim(); } return result; }
@@ -13,14 +14,7 @@ async function body(req) {
   try { const value=JSON.parse(Buffer.concat(parts).toString('utf8')); if(!value || Array.isArray(value) || typeof value!=='object')throw 0; return value; } catch { throw new Problem('JSON_INVALID','请求格式不正确。'); }
 }
 export function makeServer({service,config,staticDir}) {
-  const buckets=new Map();
-  const limit=(key,max=120,cost=1)=>{
-    const now=Date.now(); let bucket=buckets.get(key);
-    if(!bucket || now-bucket.at>60000){bucket={at:now,count:0};buckets.set(key,bucket);}
-    bucket.count+=cost;
-    if(buckets.size>10000)for(const [k,b] of buckets)if(now-b.at>60000)buckets.delete(k);
-    if(buckets.size>12000 || bucket.count>max)throw new Problem('RATE_LIMITED','操作较频繁，请稍后再试。',429);
-  };
+  const abuse=abuseProtection(),limit=abuse.hit;
   const root=resolve(staticDir), secure=new URL(config.publicOrigin).protocol==='https:';
   const cookie=(name,value,maxAge)=>`${name}=${value}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${maxAge}${secure?'; Secure':''}`;
   const adminValid=value=>{
@@ -29,24 +23,34 @@ export function makeServer({service,config,staticDir}) {
   };
   return createServer(async(req,res)=>{
     res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','no-referrer');res.setHeader('X-Frame-Options','DENY');
+    res.setHeader('X-Robots-Tag','noindex, nofollow, noarchive, nosnippet');
+    res.setHeader('Cross-Origin-Resource-Policy','same-origin');res.setHeader('Cross-Origin-Opener-Policy','same-origin');
+    res.setHeader('Permissions-Policy','camera=(), microphone=(), geolocation=()');
     res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
     const send=(status,data)=>{res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'private, no-store'});res.end(JSON.stringify(data));};
+    let release=()=>{},network=null;
     try {
-      const path=new URL(req.url,'http://local').pathname;
+      const url=new URL(req.url,'http://local'),path=url.pathname;
       if(!path.startsWith('/api/')) {
         if(!['GET','HEAD'].includes(req.method))throw new Problem('METHOD','Method not allowed',405);
+        if(path==='/robots.txt'){res.writeHead(200,{'Content-Type':'text/plain; charset=utf-8','Cache-Control':'no-store'});res.end(req.method==='HEAD'?undefined:'User-agent: *\nDisallow: /\n');return;}
         let relative; try { relative=decodeURIComponent(path); } catch { throw new Problem('PATH','Not found',404); }
         if(relative.split('/').some(p=>p.startsWith('.') || p.includes('\\')))throw new Problem('PATH','Not found',404);
+        if(!['/','/admin','/index.html','/favicon.ico'].includes(relative) && !/^\/(assets|icons)\/[^/]+$/.test(relative))throw new Problem('PATH','Not found',404);
+        if(extname(relative)&&!MIME[extname(relative)])throw new Problem('PATH','Not found',404);
         let file=resolve(root,'.'+relative);
         if(file!==root && !file.startsWith(root+sep))throw new Problem('PATH','Not found',404);
         try { if(!(await stat(file)).isFile())file=resolve(root,'index.html'); } catch { if(extname(path))throw new Problem('PATH','Not found',404); file=resolve(root,'index.html'); }
-        const data=await readFile(file);res.writeHead(200,{'Content-Type':MIME[extname(file)]||'application/octet-stream','Cache-Control':file.endsWith('index.html')?'no-cache':'public, max-age=3600'});res.end(req.method==='HEAD'?undefined:data);return;
+        const actual=await realpath(file),actualRoot=await realpath(root);
+        if(!actual.startsWith(actualRoot+sep))throw new Problem('PATH','Not found',404);
+        const data=await readFile(file);res.writeHead(200,{'Content-Type':MIME[extname(file)]||'application/octet-stream','Cache-Control':file.endsWith('index.html')?'private, no-store':'public, max-age=3600'});res.end(req.method==='HEAD'?undefined:data);return;
       }
       res.setHeader('Cache-Control','private, no-store');
       const jar=cookies(req), remote=req.socket.remoteAddress||'unknown';
       const forwarded=req.headers['x-real-ip'];
-      const ip=config.trustProxy && ['127.0.0.1','::1','::ffff:127.0.0.1'].includes(remote) && typeof forwarded==='string' && isIP(forwarded)?forwarded:remote;
+      const ip=clientNetwork(config.trustProxy && ['127.0.0.1','::1','::ffff:127.0.0.1'].includes(remote) && typeof forwarded==='string' && isIP(forwarded)?forwarded:remote);
       limit(`ip:${ip}`,2000);
+      if(url.search)throw new Problem('QUERY_NOT_ALLOWED','请勿将卡密或账号凭证放入网址。',400);
       let device=jar.pai_device;
       if(!/^device-[A-Za-z0-9_-]{32}$/.test(device||'')){device='device-'+id();res.setHeader('Set-Cookie',cookie('pai_device',device,31536000));}
       const deviceKey=service.vault.hash('device',device);
@@ -71,6 +75,7 @@ export function makeServer({service,config,staticDir}) {
         else throw new Problem('NOT_FOUND','接口不存在。',404);
         send(200,{ok:true,data});return;
       }
+      limit(`public:${ip}`,600);
       if(req.headers.origin!==config.publicOrigin || req.headers['x-pai-request']!=='1')throw new Problem('ORIGIN','请求来源不匹配，请刷新页面。',403);
       const input=await body(req);
       if(path==='/api/demo/examples' && config.mode==='mock' && config.newExamples) {
@@ -96,6 +101,13 @@ export function makeServer({service,config,staticDir}) {
         send(200,{ok:true,data});return;
       }
       limit(`device:${deviceKey}`,400);
+      network=ip;
+      const action=path.slice(5),weights={'lookup':200,'lookup-batch':200,preview:150,preflight:150,redeem:150,billing:20,'result-by-code':180,results:6000,result:300};
+      if(!Object.hasOwn(weights,action))throw new Problem('NOT_FOUND','接口不存在。',404);
+      if(['preview','lookup','lookup-batch','billing','result-by-code'].includes(action))abuse.discovery(ip);
+      const rows=Array.isArray(input.codes)?Math.max(1,input.codes.length):1;
+      limit(`action:${ip}:${action==='lookup-batch'?'lookup':action}`,weights[action],['lookup-batch','results'].includes(action)?rows:1);
+      release=abuse.acquire(ip);
       let data;
       if(path==='/api/preview') {limit(`preview:${deviceKey}`,120);data=await service.preview(input.code,device);}
       else if(path==='/api/preflight') {limit(`preflight:${deviceKey}`,120);data=await service.preflight(input.attempt_id,input.session,device);}
@@ -107,12 +119,15 @@ export function makeServer({service,config,staticDir}) {
       else if(path==='/api/lookup'){limit(`lookup:${deviceKey}`,200);data=(await service.lookup([input.code],device))[0];}
       else if(path==='/api/billing'){limit(`billing:${deviceKey}`,10);data=await service.billing(input,device);}
       else throw new Problem('NOT_FOUND','接口不存在。',404);
+      if(action==='lookup-batch'||action==='lookup'){const unknown=(action==='lookup-batch'?data.results:[data]).filter(r=>r.status==='unknown').length;if(unknown)abuse.invalid(ip,unknown);}
       send(200,{ok:true,data});
     } catch(error) {
+      if(network && ['CARD_NOT_FOUND','INVALID_CODE','ATTEMPT_NOT_FOUND','OTHER_BROWSER','BILLING_PROOF_REQUIRED'].includes(error?.code))try{abuse.invalid(network);}catch(e){error=e;}
       const known=error instanceof Problem;
+      if(error?.status===429)res.setHeader('Retry-After','60');
       if(!res.headersSent)send(known?error.status:500,{ok:false,error:{code:known?error.code:'INTERNAL',message:known?error.message:'暂时无法处理，请稍后再试。'}});
       else res.end();
-    }
+    } finally {release();}
   });
 }
 
