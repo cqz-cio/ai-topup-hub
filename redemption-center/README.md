@@ -110,3 +110,11 @@ go test ./internal/modules/procurement/integrationtest -run 'TestPAIPLUSShipping
 维护函数为 `scripts/paiplus_catalog_copy.py` 的 `apply_review`：固定核对商品 ID/slug、上架与交付方式；使用逐字段审阅的 before/after 拒绝覆盖运营新修改。先 SQLite 一致性备份，在备份副本演练及重复应用，再在单个事务内核对全部 72 张表，仅允许指定文案字段变化。正式 9 个公开商品接口逐项匹配，私有交付模板不出现在公开响应；公开配置未加入兑换地址。程序、服务和原始绑定范围未改变。
 
 备份 `/srv/zhixiang/backups/before-paiplus-copy-20261029T082143817556Z/shop.db`，同目录保存审阅文案和报告。本机证据为 `redemption-center/runtime/paiplus-content-update-backend.json`。回退仅审阅恢复指定文案字段，不回灌整库。历史 `qzweb-redemption-guide.json` 涵盖其他与归档商品，不能把它的所有旧域名全局替换或重新导入覆盖本次范围；新增商品仍须单独确认其卡密可由本站兑换。
+
+## 兑换站图标
+
+浏览器图标为海绵宝宝与小蜗合照，源文件 `public/icons/spongebob-gary-v1.svg` 采用手工 SVG 绘制，浅青绿底色、粗描边与大面部构图。SVG 可直接编辑；同名 16、32、48、180、512px PNG 为其栅格化版本，`public/favicon.ico` 包含 16/32/48px。`index.html` 设置 SVG、32px PNG 与 Apple Touch 图标，版本文件名避免沿用旧 favicon 缓存。网站页首品牌图保持原样。
+
+设计提示为“海绵宝宝和小蜗开心地靠在一起拍合照，两张脸占满画面，纯浅青绿背景，简洁平涂与粗描边，适配 32px，不加文字”。内置 imagegen 两次输出被服务拦截，最终采用可编辑 SVG 绘图及 PNG/ICO 格式转换，没有采用图像生成输出。
+
+2026-10-29 排查浏览器“不安全”提示：服务器与本机独立 TLS 验证均通过，证书 SAN 为 `cdk.qzweb.cloud`、签发者 Let's Encrypt YE1，到期时间 2027-01-27 06:28:35 UTC；两处证书 SHA256 一致，均协商 TLS 1.3。HTTP 返回 301 至 HTTPS，站点启用 HSTS；页面资源为本站 HTTPS，未发现网络 HTTP 资源。用户反馈手机正常、电脑 Chrome 仍提示不安全，尚未取得 Chrome 安全概览的具体原因，不能把服务器核验通过称为已修复浏览器警告。证据位于 `runtime/paiplus-tls-inspect-frontend.json` 和 `runtime/local-tls-check.json`。
