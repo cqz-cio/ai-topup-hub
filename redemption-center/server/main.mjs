@@ -1,4 +1,5 @@
 import { resolve } from 'node:path';
+import { realpathSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { Store } from './store.mjs';
 import { vault, id } from './security.mjs';
@@ -45,5 +46,5 @@ export function start(env=process.env) {
   process.once('SIGTERM',stop);process.once('SIGINT',stop);
   return {server,service,config,stop};
 }
-if(process.argv[1] && resolve(process.argv[1])===fileURLToPath(import.meta.url))start();
+if(process.argv[1] && realpathSync(process.argv[1])===fileURLToPath(import.meta.url))start();
 
