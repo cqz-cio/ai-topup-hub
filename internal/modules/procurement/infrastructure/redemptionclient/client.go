@@ -111,12 +111,21 @@ func (c *Client) Rewrite(order *domain.LocalOrder, connectionID uint, f *contrac
 		return nil, errors.New("unsupported redemption delivery; preserve supplier payload for review")
 	}
 	request := struct {
-		Reference string `json:"reference"`
-		Payload   string `json:"payload"`
-		Quantity  int    `json:"quantity"`
+		Reference string                 `json:"reference"`
+		Payload   string                 `json:"payload"`
+		Quantity  int                    `json:"quantity"`
+		Metadata  map[string]interface{} `json:"metadata"`
 	}{
-		fmt.Sprintf("shop:%d:order:%d", connectionID, order.ID), f.Payload, order.Items[0].Quantity,
+		Reference: fmt.Sprintf("shop:%d:order:%d", connectionID, order.ID), Payload: f.Payload, Quantity: order.Items[0].Quantity,
 	}
+	name, _ := order.Items[0].Title["zh-CN"].(string)
+	if name == "" {
+		name = fmt.Sprintf("商品 #%d", order.Items[0].ProductID)
+	}
+	if chars := []rune(name); len(chars) > 120 {
+		name = string(chars[:120])
+	}
+	request.Metadata = map[string]interface{}{"order_id": order.ID, "order_no": order.OrderNo, "product_id": order.Items[0].ProductID, "sku_id": order.Items[0].SKUID, "product_name": name}
 	encoded, err := json.Marshal(request)
 	if err != nil {
 		return nil, errors.New("encode redemption delivery failed")

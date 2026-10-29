@@ -11,6 +11,9 @@ import (
 	"github.com/dujiao-next/internal/app/jobs/consumer"
 	orderwiring "github.com/dujiao-next/internal/bootstrap/order"
 	"github.com/dujiao-next/internal/config"
+	cardsecretapp "github.com/dujiao-next/internal/modules/cardsecret/application"
+	"github.com/dujiao-next/internal/modules/cardsecret/infrastructure/managementclient"
+	cardsecrethttp "github.com/dujiao-next/internal/modules/cardsecret/transport/http"
 	downstreamreader "github.com/dujiao-next/internal/modules/downstreamcallback/infrastructure/orderreader"
 	notificationsmtp "github.com/dujiao-next/internal/modules/notification/infrastructure/smtp"
 	orderapp "github.com/dujiao-next/internal/modules/order/application"
@@ -654,5 +657,138 @@ func TestRedemptionIssuerFailureKeepsAcceptedAndRecoveryDeliversOnlyStoreCode(t 
 	}
 	if writer.calls != 2 {
 		t.Fatal("duplicate fulfilled callback rewrote historical delivery")
+	}
+}
+
+func TestPAIPLUSShopAdminShippingRevokeAndRedeem(t *testing.T) {
+	sources := []string{"ELLPLUS-ABCDEFGHIJ-23456789AB", "ELLPLUS-KLMNPQRSTU-3456789ABC"}
+	origin, stats := startRedemptionFixture(t, "http://127.0.0.1", sources)
+	paid := time.Now()
+	issuer, err := redemptionclient.New(origin, "fixture-integration-token-not-a-production-secret", []uint{30}, 1, 1, paid.Add(-time.Hour))
+	if err != nil {
+		t.Fatal(err)
+	}
+	order := &procurementdomain.LocalOrder{ID: 100, OrderNo: "ADMIN-FLOW-100", PaidAt: &paid, Items: []procurementdomain.LocalOrderItem{{ProductID: 30, SKUID: 30, Quantity: 2, Title: jsonmap.JSON{"zh-CN": "测试 Plus"}}}}
+	delivery, err := issuer.Rewrite(order, 1, &procurementcontract.Fulfillment{Type: "auto", Payload: strings.Join(sources, "\n")})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, source := range sources {
+		if strings.Contains(delivery.Payload, source) {
+			t.Fatal("customer delivery leaked supplier card")
+		}
+	}
+	client, err := managementclient.New(origin, "fixture-management-token-not-a-production-secret")
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Inventory methods are outside this fixture. The real management handler,
+	// HTTP client, Node registry and supplier mock run without replacing them.
+	handler := cardsecrethttp.NewAdminHandler(&cardsecretapp.Service{}, client)
+	router := gin.New()
+	group := router.Group("/admin", func(c *gin.Context) { c.Set("admin_id", uint(12)); c.Next() })
+	cardsecrethttp.RegisterAdminRoutes(group, handler)
+	admin := func(action string, input any) (map[string]any, int) {
+		t.Helper()
+		body, _ := json.Marshal(input)
+		req := httptest.NewRequest("POST", "/admin/card-secrets/paiplus/"+action, bytes.NewReader(body))
+		req.Header.Set("Content-Type", "application/json")
+		w := httptest.NewRecorder()
+		router.ServeHTTP(w, req)
+		if !strings.Contains(w.Header().Get("Cache-Control"), "no-store") {
+			t.Fatal("management response cacheable")
+		}
+		var envelope map[string]any
+		if err := json.Unmarshal(w.Body.Bytes(), &envelope); err != nil {
+			t.Fatal(err)
+		}
+		return envelope, int(envelope["status_code"].(float64))
+	}
+	listed, status := admin("query", map[string]any{"query": "ADMIN-FLOW-100"})
+	if status != 0 {
+		t.Fatal(listed)
+	}
+	rows := listed["data"].(map[string]any)["cards"].([]any)
+	if len(rows) != 2 {
+		t.Fatal("delivery missing from admin registry")
+	}
+	listBytes, _ := json.Marshal(listed)
+	if strings.Contains(string(listBytes), sources[0]) {
+		t.Fatal("list exposed full source code")
+	}
+	first := rows[0].(map[string]any)
+	cardID := first["id"].(string)
+	view, status := admin("reveal", map[string]any{"card_id": cardID, "actor": "shop-admin:999"})
+	if status != 0 {
+		t.Fatal(view)
+	}
+	detail := view["data"].(map[string]any)
+	code := detail["code"].(string)
+	if !strings.Contains(delivery.Payload, code) || detail["order_no"] != "ADMIN-FLOW-100" {
+		t.Fatal("wrong order/card pair")
+	}
+	if detail["source_code"] != sources[0] && detail["source_code"] != sources[1] {
+		t.Fatal("wrong upstream mapping")
+	}
+	audit := detail["audit"].([]any)
+	if audit[0].(map[string]any)["actor"] != "shop-admin:12" {
+		t.Fatal("client forged administrator identity")
+	}
+	revoked, status := admin("revoke", map[string]any{"card_id": cardID, "reason": "客户退款", "confirmed": true, "request_id": "admin-flow-revoke-100"})
+	if status != 0 || revoked["data"].(map[string]any)["destroyed"] != true {
+		t.Fatal("revocation did not succeed")
+	}
+	public := func(path string, input any) (map[string]any, int) {
+		t.Helper()
+		body, _ := json.Marshal(input)
+		req, _ := http.NewRequest("POST", origin+"/api/"+path, bytes.NewReader(body))
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Origin", "http://127.0.0.1")
+		req.Header.Set("X-Pai-Request", "1")
+		req.AddCookie(&http.Cookie{Name: "pai_device", Value: "device-ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"})
+		res, err := http.DefaultClient.Do(req)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer res.Body.Close()
+		var envelope map[string]any
+		if err = json.NewDecoder(res.Body).Decode(&envelope); err != nil {
+			t.Fatal(err)
+		}
+		return envelope, res.StatusCode
+	}
+	blocked, httpStatus := public("preview", map[string]any{"code": code})
+	if httpStatus != 409 || blocked["error"].(map[string]any)["code"] != "CARD_REVOKED" {
+		t.Fatal("destroyed card still usable")
+	}
+	secondID := rows[1].(map[string]any)["id"].(string)
+	other, _ := admin("reveal", map[string]any{"card_id": secondID})
+	secondCode := other["data"].(map[string]any)["code"].(string)
+	p, _ := public("preview", map[string]any{"code": secondCode})
+	attempt := p["data"].(map[string]any)["attempt_id"]
+	p, _ = public("preflight", map[string]any{"attempt_id": attempt, "session": `{"demo":true,"email":"admin-flow@example.invalid"}`})
+	confirmation := p["data"].(map[string]any)["confirmation"]
+	p, httpStatus = public("redeem", map[string]any{"attempt_id": attempt, "confirmation": confirmation, "confirmed": true})
+	if httpStatus != 200 {
+		t.Fatal(p)
+	}
+	if failed, status := admin("revoke", map[string]any{"card_id": secondID, "reason": "退款", "confirmed": true, "request_id": "admin-flow-revoke-101"}); status == 0 || !strings.Contains(failed["msg"].(string), "正在充值") {
+		t.Fatal("in-flight card revoked")
+	}
+	time.Sleep(3 * time.Second)
+	p, _ = public("result", map[string]any{"attempt_id": attempt})
+	if p["data"].(map[string]any)["state"] != "completed" {
+		t.Fatal("recharge did not complete")
+	}
+	if failed, status := admin("revoke", map[string]any{"card_id": secondID, "reason": "退款", "confirmed": true, "request_id": "admin-flow-revoke-102"}); status == 0 || !strings.Contains(failed["msg"].(string), "卡密无效，销毁失败") {
+		t.Fatal("used card revoked")
+	}
+	final, _ := admin("query", map[string]any{})
+	counts := final["data"].(map[string]any)["counts"].(map[string]any)
+	if counts["used"] != float64(1) || counts["revoked"] != float64(1) {
+		t.Fatal("incorrect admin status counts")
+	}
+	if snapshot := redemptionStats(t, stats); snapshot["cards"] != 2 || snapshot["submits"] != 1 {
+		t.Fatal("reissued or charged destroyed card")
 	}
 }

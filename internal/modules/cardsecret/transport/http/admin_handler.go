@@ -8,6 +8,7 @@ import (
 
 	"github.com/dujiao-next/internal/constants"
 	cardsecretapp "github.com/dujiao-next/internal/modules/cardsecret/application"
+	cardsecretcontract "github.com/dujiao-next/internal/modules/cardsecret/contract"
 	cardsecretdomain "github.com/dujiao-next/internal/modules/cardsecret/domain"
 	"github.com/dujiao-next/internal/platform/http/ginutil"
 	"github.com/dujiao-next/internal/platform/http/response"
@@ -29,14 +30,19 @@ type Service interface {
 }
 
 type AdminHandler struct {
-	service Service
+	service    Service
+	management cardsecretcontract.Management
 }
 
-func NewAdminHandler(service Service) *AdminHandler {
+func NewAdminHandler(service Service, management ...cardsecretcontract.Management) *AdminHandler {
 	if service == nil {
 		panic("card secret admin handler: required dependency is nil")
 	}
-	return &AdminHandler{service: service}
+	handler := &AdminHandler{service: service}
+	if len(management) > 0 {
+		handler.management = management[0]
+	}
+	return handler
 }
 
 // CreateCardSecretBatchRequest 批量录入卡密请求

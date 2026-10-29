@@ -1,5 +1,6 @@
 import { Problem, id, newCard, normalizeCard, maskedCard, credential, terminal, safeURL } from './security.mjs';
 import { parseDelivery, customerDelivery } from './delivery.mjs';
+import { CardManagement } from './management.mjs';
 
 const active = s => ['submitting','queued','processing','uncertain'].includes(s);
 const string = (v,n=120) => typeof v==='string'?v.slice(0,n):null;
@@ -21,6 +22,7 @@ export class RedemptionService {
     store.run("UPDATE attempts SET state='uncertain',session_enc='' WHERE state='submitting'");
     store.run("UPDATE attempts SET state='preview_failed',session_enc='',preflight_enc='',confirmation_hash='' WHERE state IN ('preparing','checking')");
     this.expire();
+    this.management=new CardManagement(this);
   }
   expire() {
     this.store.run("UPDATE attempts SET session_enc='',preflight_enc='',confirmation_hash='',state='preview' WHERE state='checked' AND checked_at<?",Date.now()-15*60000);
@@ -34,7 +36,8 @@ export class RedemptionService {
     return this.store.get('SELECT * FROM attempts WHERE id=?',a.id);
   }
   view(a,owned=true) {
-    const d=this.data(a), c=this.store.get('SELECT code_enc FROM cards WHERE id=?',a.card_id);
+    const d=this.data(a), c=this.store.get('SELECT code_enc,status FROM cards WHERE id=?',a.card_id);
+    if(['revoked','revoking','invalid'].includes(c.status))return {attempt_id:a.id,state:c.status,code:maskedCard(this.vault.decrypt(c.code_enc)),confirmation:null,submitted:!!a.submitted_at,message:c.status==='revoked'?'该本站卡密已销毁，不能继续兑换。':c.status==='revoking'?'该卡密正在销毁核验，暂不能兑换。':'该卡密已失效，请联系客服。'};
     return {attempt_id:a.id,state:a.state,code:maskedCard(this.vault.decrypt(c.code_enc)),product:d.product||'unknown',plan:d.plan||null,
       country:d.country||null,currency:d.currency||null,email:d.email||null,current_plan:d.current_plan||null,
       has_active_subscription:d.has_active_subscription??null,blocked:!!d.blocked,
@@ -54,6 +57,12 @@ export class RedemptionService {
     return a;
   }
   device(a) { return this.vault.decrypt(a.device_enc); }
+  assertUsable(c) {
+    if(c.status==='revoked')throw new Problem('CARD_REVOKED','该本站卡密已销毁，不能继续兑换。',409);
+    if(c.status==='revoking')throw new Problem('CARD_REVOKING','该卡密正在销毁核验，暂不能兑换。',409);
+    if(c.status==='invalid')throw new Problem('CARD_INVALID','该卡密已失效，请联系客服。',409);
+    if(c.status==='disabled')throw new Problem('CARD_DISABLED','该卡密已停用，请联系客服。',409);
+  }
   _issue(reference,source,label='') {
     if(typeof reference!=='string' || !reference.trim() || reference.length>200 || typeof source!=='string' || !/^[A-Za-z0-9_-]{8,256}$/.test(source) || source.toUpperCase().startsWith('PAIPLUS-')) throw new Problem('IMPORT_INVALID','来源编号或源头卡密格式不正确。');
     const hash=this.vault.hash('source',source), existing=this.store.get('SELECT * FROM cards WHERE reference=?',reference);
@@ -69,13 +78,15 @@ export class RedemptionService {
     if(new Set(rows.map(r=>r?.reference)).size!==rows.length || new Set(rows.map(r=>r?.source_code)).size!==rows.length)throw new Problem('IMPORT_DUPLICATE','同一批中存在重复来源编号或卡密。');
     return this.store.transaction(()=>rows.map(r=>this._issue(r.reference,r.source_code,r.label)));
   }
-  deliver({reference,payload,quantity}) {
+  deliver({reference,payload,quantity,metadata}) {
     if(typeof reference!=='string' || reference.length>150 || !reference || typeof payload!=='string' || Buffer.byteLength(payload)>200000 || !Number.isSafeInteger(quantity) || quantity<1 || quantity>100)throw new Problem('DELIVERY_INVALID','交付参数不完整。');
     const records=parseDelivery(payload,quantity);
+    if(metadata!==undefined && (!metadata || typeof metadata!=='object' || ['order_id','product_id','sku_id'].some(k=>!Number.isSafeInteger(metadata[k])||metadata[k]<1) || typeof metadata.order_no!=='string' || metadata.order_no.length>100 || typeof metadata.product_name!=='string' || metadata.product_name.length>120 || reference!==`shop:${Number(reference.split(':')[1])}:order:${metadata.order_id}`))throw new Problem('DELIVERY_INVALID','交付订单信息不匹配。');
     return this.store.transaction(()=>{
       const fingerprint=this.vault.hash('delivery',payload), old=this.store.get('SELECT * FROM deliveries WHERE reference=?',reference);
       if(old && old.fingerprint!==fingerprint)throw new Problem('DELIVERY_CONFLICT','同一交付编号的源头内容发生变化。',409);
       const cards=records.map(({source},i)=>this._issue(`${reference}:${i+1}`,source));
+      if(metadata)for(const c of cards)this.store.run('UPDATE cards SET order_id=?,order_no=?,product_id=?,sku_id=?,label=? WHERE id=? AND (order_id=0 OR order_id=?)',metadata.order_id,metadata.order_no,metadata.product_id,metadata.sku_id,metadata.product_name,c.id,metadata.order_id);
       this.store.run('INSERT OR IGNORE INTO deliveries(reference,fingerprint,card_ids) VALUES(?,?,?)',reference,fingerprint,JSON.stringify(cards.map(c=>c.id)));
       return customerDelivery(cards.map((c,i)=>({code:c.code,...(records[i].account?{account:records[i].account}:{})})),this.publicOrigin);
     });
@@ -83,7 +94,7 @@ export class RedemptionService {
   async preview(value,device) {
     this.expire();
     const c=this.card(value);
-    if(c.status==='disabled')throw new Problem('CARD_DISABLED','该卡密已停用，请联系客服。',409);
+    this.assertUsable(c);
     let a=c.attempt_id?this.store.get('SELECT * FROM attempts WHERE id=?',c.attempt_id):null;
     if(a) {
       if(a.device_hash!==this.vault.hash('device',device)) {
@@ -115,7 +126,8 @@ export class RedemptionService {
     let a=this.attempt(attemptID,device);
     if(!['preview','checked','blocked'].includes(a.state))throw new Problem('WRONG_STEP','请先验证卡密，处理中不能更换账号。',409);
     const c=this.store.get('SELECT * FROM cards WHERE id=?',a.card_id);
-    if(c.status==='disabled')throw new Problem('CARD_DISABLED','该卡密已停用。',409);
+    this.assertUsable(c);
+    if(c.status!=='ready')throw new Problem('CARD_IN_USE','该卡密已使用或正在充值，请查询原记录。',409);
     if(!this.store.run("UPDATE attempts SET state='checking',revision=revision+1 WHERE id=? AND revision=?",a.id,a.revision).changes)throw new Problem('BUSY','账号正在核验，请稍后。',409);
     a=this.store.get('SELECT * FROM attempts WHERE id=?',a.id);
     try {
@@ -134,8 +146,12 @@ export class RedemptionService {
     if(active(a.state)||terminal(a.state))return this.view(a);
     if(confirmed!==true || !confirmation || a.state!=='checked' || !a.confirmation_hash || a.confirmation_hash!==this.vault.hash('confirmation',confirmation))throw new Problem('CONFIRM_REQUIRED','请重新核验并确认本次账号与套餐。',409);
     const c=this.store.get('SELECT * FROM cards WHERE id=?',a.card_id);
-    if(c.status==='disabled')throw new Problem('CARD_DISABLED','该卡密已停用。',409);
+    this.assertUsable(c);
+    if(c.status!=='ready')throw new Problem('CARD_IN_USE','该卡密已使用或正在充值，请查询原记录。',409);
     this.store.transaction(()=>{
+      const current=this.store.get('SELECT status FROM cards WHERE id=?',c.id);
+      this.assertUsable(current);
+      if(current.status!=='ready')throw new Problem('CARD_IN_USE','卡密已被锁定，请查询原记录。',409);
       if(!this.store.run("UPDATE attempts SET state='submitting',submitted_at=?,updated_at=?,revision=revision+1 WHERE id=? AND state='checked' AND revision=?",Date.now(),Date.now(),a.id,a.revision).changes)throw new Problem('BUSY','兑换已经提交，请查询原记录。',409);
       this.store.run("UPDATE cards SET status='processing',updated_at=? WHERE id=?",Date.now(),c.id);
       this.store.audit('submit',a.id);
@@ -201,6 +217,7 @@ export class RedemptionService {
     if(!Array.isArray(values)||!values.length||values.length>100)throw new Problem('RESULT_LIMIT','每批查询 1–100 条兑换记录。');
     return values.map(code=>{
       const c=this.card(code),a=c.attempt_id?this.store.get('SELECT * FROM attempts WHERE id=?',c.attempt_id):null;
+      this.assertUsable(c);
       if(!a)return {state:'unused',code:maskedCard(normalizeCard(code)),submitted:false};
       const owned=a.device_hash===this.vault.hash('device',device);
       if(!owned&&!a.submitted_at)throw new Problem('OTHER_BROWSER','请在原浏览器继续核验。',409);
@@ -209,6 +226,7 @@ export class RedemptionService {
   }
   async recover(value,device) {
     const c=this.card(value), a=c.attempt_id?this.store.get('SELECT * FROM attempts WHERE id=?',c.attempt_id):null;
+    this.assertUsable(c);
     if(!a)return {state:'unused',code:maskedCard(normalizeCard(value)),submitted:false};
     if(!active(a.state) && !terminal(a.state) && a.device_hash!==this.vault.hash('device',device))throw new Problem('OTHER_BROWSER','请在原浏览器继续核验。',409);
     return this.view(await this.pollRecord(a),a.device_hash===this.vault.hash('device',device));
@@ -220,7 +238,7 @@ export class RedemptionService {
     for(let i=0;i<values.length;i++) {
       try {
         const c=this.card(values[i]), a=c.attempt_id?this.store.get('SELECT * FROM attempts WHERE id=?',c.attempt_id):null;
-        if(c.status==='disabled') { results[i]={row:i+1,code:normalizeCard(values[i]),status:'disabled',used:null,can_resubmit:false}; continue; }
+        if(['disabled','revoked','revoking','invalid'].includes(c.status)) { results[i]={row:i+1,code:normalizeCard(values[i]),status:c.status,used:null,can_resubmit:false}; continue; }
         const d=a?this.device(a):device;
         if(!groups.has(d))groups.set(d,[]); groups.get(d).push({i,c,a});
       } catch { results[i]={row:i+1,code:String(values[i]||'').slice(0,256),status:'unknown',used:null,can_resubmit:false}; }
@@ -243,7 +261,7 @@ export class RedemptionService {
   async billing({code,session},device) {
     if(!!code===!!session)throw new Problem('BILLING_INPUT','请选择卡密或账号凭证中的一种查询方式。');
     let body,d=device;
-    if(code) { const c=this.card(code), a=c.attempt_id?this.store.get('SELECT * FROM attempts WHERE id=?',c.attempt_id):null; if(c.status==='disabled')throw new Problem('CARD_DISABLED','该卡密已停用。',409); body={cdk_code:this.vault.decrypt(c.source_enc)}; if(a)d=this.device(a); }
+    if(code) { const c=this.card(code), a=c.attempt_id?this.store.get('SELECT * FROM attempts WHERE id=?',c.attempt_id):null; this.assertUsable(c); body={cdk_code:this.vault.decrypt(c.source_enc)}; if(a)d=this.device(a); }
     else body={token_input:credential(session)};
     const data=await this.partner.call('billing',body,d), summary=data.summary||{};
     const payment=p=>p && typeof p==='object'?{amount:amount(p.amount),currency:string(p.currency,12),date:dateValue(p.date??p.paid_at??p.created_at),status:string(p.status,40),invoice_url:safeURL(p.invoice_url||p.hosted_invoice_url||p.url)}:null;
@@ -270,6 +288,7 @@ export class RedemptionService {
     return this.store.transaction(()=>{
       const c=this.store.get('SELECT * FROM cards WHERE id=?',cardID);
       if(!c)throw new Problem('NOT_FOUND','卡密不存在。',404);
+      if(!['ready','disabled'].includes(c.status))throw new Problem('CARD_IN_USE','已销毁、失效或处理中卡密不能解除核验。',409);
       const a=c.attempt_id?this.store.get('SELECT * FROM attempts WHERE id=?',c.attempt_id):null;
       if(!a)return {ok:true};
       if(a.submitted_at || ['preparing','checking'].includes(a.state))throw new Problem('CARD_IN_USE','正在核验或已经提交，不能解除绑定。',409);

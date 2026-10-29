@@ -58,6 +58,19 @@ export function makeServer({service,config,staticDir}) {
         if(!equal(req.headers.authorization,`Bearer ${config.integrationToken}`))throw new Problem('UNAUTHORIZED','Unauthorized',401);
         send(200,{ok:true,data:service.deliver(await body(req))});return;
       }
+      if(path.startsWith('/api/management/')) {
+        if(!config.managementToken || !equal(req.headers.authorization,`Bearer ${config.managementToken}`))throw new Problem('UNAUTHORIZED','Unauthorized',401);
+        const input=await body(req),actor=input.actor;
+        if(!/^shop-admin:[1-9]\d{0,15}$/.test(actor||''))throw new Problem('ACTOR_REQUIRED','缺少管理员身份。',400);
+        limit(`management:${actor}`,120);
+        let data;
+        if(path==='/api/management/cards')data=service.management.list(input);
+        else if(path==='/api/management/detail')data=service.management.detail(input.card_id,actor);
+        else if(path==='/api/management/check')data=await service.management.refresh(input.card_id,actor);
+        else if(path==='/api/management/revoke')data=await service.management.revoke(input,actor);
+        else throw new Problem('NOT_FOUND','接口不存在。',404);
+        send(200,{ok:true,data});return;
+      }
       if(req.headers.origin!==config.publicOrigin || req.headers['x-pai-request']!=='1')throw new Problem('ORIGIN','请求来源不匹配，请刷新页面。',403);
       const input=await body(req);
       if(path==='/api/demo/examples' && config.mode==='mock' && config.newExamples) {

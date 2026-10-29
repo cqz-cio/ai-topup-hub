@@ -13,6 +13,7 @@ import (
 	autorechargeapp "github.com/dujiao-next/internal/modules/autorecharge/application"
 	captchaapp "github.com/dujiao-next/internal/modules/captcha/application"
 	cardsecretapp "github.com/dujiao-next/internal/modules/cardsecret/application"
+	cardsecretcontract "github.com/dujiao-next/internal/modules/cardsecret/contract"
 	cardsecretgormstore "github.com/dujiao-next/internal/modules/cardsecret/infrastructure/gormstore"
 	cartapp "github.com/dujiao-next/internal/modules/cart/application"
 	cartgormstore "github.com/dujiao-next/internal/modules/cart/infrastructure/gormstore"
@@ -168,6 +169,7 @@ type Container struct {
 	PromotionAdminService         *promotionapp.AdminService
 	PaymentService                *paymentapp.PaymentService
 	CardSecretService             *cardsecretapp.Service
+	CardManagement                cardsecretcontract.Management
 	GiftCardService               *giftcardapp.Service
 	UserLoginLogService           *auditlogapp.UserLoginService
 	AuthzAuditService             *auditlogapp.AuthzService

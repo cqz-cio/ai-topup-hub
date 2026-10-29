@@ -119,7 +119,8 @@ async function request(method: string, path: string, bodyOrOptions?: any, option
   }
 
   const controller = new AbortController()
-  const timer = setTimeout(() => controller.abort(), timeout)
+  const requestTimeout = Number.isFinite(opts.timeout) ? Math.max(1000, Math.min(180000, Number(opts.timeout))) : timeout
+  const timer = setTimeout(() => controller.abort(), requestTimeout)
 
   let response: Response
   try {

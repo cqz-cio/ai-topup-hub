@@ -16,5 +16,5 @@ const deliver=service.deliver.bind(service);
 service.deliver=input=>{const result=deliver(input);snapshot();return result;};
 const call=partner.call.bind(partner);
 partner.call=async(...args)=>{try{return await call(...args);}finally{snapshot();}};
-const server=makeServer({service,config:{mode:'mock',publicOrigin:process.env.PAIPLUS_FIXTURE_ORIGIN,adminToken:'fixture-admin-token-not-a-production-secret',integrationToken:'fixture-integration-token-not-a-production-secret',examples:[]},staticDir:'.'});
+const server=makeServer({service,config:{mode:'mock',publicOrigin:process.env.PAIPLUS_FIXTURE_ORIGIN,adminToken:'fixture-admin-token-not-a-production-secret',integrationToken:'fixture-integration-token-not-a-production-secret',managementToken:'fixture-management-token-not-a-production-secret',examples:[]},staticDir:'.'});
 server.listen(0,'127.0.0.1',()=>console.log(`http://127.0.0.1:${server.address().port}`));

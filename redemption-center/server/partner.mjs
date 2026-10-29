@@ -10,11 +10,11 @@ export class Partner {
     this.authorization='Basic '+Buffer.from('partner:'+password).toString('base64');
     this.fetchImpl=fetchImpl; this.timeout=timeout; this.redeemTimeout=redeemTimeout;
   }
-  async call(operation,body,device) {
+  async call(operation,body,device,options={}) {
     if (!operations.has(operation) || !/^[A-Za-z0-9_-]{16,128}$/.test(device)) throw new Error('Invalid partner operation or device');
     try {
       const response=await this.fetchImpl(`https://cdk.bar/api/partner/v1/${operation}`,{
-        method:'POST',redirect:'error',cache:'no-store',signal:AbortSignal.timeout(operation==='redeem'?this.redeemTimeout:this.timeout),
+        method:'POST',redirect:'error',cache:'no-store',signal:AbortSignal.timeout(operation==='redeem'?this.redeemTimeout:options.timeout||this.timeout),
         headers:{Authorization:this.authorization,'Content-Type':'application/json','X-Redemption-Device':device},body:JSON.stringify(body),
       });
       let envelope; try { envelope=await response.json(); } catch { throw new PartnerError('UPSTREAM_RESPONSE',502,operation==='redeem'); }

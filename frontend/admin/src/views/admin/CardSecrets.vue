@@ -20,6 +20,17 @@ import { formatDate, getLocalizedText } from '@/utils/format'
 import { confirmAction } from '@/utils/confirm'
 import CardSecretEditModal from './components/CardSecretEditModal.vue'
 import { adminUrl } from '@/utils/adminBase'
+import { useAdminAuthStore } from '@/stores/auth'
+import PAIPLUSCards from './components/PAIPLUSCards.vue'
+
+const cardAuth = useAdminAuthStore()
+const canManagePAIPLUS = computed(() => cardAuth.hasPermission('POST:/admin/card-secrets/paiplus/query'))
+const cardView = ref<'paiplus' | 'inventory'>(canManagePAIPLUS.value ? 'paiplus' : 'inventory')
+let inventoryLoaded = false
+async function chooseInventory() {
+  cardView.value = 'inventory'
+  if (!inventoryLoaded) { inventoryLoaded = true; await loadProductOptions(); await fetchCardSecrets(1) }
+}
 
 const { t } = useI18n()
 const { refreshing, refreshList } = useListRefresh()
@@ -729,8 +740,7 @@ const batchSkuLabel = (batch: AdminCardSecretBatch) => resolveSkuLabelById(Numbe
 const secretSkuLabel = (secret: AdminCardSecret) => resolveSkuLabelById(Number(secret?.sku_id || 0))
 
 onMounted(async () => {
-  await loadProductOptions()
-  await fetchCardSecrets(1)
+  if (cardView.value === 'inventory') await chooseInventory()
 })
 </script>
 
@@ -738,7 +748,7 @@ onMounted(async () => {
   <div class="space-y-6">
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <h1 class="text-2xl font-semibold">{{ t('admin.cardSecrets.title') }}</h1>
-      <Button class="w-full sm:w-auto" as-child>
+      <Button v-if="cardView === 'inventory'" class="w-full sm:w-auto" as-child>
         <RouterLink to="/card-secret-imports">
           <Upload class="mr-2 h-4 w-4" />
           {{ t('admin.cardSecrets.importAction') }}
@@ -746,6 +756,12 @@ onMounted(async () => {
       </Button>
     </div>
 
+    <div v-if="canManagePAIPLUS" class="flex flex-wrap gap-2" aria-label="卡密类型">
+      <Button :variant="cardView === 'paiplus' ? 'default' : 'outline'" @click="cardView = 'paiplus'">PAIPLUS 交付卡密</Button>
+      <Button :variant="cardView === 'inventory' ? 'default' : 'outline'" @click="chooseInventory">库存卡密</Button>
+    </div>
+    <PAIPLUSCards v-if="cardView === 'paiplus' && canManagePAIPLUS" />
+    <template v-else>
     <div v-if="!currentProductId" class="rounded-xl border-2 border-dashed border-primary/30 bg-primary/5 p-8">
       <div class="mx-auto max-w-lg space-y-4 text-center">
         <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
@@ -1180,5 +1196,6 @@ onMounted(async () => {
       :card-secret="editingCardSecret"
       @success="handleEditSuccess"
     />
+    </template>
   </div>
 </template>

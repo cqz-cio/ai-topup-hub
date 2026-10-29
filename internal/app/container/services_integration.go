@@ -7,6 +7,7 @@ import (
 	"github.com/dujiao-next/internal/logger"
 	apicredentialapp "github.com/dujiao-next/internal/modules/apicredential/application"
 	auditlogapp "github.com/dujiao-next/internal/modules/auditlog/application"
+	cardmanagement "github.com/dujiao-next/internal/modules/cardsecret/infrastructure/managementclient"
 	channelclientapp "github.com/dujiao-next/internal/modules/channelclient/application"
 	contentapp "github.com/dujiao-next/internal/modules/content/application"
 	localfilestore "github.com/dujiao-next/internal/modules/content/infrastructure/filestore/local"
@@ -130,6 +131,11 @@ func (c *Container) initIntegrationServices() {
 	redemptionDelivery, err := procurementredemption.FromEnvironment()
 	if err != nil {
 		logger.Errorw("invalid_paiplus_delivery_config", "error", err)
+		panic(err)
+	}
+	c.CardManagement, err = cardmanagement.FromEnvironment()
+	if err != nil {
+		logger.Errorw("invalid_paiplus_management_config", "error", err)
 		panic(err)
 	}
 	c.ProcurementOrderService = procurementapp.NewService(procurementapp.Options{
