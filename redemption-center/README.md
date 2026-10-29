@@ -2,7 +2,7 @@
 
 独立的兑换网站：海绵宝宝街景动画、侧栏四功能布局、自己的 PAIPLUS 卡密、真实持久化后端、管理后台，以及可选择启用的商城交付适配器。
 
-当前验收入口为 `http://127.0.0.1:5191/`，后台为 `/admin`。本地使用 **mock 源头**，没有真实充值或扣款。正式源头适配器已经实现，但本轮没有部署或启用商城交付转换。
+正式入口为 `https://cdk.qzweb.cloud/`，后台为 `/admin`；2026-10-29 已部署并对下文列出的 9 款商品新订单启用商城交付转换。本地验收入口为 `http://127.0.0.1:5191/`，使用 **mock 源头**。本轮验收没有真实付款、采购或充值。
 
 ## 功能与边界
 
@@ -102,3 +102,11 @@ go test ./internal/modules/procurement/integrationtest -run 'TestPAIPLUSShipping
 - 21 个兑换站发布文件及 7 个公开资源哈希通过；HTTPS、Secure Cookie、API 不缓存、来源检查、未授权管理/集成请求、私有文件不可读、模拟入口关闭均通过。正式浏览器检查四个工具入口及无效卡密提示。只用不存在的测试码检查上游鉴权（无凭据 401，有凭据按无效卡密返回 400），未提交真实充值或正式验收订单。
 - 商城备份 `/srv/zhixiang/backups/before-paiplus-20261029-153938`；兑换站配置与初始一致性备份 `/srv/paiplus/backups/before-first-release`。首次启动路径问题已修复，已有主密钥未更换。增量还原后的完整二进制 SHA256 为 `b546ee81804b2181d81f061386da2a988dded5c2a7fb8e0043b8061955d3991b`。临时传输入口已撤销，原 57 个 Nginx 文件保持。
 - 私有验收证据保存在本机 `redemption-center/runtime/`；店主管理入口及口令在该目录的 `production-admin-access.txt`，不提交 Git。服务器的数据库与加密主密钥必须一起保留；后续备份使用上面的 SQLite 一致性备份脚本。
+
+## 2026-10-29 商城介绍与发货模板补齐
+
+上线后的新订单交付程序已使用本站域名；本次继续清理同一范围内 9 款商品的原始模板。中文摘要和详情明确发放本站 **PAIPLUS 卡密**，具体兑换入口继续仅随订单交付；商品 `instructions_json` 中的旧兑换地址（含成品号的 `/recharge`）统一为 `https://cdk.qzweb.cloud/`。只改动 27 个文案字段，保留套餐、售后规则、其他语言、售价、支付配置、历史订单与原交付快照。短信、人工、其他未接入商品及归档商品没有套用此域名。
+
+维护函数为 `scripts/paiplus_catalog_copy.py` 的 `apply_review`：固定核对商品 ID/slug、上架与交付方式；使用逐字段审阅的 before/after 拒绝覆盖运营新修改。先 SQLite 一致性备份，在备份副本演练及重复应用，再在单个事务内核对全部 72 张表，仅允许指定文案字段变化。正式 9 个公开商品接口逐项匹配，私有交付模板不出现在公开响应；公开配置未加入兑换地址。程序、服务和原始绑定范围未改变。
+
+备份 `/srv/zhixiang/backups/before-paiplus-copy-20261029T082143817556Z/shop.db`，同目录保存审阅文案和报告。本机证据为 `redemption-center/runtime/paiplus-content-update-backend.json`。回退仅审阅恢复指定文案字段，不回灌整库。历史 `qzweb-redemption-guide.json` 涵盖其他与归档商品，不能把它的所有旧域名全局替换或重新导入覆盖本次范围；新增商品仍须单独确认其卡密可由本站兑换。
