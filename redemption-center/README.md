@@ -113,8 +113,8 @@ go test ./internal/modules/procurement/integrationtest -run 'TestPAIPLUSShipping
 
 ## 兑换站图标
 
-浏览器图标为海绵宝宝与小蜗合照，源文件 `public/icons/spongebob-gary-v1.svg` 采用手工 SVG 绘制，浅青绿底色、粗描边与大面部构图。SVG 可直接编辑；同名 16、32、48、180、512px PNG 为其栅格化版本，`public/favicon.ico` 包含 16/32/48px。`index.html` 设置 SVG、32px PNG 与 Apple Touch 图标，版本文件名避免沿用旧 favicon 缓存。网站页首品牌图保持原样。
+用户于 2026-10-29 确认全身海绵宝宝双手举起小蜗的透明图标，采用现有街景壁纸中的动画画风。批准原图为 `public/icons/spongebob-lifting-gary-v3.png`，由内置 imagegen 参考 `public/assets/bikini-bottom-afternoon.png` 编辑生成；保留原始 PNG 字节，格式转换只做缩放，未重绘或裁切人物。早期手绘 v1 和 v2 预览未获采用，不应再次用于站点。
 
-设计提示为“海绵宝宝和小蜗开心地靠在一起拍合照，两张脸占满画面，纯浅青绿背景，简洁平涂与粗描边，适配 32px，不加文字”。内置 imagegen 两次输出被服务拦截，最终采用可编辑 SVG 绘图及 PNG/ICO 格式转换，没有采用图像生成输出。
+同名 16、32、48、180、192、512px PNG 保留真实 alpha；版本化 ICO 与 `public/favicon.ico` 包含 16/32/48px。`index.html` 引用版本化 ICO、32/48px PNG 与 180px Apple Touch 图标，避免复用旧图标缓存。网站页首品牌图保持原样。生成提示与来源记录见 `design/favicon-v3.md`。
 
 2026-10-29 排查浏览器“不安全”提示：服务器与本机独立 TLS 验证均通过，证书 SAN 为 `cdk.qzweb.cloud`、签发者 Let's Encrypt YE1，到期时间 2027-01-27 06:28:35 UTC；两处证书 SHA256 一致，均协商 TLS 1.3。HTTP 返回 301 至 HTTPS，站点启用 HSTS；页面资源为本站 HTTPS，未发现网络 HTTP 资源。用户反馈手机正常、电脑 Chrome 仍提示不安全，尚未取得 Chrome 安全概览的具体原因，不能把服务器核验通过称为已修复浏览器警告。证据位于 `runtime/paiplus-tls-inspect-frontend.json` 和 `runtime/local-tls-check.json`。
