@@ -35,6 +35,9 @@ func (s *Service) PollUpstreamStatus(procurementOrderID uint) error {
 	if procOrder.Status != "accepted" {
 		return nil
 	}
+	if procOrder.ErrorCode == "paiplus_binding_pending" && strings.TrimSpace(procOrder.UpstreamPayload) != "" {
+		return s.HandleUpstreamCallback(procOrder.ID, "delivered", &procurementcontract.Fulfillment{Type: "auto", Status: "delivered", Payload: procOrder.UpstreamPayload})
+	}
 
 	connection, err := s.connections.Open(procOrder.ConnectionID)
 	if err != nil {
@@ -129,6 +132,12 @@ func (s *Service) SyncAcceptedOrders() {
 
 	for i := range orders {
 		procOrder := &orders[i]
+		if procOrder.ErrorCode == "paiplus_binding_pending" && strings.TrimSpace(procOrder.UpstreamPayload) != "" {
+			if err := s.PollUpstreamStatus(procOrder.ID); err != nil {
+				logger.Warnw("procurement_binding_recovery_pending", "procurement_order_id", procOrder.ID)
+			}
+			continue
+		}
 		if procOrder.UpstreamOrderID == 0 && procOrder.UpstreamOrderNo == "" {
 			continue
 		}

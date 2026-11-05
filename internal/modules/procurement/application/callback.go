@@ -35,12 +35,59 @@ func (s *Service) HandleUpstreamCallback(procurementOrderID uint, upstreamStatus
 
 	switch upstreamStatus {
 	case "delivered", "completed", "fulfilled":
+		bindingRequired := procOrder.ErrorCode == "paiplus_binding_pending" || procOrder.ErrorCode == "paiplus_format_review"
+		if bindingRequired && s.deliveryRewriter == nil {
+			return fmt.Errorf("store card binding is required for this order; issuer is disabled")
+		}
 		if fulfillment == nil || (strings.TrimSpace(fulfillment.Payload) == "" && len(fulfillment.DeliveryData) == 0) || s.orderLifecycle == nil {
 			return fmt.Errorf("supplier delivery has no card or delivery data; keep awaiting fulfillment")
 		}
 		// 先创建交付记录（幂等），再推进采购单状态；写入失败时采购单保持非终态以便上游重试
 		if fulfillment != nil && s.orderLifecycle != nil {
-			if err := s.createUpstreamFulfillment(procOrder.LocalOrderID, fulfillment, now); err != nil {
+			delivery := fulfillment
+			if s.deliveryRewriter != nil {
+				order, loadErr := s.orderRepo.GetByID(procOrder.LocalOrderID)
+				if loadErr != nil {
+					return fmt.Errorf("load order for redemption delivery: %w", loadErr)
+				}
+				if order == nil {
+					return procurementcontract.ErrOrderNotFound
+				}
+				selected := s.deliveryRewriter.RequiresRewrite(order, procOrder.ConnectionID)
+				if bindingRequired && !selected {
+					return fmt.Errorf("pending store card binding no longer matches configured scope; restore original scope")
+				}
+				bindingRequired = bindingRequired || selected
+				if bindingRequired {
+					recorder, ok := s.procRepo.(procurementcontract.DeliveryRecorder)
+					if !ok {
+						return fmt.Errorf("redemption requires durable supplier delivery storage")
+					}
+					state := "paiplus_format_review"
+					if fulfillment.Type == "auto" && len(fulfillment.DeliveryData) == 0 && strings.TrimSpace(fulfillment.Payload) != "" {
+						state = "paiplus_binding_pending"
+					}
+					stored, storeErr := recorder.PreserveDelivery(procOrder.ID, procOrder.Status, fulfillment.Payload, state)
+					if storeErr != nil {
+						return fmt.Errorf("preserve supplier delivery: %w", storeErr)
+					}
+					if !stored {
+						return fmt.Errorf("supplier delivery changed or procurement status advanced; review original delivery")
+					}
+				}
+				var rewriteErr error
+				delivery, rewriteErr = s.deliveryRewriter.Rewrite(order, procOrder.ConnectionID, fulfillment)
+				if rewriteErr != nil {
+					return rewriteErr
+				}
+				if bindingRequired && (delivery == nil || delivery.InstructionsOverride == nil) {
+					return fmt.Errorf("store card binding returned no private customer instructions")
+				}
+				if delivery == nil || strings.TrimSpace(delivery.Payload) == "" {
+					return fmt.Errorf("redemption delivery returned no payload; keep awaiting fulfillment")
+				}
+			}
+			if err := s.createUpstreamFulfillment(procOrder.LocalOrderID, delivery, now); err != nil {
 				logger.Warnw("procurement_create_fulfillment_failed",
 					"procurement_order_id", procOrder.ID,
 					"local_order_id", procOrder.LocalOrderID,
@@ -53,6 +100,10 @@ func (s *Service) HandleUpstreamCallback(procurementOrderID uint, upstreamStatus
 		// 更新采购单状态
 		updates := map[string]interface{}{
 			"updated_at": now,
+		}
+		if bindingRequired {
+			updates["error_code"] = ""
+			updates["error_message"] = ""
 		}
 		if fulfillment != nil {
 			updates["upstream_payload"] = fulfillment.Payload

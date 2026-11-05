@@ -1,0 +1,24 @@
+[Unit]
+Description=PAIPLUS redemption service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=paiplus
+Group=paiplus
+WorkingDirectory=/srv/paiplus/current
+EnvironmentFile=/etc/paiplus.env
+ExecStart=/srv/paiplus/runtime/bin/node /srv/paiplus/current/server/main.mjs
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=190
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/srv/paiplus/data
+
+[Install]
+WantedBy=multi-user.target

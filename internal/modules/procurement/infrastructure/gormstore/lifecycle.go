@@ -104,6 +104,16 @@ func (l *Lifecycle) CreateUpstreamFulfillment(orderID uint, fulfillment *procure
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			return err
 		}
+		if fulfillment.InstructionsOverride != nil {
+			result := tx.Table("order_items").Where("order_id = ? AND deleted_at IS NULL", orderID).
+				Updates(map[string]interface{}{"instructions_json": fulfillment.InstructionsOverride, "updated_at": now})
+			if result.Error != nil {
+				return result.Error
+			}
+			if result.RowsAffected != 1 {
+				return errors.New("store card instructions require exactly one order item")
+			}
+		}
 		return tx.Create(&lifecycleFulfillmentRecord{
 			OrderID: orderID, Type: constants.FulfillmentTypeUpstream,
 			Status: constants.FulfillmentStatusDelivered, Payload: fulfillment.Payload,

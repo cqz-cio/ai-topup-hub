@@ -91,6 +91,16 @@ func (s *Store) ClaimSubmission(id uint) (bool, error) {
 	return result.RowsAffected == 1, result.Error
 }
 
+func (s *Store) PreserveDelivery(id uint, current, payload, bindingState string) (bool, error) {
+	if bindingState != "paiplus_binding_pending" && bindingState != "paiplus_format_review" {
+		return false, errors.New("invalid binding state")
+	}
+	result := s.db.Model(&procurementdomain.Order{}).
+		Where("id = ? AND deleted_at IS NULL AND status = ? AND (upstream_payload IS NULL OR upstream_payload = '' OR upstream_payload = ?)", id, current, payload).
+		Updates(map[string]interface{}{"upstream_payload": payload, "error_code": bindingState, "error_message": "store card binding pending; source preserved", "updated_at": time.Now()})
+	return result.RowsAffected == 1, result.Error
+}
+
 func (s *Store) FindPaidOrdersMissingProcurement(limit int, window *procurementdomain.PurchaseWindow) ([]uint, error) {
 	var ids []uint
 	err := s.ordersWithinPurchaseWindow(s.db.Table("orders AS o").Select("o.id"), window, true).

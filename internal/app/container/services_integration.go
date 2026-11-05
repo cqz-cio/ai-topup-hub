@@ -7,6 +7,7 @@ import (
 	"github.com/dujiao-next/internal/logger"
 	apicredentialapp "github.com/dujiao-next/internal/modules/apicredential/application"
 	auditlogapp "github.com/dujiao-next/internal/modules/auditlog/application"
+	cardmanagement "github.com/dujiao-next/internal/modules/cardsecret/infrastructure/managementclient"
 	channelclientapp "github.com/dujiao-next/internal/modules/channelclient/application"
 	contentapp "github.com/dujiao-next/internal/modules/content/application"
 	localfilestore "github.com/dujiao-next/internal/modules/content/infrastructure/filestore/local"
@@ -30,6 +31,7 @@ import (
 	procurementnotification "github.com/dujiao-next/internal/modules/procurement/infrastructure/notificationadapter"
 	procurementorder "github.com/dujiao-next/internal/modules/procurement/infrastructure/orderreader"
 	procurementqueue "github.com/dujiao-next/internal/modules/procurement/infrastructure/queueadapter"
+	procurementredemption "github.com/dujiao-next/internal/modules/procurement/infrastructure/redemptionclient"
 	procurementupstream "github.com/dujiao-next/internal/modules/procurement/infrastructure/upstreamgateway"
 	reconciliationapp "github.com/dujiao-next/internal/modules/reconciliation/application"
 	reconciliationnotification "github.com/dujiao-next/internal/modules/reconciliation/infrastructure/notificationadapter"
@@ -126,7 +128,18 @@ func (c *Container) initIntegrationServices() {
 	if paidAfter != nil {
 		purchaseWindow = &procurementdomain.PurchaseWindow{OrderIDFloor: orderFloor, PaidAfter: *paidAfter}
 	}
+	redemptionDelivery, err := procurementredemption.FromEnvironment()
+	if err != nil {
+		logger.Errorw("invalid_paiplus_delivery_config", "error", err)
+		panic(err)
+	}
+	c.CardManagement, err = cardmanagement.FromEnvironment()
+	if err != nil {
+		logger.Errorw("invalid_paiplus_management_config", "error", err)
+		panic(err)
+	}
 	c.ProcurementOrderService = procurementapp.NewService(procurementapp.Options{
+		DeliveryRewriter:   redemptionDelivery,
 		PurchaseWindow:     purchaseWindow,
 		Repository:         c.ProcurementOrderRepo,
 		Orders:             procurementorder.New(c.OrderStore),

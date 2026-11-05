@@ -17,4 +17,9 @@ func RegisterAdminRoutes(admin gin.IRoutes, handler *AdminHandler) {
 	admin.GET("/card-secrets/stats", handler.GetCardSecretStats)
 	admin.GET("/card-secrets/batches", handler.GetCardSecretBatches)
 	admin.GET("/card-secrets/template", handler.GetCardSecretTemplate)
+	// POST keeps card searches and both full codes out of URLs and access logs.
+	admin.POST("/card-secrets/paiplus/query", handler.QueryPAIPLUSCards)
+	admin.POST("/card-secrets/paiplus/reveal", handler.RevealPAIPLUSCard)
+	admin.POST("/card-secrets/paiplus/check", handler.CheckPAIPLUSCard)
+	admin.POST("/card-secrets/paiplus/revoke", handler.RevokePAIPLUSCard)
 }
