@@ -22,6 +22,7 @@ import (
 	orderwiring "github.com/dujiao-next/internal/bootstrap/order"
 	paymentwiring "github.com/dujiao-next/internal/bootstrap/payment"
 	publicconfigwiring "github.com/dujiao-next/internal/bootstrap/publicconfig"
+	publicpagewiring "github.com/dujiao-next/internal/bootstrap/publicpage"
 	resellerbootstrap "github.com/dujiao-next/internal/bootstrap/reseller"
 	upstreamwiring "github.com/dujiao-next/internal/bootstrap/upstreamapi"
 	userauthwiring "github.com/dujiao-next/internal/bootstrap/userauth"
@@ -244,6 +245,9 @@ func SetupRouter(cfg *config.Config, c *container.Container) *gin.Engine {
 	r.Use(middleware.LoggerMiddleware(log))
 	r.Use(middleware.CORSMiddleware(cfg.CORS))
 	r.Use(middleware.CallbackRouteMiddleware(c.SettingService, paymentCallbackHandler, paymentWebhookHandler, upstreamHandler, middleware.RateLimitMiddleware(redisClient, callbackRule, middleware.KeyByIP)))
+	publicpagewiring.New(c, publicCatalogHandler, publicContentHandler).Register(
+		r.Group("", middleware.ConcurrencyLimit(64), middleware.ResellerTenantMiddleware(c.ResellerDomainResolver)), web.UserFS(),
+	)
 
 	// 静态文件服务（上传的图片）必须放在前面。
 	// SVG 强制下载并禁止脚本：即使上传校验被绕过，直接打开 /uploads/x.svg 也不会在站点源下执行脚本；

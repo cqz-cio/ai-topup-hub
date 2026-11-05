@@ -1,8 +1,10 @@
 import { fileURLToPath, URL } from 'node:url'
 import { dirname, resolve } from 'node:path'
+import { existsSync, statSync } from 'node:fs'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite'
+import { publicDocumentEntry } from './build/publicDocumentEntry'
 
 const cfAsyncModuleScriptPlugin = () => ({
   name: 'cfasync-module-script',
@@ -24,6 +26,7 @@ export default defineConfig(({ mode }) => ({
       dropMessageCompiler: true,
     }),
     cfAsyncModuleScriptPlugin(),
+    publicDocumentEntry(),
   ],
   resolve: {
     alias: {
@@ -52,6 +55,17 @@ export default defineConfig(({ mode }) => ({
     // 允许通过分销商子域名(*.dujiao-next.test)访问 dev server，否则 Vite 5.4+ 会拦截非 localhost 的 Host
     allowedHosts: ['.dujiao.test'],
     proxy: {
+      '^/(products|blog)/[^/]+/?$': {
+        target: 'http://localhost:8080',
+        changeOrigin: false,
+        bypass(req) {
+          const root = fileURLToPath(new URL('./public', import.meta.url))
+          const path = resolve(root, '.' + new URL(req.url || '/', 'http://localhost').pathname)
+          if (path.startsWith(root + '/') || path.startsWith(root + '\\')) {
+            if (existsSync(path) && statSync(path).isFile()) return req.url
+          }
+        },
+      },
       // changeOrigin 必须为 false：保留原始子域名 Host，后端才能据此解析分销商租户
       '/api': {
         target: 'http://localhost:8080',

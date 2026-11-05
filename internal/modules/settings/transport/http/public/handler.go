@@ -10,6 +10,7 @@ import (
 	"github.com/dujiao-next/internal/constants"
 	reseller "github.com/dujiao-next/internal/modules/reseller/contract"
 	"github.com/dujiao-next/internal/platform/http/response"
+	"github.com/dujiao-next/internal/platform/http/siteurl"
 	"github.com/dujiao-next/internal/shared/jsonmap"
 	"github.com/dujiao-next/internal/version"
 
@@ -147,6 +148,7 @@ func (h *Handler) GetConfig(c *gin.Context) {
 
 	var cached map[string]interface{}
 	if hit, err := h.cache.GetJSON(c.Request.Context(), cacheKey, &cached); err == nil && hit {
+		cached = configWithSiteURL(c, cached)
 		cached["server_time"] = time.Now().UnixMilli()
 		cached["app_version"] = version.Version
 		h.applyFeatures(cached)
@@ -256,10 +258,27 @@ func (h *Handler) GetConfig(c *gin.Context) {
 	}
 
 	_ = h.cache.SetJSON(c.Request.Context(), cacheKey, data, publicConfigCacheTTL)
+	data = configWithSiteURL(c, data)
 	data["server_time"] = time.Now().UnixMilli()
 	data["app_version"] = version.Version
 	h.applyFeatures(data)
 	response.Success(c, data)
+}
+
+// Resolve after reading/writing the shared cache: a request's origin must never
+// be persisted into another host's configuration or the stored brand settings.
+func configWithSiteURL(c *gin.Context, source map[string]interface{}) map[string]interface{} {
+	data := make(map[string]interface{}, len(source))
+	for key, value := range source {
+		data[key] = value
+	}
+	brand := make(map[string]interface{})
+	for key, value := range aboutObject(source["brand"]) {
+		brand[key] = value
+	}
+	brand["site_url"] = siteurl.Resolve(stringValue(brand["site_url"]), c.Request)
+	data["brand"] = brand
+	return data
 }
 
 func (h *Handler) applyFeatures(data map[string]interface{}) {

@@ -64,8 +64,7 @@ func (h *PublicHandler) GetPosts(c *gin.Context) {
 
 // GetPostBySlug 根据 slug 获取公开文章详情。
 func (h *PublicHandler) GetPostBySlug(c *gin.Context) {
-	requestContext := c.Request.Context()
-	post, err := h.posts.GetPublicBySlug(requestContext, c.Param("slug"))
+	result, err := h.ReadPublishedPost(c.Request.Context(), c.Param("slug"))
 	if err != nil {
 		if errors.Is(err, contentcontract.ErrNotFound) {
 			ginutil.RespondError(c, response.CodeNotFound, "error.post_not_found", nil)
@@ -75,14 +74,22 @@ func (h *PublicHandler) GetPostBySlug(c *gin.Context) {
 		return
 	}
 
+	response.Success(c, result)
+}
+
+// ReadPublishedPost shares the public API projection with HTML documents.
+func (h *PublicHandler) ReadPublishedPost(ctx context.Context, slug string) (contentpresenter.PostResp, error) {
+	post, err := h.posts.GetPublicBySlug(ctx, slug)
+	if err != nil {
+		return contentpresenter.PostResp{}, err
+	}
 	result := contentpresenter.NewPostResp(post)
 	if post.Type == constants.PostTypeBlog {
-		products, relatedErr := h.posts.ListRelatedProducts(requestContext, post.ID)
-		if relatedErr == nil {
+		if products, err := h.posts.ListRelatedProducts(ctx, post.ID); err == nil {
 			result.RelatedProducts = contentpresenter.NewRelatedProductCardList(products)
 		}
 	}
-	response.Success(c, result)
+	return result, nil
 }
 
 // GetPublicBanners 获取公开 Banner 列表。

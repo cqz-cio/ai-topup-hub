@@ -179,46 +179,13 @@ func (h *PublicHandler) GetProductBySlug(c *gin.Context) {
 	if !ok {
 		return
 	}
-	slug := c.Param("slug")
-	tenant := tenantFromRequest(c)
-
-	product, err := h.products.GetPublicBySlugForTenant(tenant, slug)
+	decorated, skuID, err := h.readPublicProduct(c.Request.Context(), tenantFromRequest(c), c.Param("slug"), level)
 	if err != nil {
-		if errors.Is(err, productcontract.ErrNotFound) {
+		if errors.Is(err, productcontract.ErrNotFound) || errors.Is(err, productcontract.ErrResellerProductNotListed) {
 			ginutil.RespondError(c, response.CodeNotFound, "error.product_not_found", nil)
-			return
-		}
-		ginutil.RespondError(c, response.CodeInternal, "error.product_fetch_failed", err)
-		return
-	}
-
-	temp := []productdomain.Product{*product}
-	if err := h.products.ApplyAutoStockCounts(temp); err != nil {
-		ginutil.RespondError(c, response.CodeInternal, "error.product_fetch_failed", err)
-		return
-	}
-	*product = temp[0]
-
-	var resellerBatch *reseller.DisplayPricingBatch
-	if isResellerTenant(tenant) {
-		if h.pricer == nil {
-			ginutil.RespondError(c, response.CodeNotFound, "error.product_not_found", nil)
-			return
-		}
-		resellerBatch, err = h.pricer.LoadDisplayPricingBatch(tenant, []productdomain.Product{*product})
-		if err != nil {
+		} else {
 			ginutil.RespondError(c, response.CodeInternal, "error.product_fetch_failed", err)
-			return
 		}
-	}
-
-	decorated, derr := h.decoratePublicProductForTenant(product, h.promotions, tenant, resellerBatch, level)
-	if derr != nil {
-		if errors.Is(derr, productcontract.ErrResellerProductNotListed) {
-			ginutil.RespondError(c, response.CodeNotFound, "error.product_not_found", nil)
-			return
-		}
-		ginutil.RespondError(c, response.CodeInternal, "error.product_fetch_failed", derr)
 		return
 	}
 
@@ -226,10 +193,7 @@ func (h *PublicHandler) GetProductBySlug(c *gin.Context) {
 	if !ok {
 		return
 	}
-	applyUserProductPrices(&decorated, userPrices, resolvePublicDisplaySKUID(product))
-	if posts, relatedErr := h.loadRelatedPostCards(c.Request.Context(), product.ID); relatedErr == nil {
-		decorated.RelatedPosts = posts
-	}
+	applyUserProductPrices(&decorated, userPrices, skuID)
 
 	response.Success(c, decorated)
 }
@@ -265,4 +229,46 @@ func (h *PublicHandler) loadRelatedPostCards(ctx context.Context, productID uint
 		})
 	}
 	return result, nil
+}
+
+// ReadAnonymousProduct uses the same visibility, tenant pricing and masked stock
+// as the public API, without resolving a visitor's account or negotiated prices.
+func (h *PublicHandler) ReadAnonymousProduct(ctx context.Context, slug string) (productpresenter.Product, error) {
+	tenant, ok := reseller.TenantFromContext(ctx)
+	if !ok {
+		tenant = reseller.MainTenantContext("")
+	}
+	result, _, err := h.readPublicProduct(ctx, tenant, slug, nil)
+	return result, err
+}
+
+func (h *PublicHandler) readPublicProduct(ctx context.Context, tenant reseller.TenantContext, slug string, level *memberleveldomain.MemberLevel) (productpresenter.Product, uint, error) {
+	empty := productpresenter.Product{}
+	product, err := h.products.GetPublicBySlugForTenant(tenant, slug)
+	if err != nil {
+		return empty, 0, err
+	}
+	items := []productdomain.Product{*product}
+	if err := h.products.ApplyAutoStockCounts(items); err != nil {
+		return empty, 0, err
+	}
+	product = &items[0]
+	var batch *reseller.DisplayPricingBatch
+	if isResellerTenant(tenant) {
+		if h.pricer == nil {
+			return empty, 0, productcontract.ErrResellerProductNotListed
+		}
+		batch, err = h.pricer.LoadDisplayPricingBatch(tenant, items)
+		if err != nil {
+			return empty, 0, err
+		}
+	}
+	result, err := h.decoratePublicProductForTenant(product, h.promotions, tenant, batch, level)
+	if err != nil {
+		return empty, 0, err
+	}
+	if posts, err := h.loadRelatedPostCards(ctx, product.ID); err == nil {
+		result.RelatedPosts = posts
+	}
+	return result, resolvePublicDisplaySKUID(product), nil
 }

@@ -2,9 +2,9 @@ package sitemaphttp
 
 import (
 	"context"
-	"strings"
 
 	"github.com/dujiao-next/internal/logger"
+	"github.com/dujiao-next/internal/platform/http/siteurl"
 
 	"github.com/gin-gonic/gin"
 )
@@ -62,26 +62,13 @@ func (h *Handler) GetRobots(c *gin.Context) {
 	c.Data(200, "text/plain; charset=utf-8", []byte(body))
 }
 
-// resolveBaseURL 站点 URL 优先取后台 brand.site_url，否则回落到当前请求 Host。
+// resolveBaseURL 与公开配置共用 URL 校验，避免将开发地址写入 sitemap。
 func (h *Handler) resolveBaseURL(c *gin.Context) string {
+	configured := ""
 	if h != nil && h.brand != nil {
 		if siteURL, err := h.brand.GetSiteURL(); err == nil {
-			if u := strings.TrimRight(strings.TrimSpace(siteURL), "/"); u != "" {
-				return u
-			}
+			configured = siteURL
 		}
 	}
-
-	scheme := "https"
-	if c.Request.TLS == nil && c.GetHeader("X-Forwarded-Proto") == "" {
-		scheme = "http"
-	}
-	if proto := c.GetHeader("X-Forwarded-Proto"); proto != "" {
-		scheme = proto
-	}
-	host := c.Request.Host
-	if forwardedHost := c.GetHeader("X-Forwarded-Host"); forwardedHost != "" {
-		host = forwardedHost
-	}
-	return scheme + "://" + host
+	return siteurl.Resolve(configured, c.Request)
 }

@@ -64,3 +64,64 @@ func TestMainAboutPageUsesSavedContentAndSharedWechatWithoutMutatingSiteConfig(t
 		t.Fatal("old installation changed without saved content")
 	}
 }
+
+type siteURLCache struct{ data map[string]interface{} }
+
+func (*siteURLCache) CacheKey(*uint) string { return "public-config" }
+func (s *siteURLCache) GetJSON(_ context.Context, _ string, dst *map[string]interface{}) (bool, error) {
+	*dst = s.data
+	return s.data != nil, nil
+}
+func (s *siteURLCache) SetJSON(_ context.Context, _ string, value interface{}, _ time.Duration) error {
+	s.data = value.(map[string]interface{})
+	return nil
+}
+
+type siteURLSettings struct{}
+
+func (siteURLSettings) GetConfig(map[string]interface{}) (map[string]interface{}, error) {
+	return map[string]interface{}{"brand": jsonmap.JSON{"site_url": "http://127.0.0.1:4170", "name": "测试商城"}}, nil
+}
+func (siteURLSettings) GetWalletRechargeChannelIDs() []uint                     { return nil }
+func (siteURLSettings) GetWalletOnlyPayment() bool                              { return false }
+func (siteURLSettings) GetAffiliateSettingMap() (map[string]interface{}, error) { return nil, nil }
+func (siteURLSettings) GetSMTPEnabled() bool                                    { return false }
+func (siteURLSettings) GetRegistrationEnabled(value bool) (bool, error)         { return value, nil }
+func (siteURLSettings) GetEmailVerificationEnabled(value bool) (bool, error)    { return value, nil }
+func (siteURLSettings) GetRegistrationEmailDomainPolicy() (bool, []string, error) {
+	return false, nil, nil
+}
+func (siteURLSettings) GetByKey(string) (interface{}, error)            { return nil, nil }
+func (siteURLSettings) GetActiveHomeAnnouncement() (jsonmap.JSON, bool) { return nil, false }
+
+type siteURLPayments struct{}
+
+func (siteURLPayments) GetOrderPaymentChannels() ([]map[string]interface{}, error) { return nil, nil }
+
+func TestPublicConfigRepairsSiteURLOnCacheMissAndHitWithoutCachingRequestHost(t *testing.T) {
+	cache := &siteURLCache{}
+	handler := &Handler{cache: cache, settings: siteURLSettings{}, payments: siteURLPayments{}}
+	for _, origin := range []string{"https://www.qzweb.cloud", "https://other.example", "http://127.0.0.1:5173"} {
+		w := httptest.NewRecorder()
+		c, _ := gin.CreateTestContext(w)
+		c.Request = httptest.NewRequest("GET", origin+"/api/v1/public/config", nil)
+		handler.GetConfig(c)
+		var result struct {
+			Data struct {
+				Brand map[string]interface{} `json:"brand"`
+			} `json:"data"`
+		}
+		if w.Code != 200 || json.Unmarshal(w.Body.Bytes(), &result) != nil {
+			t.Fatalf("unexpected response: %d %s", w.Code, w.Body.String())
+		}
+		if result.Data.Brand["site_url"] != origin || result.Data.Brand["name"] != "测试商城" {
+			t.Fatalf("incorrect public brand: %+v", result.Data.Brand)
+		}
+		if aboutObject(cache.data["brand"])["site_url"] != "http://127.0.0.1:4170" {
+			t.Fatal("request origin contaminated cached settings")
+		}
+		if _, exists := cache.data["server_time"]; exists {
+			t.Fatal("response metadata contaminated cache")
+		}
+	}
+}

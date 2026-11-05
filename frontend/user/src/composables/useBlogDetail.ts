@@ -6,6 +6,8 @@ import { postAPI } from '../api'
 import { debounceAsync } from '../utils/debounce'
 import { useLocalized } from './useProduct'
 import { usePageSeo } from './usePageSeo'
+import { useHead } from '@unhead/vue'
+import { getImageUrl } from '../utils/image'
 
 /**
  * 文章/公告详情共享逻辑（classic + vault 双模板共用）。
@@ -43,6 +45,25 @@ export function useBlogDetail() {
     image: () => post.value?.thumbnail || '',
     canonicalPath: () => `/blog/${(route.params.slug as string) || ''}`,
     type: () => 'article',
+  })
+
+  // Keep article structured data after Vue replaces the initial public HTML.
+  useHead(() => {
+    if (!post.value || loading.value) return { script: [] }
+    const origin = String(appStore.config?.brand?.site_url || window.location.origin).replace(/\/+$/, '')
+    const url = `${origin}/blog/${encodeURIComponent(post.value.slug)}`
+    const schema: Record<string, unknown> = {
+      '@context': 'https://schema.org',
+      '@type': post.value.type === 'notice' ? 'Article' : 'BlogPosting',
+      headline: getLocalizedText(post.value.title),
+      description: getLocalizedText(post.value.summary),
+      url,
+      mainEntityOfPage: url,
+      inLanguage: appStore.locale,
+    }
+    if (post.value.published_at) schema.datePublished = post.value.published_at
+    if (post.value.thumbnail) schema.image = new URL(getImageUrl(post.value.thumbnail), origin + '/').href
+    return { script: [{ key: 'article-schema', type: 'application/ld+json', innerHTML: JSON.stringify(schema).replace(/</g, '\\u003c') }] }
   })
 
   const backLink = computed(() => {

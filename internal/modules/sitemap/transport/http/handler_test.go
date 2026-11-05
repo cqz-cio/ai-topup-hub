@@ -2,6 +2,7 @@ package sitemaphttp
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -15,6 +16,45 @@ type fakeGenerator struct {
 	robots string
 	err    error
 	base   string
+}
+
+func TestSEOEndpointsRejectDevelopmentSiteURL(t *testing.T) {
+	for _, path := range []string{"/sitemap.xml", "/robots.txt"} {
+		t.Run(path, func(t *testing.T) {
+			gen := &fakeGenerator{xml: "<urlset/>", robots: "User-agent: *\n"}
+			handler := NewHandler(gen, fakeBrand{url: "http://127.0.0.1:4170"})
+			w := httptest.NewRecorder()
+			c, _ := gin.CreateTestContext(w)
+			c.Request = httptest.NewRequest("GET", "http://www.qzweb.cloud"+path, nil)
+			c.Request.Header.Set("X-Forwarded-Proto", "https")
+			c.Request.Header.Set("X-Forwarded-Host", "untrusted.example")
+			if path == "/sitemap.xml" {
+				handler.GetSitemap(c)
+			} else {
+				handler.GetRobots(c)
+			}
+			if w.Code != 200 || gen.base != "https://www.qzweb.cloud" {
+				t.Fatalf("status=%d origin=%q", w.Code, gen.base)
+			}
+			if w.Header().Get("Cache-Control") == "" {
+				t.Fatal("missing cache control")
+			}
+			if path == "/robots.txt" && !strings.HasPrefix(w.Header().Get("Content-Type"), "text/plain") {
+				t.Fatal("robots must be plain text")
+			}
+		})
+	}
+}
+
+func TestSitemapFailureDoesNotReturnSuccessfulDocument(t *testing.T) {
+	handler := NewHandler(&fakeGenerator{err: errors.New("catalog unavailable")}, fakeBrand{})
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	c.Request = httptest.NewRequest("GET", "https://www.qzweb.cloud/sitemap.xml", nil)
+	handler.GetSitemap(c)
+	if w.Code != 500 || w.Header().Get("Cache-Control") != "" {
+		t.Fatalf("failure was advertised as cacheable: status=%d headers=%v", w.Code, w.Header())
+	}
 }
 
 func (f *fakeGenerator) Generate(_ context.Context, baseURL string) (string, error) {

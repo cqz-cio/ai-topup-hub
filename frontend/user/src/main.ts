@@ -34,6 +34,9 @@ Promise.all([
   isRedemptionPath(window.location.pathname) ? Promise.resolve() : useTelegramMiniAppStore(pinia).init(),
   setI18nLocale(detectLocale()),
 ]).then(() => {
+  // The server document is visible until the interactive app is ready. Remove
+  // only its head entries so Unhead owns subsequent navigation without duplicates.
+  document.querySelectorAll('[data-public-page-seo]').forEach(node => node.remove())
   app.mount('#app')
 })
 

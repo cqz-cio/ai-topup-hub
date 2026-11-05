@@ -73,6 +73,14 @@ func (s *Service) GenerateRobots(baseURL string) string {
 	var b strings.Builder
 	b.WriteString("User-agent: *\n")
 	b.WriteString("Disallow: /api/\n")
+	// The storefront renders its content from these anonymous read endpoints.
+	// Keep private APIs blocked while allowing search engines to render pages.
+	for _, path := range []string{"config", "products", "categories", "posts", "post-categories", "banners", "member-levels"} {
+		b.WriteString("Allow: /api/v1/public/" + path + "$\n")
+		b.WriteString("Allow: /api/v1/public/" + path + "?\n")
+	}
+	b.WriteString("Allow: /api/v1/public/products/\n")
+	b.WriteString("Allow: /api/v1/public/posts/\n")
 	b.WriteString("Disallow: /admin/\n")
 	b.WriteString("Disallow: /me/\n")
 	b.WriteString("Disallow: /cart\n")
