@@ -1,0 +1,31 @@
+[Unit]
+Description=Pi support offline rules
+After=network.target
+
+[Service]
+Type=simple
+DynamicUser=yes
+ExecStart=/srv/zhixiang-support/current/support-agent -public-origin https://www.qzweb.cloud
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=10
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+CapabilityBoundingSet=
+RestrictAddressFamilies=AF_INET AF_INET6
+IPAddressDeny=any
+IPAddressAllow=localhost
+InaccessiblePaths=-/srv/zhixiang -/srv/paiplus
+MemoryMax=192M
+TasksMax=64
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

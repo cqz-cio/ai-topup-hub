@@ -55,6 +55,10 @@ export default defineConfig(({ mode }) => ({
     // 允许通过分销商子域名(*.dujiao-next.test)访问 dev server，否则 Vite 5.4+ 会拦截非 localhost 的 Host
     allowedHosts: ['.dujiao.test'],
     proxy: {
+      '/api/v1/support': {
+        target: 'http://127.0.0.1:8085',
+        changeOrigin: true,
+      },
       '^/(products|blog)/[^/]+/?$': {
         target: 'http://localhost:8080',
         changeOrigin: false,

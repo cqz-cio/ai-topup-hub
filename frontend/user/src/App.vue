@@ -2,7 +2,7 @@
   <!-- The root's stable scrollbar gutter already reserves space during body scroll locks. -->
   <ConfigProvider :scroll-body="{ padding: 0, margin: 0 }">
     <div id="app" class="min-h-screen bg-background text-foreground flex flex-col"
-      :class="{ 'brand-scene': hasBrandScene, 'brand-product-scene': hasProductScene, 'brand-route-scene': !!pageScene }"
+      :class="{ 'has-support-pet': supportEnabled, 'brand-scene': hasBrandScene, 'brand-product-scene': hasProductScene, 'brand-route-scene': !!pageScene }"
       :data-brand-page-scene="pageScene || undefined">
       <OceanSceneMotion v-if="hasBrandScene && (hasProductScene || pageScene)" :scene="hasProductScene ? 'detail' : pageScene!" />
       <BrandSceneMotion v-if="hasBrandScene && !hasProductScene && !pageScene" />
@@ -40,6 +40,7 @@
       <ConfirmDialog />
       <PaymentBalanceDialog />
       <ProductContactDialog />
+      <SupportWidget v-if="supportEnabled" />
     </div>
   </ConfigProvider>
 </template>
@@ -69,12 +70,14 @@ import MobileBottomNav from './components/MobileBottomNav.vue'
 const VaultLayout = defineAsyncComponent(() => import('./templates/vault/layout/VaultLayout.vue'))
 const OceanSceneMotion = defineAsyncComponent(() => import('./components/OceanSceneMotion.vue'))
 const BrandSceneMotion = defineAsyncComponent(() => import('./components/BrandSceneMotion.vue'))
+const SupportWidget = defineAsyncComponent(() => import('./components/support/SupportWidget.vue'))
 
 // config 由 router.beforeEach 统一加载，无需在此重复调用
 const appStore = useAppStore()
 const route = useRoute()
 const isResellerConsole = computed(() => route.meta.resellerConsole === true)
 const isStandalone = computed(() => route.meta.standalone === true)
+const supportEnabled = computed(() => !!appStore.config && !isStandalone.value && !isResellerConsole.value && !appStore.isResellerTenant)
 // getActiveTemplate 读取 appStore.config（响应式），config 加载后会重新计算
 const isVault = computed(() => getActiveTemplate() === 'vault')
 const hasBrandScene = computed(() => !isStandalone.value && !isVault.value && !isResellerConsole.value && !appStore.isResellerTenant)
@@ -83,6 +86,8 @@ const pageScene = computed(() => hasBrandScene.value ? getBrandPageScene(route.n
 </script>
 
 <style>
+.has-support-pet .back-to-top { right: 172px; }
+@media (max-width: 480px) { .has-support-pet .back-to-top { right: 144px; } }
 .page-fade-enter-active,
 .page-fade-leave-active {
   transition: opacity 200ms ease;

@@ -1,0 +1,10 @@
+{
+  "api_key": "",
+  "model": "deepseek-flash",
+  "max_output_tokens": 800,
+  "daily_budget_nanousd": 250000000,
+  "daily_calls": 100,
+  "session_daily_calls": 50,
+  "session_per_minute": 6,
+  "global_per_minute": 20
+}
