@@ -1,5 +1,7 @@
 # 版本与发布规则
 
+当前运行基准：2026-11-06 SEO/GEO 发布 `20261105-173644`，源码 `f94c3b2a80b5b9ca093105e824af27561b0094c6`。商城、后台网关与后端现在均位于新加坡；下方带日期的上海发布记录为历史。当前配置路径、验证与回退见 [公开正文发布说明](seo-public-content.md)，不要照旧模板覆盖迁移后的配置。
+
 ## 商城无损媒体与加载优化上线（2026-10-20）
 
 - 用户确认当前动画与画质后授权推送上线；上海商城发布 `20261020-213055`，干净源码 `17a1c6df26f3f6b923db8bb317398dc3ae9ed73a`。背景、底板、Logo、GPT/Gemini 保持原尺寸并使用无损 WebP，可见像素与透明度逐像素一致；动画遮罩 alpha 一致。相关媒体 6,714,440 → 4,305,265 字节（减少 35.88%）。维护见 `docs/storefront-media-loading.md`。
@@ -43,7 +45,7 @@
 6. 上线后对照本地验证结果，核对页面、健康、支付渠道、商品说明、售价、Redis、库存定时器和 storefront 任务。订单、凭据及实时库存分别维护，不用本地数据覆盖生产；不主动进行真实付款或采购测试。
 7. 保存核验结果与旧发布，再标记对应发布标签。
 
-库存任务验收必须同时核对 timer active、对应 service 的 `Result=success`、报告时间和映射清单，不能只看 timer 状态。`zhixiang-stock-sync.service` 以 `zhixiang` 用户运行，读取当前发布的 `scripts/sync-ellaixshop-stock.py`；打包/切换发布后，确保 `scripts` 目录为 `root:zhixiang` 0750、该脚本为 `root:zhixiang` 0640，或提供等价的服务用户读取权限。不要将脚本发布为仅 root 可读。上线前用 `runuser -u zhixiang -- test -r <脚本绝对路径>` 核对，并运行原有库存 service 验证最新报告，不另起同步助手或采购 worker。
+库存任务验收必须同时核对 timer active、对应 service 的 `Result=success`、报告时间和映射清单，不能只看 timer 状态。先读取当前 service 的实际 `ExecStart`，不要凭历史路径重建服务。2026-11-06 核验第一家已使用 `/srv/zhixiang/shared/scripts/sync-ellaixshop-catalog.py --apply`，最新报告为 `/srv/zhixiang/shared/reports/merchant1039-catalog-sync.json`；第二家使用共享目录的 `sync-86gamestore-stock.py`。原脚本、服务账户和共享配置必须保留；检查实际运行用户可读脚本，并运行原有库存 service 验证新鲜报告，不另起同步助手或采购 worker。历史发布仍包含旧 `scripts/sync-ellaixshop-stock.py`，保留原权限，不将它误当成当前 service 入口。
 
 GitHub CI 在 `main`、`dev` 推送及 PR 上验证；`v*` 标签触发 GoReleaser 发布包。没有自动部署新加坡的 GitHub 工作流，推送主分支或源码基线标签不会替换生产程序。
 
