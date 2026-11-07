@@ -1,31 +1,31 @@
 {
-  "checked_at": "2026-11-06T01:30:20.558663+00:00",
+  "checked_at": "2026-11-07T04:15:33.393679+00:00",
   "production_url": "https://www.qzweb.cloud/",
-  "documented_release_id": "20261105-173644",
-  "verified_release_id": "20261105-173644",
-  "previous_release_id": "20261029-181554",
-  "source_commit": "f94c3b2a80b5b9ca093105e824af27561b0094c6",
+  "documented_release_id": "20261107-121013",
+  "verified_release_id": "20261107-121013",
+  "previous_release_id": "20261105-173644",
+  "source_commit": "095966fd04f0049b80e3fcadb184e79730f241eb",
   "source_branch": "main",
   "server_git_commit_verified": true,
-  "source_tag": "production/seo-public-content-20261105-173644",
+  "source_tag": "production/balance-recovery-20261107-121013",
   "production": {
     "host": "43.134.141.10",
-    "release_path": "/srv/zhixiang/releases/20261105-173644",
-    "running_executable": "/srv/zhixiang/releases/20261105-173644/zhixiang-shop",
-    "binary_bytes": 134578338,
-    "binary_sha256": "7dbb5f5e8c6c199624e77e0fe7ee37ba2858288968ac7612c0bdd77a57d10aa5",
-    "running_binary_sha256": "7dbb5f5e8c6c199624e77e0fe7ee37ba2858288968ac7612c0bdd77a57d10aa5",
-    "manifest_binary_sha256": "7dbb5f5e8c6c199624e77e0fe7ee37ba2858288968ac7612c0bdd77a57d10aa5",
-    "source_commit": "f94c3b2a80b5b9ca093105e824af27561b0094c6",
+    "release_path": "/srv/zhixiang/releases/20261107-121013",
+    "running_executable": "/srv/zhixiang/releases/20261107-121013/zhixiang-shop",
+    "binary_bytes": 134852770,
+    "binary_sha256": "6f03f0f88e98a17e39c068b7fbbd6548d7fa08969552949187d12caaaa3bf2a8",
+    "running_binary_sha256": "6f03f0f88e98a17e39c068b7fbbd6548d7fa08969552949187d12caaaa3bf2a8",
+    "manifest_binary_sha256": "6f03f0f88e98a17e39c068b7fbbd6548d7fa08969552949187d12caaaa3bf2a8",
+    "source_commit": "095966fd04f0049b80e3fcadb184e79730f241eb",
     "source_dirty": false,
     "build_info": {
       "go_version": "go1.26.5",
-      "source_commit": "f94c3b2a80b5b9ca093105e824af27561b0094c6",
-      "vcs_revision": "f94c3b2a80b5b9ca093105e824af27561b0094c6",
+      "source_commit": "095966fd04f0049b80e3fcadb184e79730f241eb",
+      "vcs_revision": "095966fd04f0049b80e3fcadb184e79730f241eb",
       "vcs_modified": false,
       "git_metadata_pinned": true,
       "tags": "release,fullstack",
-      "source_verified_by": "clean archive, build metadata, manifest and complete running binary SHA256",
+      "source_verified_by": "clean checkout, pinned Git metadata, manifest and actual /proc running binary SHA256",
       "buildvcs": true
     },
     "runtime_mode": "storefront",
@@ -36,27 +36,29 @@
       "zhixiang-redis": "active",
       "paiplus": "active",
       "zhixiang-stock-sync.timer": "active",
-      "zhixiang-86gamestore-stock-sync.timer": "active"
+      "zhixiang-86gamestore-stock-sync.timer": "active",
+      "zhixiang-support": "active"
     },
     "pids": {
       "nginx": "387020",
-      "zhixiang-shop": "3187416",
+      "zhixiang-shop": "3884665",
       "zhixiang-redis": "52983",
-      "paiplus": "1494422"
+      "paiplus": "1494422",
+      "zhixiang-support": "3238947"
     },
     "redis_preserved_without_restart": true,
-    "backup": "/srv/zhixiang/backups/before-seo-public-content-20261105-173644",
+    "backup": "/srv/zhixiang/backups/before-balance-recovery-20261107-121013",
     "database_backup_quick_check": "ok",
-    "report_path": "/srv/zhixiang/backups/before-seo-public-content-20261105-173644/final-report.json",
+    "report_path": "/srv/zhixiang/backups/before-balance-recovery-20261107-121013/final-verification.json",
     "configuration_unchanged": true,
     "private_configuration_unchanged": true,
     "configuration_changes": [],
     "settings_changes": [],
-    "nginx_configuration_preserved": false,
-    "nginx_configuration_source": "existing Singapore config plus SEO locations; hashes retained in release manifest",
-    "nginx_changed_file": "/etc/nginx/conf.d/cardnet-qzweb-www.conf",
+    "nginx_configuration_preserved": true,
+    "nginx_configuration_source": "existing Singapore configuration preserved byte for byte",
+    "nginx_changed_file": null,
     "nginx_other_files_preserved": 24,
-    "nginx_change_scope": "sitemap/robots exact proxy, live detail HTML fallback, stable frontend boot entry cache policy",
+    "nginx_change_scope": "none",
     "last_api_recovery": {
       "recovered": true,
       "reason": "Business HTTP requests blocked while health endpoint and data stores remained responsive",
@@ -236,14 +238,11 @@
     "admin/index.html": "c717117ca56c538dc162c082ea820b4a6a0d8814914b55a67a6554988d7813fd"
   },
   "public_verification": {
-    "checked_at": "2026-11-06T01:30:20.558663+00:00",
-    "public_http_checks_passed": 449,
-    "browser_checks_passed": 4,
+    "checked_at": "2026-11-07T04:15:33.393679+00:00",
+    "browser_and_api_checks_passed": 8,
     "browser_error_count": 0,
-    "products_verified": 26,
-    "posts_verified": 3,
     "production_order_submitted": false,
-    "verification_directory": "work/codex-logs/seo-release-20261105/production"
+    "verification_directory": "work/codex-runtime/balance-recovery-release-20261107"
   },
   "catalog": {
     "prices_unchanged": true,
@@ -286,7 +285,8 @@
     "The upstream check is a balance snapshot, not a reservation. Previously copied payment instructions cannot be revoked; local mock scenarios do not constitute real-funds acceptance.",
     "20261016-190912 fixes the paid-order database deadlock. One existing paid customer order recovered through authorized automatic procurement; this was not a test purchase.",
     "The BSC HTTP 403 issue recorded for release 20261016-190912 was resolved by 20261016-194753; catch-up and continued confirmed-block scanning were verified without a real-money test.",
-    "2026-11-06: public crawlability verified; actual search indexing, rankings, AI citations and live-money acceptance were not tested. Homepage/list/category rendering was not changed. Earlier dated Shanghai entries are historical; current gateway is in Singapore."
+    "2026-11-06: public crawlability verified; actual search indexing, rankings, AI citations and live-money acceptance were not tested. Homepage/list/category rendering was not changed. Earlier dated Shanghai entries are historical; current gateway is in Singapore.",
+    "2026-11-07: real 60-second production scheduler observed with no waiting customers; recovery delivery verified using isolated supplier, Redis and SMTP fixtures. New shortages only; no historical backfill, no automatic payment or purchase, and no real acceptance email."
   ],
   "procurement_verification": {
     "mock_end_to_end_scenarios_passed": 12,
@@ -356,14 +356,14 @@
     "content_preserved_by_release": "20261012-153531"
   },
   "source_identity_verification": {
-    "source_commit": "f94c3b2a80b5b9ca093105e824af27561b0094c6",
+    "source_commit": "095966fd04f0049b80e3fcadb184e79730f241eb",
     "source_branch": "main",
     "source_dirty": false,
     "binary_build_info_commit_matches": true,
     "running_binary_sha256_matches": true,
-    "frontend_files_sha256_verified": 417,
-    "admin_files_preserved": 1559,
-    "frontend_verification_scope": "Current storefront build; 6 original SVG files retain deployed bytes; retained assets and retired paths checked separately"
+    "frontend_files_preserved": 12512,
+    "frontend_deployed": false,
+    "frontend_verification_scope": "All existing storefront/admin files preserved; actual desktop and mobile routes verified"
   },
   "previous_release": {
     "release": "20261015-160016",
@@ -417,21 +417,21 @@
   "previous_build_verification_at": "2026-10-12T08:19:31.766441+00:00",
   "management_url": "https://admin.qzweb.cloud/login",
   "frontend_gateway": {
-    "checked_at": "2026-11-06T01:20:05.588159+00:00",
+    "checked_at": "2026-11-07T04:15:33.393679+00:00",
     "frontend_host": "43.134.141.10",
     "backend_host": "43.134.141.10",
-    "frontend_release": "20261105-173644",
-    "storefront_release": "20261105-173644",
+    "frontend_release": "20261106-110800",
+    "storefront_release": "20261106-110800",
     "previous_frontend_release": "20261029-181554",
-    "source_commit": "f94c3b2a80b5b9ca093105e824af27561b0094c6",
-    "storefront_source_commit": "f94c3b2a80b5b9ca093105e824af27561b0094c6",
-    "frontend_build_source_commit": "f94c3b2a80b5b9ca093105e824af27561b0094c6",
-    "source_dirty": false,
-    "source_tag": "production/seo-public-content-20261105-173644",
+    "source_commit": null,
+    "storefront_source_commit": null,
+    "frontend_build_source_commit": null,
+    "source_dirty": true,
+    "source_tag": null,
     "storefront_url": "https://www.qzweb.cloud/",
     "management_url": "https://admin.qzweb.cloud/login",
     "api_transport": "Singapore Nginx to loopback 127.0.0.1:8080",
-    "frontend_source_identical_to_backend": true,
+    "frontend_source_identical_to_backend": false,
     "frontend_only_update": false,
     "backend_program_preserved": false,
     "backend_setting_changes": [],
@@ -447,8 +447,8 @@
     "previous_directory_inventory_count": 10549,
     "previous_hashed_assets_retained": true,
     "retained_files_preserved": true,
-    "static_verification_scope": "417 current storefront files, 10548 retained storefront files, all 1559 admin files, 69 retired paths",
-    "nginx_changed_file": "/etc/nginx/conf.d/cardnet-qzweb-www.conf",
+    "static_verification_scope": "All 12512 existing storefront/admin files preserved; no frontend publish",
+    "nginx_changed_file": null,
     "nginx_other_files_preserved": 24,
     "existing_tls_and_ipv6_preserved": true,
     "dns_changed_by_this_release": false,
@@ -464,7 +464,10 @@
     "report_path": "/srv/zhixiang/backups/before-seo-public-content-20261105-173644/final-report.json",
     "database_uploaded": false,
     "real_payment_or_purchase_performed": false,
-    "release_scope": "SEO canonical URL, robots/sitemap and directly readable public product/article detail HTML"
+    "release_scope": "backend balance recovery polling and customer email only",
+    "source_record": "docs/history/support-agent-release-20261106.json",
+    "backend_changed": true,
+    "nginx_configuration_changed": false
   },
   "alipay": {
     "code_and_official_sandbox_query_verified": true,
@@ -2921,7 +2924,7 @@
     "documentation": "docs/bsc-rpc-recovery.md",
     "private_evidence": "deployment/local/bsc-rpc-recovery/verified-report.json"
   },
-  "backend_checked_at": "2026-11-06T01:20:05.588159+00:00",
+  "backend_checked_at": "2026-11-07T04:15:33.393679+00:00",
   "manual_supplier_import": {
     "release": "20261017-233133",
     "source_commit": "ba49f41bfe5aa5c1d023edb539c29bd69fe482d6",
@@ -3654,5 +3657,257 @@
     "evidence": "work/codex-runtime/seo-release-20261105/verified-report.json",
     "search_indexing_or_ai_citation_verified": false,
     "extra_anti_scraping_deployed": false
+  },
+  "balance_recovery_previous_baseline": {
+    "checked_at": "2026-11-06T01:30:20.558663+00:00",
+    "documented_release_id": "20261105-173644",
+    "source_commit": "f94c3b2a80b5b9ca093105e824af27561b0094c6",
+    "source_tag": "production/seo-public-content-20261105-173644",
+    "production": {
+      "host": "43.134.141.10",
+      "release_path": "/srv/zhixiang/releases/20261105-173644",
+      "running_executable": "/srv/zhixiang/releases/20261105-173644/zhixiang-shop",
+      "binary_bytes": 134578338,
+      "binary_sha256": "7dbb5f5e8c6c199624e77e0fe7ee37ba2858288968ac7612c0bdd77a57d10aa5",
+      "running_binary_sha256": "7dbb5f5e8c6c199624e77e0fe7ee37ba2858288968ac7612c0bdd77a57d10aa5",
+      "manifest_binary_sha256": "7dbb5f5e8c6c199624e77e0fe7ee37ba2858288968ac7612c0bdd77a57d10aa5",
+      "source_commit": "f94c3b2a80b5b9ca093105e824af27561b0094c6",
+      "source_dirty": false,
+      "build_info": {
+        "go_version": "go1.26.5",
+        "source_commit": "f94c3b2a80b5b9ca093105e824af27561b0094c6",
+        "vcs_revision": "f94c3b2a80b5b9ca093105e824af27561b0094c6",
+        "vcs_modified": false,
+        "git_metadata_pinned": true,
+        "tags": "release,fullstack",
+        "source_verified_by": "clean archive, build metadata, manifest and complete running binary SHA256",
+        "buildvcs": true
+      },
+      "runtime_mode": "storefront",
+      "upstream_purchase_enabled": true,
+      "services": {
+        "nginx": "active",
+        "zhixiang-shop": "active",
+        "zhixiang-redis": "active",
+        "paiplus": "active",
+        "zhixiang-stock-sync.timer": "active",
+        "zhixiang-86gamestore-stock-sync.timer": "active"
+      },
+      "pids": {
+        "nginx": "387020",
+        "zhixiang-shop": "3187416",
+        "zhixiang-redis": "52983",
+        "paiplus": "1494422"
+      },
+      "redis_preserved_without_restart": true,
+      "backup": "/srv/zhixiang/backups/before-seo-public-content-20261105-173644",
+      "database_backup_quick_check": "ok",
+      "report_path": "/srv/zhixiang/backups/before-seo-public-content-20261105-173644/final-report.json",
+      "configuration_unchanged": true,
+      "private_configuration_unchanged": true,
+      "configuration_changes": [],
+      "settings_changes": [],
+      "nginx_configuration_preserved": false,
+      "nginx_configuration_source": "existing Singapore config plus SEO locations; hashes retained in release manifest",
+      "nginx_changed_file": "/etc/nginx/conf.d/cardnet-qzweb-www.conf",
+      "nginx_other_files_preserved": 24,
+      "nginx_change_scope": "sitemap/robots exact proxy, live detail HTML fallback, stable frontend boot entry cache policy",
+      "last_api_recovery": {
+        "recovered": true,
+        "reason": "Business HTTP requests blocked while health endpoint and data stores remained responsive",
+        "backup": "/srv/zhixiang/backups/before-api-recovery-20261016T070422Z",
+        "old_api_pid": "2265207",
+        "new_api_pid": "2942544",
+        "same_binary": true,
+        "private_configuration_preserved": true,
+        "redis_pid_preserved": true,
+        "stock_timer": "active",
+        "checks": [
+          {
+            "route": "/health",
+            "result": "200|0.000832",
+            "exit": 0
+          },
+          {
+            "route": "/api/v1/public/config",
+            "result": "200|0.006168",
+            "exit": 0
+          },
+          {
+            "route": "/api/v1/public/products/qzweb-58",
+            "result": "200|0.002638",
+            "exit": 0
+          }
+        ]
+      },
+      "paid_order_deadlock_fixed_in_release": "20261016-190912",
+      "bsc_rpc_recovered_in_release": "20261016-194753"
+    },
+    "source_identity_verification": {
+      "source_commit": "f94c3b2a80b5b9ca093105e824af27561b0094c6",
+      "source_branch": "main",
+      "source_dirty": false,
+      "binary_build_info_commit_matches": true,
+      "running_binary_sha256_matches": true,
+      "frontend_files_sha256_verified": 417,
+      "admin_files_preserved": 1559,
+      "frontend_verification_scope": "Current storefront build; 6 original SVG files retain deployed bytes; retained assets and retired paths checked separately"
+    },
+    "public_verification": {
+      "checked_at": "2026-11-06T01:30:20.558663+00:00",
+      "public_http_checks_passed": 449,
+      "browser_checks_passed": 4,
+      "browser_error_count": 0,
+      "products_verified": 26,
+      "posts_verified": 3,
+      "production_order_submitted": false,
+      "verification_directory": "work/codex-logs/seo-release-20261105/production"
+    },
+    "frontend_gateway": {
+      "checked_at": "2026-11-06T01:20:05.588159+00:00",
+      "frontend_host": "43.134.141.10",
+      "backend_host": "43.134.141.10",
+      "frontend_release": "20261105-173644",
+      "storefront_release": "20261105-173644",
+      "previous_frontend_release": "20261029-181554",
+      "source_commit": "f94c3b2a80b5b9ca093105e824af27561b0094c6",
+      "storefront_source_commit": "f94c3b2a80b5b9ca093105e824af27561b0094c6",
+      "frontend_build_source_commit": "f94c3b2a80b5b9ca093105e824af27561b0094c6",
+      "source_dirty": false,
+      "source_tag": "production/seo-public-content-20261105-173644",
+      "storefront_url": "https://www.qzweb.cloud/",
+      "management_url": "https://admin.qzweb.cloud/login",
+      "api_transport": "Singapore Nginx to loopback 127.0.0.1:8080",
+      "frontend_source_identical_to_backend": true,
+      "frontend_only_update": false,
+      "backend_program_preserved": false,
+      "backend_setting_changes": [],
+      "admin_release": "20261029-181554",
+      "admin_source_commit": null,
+      "admin_source_note": "Existing public admin artifact preserved byte-for-byte; previous frontend manifest has stale admin source metadata. No admin rebuild was deployed.",
+      "admin_base": "/",
+      "admin_files_verified": 1559,
+      "admin_files_preserved": 1559,
+      "storefront_files_verified": 417,
+      "storefront_build_files_scanned": 417,
+      "storefront_files_preserved": 10548,
+      "previous_directory_inventory_count": 10549,
+      "previous_hashed_assets_retained": true,
+      "retained_files_preserved": true,
+      "static_verification_scope": "417 current storefront files, 10548 retained storefront files, all 1559 admin files, 69 retired paths",
+      "nginx_changed_file": "/etc/nginx/conf.d/cardnet-qzweb-www.conf",
+      "nginx_other_files_preserved": 24,
+      "existing_tls_and_ipv6_preserved": true,
+      "dns_changed_by_this_release": false,
+      "verified_services": {
+        "nginx": "active",
+        "zhixiang-shop": "active",
+        "zhixiang-redis": "active",
+        "paiplus": "active",
+        "zhixiang-stock-sync.timer": "active",
+        "zhixiang-86gamestore-stock-sync.timer": "active"
+      },
+      "backup": "/srv/zhixiang/backups/before-seo-public-content-20261105-173644",
+      "report_path": "/srv/zhixiang/backups/before-seo-public-content-20261105-173644/final-report.json",
+      "database_uploaded": false,
+      "real_payment_or_purchase_performed": false,
+      "release_scope": "SEO canonical URL, robots/sitemap and directly readable public product/article detail HTML"
+    }
+  },
+  "balance_recovery_20261107": {
+    "passed": true,
+    "checked_at": "2026-11-07T04:15:33.393679+00:00",
+    "release": "20261107-121013",
+    "source_commit": "095966fd04f0049b80e3fcadb184e79730f241eb",
+    "source_tag": "production/balance-recovery-20261107-121013",
+    "ci": {
+      "id": 42337064185,
+      "name": "ci",
+      "head_sha": "095966fd04f0049b80e3fcadb184e79730f241eb",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/cqz-cio/ai-topup-hub/actions/runs/42337064185"
+    },
+    "poll_seconds": 60,
+    "observed_poll_intervals_seconds": [
+      59.982469
+    ],
+    "brand": "π星卡社",
+    "sender": "guanxichen376@gmail.com",
+    "wait_rows_at_acceptance": 0,
+    "existing_tables": 72,
+    "new_tables": [
+      "supplier_balance_waits"
+    ],
+    "stock_mapping_counts": {
+      "1": 46,
+      "2": 9
+    },
+    "business_changes": {
+      "admins": {
+        "added": 0,
+        "removed": 0,
+        "columns": [
+          "last_login_at"
+        ]
+      },
+      "admin_login_logs": {
+        "added": 1,
+        "removed": 0,
+        "columns": []
+      },
+      "product_mappings": {
+        "added": 0,
+        "removed": 0,
+        "columns": [
+          "last_synced_at",
+          "updated_at"
+        ]
+      },
+      "sku_mappings": {
+        "added": 0,
+        "removed": 0,
+        "columns": [
+          "stock_synced_at",
+          "updated_at"
+        ]
+      },
+      "chain_payment_cursors": {
+        "added": 0,
+        "removed": 0,
+        "columns": [
+          "next_block",
+          "previous_hash",
+          "updated_at"
+        ]
+      },
+      "ellaix_catalog_meta": {
+        "added": 0,
+        "removed": 0,
+        "columns": [
+          "last_at"
+        ]
+      },
+      "ellaix_catalog_items": {
+        "added": 0,
+        "removed": 0,
+        "columns": [
+          "last_seen",
+          "missing_count"
+        ]
+      }
+    },
+    "prices_settings_payments_history_preserved": true,
+    "private_configuration_preserved": true,
+    "frontend_preserved_release": "20261106-110800",
+    "support_preserved_release": "20261106-110800",
+    "paiplus_preserved_release": "20261103-153828",
+    "backup": "/srv/zhixiang/backups/before-balance-recovery-20261107-121013",
+    "previous_backend": "20261105-173644",
+    "production_browser_checks": 8,
+    "evidence": "work/codex-runtime/balance-recovery-release-20261107/verified-report.json",
+    "database_uploaded": false,
+    "real_customer_acceptance_email_sent": false,
+    "real_payment_or_purchase_test": false
   }
 }
