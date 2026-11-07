@@ -27,17 +27,17 @@ func TestProcurementUsesCompleteVerticalLayout(t *testing.T) {
 	if production != 0 || total != 0 {
 		t.Fatalf("procurement module root must remain structural only, got production=%d total=%d", production, total)
 	}
-	assertDirectoryGoFileBudget(t, applicationRoot, 12) // funding checks and persistent purchase resumption boundary
-	assertDirectoryGoFileBudget(t, contractRoot, 3)
-	assertDirectoryGoFileBudget(t, domainRoot, 2)
-	assertDirectoryGoFileBudget(t, storeRoot, 3)
+	assertDirectoryGoFileBudget(t, applicationRoot, 13) // read-only balance recovery owns a separate application service
+	assertDirectoryGoFileBudget(t, contractRoot, 4)
+	assertDirectoryGoFileBudget(t, domainRoot, 3)
+	assertDirectoryGoFileBudget(t, storeRoot, 4)
 	assertDirectoryGoFileBudget(t, orderReaderRoot, 1)
 	assertDirectoryGoFileBudget(t, mappingReaderRoot, 1)
 	assertDirectoryGoFileBudget(t, upstreamGatewayRoot, 1)
 	assertDirectoryGoFileBudget(t, queueAdapterRoot, 1)
-	assertDirectoryGoFileBudget(t, notificationAdapterRoot, 1)
+	assertDirectoryGoFileBudget(t, notificationAdapterRoot, 2)
 	assertDirectoryGoFileBudget(t, transportRoot, 2)
-	assertDirectoryGoFileBudget(t, integrationTestRoot, 7)
+	assertDirectoryGoFileBudget(t, integrationTestRoot, 8) // durable balance recovery integration coverage
 
 	assertFileDeclaresTypes(t, filepath.Join(applicationRoot, "service.go"), []string{"Service", "Options"})
 	assertFileDeclaresFunctions(t, filepath.Join(applicationRoot, "service.go"), []string{"NewService"})

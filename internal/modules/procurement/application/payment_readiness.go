@@ -110,6 +110,7 @@ func (s *Service) CheckPaymentBalance(ctx context.Context, orderID uint) error {
 			return unavailableBalance()
 		}
 		if balance.LessThan(need.amount) {
+			s.recordBalanceWait(ctx, order.ID, needs)
 			status := "not_sent"
 			if s.balanceNotifier != nil {
 				status = s.balanceNotifier.NotifyBalanceShortage(ctx, need.connectionID, need.amount.StringFixed(2), balance.StringFixed(2), need.currency)

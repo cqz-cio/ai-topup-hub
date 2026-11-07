@@ -38,6 +38,7 @@ func (c *Consumer) RegisterNotifications(mux *asynq.ServeMux) {
 	}
 	mux.HandleFunc(queue.TaskOrderStatusEmail, withPanicRecovery(queue.TaskOrderStatusEmail, c.handleOrderStatusEmail))
 	mux.HandleFunc(queue.TaskNotificationDispatch, withPanicRecovery(queue.TaskNotificationDispatch, c.handleNotificationDispatch))
+	mux.HandleFunc(queue.TaskBalanceRecoveryEmail, withPanicRecovery(queue.TaskBalanceRecoveryEmail, c.handleBalanceRecoveryEmail))
 }
 
 func (c *Consumer) Register(mux *asynq.ServeMux) {
@@ -57,6 +58,7 @@ func (c *Consumer) Register(mux *asynq.ServeMux) {
 	mux.HandleFunc(queue.TaskProcurementPollStatus, withPanicRecovery(queue.TaskProcurementPollStatus, c.handleProcurementPollStatus))
 	mux.HandleFunc(queue.TaskProcurementSyncAccepted, withPanicRecovery(queue.TaskProcurementSyncAccepted, c.handleProcurementSyncAccepted))
 	mux.HandleFunc(queue.TaskProcurementRecover, withPanicRecovery(queue.TaskProcurementRecover, c.handleProcurementRecover))
+	mux.HandleFunc(queue.TaskBalanceRecoveryPoll, withPanicRecovery(queue.TaskBalanceRecoveryPoll, c.handleBalanceRecoveryPoll))
 	mux.HandleFunc(queue.TaskDownstreamCallback, withPanicRecovery(queue.TaskDownstreamCallback, c.handleDownstreamCallback))
 	mux.HandleFunc(queue.TaskReconciliationRun, withPanicRecovery(queue.TaskReconciliationRun, c.handleReconciliationRun))
 	mux.HandleFunc(queue.TaskBotNotify, withPanicRecovery(queue.TaskBotNotify, c.handleBotNotify))
@@ -89,5 +91,6 @@ func (c *Consumer) RegisterStorefront(mux *asynq.ServeMux) {
 	mux.HandleFunc(queue.TaskProcurementPollStatus, withPanicRecovery(queue.TaskProcurementPollStatus, c.handleProcurementPollStatus))
 	mux.HandleFunc(queue.TaskProcurementSyncAccepted, withPanicRecovery(queue.TaskProcurementSyncAccepted, c.handleProcurementSyncAccepted))
 	mux.HandleFunc(queue.TaskProcurementRecover, withPanicRecovery(queue.TaskProcurementRecover, c.handleProcurementRecover))
+	mux.HandleFunc(queue.TaskBalanceRecoveryPoll, withPanicRecovery(queue.TaskBalanceRecoveryPoll, c.handleBalanceRecoveryPoll))
 	mux.HandleFunc(queue.TaskDownstreamCallback, withPanicRecovery(queue.TaskDownstreamCallback, c.handleDownstreamCallback))
 }

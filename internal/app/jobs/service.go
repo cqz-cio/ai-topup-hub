@@ -68,6 +68,7 @@ func newService(cfg *config.QueueConfig, consumer *jobconsumer.Consumer, profile
 		consumer.RegisterStorefront(mux)
 		scheduler := asynq.NewScheduler(opt, nil)
 		registerProcurementRecovery(scheduler, consumer)
+		registerBalanceRecovery(scheduler, consumer)
 		registerSettlementTasks(scheduler, consumer)
 		return &Service{name: "storefront-worker", server: server, mux: mux, scheduler: scheduler, consumer: consumer}, nil
 	}
@@ -76,6 +77,7 @@ func newService(cfg *config.QueueConfig, consumer *jobconsumer.Consumer, profile
 	scheduler := asynq.NewScheduler(opt, nil)
 	registerPeriodicTasks(scheduler, consumer, cfg)
 	registerProcurementRecovery(scheduler, consumer)
+	registerBalanceRecovery(scheduler, consumer)
 
 	return &Service{
 		name:      "worker",
@@ -84,6 +86,15 @@ func newService(cfg *config.QueueConfig, consumer *jobconsumer.Consumer, profile
 		scheduler: scheduler,
 		consumer:  consumer,
 	}, nil
+}
+
+func registerBalanceRecovery(scheduler *asynq.Scheduler, consumer *jobconsumer.Consumer) {
+	if consumer.BalanceRecoveryService == nil {
+		return
+	}
+	if _, err := scheduler.Register("@every 60s", asynq.NewTask(queue.TaskBalanceRecoveryPoll, nil), asynq.Queue(queue.DefaultQueue), asynq.Unique(55*time.Second), asynq.Timeout(50*time.Second), asynq.MaxRetry(0)); err != nil {
+		logger.Warnw("scheduler_register_balance_recovery_failed", "error", err)
+	}
 }
 
 func registerProcurementRecovery(scheduler *asynq.Scheduler, consumer *jobconsumer.Consumer) {

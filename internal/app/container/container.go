@@ -192,6 +192,7 @@ type Container struct {
 	SiteConnectionService         *siteconnectionapp.Service
 	ProductMappingService         *mappingapp.Service
 	ProcurementOrderService       *procurementapp.Service
+	BalanceRecoveryService        *procurementapp.BalanceRecovery
 	DownstreamCallbackService     *downstreamcallbackapp.Service
 	ReconciliationService         *reconciliationapp.Service
 	ChannelClientService          *channelclientapp.Service

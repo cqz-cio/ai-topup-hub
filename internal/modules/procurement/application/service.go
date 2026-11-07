@@ -32,6 +32,7 @@ type Service struct {
 	botNotifier        procurementcontract.BotFulfillmentNotifier
 	notifications      procurementcontract.FailureNotifier
 	balanceNotifier    procurementcontract.BalanceNotifier
+	balanceRecovery    *BalanceRecovery
 	purchaseWindow     *procurementdomain.PurchaseWindow
 	deliveryRewriter   procurementcontract.DeliveryRewriter
 }

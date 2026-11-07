@@ -1,10 +1,65 @@
 package orderreader
 
 import (
+	"context"
+	"errors"
+	"fmt"
+	"sort"
+	"strings"
+
 	orderdomain "github.com/dujiao-next/internal/modules/order/domain"
 	procurementcontract "github.com/dujiao-next/internal/modules/procurement/contract"
 	procurementdomain "github.com/dujiao-next/internal/modules/procurement/domain"
 )
+
+func (r *Reader) ReadBalanceRecoveryOrder(ctx context.Context, id uint) (*procurementcontract.BalanceRecoveryOrder, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	order, err := r.source.GetByID(id)
+	if err != nil || order == nil {
+		return nil, err
+	}
+	recipient := strings.TrimSpace(order.GuestEmail)
+	if order.UserID != 0 {
+		resolver, ok := r.source.(interface{ ResolveReceiverEmailByOrderID(uint) (string, error) })
+		if !ok {
+			return nil, errors.New("order email resolver unavailable")
+		}
+		recipient, err = resolver.ResolveReceiverEmailByOrderID(id)
+		if err != nil {
+			return nil, err
+		}
+	}
+	var products []string
+	var walk func(*orderdomain.Order)
+	walk = func(current *orderdomain.Order) {
+		if len(current.Children) > 0 {
+			for i := range current.Children {
+				walk(&current.Children[i])
+			}
+			return
+		}
+		for _, item := range current.Items {
+			title := "商品"
+			keys := []string{"zh-CN", "zh-TW", "en-US"}
+			var other []string
+			for key := range item.TitleJSON {
+				other = append(other, key)
+			}
+			sort.Strings(other)
+			for _, key := range append(keys, other...) {
+				if v, ok := item.TitleJSON[key].(string); ok && strings.TrimSpace(v) != "" {
+					title = strings.TrimSpace(v)
+					break
+				}
+			}
+			products = append(products, fmt.Sprintf("%s × %d", title, item.Quantity))
+		}
+	}
+	walk(order)
+	return &procurementcontract.BalanceRecoveryOrder{OrderNo: order.OrderNo, Recipient: recipient, Products: strings.Join(products, "；"), Status: order.Status, ExpiresAt: order.ExpiresAt, CanceledAt: order.CanceledAt, PaidAt: order.PaidAt, ResellerID: order.ResellerID}, nil
+}
 
 type Source interface {
 	GetByID(id uint) (*orderdomain.Order, error)

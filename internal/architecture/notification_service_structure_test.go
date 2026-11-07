@@ -34,7 +34,7 @@ func TestNotificationImplementationLivesInBoundedContextDirectories(t *testing.T
 		t.Fatalf("notification module root must remain structural only, got production=%d total=%d", production, total)
 	}
 	assertDirectoryGoFileBudget(t, domainRoot, 1)
-	assertDirectoryGoFileBudget(t, contractRoot, 2)
+	assertDirectoryGoFileBudget(t, contractRoot, 3)    // customer-safe balance recovery mail input
 	assertDirectoryGoFileBudget(t, applicationRoot, 8) // supplier balance email dispatch and its delivery-state tests
 	assertFileDeclaresFunctions(t, filepath.Join(applicationRoot, "balance_alert.go"), []string{"NotifyBalanceShortage", "BalanceAlertStatus", "dispatchBalanceAlert"})
 	assertDirectoryGoFileBudget(t, formatRoot, 6)

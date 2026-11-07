@@ -152,6 +152,11 @@ func (c *Container) initIntegrationServices() {
 		BotNotifier:        c.FulfillmentService,
 		Notifications:      procurementnotification.New(c.NotificationService),
 	})
+	c.BalanceRecoveryService = procurementapp.NewBalanceRecovery(
+		c.ProcurementOrderRepo, procurementorder.New(c.OrderStore), procurementupstream.New(c.SiteConnectionService),
+		c.QueueClient, procurementnotification.NewRecoveryMailer(c.EmailSender, c.NotificationLogRepo),
+	)
+	c.ProcurementOrderService.SetBalanceRecovery(c.BalanceRecoveryService)
 	c.ReconciliationService = reconciliationapp.NewService(reconciliationapp.Options{
 		Jobs: c.ReconciliationJobRepo, Items: c.ReconciliationItemRepo,
 		Procurements:  reconciliationprocurement.New(c.ProcurementOrderRepo),

@@ -104,6 +104,10 @@ func TestAllEmailKindsUseBoundedSMTPAndDoNotRetryAcceptedData(t *testing.T) {
 		t.Fatal(err)
 	}
 	count++
+	if err := svc.SendBalanceRecoveryEmail("owner@example.invalid", notificationcontract.BalanceRecoveryEmailInput{OrderNo: "TEST-RECOVERY", Products: "5x 测试商品"}); err != nil {
+		t.Fatal(err)
+	}
+	count++
 	if time.Since(started) > 5*time.Second {
 		t.Fatal("mail was artificially delayed")
 	}
