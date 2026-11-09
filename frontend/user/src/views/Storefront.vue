@@ -375,9 +375,8 @@ const copyWechat = async () => {
   }, 3000)
 }
 usePageSeo({
-  title: () => catalogOnly ? (selectedCategory.value || t('nav.products')) : siteName.value,
-  description: () =>
-    t(catalogOnly ? 'shopUi.catalogHint' : 'shopUi.heroDescription'),
+  title: () => catalogOnly ? (selectedCategory.value || t('nav.products')) : undefined,
+  description: () => catalogOnly ? t('shopUi.catalogHint') : undefined,
   canonicalPath: () => catalogOnly ? route.path : '/',
 })
 onMounted(() => {

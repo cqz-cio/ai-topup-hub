@@ -28,6 +28,7 @@ type Link struct{ Title, Path string }
 type Fact struct{ Name, Value string }
 type Page struct {
 	Kind, Path, Title, Summary, Content string
+	SEOTitle, SEODescription            string
 	Price, Category, Availability       string
 	Images                              []string
 	Facts                               []Fact
@@ -108,8 +109,18 @@ func (h *Handler) serve(c *gin.Context, load func(context.Context, string) (Page
 		Summary:     template.HTML(h.policy.Sanitize(page.Summary)),
 		Description: plainText(page.Summary),
 	}
+	if description := plainText(page.SEODescription); description != "" {
+		data.Description = description
+	}
 	if data.Description == "" {
 		data.Description = page.Title
+	}
+	data.MetadataTitle = strings.TrimSpace(page.SEOTitle)
+	if data.MetadataTitle == "" {
+		data.MetadataTitle = page.Title
+	}
+	if site.Name != "" && data.MetadataTitle != site.Name {
+		data.MetadataTitle += " - " + site.Name
 	}
 	schema := map[string]any{"@context": "https://schema.org", "@type": "BlogPosting", "headline": page.Title, "url": canonical, "mainEntityOfPage": canonical, "description": data.Description, "inLanguage": "zh-CN"}
 	if page.Kind == "notice" {

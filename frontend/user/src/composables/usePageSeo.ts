@@ -2,6 +2,7 @@ import { computed } from 'vue'
 import { useHead } from '@unhead/vue'
 import { useAppStore } from '../stores/app'
 import { getImageUrl } from '../utils/image'
+import { seoText, seoTitle } from '../utils/seo'
 
 export interface PageSeoOptions {
   /** 页面专属标题；若与站点名相同，仅展示站点名 */
@@ -42,18 +43,14 @@ export function usePageSeo(options: PageSeoOptions = {}) {
   })
 
   const siteName = computed(() => {
-    const lang = appStore.locale
-    const seo = appStore.config?.seo
-    const localized = seo?.title?.[lang]
-    if (localized && String(localized).trim()) return String(localized).trim()
     return String(appStore.config?.brand?.site_name || '').trim()
+      || seoText(appStore.config?.seo?.title, appStore.locale)
   })
 
+  const siteTitle = computed(() => seoText(appStore.config?.seo?.title, appStore.locale) || siteName.value)
+
   const siteDescription = computed(() => {
-    const lang = appStore.locale
-    const seo = appStore.config?.seo
-    const localized = seo?.description?.[lang]
-    return localized ? String(localized).trim() : ''
+    return seoText(appStore.config?.seo?.description, appStore.locale)
   })
 
   const defaultImage = computed(() => {
@@ -67,10 +64,7 @@ export function usePageSeo(options: PageSeoOptions = {}) {
   })
 
   const fullTitle = computed(() => {
-    if (pageTitle.value && siteName.value && pageTitle.value !== siteName.value) {
-      return `${pageTitle.value} - ${siteName.value}`
-    }
-    return pageTitle.value || siteName.value || undefined
+    return (pageTitle.value ? seoTitle(pageTitle.value, siteName.value) : siteTitle.value) || undefined
   })
 
   const fullDescription = computed(() => {

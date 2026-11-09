@@ -151,3 +151,18 @@ func TestEmbeddedProductImageIsNotShadowedByHTMLRoute(t *testing.T) {
 		t.Fatalf("%d %v %s", w.Code, w.Header(), w.Body)
 	}
 }
+
+func TestProductMetadataDoesNotRenameVisibleProduct(t *testing.T) {
+	s := &sourceStub{page: Page{Kind: "product", Path: "/products/item", Title: "原商品名", Summary: "商品卡片摘要", SEOTitle: "Plus 兑换码与购买条件", SEODescription: "<b>专属摘要</b> &amp; 条件", Content: "<p>完整条件</p>", Price: "130.00"}}
+	body := request(t, s, "GET", "/products/item", "").Body.String()
+	for _, want := range []string{`<title data-public-page-seo>Plus 兑换码与购买条件 - 青栀商城</title>`, `<h1>原商品名</h1>`, `name="description" content="专属摘要 &amp; 条件"`, `"name":"原商品名"`, `"description":"专属摘要 \u0026 条件"`, `商品卡片摘要`} {
+		if !strings.Contains(body, want) {
+			t.Errorf("missing %q", want)
+		}
+	}
+	s.page.SEOTitle, s.page.SEODescription = "", ""
+	body = request(t, s, "GET", "/products/item", "").Body.String()
+	if !strings.Contains(body, `<title data-public-page-seo>原商品名 - 青栀商城</title>`) || !strings.Contains(body, `name="description" content="商品卡片摘要"`) {
+		t.Fatal("empty metadata must fall back to the public product copy")
+	}
+}

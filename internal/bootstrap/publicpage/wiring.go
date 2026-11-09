@@ -51,7 +51,7 @@ func (s *source) Site(ctx context.Context) (publicpage.Site, error) {
 	values, _ := data["brand"].(map[string]interface{})
 	name, _ := values["site_name"].(string)
 	origin, _ := values["site_url"].(string)
-	if seo, ok := data["seo"].(map[string]interface{}); ok {
+	if seo, ok := data["seo"].(map[string]interface{}); ok && strings.TrimSpace(name) == "" {
 		if titles, ok := seo["title"].(map[string]interface{}); ok {
 			if title, ok := titles["zh-CN"].(string); ok && strings.TrimSpace(title) != "" {
 				name = title
@@ -74,6 +74,8 @@ func (s *source) Product(ctx context.Context, slug string) (publicpage.Page, err
 		price = *p.EffectivePriceAmount
 	}
 	page := publicpage.Page{Kind: "product", Path: "/products/" + url.PathEscape(p.Slug), Title: localized(p.Title), Summary: localized(p.Description), Content: localized(p.Content), Price: price.String(), Category: localized(p.Category.Name), Images: p.Images, Availability: "https://schema.org/InStock"}
+	page.SEOTitle = metadataText(p.SeoMeta["title"])
+	page.SEODescription = metadataText(p.SeoMeta["description"])
 	if p.IsSoldOut {
 		page.Availability = "https://schema.org/OutOfStock"
 	}
@@ -141,4 +143,18 @@ func localized(values jsonmap.JSON) string {
 		}
 	}
 	return ""
+}
+
+// Older catalog records may store a plain string instead of localized metadata.
+func metadataText(value interface{}) string {
+	switch v := value.(type) {
+	case string:
+		return strings.TrimSpace(v)
+	case map[string]interface{}:
+		return localized(jsonmap.JSON(v))
+	case jsonmap.JSON:
+		return localized(v)
+	default:
+		return ""
+	}
 }

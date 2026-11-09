@@ -2,6 +2,8 @@ import { ref, onMounted, onUnmounted, computed, watch, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useHead } from '@unhead/vue'
+import { usePageSeo } from './usePageSeo'
+import { seoPlainText, seoText } from '../utils/seo'
 import { useAppStore } from '../stores/app'
 import { productAPI } from '../api'
 import { getImageUrl } from '../utils/image'
@@ -596,55 +598,33 @@ export function useProductDetail(options: { onLoaded?: () => void } = {}) {
     return `${base}/products/${product.value.slug}`
   })
 
+  const productSeoDescription = computed(() => {
+    if (!product.value) return ''
+    return seoPlainText(seoText(product.value.seo_meta?.description, appStore.locale)
+      || getLocalizedText(product.value.description)) || getLocalizedText(product.value.title)
+  })
+
+  usePageSeo({
+    title: () => product.value
+      ? seoText(product.value.seo_meta?.title, appStore.locale) || getLocalizedText(product.value.title)
+      : '',
+    description: () => productSeoDescription.value,
+    canonicalPath: () => `/products/${encodeURIComponent(String(route.params.slug || ''))}`,
+    image: () => images.value[0] || '',
+    type: () => 'product',
+  })
+
   useHead({
-    title: () => product.value ? getLocalizedText(product.value.title) : '',
-    link: () => {
-      if (!canonicalUrl.value) return []
-      return [{ rel: 'canonical', href: canonicalUrl.value }]
-    },
     meta: () => {
       if (!product.value) return []
-      const seoMeta = product.value.seo_meta || {}
-      const seoKeywords = getLocalizedText(seoMeta.keywords) || (typeof seoMeta.keywords === 'string' ? seoMeta.keywords : '')
-      const seoDescription = getLocalizedText(seoMeta.description) || (typeof seoMeta.description === 'string' ? seoMeta.description : '')
-      const tags = []
-
-      if (seoKeywords) tags.push({ name: 'keywords', content: seoKeywords })
-      if (seoDescription) tags.push({ name: 'description', content: seoDescription })
-
-      tags.push({ property: 'og:type', content: 'product' })
-      if (product.value.title) {
-        tags.push({ property: 'og:title', content: getLocalizedText(product.value.title) })
-      }
-      if (seoDescription) {
-        tags.push({ property: 'og:description', content: seoDescription })
-      }
-      if (images.value && images.value.length > 0) {
-        tags.push({ property: 'og:image', content: images.value[0] })
-      }
-      if (canonicalUrl.value) {
-        tags.push({ property: 'og:url', content: canonicalUrl.value })
-      }
-
-      tags.push({ name: 'twitter:card', content: 'summary_large_image' })
-      if (product.value.title) {
-        tags.push({ name: 'twitter:title', content: getLocalizedText(product.value.title) })
-      }
-      if (seoDescription) {
-        tags.push({ name: 'twitter:description', content: seoDescription })
-      }
-      if (images.value && images.value.length > 0) {
-        tags.push({ name: 'twitter:image', content: images.value[0] })
-      }
-
-      return tags
+      const keywords = seoText(product.value.seo_meta?.keywords, appStore.locale)
+      return keywords ? [{ name: 'keywords', content: keywords }] : []
     },
     script: () => {
       if (!product.value) return []
       const title = getLocalizedText(product.value.title)
-      const seoMeta = product.value.seo_meta || {}
-      const description = getLocalizedText(seoMeta.description) || (typeof seoMeta.description === 'string' ? seoMeta.description : '')
-      const priceAmount = product.value.price_amount || '0'
+      const description = productSeoDescription.value
+      const priceAmount = product.value.effective_price_amount ?? product.value.price_amount ?? '0'
       const currency = siteCurrency.value || 'CNY'
 
       const jsonLd: Record<string, any> = {
@@ -654,6 +634,7 @@ export function useProductDetail(options: { onLoaded?: () => void } = {}) {
         url: canonicalUrl.value || window.location.href,
         offers: {
           '@type': 'Offer',
+          url: canonicalUrl.value || window.location.href,
           price: priceAmount,
           priceCurrency: currency,
           availability: product.value.stock_status === 'out_of_stock'
@@ -662,14 +643,17 @@ export function useProductDetail(options: { onLoaded?: () => void } = {}) {
         },
       }
       if (description) jsonLd.description = description
-      if (images.value.length > 0) jsonLd.image = images.value
+      if (images.value.length > 0) {
+        jsonLd.image = images.value.map(image => new URL(image, canonicalUrl.value || window.location.href).href)
+      }
       if (product.value.category?.name) {
         jsonLd.category = getLocalizedText(product.value.category.name)
       }
 
       return [{
+        key: 'product-schema',
         type: 'application/ld+json',
-        innerHTML: JSON.stringify(jsonLd),
+        innerHTML: JSON.stringify(jsonLd).replace(/</g, '\\u003c'),
       }]
     },
   })

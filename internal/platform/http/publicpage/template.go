@@ -6,6 +6,7 @@ type document struct {
 	Page
 	Site                   Site
 	Canonical, Description string
+	MetadataTitle          string
 	Images                 []string
 	Body, Summary          template.HTML
 	Schema                 template.JS
@@ -16,10 +17,10 @@ type document struct {
 var documentTemplate = template.Must(template.New("public-detail").Parse(`<!doctype html>
 <html lang="zh-CN"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title data-public-page-seo>{{.Title}} - {{.Site.Name}}</title>
+<title data-public-page-seo>{{.MetadataTitle}}</title>
 <meta data-public-page-seo name="description" content="{{.Description}}">
 <link data-public-page-seo rel="canonical" href="{{.Canonical}}">
-<meta data-public-page-seo property="og:title" content="{{.Title}} - {{.Site.Name}}">
+<meta data-public-page-seo property="og:title" content="{{.MetadataTitle}}">
 <meta data-public-page-seo property="og:description" content="{{.Description}}">
 <meta data-public-page-seo property="og:url" content="{{.Canonical}}">
 <meta data-public-page-seo property="og:site_name" content="{{.Site.Name}}">
