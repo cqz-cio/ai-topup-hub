@@ -47,7 +47,7 @@ func NewPublicHandler(posts PublicPostQueries, categories PublicPostCategoryQuer
 // GetPosts 获取公开文章或公告列表。
 func (h *PublicHandler) GetPosts(c *gin.Context) {
 	page, pageSize := ginutil.ParsePagination(c)
-	posts, total, err := h.posts.ListPublic(c.Request.Context(), contentapp.PublicPostQuery{
+	posts, total, err := h.ReadPublishedPosts(c.Request.Context(), contentapp.PublicPostQuery{
 		Type:     c.Query("type"),
 		Search:   c.Query("search"),
 		Page:     page,
@@ -59,7 +59,16 @@ func (h *PublicHandler) GetPosts(c *gin.Context) {
 	}
 
 	pagination := response.BuildPagination(page, pageSize, total)
-	response.SuccessWithPage(c, contentpresenter.NewPostRespList(posts), pagination)
+	response.SuccessWithPage(c, posts, pagination)
+}
+
+// ReadPublishedPosts shares exactly the published-only API projection with HTML lists.
+func (h *PublicHandler) ReadPublishedPosts(ctx context.Context, query contentapp.PublicPostQuery) ([]contentpresenter.PostResp, int64, error) {
+	posts, total, err := h.posts.ListPublic(ctx, query)
+	if err != nil {
+		return nil, 0, err
+	}
+	return contentpresenter.NewPostRespList(posts), total, nil
 }
 
 // GetPostBySlug 根据 slug 获取公开文章详情。

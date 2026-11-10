@@ -124,6 +124,8 @@ import { useAppStore } from '../stores/app'
 import { useUserAuthStore } from '../stores/userAuth'
 import { usePageSeo } from '../composables/usePageSeo'
 import { useHead } from '@unhead/vue'
+import { schemaJSON } from '../utils/siteIdentity'
+import { seoText } from '../utils/seo'
 import { gptRecharge, gptRechargeHtml } from '../utils/gptRecharge'
 import ProductDetailContent from '../components/product/ProductDetailContent.vue'
 import AnnouncementModal from '../components/AnnouncementModal.vue'
@@ -389,6 +391,14 @@ usePageSeo({
   canonicalPath: () => isRechargePage.value ? gptRecharge.path : catalogOnly ? route.path : '/',
 })
 useHead(() => {
+  if (!catalogOnly && !appStore.isResellerTenant) {
+    const origin = String(appStore.config?.brand?.site_url || window.location.origin).replace(/\/+$/, '')
+    return { script: [{ key: 'home-page', type: 'application/ld+json', innerHTML: schemaJSON({
+      '@context': 'https://schema.org', '@type': 'WebPage', name: t('shopUi.heroTitle') + t('shopUi.heroAccent'),
+      url: origin + '/', description: seoText(appStore.config?.seo?.description, appStore.locale), inLanguage: appStore.locale,
+      isPartOf: { '@id': origin + '/#website' }, about: { '@id': origin + '/#organization' },
+    }) }] }
+  }
   if (!isRechargePage.value || initialLoading.value || loadFailed.value) return { script: [] }
   const origin = String(appStore.config?.brand?.site_url || window.location.origin).replace(/\/+$/, '')
   const items = sortStorefrontProducts(products.value.filter(product => product.category?.slug === gptRecharge.categorySlug), 'asc')

@@ -65,6 +65,7 @@ import ProductContactDialog from './components/product/ProductContactDialog.vue'
 import ErrorBoundary from './components/ErrorBoundary.vue'
 import BackToTop from './components/BackToTop.vue'
 import MobileBottomNav from './components/MobileBottomNav.vue'
+import { useSiteIdentity } from './composables/useSiteIdentity'
 
 // vault 外壳按需加载，classic 用户不会拉取其 chunk/样式
 const VaultLayout = defineAsyncComponent(() => import('./templates/vault/layout/VaultLayout.vue'))
@@ -75,6 +76,7 @@ const SupportWidget = defineAsyncComponent(() => import('./components/support/Su
 // config 由 router.beforeEach 统一加载，无需在此重复调用
 const appStore = useAppStore()
 const route = useRoute()
+useSiteIdentity()
 const isResellerConsole = computed(() => route.meta.resellerConsole === true)
 const isStandalone = computed(() => route.meta.standalone === true)
 const supportEnabled = computed(() => !!appStore.config && !isStandalone.value && !isResellerConsole.value && !appStore.isResellerTenant)

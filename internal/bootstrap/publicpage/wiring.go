@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/dujiao-next/internal/app/container"
-	"github.com/dujiao-next/internal/constants"
 	categorydomain "github.com/dujiao-next/internal/modules/catalog/category/domain"
 	productcontract "github.com/dujiao-next/internal/modules/catalog/product/contract"
 	producthttp "github.com/dujiao-next/internal/modules/catalog/product/transport/http"
@@ -18,7 +17,6 @@ import (
 	contenthttp "github.com/dujiao-next/internal/modules/content/transport/http"
 	resellerapp "github.com/dujiao-next/internal/modules/reseller/application"
 	reseller "github.com/dujiao-next/internal/modules/reseller/contract"
-	settingsapp "github.com/dujiao-next/internal/modules/settings/application"
 	"github.com/dujiao-next/internal/platform/http/publicpage"
 	"github.com/dujiao-next/internal/platform/publiccontent"
 	"github.com/dujiao-next/internal/shared/jsonmap"
@@ -35,12 +33,17 @@ type catalogReader interface {
 	ListAnonymousProductSlugs(context.Context, string, int, int) ([]string, int64, error)
 }
 
+type settingsReader interface {
+	GetByKey(string) (jsonmap.JSON, error)
+	GetSiteCurrency(string) (string, error)
+}
+
 type source struct {
 	products   publicProductReader
 	categories categoryReader
 	catalog    catalogReader
 	posts      *contenthttp.PublicHandler
-	settings   *settingsapp.Service
+	settings   settingsReader
 	overlay    *resellerapp.SiteConfigService
 }
 
@@ -49,7 +52,7 @@ func New(c *container.Container, products *producthttp.PublicHandler, posts *con
 }
 
 func (s *source) Site(ctx context.Context) (publicpage.Site, error) {
-	config, err := s.settings.GetByKey(constants.SettingKeySiteConfig)
+	data, err := s.publicConfig(ctx, false)
 	if err != nil {
 		return publicpage.Site{}, err
 	}
@@ -57,25 +60,12 @@ func (s *source) Site(ctx context.Context) (publicpage.Site, error) {
 	if err != nil {
 		return publicpage.Site{}, err
 	}
-	data := map[string]interface{}{"brand": config["brand"], "seo": config["seo"]}
-	if s.overlay != nil {
-		tenant, _ := reseller.TenantFromContext(ctx)
-		data, err = s.overlay.ApplyPublicConfigOverlay(ctx, tenant, data)
-		if err != nil {
-			return publicpage.Site{}, err
-		}
+	brand, seo := configMap(data["brand"]), configMap(data["seo"])
+	name, origin := metadataText(brand["site_name"]), metadataText(brand["site_url"])
+	if name == "" {
+		name = metadataText(seo["title"])
 	}
-	values, _ := data["brand"].(map[string]interface{})
-	name, _ := values["site_name"].(string)
-	origin, _ := values["site_url"].(string)
-	if seo, ok := data["seo"].(map[string]interface{}); ok && strings.TrimSpace(name) == "" {
-		if titles, ok := seo["title"].(map[string]interface{}); ok {
-			if title, ok := titles["zh-CN"].(string); ok && strings.TrimSpace(title) != "" {
-				name = title
-			}
-		}
-	}
-	return publicpage.Site{Name: name, URL: origin, Currency: currency}, nil
+	return publicpage.Site{Name: name, URL: origin, Currency: currency, Logo: metadataText(brand["site_logo"]), Description: metadataText(seo["description"])}, nil
 }
 
 func (s *source) Product(ctx context.Context, slug string) (publicpage.Page, error) {
@@ -143,6 +133,7 @@ func (s *source) Post(ctx context.Context, slug string) (publicpage.Page, error)
 	}
 	if isMainSite(ctx) {
 		page.Content = publiccontent.GPTRecharge().AppendRelated(page.Content, page.Kind, p.Slug, "")
+		page.Editorial = isEditorial(p.Slug)
 	}
 	if p.Thumbnail != "" {
 		page.Images = []string{p.Thumbnail}
@@ -180,35 +171,9 @@ func (s *source) Category(ctx context.Context, slug string) (publicpage.Page, er
 		return publicpage.Page{}, publicpage.ErrNotFound
 	}
 	page := publicpage.Page{Kind: "category", Path: "/categories/" + url.PathEscape(slug), Title: localized(category.NameJSON)}
-	for number := 1; ; number++ {
-		if err := ctx.Err(); err != nil {
-			return publicpage.Page{}, err
-		}
-		rows, total, err := s.catalog.ListAnonymousProductSlugs(ctx, strconv.FormatUint(uint64(category.ID), 10), number, 100)
-		if err != nil {
-			return publicpage.Page{}, err
-		}
-		for _, slug := range rows {
-			item, err := s.products.ReadAnonymousProduct(ctx, slug)
-			if errors.Is(err, productcontract.ErrNotFound) || errors.Is(err, productcontract.ErrResellerProductNotListed) {
-				continue
-			}
-			if err != nil {
-				return publicpage.Page{}, err
-			}
-			price := item.PriceAmount
-			if item.EffectivePriceAmount != nil {
-				price = *item.EffectivePriceAmount
-			}
-			availability := "https://schema.org/InStock"
-			if item.IsSoldOut {
-				availability = "https://schema.org/OutOfStock"
-			}
-			page.Items = append(page.Items, publicpage.Item{Title: localized(item.Title), Path: "/products/" + url.PathEscape(item.Slug), Price: price.String(), Availability: availability})
-		}
-		if len(rows) == 0 || int64(number*100) >= total {
-			break
-		}
+	page.Items, err = s.catalogItems(ctx, strconv.FormatUint(uint64(category.ID), 10))
+	if err != nil {
+		return publicpage.Page{}, err
 	}
 	if len(page.Items) == 0 {
 		return publicpage.Page{}, publicpage.ErrNotFound

@@ -23,10 +23,14 @@ import (
 
 var ErrNotFound = errors.New("public document not found")
 
-type Site struct{ Name, URL, Currency string }
+type Site struct{ Name, URL, Currency, Logo, Description string }
 type Link struct{ Title, Path string }
 type Fact struct{ Name, Value string }
-type Item struct{ Title, Path, Price, Availability string }
+type Item struct{ Title, Path, Price, Availability, Summary, Category string }
+type Entry struct {
+	Title, Path, Summary string
+	PublishedAt          *time.Time
+}
 type Page struct {
 	Kind, Path, Title, Summary, Content string
 	SEOTitle, SEODescription            string
@@ -36,6 +40,9 @@ type Page struct {
 	Links                               []Link
 	Items                               []Item
 	PublishedAt                         *time.Time
+	Entries                             []Entry
+	Pagination                          []Link
+	NoIndex, Editorial                  bool
 }
 
 type Source interface {
@@ -43,6 +50,12 @@ type Source interface {
 	Product(context.Context, string) (Page, error)
 	Post(context.Context, string) (Page, error)
 	Category(context.Context, string) (Page, error)
+}
+
+type SitePages interface {
+	Home(context.Context) (Page, error)
+	About(context.Context) (Page, error)
+	BlogList(context.Context, int, string) (Page, error)
 }
 
 type Handler struct {
@@ -60,6 +73,34 @@ func New(source Source) *Handler {
 // Register also preserves /products/* image files in embedded/fullstack mode.
 // The split frontend gateway performs the equivalent file check before proxying.
 func (h *Handler) Register(routes gin.IRoutes, assets fs.FS) {
+	if source, ok := h.source.(SitePages); ok {
+		for path, load := range map[string]func(context.Context) (Page, error){"/": source.Home, "/about": source.About} {
+			handler := func(c *gin.Context) {
+				h.serve(c, func(ctx context.Context, _ string) (Page, error) { return load(ctx) })
+			}
+			routes.GET(path, handler)
+			routes.HEAD(path, handler)
+		}
+		list := func(c *gin.Context) {
+			h.serve(c, func(ctx context.Context, _ string) (Page, error) {
+				page := 1
+				if raw := c.Query("page"); raw != "" {
+					value, err := strconv.Atoi(raw)
+					if err != nil || value < 1 || value > 100000 {
+						return Page{}, ErrNotFound
+					}
+					page = value
+				}
+				search := strings.TrimSpace(c.Query("search"))
+				if len([]rune(search)) > 200 {
+					return Page{}, ErrNotFound
+				}
+				return source.BlogList(ctx, page, search)
+			})
+		}
+		routes.GET("/blog", list)
+		routes.HEAD("/blog", list)
+	}
 	for _, kind := range []string{"products", "blog", "categories"} {
 		load := h.source.Product
 		if kind == "blog" {
@@ -125,12 +166,23 @@ func (h *Handler) serve(c *gin.Context, load func(context.Context, string) (Page
 	if data.MetadataTitle == "" {
 		data.MetadataTitle = page.Title
 	}
-	if site.Name != "" && data.MetadataTitle != site.Name {
+	if site.Name != "" && data.MetadataTitle != site.Name && page.Kind != "home" {
 		data.MetadataTitle += " - " + site.Name
 	}
 	schema := map[string]any{"@context": "https://schema.org", "@type": "BlogPosting", "headline": page.Title, "url": canonical, "mainEntityOfPage": canonical, "description": data.Description, "inLanguage": "zh-CN"}
 	if page.Kind == "notice" {
 		schema["@type"] = "Article"
+	}
+	if page.Kind == "home" || page.Kind == "about" || page.Kind == "blog" {
+		kind := map[string]string{"home": "WebPage", "about": "AboutPage", "blog": "CollectionPage"}[page.Kind]
+		schema = map[string]any{"@context": "https://schema.org", "@type": kind, "name": page.Title, "url": canonical, "description": data.Description, "inLanguage": "zh-CN", "isPartOf": map[string]string{"@id": origin + "/#website"}, "about": map[string]string{"@id": origin + "/#organization"}}
+		if page.Kind == "blog" {
+			items := make([]map[string]any, 0, len(page.Entries))
+			for i, entry := range page.Entries {
+				items = append(items, map[string]any{"@type": "ListItem", "position": i + 1, "name": entry.Title, "url": origin + entry.Path})
+			}
+			schema["mainEntity"] = map[string]any{"@type": "ItemList", "itemListElement": items}
+		}
 	}
 	if page.Kind == "category" {
 		items := make([]map[string]any, 0, len(page.Items))
@@ -151,12 +203,34 @@ func (h *Handler) serve(c *gin.Context, load func(context.Context, string) (Page
 	if len(images) > 0 {
 		schema["image"] = images
 	}
+	if page.Kind == "article" || page.Kind == "notice" {
+		schema["publisher"] = map[string]string{"@id": origin + "/#organization"}
+		if page.Editorial {
+			schema["author"] = map[string]string{"@type": "Organization", "@id": origin + "/#organization", "name": site.Name, "url": origin + "/about"}
+		}
+	}
 	raw, err := json.Marshal(schema) // Escapes <, > and &; content cannot terminate the script.
 	if err != nil {
 		h.failure(c, err)
 		return
 	}
 	data.Schema = template.JS(raw)
+	identity := map[string]any{"@type": "Organization", "@id": origin + "/#organization", "name": site.Name, "url": origin + "/", "contactPoint": map[string]any{"@type": "ContactPoint", "contactType": "customer support", "url": origin + "/about"}}
+	if logo := absoluteImage(origin, site.Logo); logo != "" {
+		identity["logo"] = logo
+	}
+	if site.Description != "" {
+		identity["description"] = site.Description
+	}
+	identityRaw, err := json.Marshal(map[string]any{"@context": "https://schema.org", "@graph": []any{identity, map[string]any{"@type": "WebSite", "@id": origin + "/#website", "url": origin + "/", "name": site.Name, "publisher": map[string]string{"@id": origin + "/#organization"}}}})
+	if err != nil {
+		h.failure(c, err)
+		return
+	}
+	data.Identity = template.JS(identityRaw)
+	if page.NoIndex {
+		c.Header("X-Robots-Tag", "noindex, follow")
+	}
 	var out bytes.Buffer
 	if err := documentTemplate.Execute(&out, data); err != nil {
 		h.failure(c, err)

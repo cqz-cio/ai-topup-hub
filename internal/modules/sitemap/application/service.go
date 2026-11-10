@@ -116,7 +116,6 @@ type urlSet struct {
 }
 
 func (s *Service) collectURLs(ctx context.Context, baseURL string) ([]domain.URL, error) {
-	now := time.Now().UTC().Format("2006-01-02")
 	entries := make([]domain.URL, 0, 64)
 
 	// 1. 静态页面
@@ -135,8 +134,8 @@ func (s *Service) collectURLs(ctx context.Context, baseURL string) ([]domain.URL
 	}
 	for _, p := range staticPages {
 		entries = append(entries, domain.URL{
-			Location:        baseURL + p.Path,
-			LastModified:    now,
+			Location: baseURL + p.Path,
+			// Unknown content modification time: omit rather than emit today's date.
 			ChangeFrequency: p.ChangeFreq,
 			Priority:        p.Priority,
 		})

@@ -1,0 +1,43 @@
+{
+  "reviewed_at": "2026-11-10",
+  "about": [
+    {
+      "section": "services",
+      "index": 2,
+      "title": "收到卡密，按指引兑换",
+      "before": [
+        "ChatGPT 类商品为兑换码，非成品账号。收到卡密后，请按订单说明前往 订单交付说明中的兑换入口 操作，以兑换结果为准；其他商品遵循各自的交付说明。"
+      ],
+      "value": "兑换码商品需要在领取后按订单说明兑换；人工充值与成品账号按各自商品详情和交付说明办理。收到交付内容后，请核对实际开通结果。"
+    },
+    {
+      "section": "recharge",
+      "index": 2,
+      "title": "充值方式与质保补充",
+      "before": [
+        "ChatGPT 订阅采用官方直充方式，正常情况下可持续使用至到期。Go 与 iOS 商品提供一个月质保；质保期内如提前掉订阅，经客服核实后按剩余天数退款。"
+      ],
+      "value": "本站提供独立第三方订阅服务。开通方式、使用期限、质保范围和退款条件因商品而异，请以所购商品详情为准；不同套餐不能互相套用规则。"
+    }
+  ],
+  "posts": [
+    {
+      "slug": "chatgpt-membership-not-active",
+      "title": "ChatGPT 充值后没有显示会员，应该怎么排查？",
+      "summary": "区分付款、交付和开通状态，按商品类型、目标账号与购买渠道排查会员未显示，并整理售后需要的信息。",
+      "file": "chatgpt-membership-not-active.html"
+    },
+    {
+      "slug": "chatgpt-plus-vs-api-balance",
+      "title": "ChatGPT Plus 订阅和 API 余额有什么区别？",
+      "summary": "分清 ChatGPT 会员与 API 账单，结合使用场景、商品说明和结果核对位置，避免把订阅充值当成 API 余额。",
+      "file": "chatgpt-plus-vs-api-balance.html"
+    },
+    {
+      "slug": "chatgpt-code-region-check",
+      "title": "不同地区的 GPT 兑换码能通用吗？购买前如何核对？",
+      "summary": "地区、套餐与原订阅条件需要分别核对。通过购买清单、预检失败处理和售后边界，减少买错兑换码的情况。",
+      "file": "chatgpt-code-region-check.html"
+    }
+  ]
+}

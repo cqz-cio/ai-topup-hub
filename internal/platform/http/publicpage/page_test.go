@@ -21,7 +21,7 @@ type sourceStub struct {
 }
 
 func (s *sourceStub) Site(context.Context) (Site, error) {
-	return Site{"青栀商城", "http://127.0.0.1:4170", "CNY"}, s.siteErr
+	return Site{Name: "青栀商城", URL: "http://127.0.0.1:4170", Currency: "CNY"}, s.siteErr
 }
 func (s *sourceStub) Product(context.Context, string) (Page, error)  { return s.page, s.err }
 func (s *sourceStub) Post(context.Context, string) (Page, error)     { return s.page, s.err }

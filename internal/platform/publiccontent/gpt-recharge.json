@@ -24,14 +24,30 @@
     },
     {
       "title": "GPT 充值与使用指南",
-      "html": "<ul><li><a href=\"/blog/chatgpt-payment-methods\">ChatGPT 充值方式有哪些？订阅渠道、账号条件与注意事项</a></li><li><a href=\"/blog/chatgpt-plus-code-guide\">ChatGPT Plus 兑换码怎么用？从领取到核对开通结果</a></li><li><a href=\"/blog/chatgpt-plus-renewal-rules\">ChatGPT Plus 没到期能充值吗？到期续费与覆盖充值的区别</a></li></ul><p>本文帮助你选择本站服务，产品名称仅用于说明服务对象。具体订阅功能与官方规则请以相应产品的官方说明为准。</p>"
+      "html": "<ul><li><a href=\"/blog/chatgpt-payment-methods\">ChatGPT 充值方式有哪些？订阅渠道、账号条件与注意事项</a></li><li><a href=\"/blog/chatgpt-plus-code-guide\">ChatGPT Plus 兑换码怎么用？从领取到核对开通结果</a></li><li><a href=\"/blog/chatgpt-plus-renewal-rules\">ChatGPT Plus 没到期能充值吗？到期续费与覆盖充值的区别</a></li><li><a href=\"/blog/chatgpt-membership-not-active\">ChatGPT 充值后没有显示会员，应该怎么排查？</a></li><li><a href=\"/blog/chatgpt-plus-vs-api-balance\">ChatGPT Plus 订阅和 API 余额有什么区别？</a></li><li><a href=\"/blog/chatgpt-code-region-check\">不同地区的 GPT 兑换码能通用吗？购买前如何核对？</a></li></ul><p>本文帮助你选择本站服务，产品名称仅用于说明服务对象。具体订阅功能与官方规则请以相应产品的官方说明为准。</p>"
     }
   ],
-  "productCategories": ["qzweb-category-4", "gpt-overwrite-topup"],
-  "blogSlugs": ["chatgpt-payment-methods", "chatgpt-plus-code-guide", "chatgpt-plus-renewal-rules"],
+  "productCategories": [
+    "qzweb-category-4",
+    "gpt-overwrite-topup"
+  ],
+  "blogSlugs": [
+    "chatgpt-payment-methods",
+    "chatgpt-plus-code-guide",
+    "chatgpt-plus-renewal-rules",
+    "chatgpt-membership-not-active",
+    "chatgpt-plus-vs-api-balance",
+    "chatgpt-code-region-check"
+  ],
   "relatedHeading": "继续了解 GPT 充值",
   "relatedLinks": [
-    {"title": "GPT 充值方案与购买须知", "path": "/categories/qzweb-category-4"},
-    {"title": "ChatGPT 充值方式与账号条件", "path": "/blog/chatgpt-payment-methods"}
+    {
+      "title": "GPT 充值方案与购买须知",
+      "path": "/categories/qzweb-category-4"
+    },
+    {
+      "title": "ChatGPT 充值方式与账号条件",
+      "path": "/blog/chatgpt-payment-methods"
+    }
   ]
 }

@@ -2,6 +2,9 @@ import { computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAppStore } from '../stores/app'
 import { usePageSeo } from './usePageSeo'
+import { useHead } from '@unhead/vue'
+import { resolveAboutPage } from '../../../shared/aboutPage'
+import { schemaJSON } from '../utils/siteIdentity'
 
 /**
  * 关于页共享逻辑（classic + vault 双模板共用）。
@@ -13,8 +16,10 @@ export function useAbout() {
 
   usePageSeo({
     title: () => t('nav.about'),
+    description: () => appStore.isResellerTenant ? '' : resolveAboutPage(appStore.config?.about_page, appStore.config?.about, locale.value, appStore.config?.contact).subtitle,
     canonicalPath: () => '/about',
   })
+
 
   const aboutConfig = computed(() => appStore.config?.about || null)
   const contactConfig = computed(() => appStore.config?.contact || null)
@@ -59,6 +64,20 @@ export function useAbout() {
   const hasServices = computed(() => servicesTitle.value !== '' || serviceItems.value.length > 0)
   const hasContactLinks = computed(() => !!(contactConfig.value?.telegram || contactConfig.value?.whatsapp))
   const hasContact = computed(() => contactTitle.value !== '' || contactText.value !== '' || hasContactLinks.value)
+
+  useHead(() => {
+    if (!appStore.config) return { script: [] }
+    const copy = resolveAboutPage(appStore.config.about_page, appStore.config.about, locale.value, appStore.config.contact)
+    const origin = String(appStore.config.brand?.site_url || window.location.origin).replace(/\/+$/, '')
+    const schema = {
+      '@context': 'https://schema.org', '@type': 'AboutPage',
+      name: appStore.isResellerTenant ? heroTitle.value : copy.title,
+      description: appStore.isResellerTenant ? heroSubtitle.value : copy.subtitle,
+      url: origin + '/about', inLanguage: appStore.locale,
+      isPartOf: { '@id': origin + '/#website' }, about: { '@id': origin + '/#organization' },
+    }
+    return { script: [{ key: 'about-page', type: 'application/ld+json', innerHTML: schemaJSON(schema) }] }
+  })
 
   onMounted(async () => {
     if (!appStore.config) {

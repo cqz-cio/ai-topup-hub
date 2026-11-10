@@ -8,7 +8,7 @@ import { useLocalized } from './useProduct'
 import { usePageSeo } from './usePageSeo'
 import { useHead } from '@unhead/vue'
 import { getImageUrl } from '../utils/image'
-import { appendRechargeLinks } from '../utils/gptRecharge'
+import { appendRechargeLinks, gptRecharge } from '../utils/gptRecharge'
 
 /**
  * 文章/公告详情共享逻辑（classic + vault 双模板共用）。
@@ -65,6 +65,10 @@ export function useBlogDetail() {
       url,
       mainEntityOfPage: url,
       inLanguage: appStore.locale,
+      publisher: { '@id': origin + '/#organization' },
+    }
+    if (!appStore.isResellerTenant && gptRecharge.blogSlugs.includes(post.value.slug)) {
+      schema.author = { '@type': 'Organization', '@id': origin + '/#organization', name: appStore.config?.brand?.site_name, url: origin + '/about' }
     }
     if (post.value.published_at) schema.datePublished = post.value.published_at
     if (post.value.thumbnail) schema.image = new URL(getImageUrl(post.value.thumbnail), origin + '/').href

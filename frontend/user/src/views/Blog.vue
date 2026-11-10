@@ -76,6 +76,7 @@
         <PaginationNav
           :current-page="currentPage"
           :total-pages="totalPages"
+          :page-href="pageHref"
           @change-page="changePage"
         />
       </div>
@@ -105,7 +106,7 @@ const { t } = useI18n()
 
 const {
   loading, posts, currentPage, totalPages, searchKeyword,
-  getLocalizedText, formatDate, changePage,
+  getLocalizedText, formatDate, changePage, pageHref,
 } = usePostList('blog', { title: () => t('nav.blog'), canonicalPath: '/blog' })
 </script>
 

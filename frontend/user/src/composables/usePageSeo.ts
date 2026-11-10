@@ -17,6 +17,7 @@ export interface PageSeoOptions {
   type?: () => string | undefined | null
   /** 标识页面不该被索引（私密页/动态查询页） */
   noindex?: () => boolean
+  followWhenNoindex?: boolean
 }
 
 const trimSlashEnd = (s: string) => s.replace(/\/+$/, '')
@@ -104,7 +105,7 @@ export function usePageSeo(options: PageSeoOptions = {}) {
       const tags: Array<{ name?: string; property?: string; content: string }> = []
 
       if (options.noindex?.()) {
-        tags.push({ name: 'robots', content: 'noindex, nofollow' })
+        tags.push({ name: 'robots', content: options.followWhenNoindex ? 'noindex, follow' : 'noindex, nofollow' })
       }
 
       if (fullDescription.value) {

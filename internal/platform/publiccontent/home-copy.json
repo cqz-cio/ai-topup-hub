@@ -1,0 +1,26 @@
+{
+  "heroEyebrow": "智享日常，从这里开始",
+  "heroTitle": "好用的数字服务，",
+  "heroAccent": "轻松拥有。",
+  "heroDescription": "选择适合你的服务与规格，在线完成付款。到账确认后，在本站查看并领取账号或卡密。",
+  "flowTitle": "从选购到领取，清楚每一步。",
+  "flowDescription": "不必来回找入口，在本站完成整个购买流程。",
+  "steps": {
+    "cart": "选择商品",
+    "checkout": "确认订单",
+    "payment": "完成付款",
+    "delivery": "领取卡密"
+  },
+  "stepHints": {
+    "cart": "确认规格与使用期限",
+    "checkout": "保存邮箱和查询密码",
+    "payment": "按订单指引完成付款",
+    "delivery": "到账后在订单中领取"
+  },
+  "helpTitle": "购买前需要帮助？",
+  "helpDescription": "不确定规格、使用方式或售后范围，可以联系在线客服。",
+  "catalogHint": "使用期限与质保期不同，购买前请分别确认。",
+  "deliveryNotice": "交付内容在订单内领取。游客请保存下单邮箱与查询密码。",
+  "lookupTitle": "购买之后，在这里领取。",
+  "lookupHint": "会员登录查看订单；游客使用下单邮箱和查询密码即可找回。"
+}

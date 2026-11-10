@@ -1,9 +1,12 @@
 import { ref, onMounted, onUnmounted, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useAppStore } from '../stores/app'
 import { postAPI } from '../api'
 import { debounceAsync } from '../utils/debounce'
 import { usePageSeo } from './usePageSeo'
+import { useHead } from '@unhead/vue'
+import { postListState, postListPath } from '../utils/postListUrl'
+import { schemaJSON } from '../utils/siteIdentity'
 
 /**
  * 文章/公告列表共享逻辑（Blog/Notice，classic + vault 双模板共用）。
@@ -15,20 +18,27 @@ export function usePostList(
   seo: { title: () => string; canonicalPath: string },
 ) {
   const router = useRouter()
+  const route = useRoute()
   const appStore = useAppStore()
 
-  usePageSeo({
-    title: seo.title,
-    canonicalPath: () => seo.canonicalPath,
-  })
+
 
   const loading = ref(true)
   const posts = ref<any[]>([])
-  const currentPage = ref(1)
+  const currentPage = ref(postListState(route.query).page)
   const pageSize = ref(12)
   const total = ref(0)
   const totalPages = ref(0)
-  const searchKeyword = ref('')
+  const searchKeyword = ref(postListState(route.query).search)
+  let request = 0
+
+  usePageSeo({
+    title: seo.title,
+    description: () => type === 'blog' ? '最新文章和动态' : undefined,
+    canonicalPath: () => postListPath(seo.canonicalPath, searchKeyword.value.trim() ? 1 : currentPage.value),
+    noindex: () => !!searchKeyword.value.trim(),
+    followWhenNoindex: true,
+  })
 
   const getLocalizedText = (jsonData: any) => {
     if (!jsonData) return ''
@@ -47,6 +57,7 @@ export function usePostList(
   }
 
   const loadPosts = async () => {
+    const id = ++request
     loading.value = true
     try {
       const params: Record<string, any> = {
@@ -59,19 +70,25 @@ export function usePostList(
         params.search = keyword
       }
       const response = await postAPI.list(params)
+      if (id !== request) return
       posts.value = response.data.data || []
       if (response.data.pagination) {
         total.value = response.data.pagination.total || 0
         totalPages.value = response.data.pagination.total_page || 0
       }
     } catch (error) {
+      if (id !== request) return
+      posts.value = []
       console.error('Failed to load posts:', error)
     } finally {
-      loading.value = false
+      if (id === request) loading.value = false
     }
   }
 
-  const debouncedLoadPosts = debounceAsync(loadPosts, 300)
+  const debouncedSearch = debounceAsync(async () => {
+    await router.replace(postListPath(seo.canonicalPath, 1, searchKeyword.value))
+  }, 300)
+  const pageHref = (page: number) => postListPath(seo.canonicalPath, page, searchKeyword.value)
 
   const goToPost = (slug: string) => {
     router.push(`/blog/${slug}`)
@@ -79,14 +96,34 @@ export function usePostList(
 
   const changePage = (page: number) => {
     if (page < 1 || page > totalPages.value) return
-    currentPage.value = page
-    debouncedLoadPosts()
+    debouncedSearch.cancel()
+    void router.push(pageHref(page))
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  watch(searchKeyword, () => {
-    currentPage.value = 1
-    debouncedLoadPosts()
+  watch(searchKeyword, value => {
+    if (value.trim() !== postListState(route.query).search) debouncedSearch()
+  })
+  watch(() => [route.query.page, route.query.search], () => {
+    debouncedSearch.cancel()
+    const state = postListState(route.query)
+    currentPage.value = state.page
+    searchKeyword.value = state.search
+    void loadPosts()
+  })
+
+  useHead(() => {
+    if (type !== 'blog' || loading.value) return { script: [] }
+    const origin = String(appStore.config?.brand?.site_url || window.location.origin).replace(/\/+$/, '')
+    const schema = {
+      '@context': 'https://schema.org', '@type': 'CollectionPage', name: seo.title(), description: '最新文章和动态',
+      url: origin + postListPath(seo.canonicalPath, searchKeyword.value.trim() ? 1 : currentPage.value),
+      inLanguage: appStore.locale, isPartOf: { '@id': origin + '/#website' }, about: { '@id': origin + '/#organization' },
+      mainEntity: { '@type': 'ItemList', itemListElement: posts.value.map((post, i) => ({
+        '@type': 'ListItem', position: i + 1, name: getLocalizedText(post.title), url: `${origin}/blog/${encodeURIComponent(post.slug)}`,
+      })) },
+    }
+    return { script: [{ key: 'blog-list', type: 'application/ld+json', innerHTML: schemaJSON(schema) }] }
   })
 
   onMounted(() => {
@@ -94,7 +131,8 @@ export function usePostList(
   })
 
   onUnmounted(() => {
-    debouncedLoadPosts.cancel()
+    request++
+    debouncedSearch.cancel()
   })
 
   return {
@@ -108,5 +146,6 @@ export function usePostList(
     formatDate,
     goToPost,
     changePage,
+    pageHref,
   }
 }

@@ -6,12 +6,14 @@
     >
       <Button
         type="button"
+        :as="pageHref && currentPage > 1 && !loading ? 'a' : 'button'"
+        :href="pageHref && currentPage > 1 && !loading ? pageHref(currentPage - 1) : undefined"
         variant="outline"
         size="icon"
         :class="compact ? 'h-10 w-10' : 'h-12 w-12'"
         :aria-label="t('pagination.previous')"
         :disabled="currentPage === 1 || loading"
-        @click="handlePage(currentPage - 1)"
+        @click="handlePage(currentPage - 1, $event)"
       >
         <ChevronLeft />
       </Button>
@@ -34,12 +36,14 @@
 
       <Button
         type="button"
+        :as="pageHref && currentPage < totalPages && !loading ? 'a' : 'button'"
+        :href="pageHref && currentPage < totalPages && !loading ? pageHref(currentPage + 1) : undefined"
         variant="outline"
         size="icon"
         :class="compact ? 'h-10 w-10' : 'h-12 w-12'"
         :aria-label="t('pagination.next')"
         :disabled="currentPage === totalPages || loading"
-        @click="handlePage(currentPage + 1)"
+        @click="handlePage(currentPage + 1, $event)"
       >
         <ChevronRight />
       </Button>
@@ -58,6 +62,7 @@ const props = defineProps<{
   compact?: boolean
   loading?: boolean
   scrollTop?: boolean
+  pageHref?: (page: number) => string
 }>()
 
 const emit = defineEmits<{
@@ -66,7 +71,9 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 
-const handlePage = (page: number) => {
+const handlePage = (page: number, event: MouseEvent) => {
+  if (props.pageHref && (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || event.button !== 0)) return
+  event.preventDefault()
   if (page < 1 || page > props.totalPages || page === props.currentPage) return
   emit('changePage', page)
   if (props.scrollTop !== false) {

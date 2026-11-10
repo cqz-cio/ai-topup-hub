@@ -11,6 +11,7 @@
         <section class="about-introduction" aria-labelledby="about-intro-title">
           <h2 id="about-intro-title">{{ copy.introductionTitle }}</h2>
           <p>{{ copy.introduction }}</p>
+          <p>{{ identityStatement }}</p>
         </section>
 
         <section v-if="copy.servicesTitle || copy.services.length" class="about-section" aria-labelledby="about-services-title">
@@ -82,6 +83,7 @@ import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ArrowRight, ArrowUpRight, Check, ClipboardList, Copy, Handshake, KeyRound, ShieldCheck, ShoppingCart } from 'lucide-vue-next'
 import { resolveAboutPage } from '../../../shared/aboutPage'
+import { identityStatement } from '../utils/siteIdentity'
 import { useAppStore } from '../stores/app'
 import { copyText } from '../utils/clipboard'
 import { toast } from '../composables/useToast'
