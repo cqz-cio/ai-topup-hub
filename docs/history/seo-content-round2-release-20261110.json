@@ -1,0 +1,202 @@
+{
+  "status": "verified",
+  "checked_at": "2026-11-10T02:45:30.320713+00:00",
+  "release": "20261110-102602",
+  "source_commit": "6f1f76639cbfb61d5124280da15eb4f6d3fb8903",
+  "source_tag": "production/seo-content-round2-20261110-102602",
+  "source_dirty": false,
+  "binary_sha256": "077133967f4f617fb5aed28134609f7bd1714f6280b7f56b4fa4519da587a3a7",
+  "binary_bytes": 134889634,
+  "ci": {
+    "id": 42742263533,
+    "conclusion": "success",
+    "url": "https://github.com/cqz-cio/ai-topup-hub/actions/runs/42742263533",
+    "jobs": {
+      "Verify release config": "success",
+      "Verify fullstack build": "success",
+      "Verify API": "success",
+      "Verify installer": "success"
+    }
+  },
+  "scope": [
+    "Existing GPT recharge category landing page and public HTML",
+    "Homepage and catalog GPT group entry links",
+    "12 GPT product and 3 blog return links in the presentation layer",
+    "Shared public copy, canonical, CollectionPage and ItemList, sitemap lastmod"
+  ],
+  "landing_url": "https://www.qzweb.cloud/categories/qzweb-category-4",
+  "local_verification": {
+    "frontendTests": 255,
+    "relatedGoTestsIncludingSubtests": 824,
+    "httpChecks": 138,
+    "scannedPublicFiles": 429,
+    "responsiveWidths": [
+      1920,
+      390,
+      320
+    ],
+    "darkModeWidth": 320,
+    "homepageLink": true,
+    "productAndBlogLinks": true,
+    "searchSortQuantity": true,
+    "noJavascriptText": true
+  },
+  "public_http_checks_passed": 153,
+  "browser_views_checked": 11,
+  "browser_error_count": 0,
+  "browser_interactions": {
+    "quantityIncreaseAndRestore": true,
+    "plusSearchOneMatchingProduct": true,
+    "descendingPriceSort": true,
+    "homepageLandingLink": true,
+    "productAndBlogReturnLinks": true,
+    "guideAnchor": true,
+    "supportPanelOpenClose": true,
+    "cartEmptyEntry": true,
+    "guestOrderEntry": true,
+    "productionTestOrderCreated": false,
+    "realPaymentPurchaseRefundOrTestEmail": false
+  },
+  "viewports_requested": [
+    1920,
+    390,
+    320
+  ],
+  "browser_client_widths": [
+    310,
+    380,
+    1910
+  ],
+  "public_files_verified": 429,
+  "retained_storefront_files": 11139,
+  "admin_files_preserved": 1559,
+  "public_build_files_scanned": 552,
+  "nginx_files_preserved": 25,
+  "nginx_changed_files": [
+    "/etc/nginx/conf.d/cardnet-qzweb-www.conf"
+  ],
+  "nginx_change_scope": "Append categories to the existing public HTML route expression; preserve all other configuration",
+  "backend_previous_release": "20261109-162247",
+  "storefront_previous_release": "20261109-162247",
+  "admin_preserved_release": "20261029-181554",
+  "support_preserved_release": "20261106-110800",
+  "paiplus_preserved_release": "20261103-153828",
+  "private_configuration_preserved": true,
+  "prices_settings_payments_copy_mappings_preserved": true,
+  "redis_paiplus_support_pids_preserved": true,
+  "support_model_enabled": false,
+  "usdt_cny_rates": {
+    "/bsc_usdt": "6.65",
+    "/plasma_usdt": "6.65",
+    "/tron_usdt": "6.65"
+  },
+  "services": {
+    "nginx": "active",
+    "zhixiang-shop": "active",
+    "zhixiang-redis": "active",
+    "paiplus": "active",
+    "zhixiang-support": "active",
+    "zhixiang-stock-sync.timer": "active",
+    "zhixiang-86gamestore-stock-sync.timer": "active"
+  },
+  "stock_services": {
+    "zhixiang-stock-sync.service": {
+      "Result": "success",
+      "ExecMainStartTimestamp": "Tue 2026-11-10 10:36:24 CST",
+      "ExecMainExitTimestamp": "Tue 2026-11-10 10:36:32 CST",
+      "ExecMainStatus": "0"
+    },
+    "zhixiang-86gamestore-stock-sync.service": {
+      "Result": "success",
+      "ExecMainStartTimestamp": "Tue 2026-11-10 10:35:14 CST",
+      "ExecMainExitTimestamp": "Tue 2026-11-10 10:35:19 CST",
+      "ExecMainStatus": "0"
+    }
+  },
+  "business_tables_checked": 73,
+  "business_tables_unchanged_at_cutover": 72,
+  "cutover_runtime_changed_tables": [
+    "chain_payment_cursors"
+  ],
+  "business_tables_unchanged_after_stock": 64,
+  "runtime_table_changes_after_stock": {
+    "admins": {
+      "added": 0,
+      "removed": 0,
+      "changed_columns": [
+        "last_login_at"
+      ]
+    },
+    "admin_login_logs": {
+      "added": 1,
+      "removed": 0,
+      "changed_columns": []
+    },
+    "products": {
+      "added": 0,
+      "removed": 0,
+      "changed_columns": [
+        "manual_stock_total",
+        "updated_at"
+      ]
+    },
+    "product_skus": {
+      "added": 0,
+      "removed": 0,
+      "changed_columns": [
+        "manual_stock_total",
+        "updated_at"
+      ]
+    },
+    "product_mappings": {
+      "added": 0,
+      "removed": 0,
+      "changed_columns": [
+        "last_synced_at",
+        "updated_at"
+      ]
+    },
+    "sku_mappings": {
+      "added": 0,
+      "removed": 0,
+      "changed_columns": [
+        "stock_synced_at",
+        "updated_at",
+        "upstream_stock"
+      ]
+    },
+    "chain_payment_cursors": {
+      "added": 0,
+      "removed": 0,
+      "changed_columns": [
+        "next_block",
+        "previous_hash",
+        "updated_at"
+      ]
+    },
+    "ellaix_catalog_meta": {
+      "added": 0,
+      "removed": 0,
+      "changed_columns": [
+        "last_at"
+      ]
+    },
+    "ellaix_catalog_items": {
+      "added": 0,
+      "removed": 0,
+      "changed_columns": [
+        "last_seen",
+        "missing_count"
+      ]
+    }
+  },
+  "public_product_count": 25,
+  "backup": "/srv/zhixiang/backups/before-seo-round2-20261110-102602",
+  "rollback": "Restore both backend and storefront 20261109-162247 and the saved main storefront Nginx configuration; validate and reload Nginx. Do not restore the business database.",
+  "evidence": "work/codex-runtime/seo-round2-release-20261110/verified-report.json",
+  "database_uploaded": false,
+  "data_migration": false,
+  "production_test_order_created": false,
+  "real_payment_purchase_refund_or_test_email": false,
+  "search_indexing_or_ai_recommendation_verified": false
+}

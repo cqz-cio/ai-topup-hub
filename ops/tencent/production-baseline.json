@@ -1,27 +1,27 @@
 {
-  "checked_at": "2026-11-09T08:39:44.581246+00:00",
+  "checked_at": "2026-11-10T02:45:30.320713+00:00",
   "production_url": "https://www.qzweb.cloud/",
-  "documented_release_id": "20261109-162247",
-  "verified_release_id": "20261109-162247",
-  "previous_release_id": "20261107-121013",
-  "source_commit": "cd0307106444b5811273168afe55fdc33b687ae6",
+  "documented_release_id": "20261110-102602",
+  "verified_release_id": "20261110-102602",
+  "previous_release_id": "20261109-162247",
+  "source_commit": "6f1f76639cbfb61d5124280da15eb4f6d3fb8903",
   "source_branch": "main",
   "server_git_commit_verified": true,
-  "source_tag": "production/seo-content-round1-20261109-162247",
+  "source_tag": "production/seo-content-round2-20261110-102602",
   "production": {
     "host": "43.134.141.10",
-    "release_path": "/srv/zhixiang/releases/20261109-162247",
-    "running_executable": "/srv/zhixiang/releases/20261109-162247/zhixiang-shop",
-    "binary_bytes": 134852770,
-    "binary_sha256": "f78e16261c9e925dd13987637c846bfbc29113c14a35cba70bca3ebfb286a10d",
-    "running_binary_sha256": "f78e16261c9e925dd13987637c846bfbc29113c14a35cba70bca3ebfb286a10d",
-    "manifest_binary_sha256": "f78e16261c9e925dd13987637c846bfbc29113c14a35cba70bca3ebfb286a10d",
-    "source_commit": "cd0307106444b5811273168afe55fdc33b687ae6",
+    "release_path": "/srv/zhixiang/releases/20261110-102602",
+    "running_executable": "/srv/zhixiang/releases/20261110-102602/zhixiang-shop",
+    "binary_bytes": 134889634,
+    "binary_sha256": "077133967f4f617fb5aed28134609f7bd1714f6280b7f56b4fa4519da587a3a7",
+    "running_binary_sha256": "077133967f4f617fb5aed28134609f7bd1714f6280b7f56b4fa4519da587a3a7",
+    "manifest_binary_sha256": "077133967f4f617fb5aed28134609f7bd1714f6280b7f56b4fa4519da587a3a7",
+    "source_commit": "6f1f76639cbfb61d5124280da15eb4f6d3fb8903",
     "source_dirty": false,
     "build_info": {
       "go_version": "go1.26.5",
-      "source_commit": "cd0307106444b5811273168afe55fdc33b687ae6",
-      "vcs_revision": "cd0307106444b5811273168afe55fdc33b687ae6",
+      "source_commit": "6f1f76639cbfb61d5124280da15eb4f6d3fb8903",
+      "vcs_revision": "6f1f76639cbfb61d5124280da15eb4f6d3fb8903",
       "vcs_modified": false,
       "git_metadata_pinned": true,
       "tags": "release,fullstack",
@@ -41,27 +41,26 @@
     },
     "pids": {
       "nginx": "387020",
-      "zhixiang-shop": "1068749",
+      "zhixiang-shop": "1532008",
       "zhixiang-redis": "52983",
       "paiplus": "1494422",
       "zhixiang-support": "3238947"
     },
     "redis_preserved_without_restart": true,
-    "backup": "/srv/zhixiang/backups/before-seo-round1-20261109-162247",
+    "backup": "/srv/zhixiang/backups/before-seo-round2-20261110-102602",
     "database_backup_quick_check": "ok",
-    "report_path": "/srv/zhixiang/backups/before-seo-round1-20261109-162247/final-report.json",
-    "configuration_unchanged": true,
+    "report_path": "/srv/zhixiang/backups/before-seo-round2-20261110-102602/final-report.json",
+    "configuration_unchanged": false,
     "private_configuration_unchanged": true,
-    "configuration_changes": [],
-    "settings_changes": [
-      "seo.zh-CN.title",
-      "seo.zh-CN.description"
+    "configuration_changes": [
+      "/etc/nginx/conf.d/cardnet-qzweb-www.conf"
     ],
-    "nginx_configuration_preserved": true,
-    "nginx_configuration_source": "existing Singapore configuration preserved byte for byte",
-    "nginx_changed_file": null,
-    "nginx_other_files_preserved": 26,
-    "nginx_change_scope": "none",
+    "settings_changes": [],
+    "nginx_configuration_preserved": false,
+    "nginx_configuration_source": "Existing Singapore storefront gateway; only categories appended to the public HTML regex",
+    "nginx_changed_file": "/etc/nginx/conf.d/cardnet-qzweb-www.conf",
+    "nginx_other_files_preserved": 25,
+    "nginx_change_scope": "Category public HTML routing only",
     "last_api_recovery": {
       "recovered": true,
       "reason": "Business HTTP requests blocked while health endpoint and data stores remained responsive",
@@ -118,7 +117,7 @@
         "wallet"
       ]
     },
-    "cny_per_usdt": "6.72",
+    "cny_per_usdt": "6.65",
     "confirmations": 15,
     "public_channels": [
       {
@@ -184,7 +183,7 @@
     "monitor_access_requires_existing_compliance_acknowledgement": true,
     "compliance_acknowledgement_preserved": true,
     "previous_detailed_verification_recorded_at": "2026-10-12T05:45:38.041686+00:00",
-    "current_release_verification_scope": "Payment records/configuration and three 6.72 exchange rates preserved; no real payment or purchase submitted.",
+    "current_release_verification_scope": "Payment records/configuration and all three pre-existing 6.65 exchange rates preserved; no real payment or purchase submitted.",
     "new_invoice_amount_decimals": 4,
     "xorpay": {
       "id": 3,
@@ -224,7 +223,7 @@
         "wallet"
       ],
       "confirmations": 15,
-      "cny_per_usdt": "6.72",
+      "cny_per_usdt": "6.65",
       "real_money_acceptance": false
     }
   },
@@ -237,16 +236,16 @@
     "https://124.220.2.69:18888/login"
   ],
   "verified_asset_sha256": {
-    "user/index.html": "c3cff4f659061dadf1967520add36749e6d2bfe28b039c931b653cb449084962",
+    "user/index.html": "b8c62fa4972b26feca3a84c1fc6adb4e72b68184b7a09ed1aa3bc5bcd4a37826",
     "admin/index.html": "ab3eefe0be91974434a907e614b063bb470e6541cc5788b8ac8f9ee187b91b31"
   },
   "public_verification": {
-    "checked_at": "2026-11-09T08:39:44.581246+00:00",
-    "public_http_checks_passed": 97,
-    "browser_views_checked": 12,
+    "checked_at": "2026-11-10T02:45:30.320713+00:00",
+    "public_http_checks_passed": 153,
+    "browser_views_checked": 11,
     "browser_error_count": 0,
     "production_order_submitted": false,
-    "verification_directory": "work/codex-runtime/seo-round1-release-20261109"
+    "verification_directory": "work/codex-runtime/seo-round2-release-20261110"
   },
   "catalog": {
     "prices_unchanged": true,
@@ -270,7 +269,7 @@
     "mapped_products": 19,
     "database_product_rows": 51,
     "qzweb_55_price_note": "Observed current pre-release price, preserved without repricing; replaces the stale early 1160.00 note.",
-    "public_product_count": 26,
+    "public_product_count": 25,
     "category_product_counts": {
       "GPT": 8,
       "Codex": 6,
@@ -360,15 +359,15 @@
     "content_preserved_by_release": "20261012-153531"
   },
   "source_identity_verification": {
-    "source_commit": "cd0307106444b5811273168afe55fdc33b687ae6",
+    "source_commit": "6f1f76639cbfb61d5124280da15eb4f6d3fb8903",
     "source_branch": "main",
     "source_dirty": false,
     "binary_build_info_commit_matches": true,
     "running_binary_sha256_matches": true,
     "frontend_deployed": true,
-    "frontend_files_sha256_verified": 426,
+    "frontend_files_sha256_verified": 429,
     "admin_files_preserved": 1559,
-    "frontend_verification_scope": "426 build files; 6 existing SVG byte variants preserved; all retained assets and public admin preserved"
+    "frontend_verification_scope": "429 current storefront files, approved preview match, original SVG bytes and retained assets preserved"
   },
   "previous_release": {
     "release": "20261015-160016",
@@ -422,42 +421,39 @@
   "previous_build_verification_at": "2026-10-12T08:19:31.766441+00:00",
   "management_url": "https://admin.qzweb.cloud/login",
   "frontend_gateway": {
-    "checked_at": "2026-11-09T08:39:44.581246+00:00",
+    "checked_at": "2026-11-10T02:45:30.320713+00:00",
     "frontend_host": "43.134.141.10",
     "backend_host": "43.134.141.10",
-    "frontend_release": "20261109-162247",
-    "storefront_release": "20261109-162247",
-    "previous_frontend_release": "20261106-110800",
-    "source_commit": "cd0307106444b5811273168afe55fdc33b687ae6",
-    "storefront_source_commit": "cd0307106444b5811273168afe55fdc33b687ae6",
-    "frontend_build_source_commit": "cd0307106444b5811273168afe55fdc33b687ae6",
+    "frontend_release": "20261110-102602",
+    "storefront_release": "20261110-102602",
+    "previous_frontend_release": "20261109-162247",
+    "source_commit": "6f1f76639cbfb61d5124280da15eb4f6d3fb8903",
+    "storefront_source_commit": "6f1f76639cbfb61d5124280da15eb4f6d3fb8903",
+    "frontend_build_source_commit": "6f1f76639cbfb61d5124280da15eb4f6d3fb8903",
     "source_dirty": false,
-    "source_tag": "production/seo-content-round1-20261109-162247",
+    "source_tag": "production/seo-content-round2-20261110-102602",
     "storefront_url": "https://www.qzweb.cloud/",
     "management_url": "https://admin.qzweb.cloud/login",
     "api_transport": "Singapore Nginx to loopback 127.0.0.1:8080",
     "frontend_source_identical_to_backend": true,
     "frontend_only_update": false,
     "backend_program_preserved": false,
-    "backend_setting_changes": [
-      "seo.zh-CN.title",
-      "seo.zh-CN.description"
-    ],
+    "backend_setting_changes": [],
     "admin_release": "20261029-181554",
     "admin_source_commit": null,
     "admin_source_note": "Existing public admin artifact preserved byte-for-byte; previous frontend manifest has stale admin source metadata. No admin rebuild was deployed.",
     "admin_base": "/",
     "admin_files_verified": 1559,
     "admin_files_preserved": 1559,
-    "storefront_files_verified": 426,
-    "storefront_build_files_scanned": 426,
-    "storefront_files_preserved": 10945,
-    "previous_directory_inventory_count": 10947,
+    "storefront_files_verified": 429,
+    "storefront_build_files_scanned": 429,
+    "storefront_files_preserved": 11139,
+    "previous_directory_inventory_count": 11141,
     "previous_hashed_assets_retained": true,
     "retained_files_preserved": true,
-    "static_verification_scope": "426 current storefront files, 10945 retained files, 1559 admin files; all 26 Nginx files including retired-resource rules preserved",
-    "nginx_changed_file": null,
-    "nginx_other_files_preserved": 26,
+    "static_verification_scope": "429 current storefront files, 11139 retained files and 1559 public admin files verified; one Nginx route expression extended and 25 other files preserved",
+    "nginx_changed_file": "/etc/nginx/conf.d/cardnet-qzweb-www.conf",
+    "nginx_other_files_preserved": 25,
     "existing_tls_and_ipv6_preserved": true,
     "dns_changed_by_this_release": false,
     "verified_services": {
@@ -469,14 +465,14 @@
       "zhixiang-stock-sync.timer": "active",
       "zhixiang-86gamestore-stock-sync.timer": "active"
     },
-    "backup": "/srv/zhixiang/backups/before-seo-round1-20261109-162247",
-    "report_path": "/srv/zhixiang/backups/before-seo-round1-20261109-162247/final-report.json",
+    "backup": "/srv/zhixiang/backups/before-seo-round2-20261110-102602",
+    "report_path": "/srv/zhixiang/backups/before-seo-round2-20261110-102602/final-report.json",
     "database_uploaded": false,
     "real_payment_or_purchase_performed": false,
-    "release_scope": "Homepage and product metadata, two product public descriptions and three blog articles",
-    "source_record": "docs/history/seo-content-round1-release-20261109.json",
+    "release_scope": "GPT landing page, homepage entry and product/blog links, complete category public HTML",
+    "source_record": "docs/history/seo-content-round2-release-20261110.json",
     "backend_changed": true,
-    "nginx_configuration_changed": false
+    "nginx_configuration_changed": true
   },
   "alipay": {
     "code_and_official_sandbox_query_verified": true,
@@ -2933,7 +2929,7 @@
     "documentation": "docs/bsc-rpc-recovery.md",
     "private_evidence": "deployment/local/bsc-rpc-recovery/verified-report.json"
   },
-  "backend_checked_at": "2026-11-09T08:39:44.581246+00:00",
+  "backend_checked_at": "2026-11-10T02:43:07.075578+00:00",
   "manual_supplier_import": {
     "release": "20261017-233133",
     "source_commit": "ba49f41bfe5aa5c1d023edb539c29bd69fe482d6",
@@ -4239,6 +4235,233 @@
     "rollback": "Restore previous program and storefront; review and reverse only this content change set. Never restore the whole business database.",
     "evidence": "work/codex-runtime/seo-round1-release-20261109/verified-report.json",
     "database_uploaded": false,
+    "production_test_order_created": false,
+    "real_payment_purchase_refund_or_test_email": false,
+    "search_indexing_or_ai_recommendation_verified": false
+  },
+  "seo_content_round2_previous_baseline": {
+    "checked_at": "2026-11-09T08:39:44.581246+00:00",
+    "verified_release_id": "20261109-162247",
+    "source_commit": "cd0307106444b5811273168afe55fdc33b687ae6",
+    "source_tag": "production/seo-content-round1-20261109-162247",
+    "public_verification": {
+      "checked_at": "2026-11-09T08:39:44.581246+00:00",
+      "public_http_checks_passed": 97,
+      "browser_views_checked": 12,
+      "browser_error_count": 0,
+      "production_order_submitted": false,
+      "verification_directory": "work/codex-runtime/seo-round1-release-20261109"
+    },
+    "source_identity_verification": {
+      "source_commit": "cd0307106444b5811273168afe55fdc33b687ae6",
+      "source_branch": "main",
+      "source_dirty": false,
+      "binary_build_info_commit_matches": true,
+      "running_binary_sha256_matches": true,
+      "frontend_deployed": true,
+      "frontend_files_sha256_verified": 426,
+      "admin_files_preserved": 1559,
+      "frontend_verification_scope": "426 build files; 6 existing SVG byte variants preserved; all retained assets and public admin preserved"
+    }
+  },
+  "seo_content_round2_20261110": {
+    "status": "verified",
+    "checked_at": "2026-11-10T02:45:30.320713+00:00",
+    "release": "20261110-102602",
+    "source_commit": "6f1f76639cbfb61d5124280da15eb4f6d3fb8903",
+    "source_tag": "production/seo-content-round2-20261110-102602",
+    "source_dirty": false,
+    "binary_sha256": "077133967f4f617fb5aed28134609f7bd1714f6280b7f56b4fa4519da587a3a7",
+    "binary_bytes": 134889634,
+    "ci": {
+      "id": 42742263533,
+      "conclusion": "success",
+      "url": "https://github.com/cqz-cio/ai-topup-hub/actions/runs/42742263533",
+      "jobs": {
+        "Verify release config": "success",
+        "Verify fullstack build": "success",
+        "Verify API": "success",
+        "Verify installer": "success"
+      }
+    },
+    "scope": [
+      "Existing GPT recharge category landing page and public HTML",
+      "Homepage and catalog GPT group entry links",
+      "12 GPT product and 3 blog return links in the presentation layer",
+      "Shared public copy, canonical, CollectionPage and ItemList, sitemap lastmod"
+    ],
+    "landing_url": "https://www.qzweb.cloud/categories/qzweb-category-4",
+    "local_verification": {
+      "frontendTests": 255,
+      "relatedGoTestsIncludingSubtests": 824,
+      "httpChecks": 138,
+      "scannedPublicFiles": 429,
+      "responsiveWidths": [
+        1920,
+        390,
+        320
+      ],
+      "darkModeWidth": 320,
+      "homepageLink": true,
+      "productAndBlogLinks": true,
+      "searchSortQuantity": true,
+      "noJavascriptText": true
+    },
+    "public_http_checks_passed": 153,
+    "browser_views_checked": 11,
+    "browser_error_count": 0,
+    "browser_interactions": {
+      "quantityIncreaseAndRestore": true,
+      "plusSearchOneMatchingProduct": true,
+      "descendingPriceSort": true,
+      "homepageLandingLink": true,
+      "productAndBlogReturnLinks": true,
+      "guideAnchor": true,
+      "supportPanelOpenClose": true,
+      "cartEmptyEntry": true,
+      "guestOrderEntry": true,
+      "productionTestOrderCreated": false,
+      "realPaymentPurchaseRefundOrTestEmail": false
+    },
+    "viewports_requested": [
+      1920,
+      390,
+      320
+    ],
+    "browser_client_widths": [
+      310,
+      380,
+      1910
+    ],
+    "public_files_verified": 429,
+    "retained_storefront_files": 11139,
+    "admin_files_preserved": 1559,
+    "public_build_files_scanned": 552,
+    "nginx_files_preserved": 25,
+    "nginx_changed_files": [
+      "/etc/nginx/conf.d/cardnet-qzweb-www.conf"
+    ],
+    "nginx_change_scope": "Append categories to the existing public HTML route expression; preserve all other configuration",
+    "backend_previous_release": "20261109-162247",
+    "storefront_previous_release": "20261109-162247",
+    "admin_preserved_release": "20261029-181554",
+    "support_preserved_release": "20261106-110800",
+    "paiplus_preserved_release": "20261103-153828",
+    "private_configuration_preserved": true,
+    "prices_settings_payments_copy_mappings_preserved": true,
+    "redis_paiplus_support_pids_preserved": true,
+    "support_model_enabled": false,
+    "usdt_cny_rates": {
+      "/bsc_usdt": "6.65",
+      "/plasma_usdt": "6.65",
+      "/tron_usdt": "6.65"
+    },
+    "services": {
+      "nginx": "active",
+      "zhixiang-shop": "active",
+      "zhixiang-redis": "active",
+      "paiplus": "active",
+      "zhixiang-support": "active",
+      "zhixiang-stock-sync.timer": "active",
+      "zhixiang-86gamestore-stock-sync.timer": "active"
+    },
+    "stock_services": {
+      "zhixiang-stock-sync.service": {
+        "Result": "success",
+        "ExecMainStartTimestamp": "Tue 2026-11-10 10:36:24 CST",
+        "ExecMainExitTimestamp": "Tue 2026-11-10 10:36:32 CST",
+        "ExecMainStatus": "0"
+      },
+      "zhixiang-86gamestore-stock-sync.service": {
+        "Result": "success",
+        "ExecMainStartTimestamp": "Tue 2026-11-10 10:35:14 CST",
+        "ExecMainExitTimestamp": "Tue 2026-11-10 10:35:19 CST",
+        "ExecMainStatus": "0"
+      }
+    },
+    "business_tables_checked": 73,
+    "business_tables_unchanged_at_cutover": 72,
+    "cutover_runtime_changed_tables": [
+      "chain_payment_cursors"
+    ],
+    "business_tables_unchanged_after_stock": 64,
+    "runtime_table_changes_after_stock": {
+      "admins": {
+        "added": 0,
+        "removed": 0,
+        "changed_columns": [
+          "last_login_at"
+        ]
+      },
+      "admin_login_logs": {
+        "added": 1,
+        "removed": 0,
+        "changed_columns": []
+      },
+      "products": {
+        "added": 0,
+        "removed": 0,
+        "changed_columns": [
+          "manual_stock_total",
+          "updated_at"
+        ]
+      },
+      "product_skus": {
+        "added": 0,
+        "removed": 0,
+        "changed_columns": [
+          "manual_stock_total",
+          "updated_at"
+        ]
+      },
+      "product_mappings": {
+        "added": 0,
+        "removed": 0,
+        "changed_columns": [
+          "last_synced_at",
+          "updated_at"
+        ]
+      },
+      "sku_mappings": {
+        "added": 0,
+        "removed": 0,
+        "changed_columns": [
+          "stock_synced_at",
+          "updated_at",
+          "upstream_stock"
+        ]
+      },
+      "chain_payment_cursors": {
+        "added": 0,
+        "removed": 0,
+        "changed_columns": [
+          "next_block",
+          "previous_hash",
+          "updated_at"
+        ]
+      },
+      "ellaix_catalog_meta": {
+        "added": 0,
+        "removed": 0,
+        "changed_columns": [
+          "last_at"
+        ]
+      },
+      "ellaix_catalog_items": {
+        "added": 0,
+        "removed": 0,
+        "changed_columns": [
+          "last_seen",
+          "missing_count"
+        ]
+      }
+    },
+    "public_product_count": 25,
+    "backup": "/srv/zhixiang/backups/before-seo-round2-20261110-102602",
+    "rollback": "Restore both backend and storefront 20261109-162247 and the saved main storefront Nginx configuration; validate and reload Nginx. Do not restore the business database.",
+    "evidence": "work/codex-runtime/seo-round2-release-20261110/verified-report.json",
+    "database_uploaded": false,
+    "data_migration": false,
     "production_test_order_created": false,
     "real_payment_purchase_refund_or_test_email": false,
     "search_indexing_or_ai_recommendation_verified": false
