@@ -59,7 +59,7 @@ export default defineConfig(({ mode }) => ({
         target: 'http://127.0.0.1:8085',
         changeOrigin: true,
       },
-      '^/(products|blog)/[^/]+/?$': {
+      '^/(products|blog|categories)/[^/]+/?$': {
         target: 'http://localhost:8080',
         changeOrigin: false,
         bypass(req) {

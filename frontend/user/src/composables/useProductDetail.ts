@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { useHead } from '@unhead/vue'
 import { usePageSeo } from './usePageSeo'
 import { seoPlainText, seoText } from '../utils/seo'
+import { appendRechargeLinks } from '../utils/gptRecharge'
 import { useAppStore } from '../stores/app'
 import { productAPI } from '../api'
 import { getImageUrl } from '../utils/image'
@@ -66,6 +67,10 @@ export function useProductDetail(options: { onLoaded?: () => void } = {}) {
   const loading = ref(true)
   const refreshFailed = ref(false)
   const product = ref<any>(null)
+  const readingContent = computed(() => appendRechargeLinks(
+    getLocalizedText(product.value?.content), 'product', product.value?.slug || '',
+    product.value?.category?.slug || '', appStore.isResellerTenant,
+  ))
   const contactFirst = computed(() => isContactFirstProduct(product.value?.slug))
   const { openContact } = useProductContact()
   const relatedPosts = computed<any[]>(() => product.value?.related_posts || [])
@@ -708,6 +713,7 @@ export function useProductDetail(options: { onLoaded?: () => void } = {}) {
   })
 
   return {
+    readingContent,
     // 国际化/格式化（模板需要）
     getLocalizedText, siteCurrency, formatPrice,
     getPurchaseTypeLabel, getFulfillmentTypeLabel, getStockBadgeVariant, getStockStatusLabel,

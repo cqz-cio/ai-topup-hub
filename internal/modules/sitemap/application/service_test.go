@@ -2,6 +2,7 @@ package application
 
 import (
 	"context"
+	"strings"
 	"testing"
 	"time"
 
@@ -9,12 +10,36 @@ import (
 )
 
 type catalogStub struct {
-	calls int
+	calls      int
+	categories []contract.Category
 }
 
 func (c *catalogStub) ListActiveCategories() ([]contract.Category, error) {
 	c.calls++
-	return nil, nil
+	return c.categories, nil
+}
+
+func TestRechargeCategoryKeepsURLAndUsesActualEditorialDate(t *testing.T) {
+	catalog := &catalogStub{categories: []contract.Category{
+		{Slug: "qzweb-category-4", CreatedAt: time.Date(2026, 10, 1, 0, 0, 0, 0, time.UTC)},
+		{Slug: "other", CreatedAt: time.Date(2026, 10, 2, 0, 0, 0, 0, time.UTC)},
+	}}
+	service, err := NewService(catalog, &postStub{}, &cacheStub{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	entries, err := service.collectURLs(context.Background(), "https://www.qzweb.cloud")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, entry := range entries {
+		if strings.HasSuffix(entry.Location, "/categories/qzweb-category-4") && entry.LastModified != "2026-11-10" {
+			t.Fatal(entry)
+		}
+		if strings.HasSuffix(entry.Location, "/categories/other") && entry.LastModified != "2026-10-02" {
+			t.Fatal("unrelated category date changed")
+		}
+	}
 }
 
 func (c *catalogStub) ListActiveProducts(int) ([]contract.Product, error) {

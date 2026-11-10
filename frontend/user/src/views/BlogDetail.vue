@@ -57,7 +57,7 @@
           </header>
 
           <!-- Post Content -->
-          <div v-html="processHtmlForDisplay(getLocalizedText(post.content))"
+          <div v-html="processHtmlForDisplay(readingContent)"
             class="prose prose-lg max-w-none dark:prose-invert theme-prose">
           </div>
 
@@ -131,7 +131,7 @@ import { useBlogDetail } from '../composables/useBlogDetail'
 const { t } = useI18n()
 
 const {
-  loading, post, relatedProducts, getLocalizedText, formatDate, formatPrice, backLink, backText,
+  loading, post, readingContent, relatedProducts, getLocalizedText, formatDate, formatPrice, backLink, backText,
 } = useBlogDetail()
 const summaryExpanded = ref(false)
 watch(() => post.value?.id, () => { summaryExpanded.value = false })

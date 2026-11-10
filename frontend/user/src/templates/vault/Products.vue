@@ -6,6 +6,7 @@
       <span class="min-w-0 truncate text-foreground">{{ pageTitle }}</span>
     </nav>
     <h1 class="mb-3.5 break-words text-3xl font-extrabold">{{ pageTitle }}</h1>
+    <p v-if="isRechargePage" class="mb-5 text-sm leading-relaxed">{{ gptRecharge.summary }}</p>
 
     <div class="grid items-start gap-7 py-1.5 pb-9 lg:grid-cols-[248px_1fr]">
       <!-- 筛选侧栏：桌面竖排 + 移动端横向 chips -->
@@ -76,6 +77,7 @@
       </section>
     </div>
 
+    <section v-if="isRechargePage && !loading && !loadFailed" class="mb-8" aria-label="GPT 充值购买须知"><ProductDetailContent :html="gptRechargeHtml" /></section>
     <ProductQuickBuy
       v-if="quickBuyProduct"
       :product="quickBuyProduct"
@@ -94,6 +96,9 @@ import { Button } from '@/components/ui/button'
 import { useProductList } from '../../composables/useProductList'
 import { usePageSeo } from '../../composables/usePageSeo'
 import { useLocalized } from '../../composables/useProduct'
+import { useAppStore } from '../../stores/app'
+import { gptRecharge, gptRechargeHtml } from '../../utils/gptRecharge'
+import ProductDetailContent from '../../components/product/ProductDetailContent.vue'
 import type { PublicCategory } from '../../utils/category'
 import VaultProductCard from './components/VaultProductCard.vue'
 import VaultCategorySidebar from './components/VaultCategorySidebar.vue'
@@ -103,6 +108,8 @@ import { splitCodexCredits } from '../../utils/codexCredits'
 
 const { t } = useI18n()
 const route = useRoute()
+const appStore = useAppStore()
+const isRechargePage = computed(() => route.params.slug === gptRecharge.categorySlug && !appStore.isResellerTenant)
 const { getLocalizedText } = useLocalized()
 
 const quickBuyProduct = ref<any>(null)
@@ -144,6 +151,7 @@ const selectedCategoryName = computed(() => {
 })
 
 const pageTitle = computed(() => {
+  if (isRechargePage.value) return gptRecharge.title
   if (route.name === 'category-products') return selectedCategoryName.value || t('nav.products')
   return t('nav.products')
 })
@@ -166,8 +174,9 @@ const resetFilters = () => {
 }
 
 usePageSeo({
-  canonicalPath: () => route.path,
-  title: () => pageTitle.value,
+  canonicalPath: () => isRechargePage.value ? gptRecharge.path : route.path,
+  title: () => isRechargePage.value ? gptRecharge.seoTitle : pageTitle.value,
+  description: () => isRechargePage.value ? gptRecharge.summary : undefined,
 })
 
 onMounted(() => { void initialize() })

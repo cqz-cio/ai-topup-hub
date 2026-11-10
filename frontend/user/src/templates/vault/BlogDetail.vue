@@ -33,7 +33,7 @@
 
         <div
           class="prose max-w-none dark:prose-invert prose-a:text-primary prose-img:rounded-md"
-          v-html="processHtmlForDisplay(getLocalizedText(post.content))"
+          v-html="processHtmlForDisplay(readingContent)"
         ></div>
 
         <!-- 相关商品 -->
@@ -91,6 +91,6 @@ import { useBlogDetail } from '../../composables/useBlogDetail'
 const { t } = useI18n()
 
 const {
-  loading, post, relatedProducts, getLocalizedText, formatDate, formatPrice, backLink, backText,
+  loading, post, readingContent, relatedProducts, getLocalizedText, formatDate, formatPrice, backLink, backText,
 } = useBlogDetail()
 </script>

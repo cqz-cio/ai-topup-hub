@@ -26,7 +26,7 @@
 
     <main id="catalog-content" class="catalog-section" tabindex="-1">
       <div class="catalog-toolbar">
-        <div><p class="commerce-eyebrow">{{ t('shopUi.catalog') }}</p><component :is="catalogOnly ? 'h1' : 'h2'" class="catalog-title">{{ search.trim() ? t('shopUi.searchResults') : (selectedCategory || t('shopUi.allProducts')) }}<span v-if="!initialLoading && !loadFailed" role="status">{{ t('shopUi.productCount', { count: visibleProducts.length }) }}</span></component></div>
+        <div><p class="commerce-eyebrow">{{ t('shopUi.catalog') }}</p><component :is="catalogOnly ? 'h1' : 'h2'" class="catalog-title">{{ isRechargePage ? gptRecharge.title : (search.trim() ? t('shopUi.searchResults') : (selectedCategory || t('shopUi.allProducts'))) }}<span v-if="!initialLoading && !loadFailed" role="status">{{ t('shopUi.productCount', { count: visibleProducts.length }) }}</span></component></div>
         <label class="catalog-search">
           <Search :size="18" aria-hidden="true" /><span class="sr-only">{{ t('shopUi.search') }}</span>
           <input v-model="search" type="search" :placeholder="t('shopUi.search')" />
@@ -56,6 +56,7 @@
           </div>
         </aside>
         <div class="catalog-main">
+          <p v-if="isRechargePage" class="recharge-intro">{{ gptRecharge.summary }} <a class="store-text-link" href="#gpt-recharge-guide">查看购买须知<ArrowRight :size="14" aria-hidden="true" /></a></p>
           <div class="delivery-notice"><Info :size="15" aria-hidden="true" /><p><span class="full-delivery-hint">{{ t('shopUi.deliveryNotice') }}</span><span class="compact-delivery-hint">{{ t('shopUi.chooseProductHint') }}</span></p></div>
           <div v-if="initialLoading" class="product-grid" :aria-label="t('shopUi.loading')" aria-busy="true">
             <div v-for="index in 6" :key="index" class="product-skeleton"><div></div><p></p><p></p><p></p></div>
@@ -72,6 +73,7 @@
           <section v-for="group in visibleProductGroups" :key="group.category" class="catalog-group" :aria-label="group.category">
           <header class="catalog-group-heading">
             <h3>{{ group.category }}<span>{{ t('shopUi.productCount', { count: group.products.length }) }}</span></h3>
+            <RouterLink v-if="!isRechargePage && !appStore.isResellerTenant && group.products.some(product => gptRecharge.productCategories.includes(product.category?.slug || ''))" :to="gptRecharge.path" class="store-text-link">GPT 充值方案与购买须知<ArrowUpRight :size="14" aria-hidden="true" /></RouterLink>
             <OceanPriceSort
               :model-value="categoryPriceOrders[group.category] || 'asc'"
               :category="group.category"
@@ -91,6 +93,9 @@
           </section>
           </template>
           <p class="catalog-note">{{ t('shopUi.catalogHint') }}</p>
+          <section v-if="isRechargePage && !initialLoading && !loadFailed" id="gpt-recharge-guide" class="recharge-guide" aria-label="GPT 充值购买须知">
+            <ProductDetailContent :html="gptRechargeHtml" reading-surface />
+          </section>
         </div>
       </div>
     </main>
@@ -118,6 +123,9 @@ import { categoryAPI, productAPI } from '../api/product'
 import { useAppStore } from '../stores/app'
 import { useUserAuthStore } from '../stores/userAuth'
 import { usePageSeo } from '../composables/usePageSeo'
+import { useHead } from '@unhead/vue'
+import { gptRecharge, gptRechargeHtml } from '../utils/gptRecharge'
+import ProductDetailContent from '../components/product/ProductDetailContent.vue'
 import AnnouncementModal from '../components/AnnouncementModal.vue'
 import CodexCreditsSection from '../components/commerce/CodexCreditsSection.vue'
 import StorefrontProductCard from '../components/commerce/StorefrontProductCard.vue'
@@ -146,6 +154,7 @@ const { catalogOnly = false } = defineProps<{ catalogOnly?: boolean }>()
 const route = useRoute()
 const router = useRouter()
 const appStore = useAppStore()
+const isRechargePage = computed(() => catalogOnly && route.params.slug === gptRecharge.categorySlug && !appStore.isResellerTenant)
 const { shouldShow } = useAnnouncement()
 const activeAnnouncement = computed<HomeAnnouncement | undefined>(() => appStore.config?.announcement)
 const announcementVisible = ref(false)
@@ -375,9 +384,22 @@ const copyWechat = async () => {
   }, 3000)
 }
 usePageSeo({
-  title: () => catalogOnly ? (selectedCategory.value || t('nav.products')) : undefined,
-  description: () => catalogOnly ? t('shopUi.catalogHint') : undefined,
-  canonicalPath: () => catalogOnly ? route.path : '/',
+  title: () => isRechargePage.value ? gptRecharge.seoTitle : catalogOnly ? (selectedCategory.value || t('nav.products')) : undefined,
+  description: () => isRechargePage.value ? gptRecharge.summary : catalogOnly ? t('shopUi.catalogHint') : undefined,
+  canonicalPath: () => isRechargePage.value ? gptRecharge.path : catalogOnly ? route.path : '/',
+})
+useHead(() => {
+  if (!isRechargePage.value || initialLoading.value || loadFailed.value) return { script: [] }
+  const origin = String(appStore.config?.brand?.site_url || window.location.origin).replace(/\/+$/, '')
+  const items = sortStorefrontProducts(products.value.filter(product => product.category?.slug === gptRecharge.categorySlug), 'asc')
+  const schema = {
+    '@context': 'https://schema.org', '@type': 'CollectionPage', name: gptRecharge.title,
+    description: gptRecharge.summary, url: origin + gptRecharge.path,
+    mainEntity: { '@type': 'ItemList', itemListElement: items.map((product, index) => ({
+      '@type': 'ListItem', position: index + 1, name: productTitle(product), url: `${origin}/products/${encodeURIComponent(product.slug)}`,
+    })) },
+  }
+  return { script: [{ key: 'category-schema', type: 'application/ld+json', innerHTML: JSON.stringify(schema).replace(/</g, '\\u003c') }] }
 })
 onMounted(() => {
   void refreshProducts()
@@ -453,6 +475,8 @@ onUnmounted(() => {
 .purchase-help > span { display: block; font-size: 10px; color: var(--ui-text-muted); }
 .wechat-copy { display: flex; gap: 8px; align-items: center; border: none; background: transparent; padding: 4px 0; color: var(--ui-text-primary); font-size: 14px; cursor: pointer; font-weight: 600; word-break: break-all; }
 .catalog-main { min-width: 0; }
+.recharge-intro { margin-bottom: 20px; font-size: 14px; line-height: 1.85; color: var(--ui-text-primary); }
+.recharge-guide { margin-top: 32px; scroll-margin-top: 100px; }
 .catalog-group + .catalog-group { margin-top: 32px; }
 .catalog-group-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin: 0 0 16px; }
 .catalog-group-heading h3 { min-width: 0; font-size: 18px; font-weight: 700; overflow-wrap: anywhere; }

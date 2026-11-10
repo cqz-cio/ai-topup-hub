@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { processHtmlForDisplay } from '../../utils/content'
 
-const props = defineProps<{ html: string }>()
+const props = defineProps<{ html: string; readingSurface?: boolean }>()
 const sections = computed(() => {
   const doc = new DOMParser().parseFromString(processHtmlForDisplay(props.html), 'text/html')
   const groups: string[][] = []
@@ -21,7 +21,7 @@ const sections = computed(() => {
 
 <template>
   <div class="product-content-sections" :class="{ 'three-sections': sections.length === 3 }">
-    <section v-for="(section, index) in sections" :key="index" class="product-content-section prose dark:prose-invert max-w-none" v-html="section"></section>
+    <section v-for="(section, index) in sections" :key="index" class="product-content-section prose dark:prose-invert max-w-none" :class="{ 'ocean-reading-surface': readingSurface }" v-html="section"></section>
   </div>
 </template>
 

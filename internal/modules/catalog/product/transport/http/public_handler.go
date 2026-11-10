@@ -242,6 +242,24 @@ func (h *PublicHandler) ReadAnonymousProduct(ctx context.Context, slug string) (
 	return result, err
 }
 
+// ListAnonymousProductSlugs shares the public API's active-category and tenant
+// visibility rules. Only identifiers cross into the public document renderer.
+func (h *PublicHandler) ListAnonymousProductSlugs(ctx context.Context, category string, page, pageSize int) ([]string, int64, error) {
+	tenant, ok := reseller.TenantFromContext(ctx)
+	if !ok {
+		tenant = reseller.MainTenantContext("")
+	}
+	rows, total, err := h.products.ListPublicForTenant(tenant, category, "", page, pageSize)
+	if err != nil {
+		return nil, 0, err
+	}
+	slugs := make([]string, 0, len(rows))
+	for _, row := range rows {
+		slugs = append(slugs, row.Slug)
+	}
+	return slugs, total, nil
+}
+
 func (h *PublicHandler) readPublicProduct(ctx context.Context, tenant reseller.TenantContext, slug string, level *memberleveldomain.MemberLevel) (productpresenter.Product, uint, error) {
 	empty := productpresenter.Product{}
 	product, err := h.products.GetPublicBySlugForTenant(tenant, slug)

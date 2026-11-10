@@ -23,8 +23,9 @@ type sourceStub struct {
 func (s *sourceStub) Site(context.Context) (Site, error) {
 	return Site{"青栀商城", "http://127.0.0.1:4170", "CNY"}, s.siteErr
 }
-func (s *sourceStub) Product(context.Context, string) (Page, error) { return s.page, s.err }
-func (s *sourceStub) Post(context.Context, string) (Page, error)    { return s.page, s.err }
+func (s *sourceStub) Product(context.Context, string) (Page, error)  { return s.page, s.err }
+func (s *sourceStub) Post(context.Context, string) (Page, error)     { return s.page, s.err }
+func (s *sourceStub) Category(context.Context, string) (Page, error) { return s.page, s.err }
 
 func request(t *testing.T, source *sourceStub, method, path, agent string) *httptest.ResponseRecorder {
 	t.Helper()
@@ -164,5 +165,36 @@ func TestProductMetadataDoesNotRenameVisibleProduct(t *testing.T) {
 	body = request(t, s, "GET", "/products/item", "").Body.String()
 	if !strings.Contains(body, `<title data-public-page-seo>原商品名 - 青栀商城</title>`) || !strings.Contains(body, `name="description" content="商品卡片摘要"`) {
 		t.Fatal("empty metadata must fall back to the public product copy")
+	}
+}
+
+func TestCategoryDocumentHasVisiblePricesLinksAndCollectionSchema(t *testing.T) {
+	s := &sourceStub{page: Page{Kind: "category", Path: "/categories/gpt", Title: "GPT 充值", SEOTitle: "GPT充值与购买须知", Summary: "核对账号条件", Content: `<h2>购买前</h2><p>不是官方授权</p><a href="/blog/help">教程</a>`, Items: []Item{
+		{Title: "Plus", Path: "/products/plus", Price: "130.00", Availability: "https://schema.org/InStock"},
+		{Title: "Pro", Path: "/products/pro", Price: "700.00", Availability: "https://schema.org/OutOfStock"},
+	}}}
+	w := request(t, s, "GET", "/categories/gpt?source=test", "")
+	body := w.Body.String()
+	for _, want := range []string{`href="https://www.qzweb.cloud/categories/gpt"`, `href="/products/plus"`, `href="/products/pro"`, "130.00 CNY", "暂时缺货", "核对账号条件", "不是官方授权", `"@type":"CollectionPage"`, `"@type":"ItemList"`, `content="website"`} {
+		if !strings.Contains(body, want) {
+			t.Errorf("missing %s", want)
+		}
+	}
+	for _, agent := range []string{"Googlebot", "bingbot", "OAI-SearchBot"} {
+		if got := request(t, s, "GET", "/categories/gpt?source=test", agent).Body.String(); got != body {
+			t.Fatal("UA-dependent content")
+		}
+	}
+	if head := request(t, s, "HEAD", "/categories/gpt", ""); head.Code != 200 || head.Body.Len() != 0 {
+		t.Fatal("HEAD contract")
+	}
+	for _, tc := range []struct {
+		err    error
+		status int
+	}{{ErrNotFound, 404}, {errors.New("private failure"), 503}} {
+		w := request(t, &sourceStub{err: tc.err}, "GET", "/categories/gpt", "")
+		if w.Code != tc.status || w.Header().Get("X-Robots-Tag") != "noindex" {
+			t.Fatal("incorrect category error semantics")
+		}
 	}
 }

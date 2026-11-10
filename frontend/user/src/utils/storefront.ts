@@ -3,7 +3,7 @@ export interface StorefrontProduct {
   slug: string
   title: unknown
   description?: unknown
-  category?: { name?: unknown }
+  category?: { name?: unknown; slug?: string }
   images?: string[] | { images?: string[] }
   price_amount: unknown
   effective_price_amount?: unknown

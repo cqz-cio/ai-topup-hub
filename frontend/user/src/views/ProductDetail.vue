@@ -345,7 +345,7 @@
             <span class="w-1.5 h-8 bg-primary rounded-full"></span>
             {{ t('productDetail.details') }}
           </h2>
-          <ProductDetailContent :html="getLocalizedText(product.content)" />
+          <ProductDetailContent :html="readingContent" />
         </div>
 
         <!-- Related Posts -->
@@ -462,7 +462,7 @@ const {
   hasSkuPromotionPrice, getSkuPromotionSaveAmount,
   hasPromotionRules, getPromotionRules,
   formatPromotionRule, formatWholesaleTier, formatRelatedPostDate, normalizeSkuId,
-  loading, product, relatedPosts, currentImage, selectedSkuId, quantity, purchaseWarning,
+  loading, product, readingContent, relatedPosts, currentImage, selectedSkuId, quantity, purchaseWarning,
   activeSkus, selectedSku,
   selectedSkuMemberPrice, hasMemberPrice,
   hasSelectedSkuWholesalePrice, selectedSkuWholesaleFinalIsMember, selectedSkuWholesaleFinalPrice,

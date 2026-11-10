@@ -10,6 +10,7 @@ import (
 
 	"github.com/dujiao-next/internal/modules/sitemap/contract"
 	"github.com/dujiao-next/internal/modules/sitemap/domain"
+	"github.com/dujiao-next/internal/platform/publiccontent"
 )
 
 // Service 生成 sitemap.xml / robots.txt 内容。
@@ -147,9 +148,14 @@ func (s *Service) collectURLs(ctx context.Context, baseURL string) ([]domain.URL
 		return nil, fmt.Errorf("sitemap: list categories: %w", err)
 	}
 	for _, cat := range categories {
+		lastModified := cat.CreatedAt.UTC().Format("2006-01-02")
+		guide := publiccontent.GPTRecharge()
+		if cat.Slug == guide.CategorySlug && lastModified < guide.UpdatedAt {
+			lastModified = guide.UpdatedAt
+		}
 		entries = append(entries, domain.URL{
 			Location:        baseURL + "/categories/" + url.PathEscape(cat.Slug),
-			LastModified:    cat.CreatedAt.UTC().Format("2006-01-02"),
+			LastModified:    lastModified,
 			ChangeFrequency: "weekly",
 			Priority:        "0.7",
 		})

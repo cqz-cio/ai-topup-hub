@@ -1,0 +1,37 @@
+{
+  "categorySlug": "qzweb-category-4",
+  "path": "/categories/qzweb-category-4",
+  "updatedAt": "2026-11-10",
+  "title": "GPT 充值",
+  "seoTitle": "GPT充值｜ChatGPT Plus、Pro 方案与购买须知",
+  "summary": "了解 ChatGPT Plus、Pro 的充值方式，先核对账号地区、当前订阅和开通条件，再选择兑换码或人工充值。下方为自助兑换商品，未到期或需要覆盖充值请查看对应人工商品。",
+  "sections": [
+    {
+      "title": "Plus、Pro 充值怎么选？",
+      "html": "<p>给自己的 ChatGPT 账号充值，请先区分自助兑换和人工充值。本站提供独立第三方服务，不是 OpenAI 官方网站，也不代表官方授权。</p><ul><li><a href=\"/products/qzweb-5\">ChatGPT Plus 自助兑换码</a>：付款后在订单内领取，按说明完成账号预检和兑换。</li><li><a href=\"/products/86gamestore-88\">ChatGPT Plus 人工充值</a>：适用条件、覆盖方式和交付时间请以该商品说明为准。</li><li>ChatGPT Pro：本页商品按地区、套餐档位与新开通／续费区分；如需人工处理，可查看<a href=\"/categories/gpt-overwrite-topup\">GPT 人工及覆盖充值商品</a>。</li></ul><p>这些商品用于 ChatGPT 订阅，不是 OpenAI API 余额，也不是给现有账号购买 Codex 点数。</p>"
+    },
+    {
+      "title": "充值前需要确认什么？",
+      "html": "<ol><li>确认登录的是需要充值的账号，查看当前套餐、到期时间和原订阅渠道。</li><li>核对商品要求的账号地区、支付方式及新开通或续费资格；不同地区、档位的兑换码不能默认通用。</li><li>已有订阅时，先阅读<a href=\"/blog/chatgpt-plus-renewal-rules\">Plus 到期续费与覆盖充值的区别</a>。剩余时间是否保留、能否叠加，应按所选商品规则确认；Pro 不直接套用 Plus 规则。</li><li>不确定账号是否适用时，先联系本站客服确认，再购买。</li></ol>"
+    },
+    {
+      "title": "GPT 充值多少钱，付款后收到什么？",
+      "html": "<p>商品卡片显示当前售价和库存；具体规格、优惠、可用支付渠道及手续费，在商品详情和结算页核对。不要把不同地区或套餐档位的价格当成同一种服务比较。</p><p>自动发码商品的交付内容在订单内领取，收到兑换码并不等于账号已经开通，需要继续按说明兑换。人工商品按详情要求提交必要资料并等待处理。游客请保存下单邮箱与查询密码，通过<a href=\"/guest/orders\">游客查单</a>领取；会员可到<a href=\"/me/orders\">我的订单</a>查看。</p>"
+    },
+    {
+      "title": "如何确认成功，失败了怎么办？",
+      "html": "<p>充值完成后，回到自己的 ChatGPT 账号核对套餐状态与到期时间。不要只凭付款成功或收到卡密判断开通完成。</p><p>遇到预检不通过、兑换报错或订阅未更新，先保存订单号、错误提示和操作时间，暂停重复购买或兑换，联系本站客服。不要在公开评论中发布卡密、密码或账号凭证。</p><p>使用期限与质保期不同。是否支持退款、补差价重开及具体计算方式，以所购商品说明和实际处理结果为准；本站不作所有套餐通用的退款承诺。</p>"
+    },
+    {
+      "title": "GPT 充值与使用指南",
+      "html": "<ul><li><a href=\"/blog/chatgpt-payment-methods\">ChatGPT 充值方式有哪些？订阅渠道、账号条件与注意事项</a></li><li><a href=\"/blog/chatgpt-plus-code-guide\">ChatGPT Plus 兑换码怎么用？从领取到核对开通结果</a></li><li><a href=\"/blog/chatgpt-plus-renewal-rules\">ChatGPT Plus 没到期能充值吗？到期续费与覆盖充值的区别</a></li></ul><p>本文帮助你选择本站服务，产品名称仅用于说明服务对象。具体订阅功能与官方规则请以相应产品的官方说明为准。</p>"
+    }
+  ],
+  "productCategories": ["qzweb-category-4", "gpt-overwrite-topup"],
+  "blogSlugs": ["chatgpt-payment-methods", "chatgpt-plus-code-guide", "chatgpt-plus-renewal-rules"],
+  "relatedHeading": "继续了解 GPT 充值",
+  "relatedLinks": [
+    {"title": "GPT 充值方案与购买须知", "path": "/categories/qzweb-category-4"},
+    {"title": "ChatGPT 充值方式与账号条件", "path": "/blog/chatgpt-payment-methods"}
+  ]
+}

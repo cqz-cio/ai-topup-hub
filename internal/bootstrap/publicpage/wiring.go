@@ -5,30 +5,47 @@ import (
 	"errors"
 	"net/url"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/dujiao-next/internal/app/container"
 	"github.com/dujiao-next/internal/constants"
+	categorydomain "github.com/dujiao-next/internal/modules/catalog/category/domain"
 	productcontract "github.com/dujiao-next/internal/modules/catalog/product/contract"
 	producthttp "github.com/dujiao-next/internal/modules/catalog/product/transport/http"
+	productpresenter "github.com/dujiao-next/internal/modules/catalog/product/transport/presenter"
 	contentcontract "github.com/dujiao-next/internal/modules/content/contract"
 	contenthttp "github.com/dujiao-next/internal/modules/content/transport/http"
 	resellerapp "github.com/dujiao-next/internal/modules/reseller/application"
 	reseller "github.com/dujiao-next/internal/modules/reseller/contract"
 	settingsapp "github.com/dujiao-next/internal/modules/settings/application"
 	"github.com/dujiao-next/internal/platform/http/publicpage"
+	"github.com/dujiao-next/internal/platform/publiccontent"
 	"github.com/dujiao-next/internal/shared/jsonmap"
+	"github.com/shopspring/decimal"
 )
 
+type publicProductReader interface {
+	ReadAnonymousProduct(context.Context, string) (productpresenter.Product, error)
+}
+type categoryReader interface {
+	ListActive() ([]categorydomain.Category, error)
+}
+type catalogReader interface {
+	ListAnonymousProductSlugs(context.Context, string, int, int) ([]string, int64, error)
+}
+
 type source struct {
-	products *producthttp.PublicHandler
-	posts    *contenthttp.PublicHandler
-	settings *settingsapp.Service
-	overlay  *resellerapp.SiteConfigService
+	products   publicProductReader
+	categories categoryReader
+	catalog    catalogReader
+	posts      *contenthttp.PublicHandler
+	settings   *settingsapp.Service
+	overlay    *resellerapp.SiteConfigService
 }
 
 func New(c *container.Container, products *producthttp.PublicHandler, posts *contenthttp.PublicHandler) *publicpage.Handler {
-	return publicpage.New(&source{products: products, posts: posts, settings: c.SettingService, overlay: c.ResellerSiteConfigService})
+	return publicpage.New(&source{products: products, categories: c.CategoryService, catalog: products, posts: posts, settings: c.SettingService, overlay: c.ResellerSiteConfigService})
 }
 
 func (s *source) Site(ctx context.Context) (publicpage.Site, error) {
@@ -74,6 +91,9 @@ func (s *source) Product(ctx context.Context, slug string) (publicpage.Page, err
 		price = *p.EffectivePriceAmount
 	}
 	page := publicpage.Page{Kind: "product", Path: "/products/" + url.PathEscape(p.Slug), Title: localized(p.Title), Summary: localized(p.Description), Content: localized(p.Content), Price: price.String(), Category: localized(p.Category.Name), Images: p.Images, Availability: "https://schema.org/InStock"}
+	if isMainSite(ctx) {
+		page.Content = publiccontent.GPTRecharge().AppendRelated(page.Content, page.Kind, p.Slug, p.Category.Slug)
+	}
 	page.SEOTitle = metadataText(p.SeoMeta["title"])
 	page.SEODescription = metadataText(p.SeoMeta["description"])
 	if p.IsSoldOut {
@@ -121,6 +141,9 @@ func (s *source) Post(ctx context.Context, slug string) (publicpage.Page, error)
 	if p.Type == "notice" {
 		page.Kind = "notice"
 	}
+	if isMainSite(ctx) {
+		page.Content = publiccontent.GPTRecharge().AppendRelated(page.Content, page.Kind, p.Slug, "")
+	}
 	if p.Thumbnail != "" {
 		page.Images = []string{p.Thumbnail}
 	}
@@ -130,6 +153,74 @@ func (s *source) Post(ctx context.Context, slug string) (publicpage.Page, error)
 		if err == nil {
 			page.Links = append(page.Links, publicpage.Link{Title: localized(item.Title), Path: "/products/" + url.PathEscape(item.Slug)})
 		}
+	}
+	return page, nil
+}
+
+func isMainSite(ctx context.Context) bool {
+	tenant, ok := reseller.TenantFromContext(ctx)
+	return !ok || (tenant.IsMain && !tenant.Unavailable)
+}
+
+// Category uses live, publicly listed products. The anonymous detail projection
+// remains responsible for stock masking, tenant visibility and current pricing.
+func (s *source) Category(ctx context.Context, slug string) (publicpage.Page, error) {
+	categories, err := s.categories.ListActive()
+	if err != nil {
+		return publicpage.Page{}, err
+	}
+	var category *categorydomain.Category
+	for i := range categories {
+		if categories[i].Slug == slug {
+			category = &categories[i]
+			break
+		}
+	}
+	if category == nil {
+		return publicpage.Page{}, publicpage.ErrNotFound
+	}
+	page := publicpage.Page{Kind: "category", Path: "/categories/" + url.PathEscape(slug), Title: localized(category.NameJSON)}
+	for number := 1; ; number++ {
+		if err := ctx.Err(); err != nil {
+			return publicpage.Page{}, err
+		}
+		rows, total, err := s.catalog.ListAnonymousProductSlugs(ctx, strconv.FormatUint(uint64(category.ID), 10), number, 100)
+		if err != nil {
+			return publicpage.Page{}, err
+		}
+		for _, slug := range rows {
+			item, err := s.products.ReadAnonymousProduct(ctx, slug)
+			if errors.Is(err, productcontract.ErrNotFound) || errors.Is(err, productcontract.ErrResellerProductNotListed) {
+				continue
+			}
+			if err != nil {
+				return publicpage.Page{}, err
+			}
+			price := item.PriceAmount
+			if item.EffectivePriceAmount != nil {
+				price = *item.EffectivePriceAmount
+			}
+			availability := "https://schema.org/InStock"
+			if item.IsSoldOut {
+				availability = "https://schema.org/OutOfStock"
+			}
+			page.Items = append(page.Items, publicpage.Item{Title: localized(item.Title), Path: "/products/" + url.PathEscape(item.Slug), Price: price.String(), Availability: availability})
+		}
+		if len(rows) == 0 || int64(number*100) >= total {
+			break
+		}
+	}
+	if len(page.Items) == 0 {
+		return publicpage.Page{}, publicpage.ErrNotFound
+	}
+	sort.SliceStable(page.Items, func(i, j int) bool {
+		a, _ := decimal.NewFromString(page.Items[i].Price)
+		b, _ := decimal.NewFromString(page.Items[j].Price)
+		return a.LessThan(b)
+	})
+	guide := publiccontent.GPTRecharge()
+	if slug == guide.CategorySlug && isMainSite(ctx) {
+		page.Title, page.SEOTitle, page.Summary, page.Content = guide.Title, guide.SEOTitle, guide.Summary, guide.HTML()
 	}
 	return page, nil
 }

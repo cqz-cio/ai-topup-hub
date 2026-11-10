@@ -197,7 +197,7 @@
         </div>
         <div class="prose max-w-none dark:prose-invert prose-a:text-primary prose-img:rounded-md">
           <p v-if="getLocalizedText(product.description)">{{ getLocalizedText(product.description) }}</p>
-          <div v-if="product.content" v-html="processHtmlForDisplay(getLocalizedText(product.content))"></div>
+          <div v-if="product.content" v-html="processHtmlForDisplay(readingContent)"></div>
         </div>
       </section>
 
@@ -293,7 +293,7 @@ const {
   hasSkuPromotionPrice, getSkuPromotionSaveAmount,
   hasPromotionRules, getPromotionRules,
   formatPromotionRule, formatWholesaleTier, formatRelatedPostDate, normalizeSkuId,
-  loading, product, relatedPosts, currentImage, selectedSkuId, quantity, purchaseWarning,
+  loading, product, readingContent, relatedPosts, currentImage, selectedSkuId, quantity, purchaseWarning,
   activeSkus, selectedSku,
   selectedSkuMemberPrice, hasMemberPrice,
   hasSelectedSkuWholesalePrice, selectedSkuWholesaleFinalIsMember, selectedSkuWholesaleFinalPrice,

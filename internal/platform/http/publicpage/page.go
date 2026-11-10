@@ -26,6 +26,7 @@ var ErrNotFound = errors.New("public document not found")
 type Site struct{ Name, URL, Currency string }
 type Link struct{ Title, Path string }
 type Fact struct{ Name, Value string }
+type Item struct{ Title, Path, Price, Availability string }
 type Page struct {
 	Kind, Path, Title, Summary, Content string
 	SEOTitle, SEODescription            string
@@ -33,6 +34,7 @@ type Page struct {
 	Images                              []string
 	Facts                               []Fact
 	Links                               []Link
+	Items                               []Item
 	PublishedAt                         *time.Time
 }
 
@@ -40,6 +42,7 @@ type Source interface {
 	Site(context.Context) (Site, error)
 	Product(context.Context, string) (Page, error)
 	Post(context.Context, string) (Page, error)
+	Category(context.Context, string) (Page, error)
 }
 
 type Handler struct {
@@ -57,10 +60,13 @@ func New(source Source) *Handler {
 // Register also preserves /products/* image files in embedded/fullstack mode.
 // The split frontend gateway performs the equivalent file check before proxying.
 func (h *Handler) Register(routes gin.IRoutes, assets fs.FS) {
-	for _, kind := range []string{"products", "blog"} {
+	for _, kind := range []string{"products", "blog", "categories"} {
 		load := h.source.Product
 		if kind == "blog" {
 			load = h.source.Post
+		}
+		if kind == "categories" {
+			load = h.source.Category
 		}
 		handler := func(c *gin.Context) {
 			if assets != nil {
@@ -125,6 +131,13 @@ func (h *Handler) serve(c *gin.Context, load func(context.Context, string) (Page
 	schema := map[string]any{"@context": "https://schema.org", "@type": "BlogPosting", "headline": page.Title, "url": canonical, "mainEntityOfPage": canonical, "description": data.Description, "inLanguage": "zh-CN"}
 	if page.Kind == "notice" {
 		schema["@type"] = "Article"
+	}
+	if page.Kind == "category" {
+		items := make([]map[string]any, 0, len(page.Items))
+		for i, item := range page.Items {
+			items = append(items, map[string]any{"@type": "ListItem", "position": i + 1, "name": item.Title, "url": origin + item.Path})
+		}
+		schema = map[string]any{"@context": "https://schema.org", "@type": "CollectionPage", "name": page.Title, "url": canonical, "description": data.Description, "mainEntity": map[string]any{"@type": "ItemList", "itemListElement": items}}
 	}
 	if page.Kind == "product" {
 		schema = map[string]any{"@context": "https://schema.org", "@type": "Product", "name": page.Title, "url": canonical, "description": data.Description,

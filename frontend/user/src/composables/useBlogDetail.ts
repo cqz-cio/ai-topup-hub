@@ -8,6 +8,7 @@ import { useLocalized } from './useProduct'
 import { usePageSeo } from './usePageSeo'
 import { useHead } from '@unhead/vue'
 import { getImageUrl } from '../utils/image'
+import { appendRechargeLinks } from '../utils/gptRecharge'
 
 /**
  * 文章/公告详情共享逻辑（classic + vault 双模板共用）。
@@ -38,6 +39,10 @@ export function useBlogDetail() {
       day: 'numeric',
     })
   }
+
+  const readingContent = computed(() => appendRechargeLinks(
+    getLocalizedText(post.value?.content), 'article', post.value?.slug || '', '', appStore.isResellerTenant,
+  ))
 
   usePageSeo({
     title: () => post.value ? getLocalizedText(post.value.title) : '',
@@ -101,6 +106,7 @@ export function useBlogDetail() {
   })
 
   return {
+    readingContent,
     loading,
     post,
     relatedProducts,

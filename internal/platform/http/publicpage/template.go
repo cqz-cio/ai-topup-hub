@@ -24,7 +24,7 @@ var documentTemplate = template.Must(template.New("public-detail").Parse(`<!doct
 <meta data-public-page-seo property="og:description" content="{{.Description}}">
 <meta data-public-page-seo property="og:url" content="{{.Canonical}}">
 <meta data-public-page-seo property="og:site_name" content="{{.Site.Name}}">
-<meta data-public-page-seo property="og:type" content="{{if eq .Kind "product"}}product{{else}}article{{end}}">
+<meta data-public-page-seo property="og:type" content="{{if eq .Kind "product"}}product{{else if eq .Kind "category"}}website{{else}}article{{end}}">
 {{range .Images}}<meta data-public-page-seo property="og:image" content="{{.}}">{{end}}
 <script data-public-page-seo type="application/ld+json">{{.Schema}}</script>
 <link rel="stylesheet" href="/storefront-entry.css">
@@ -38,6 +38,7 @@ var documentTemplate = template.Must(template.New("public-detail").Parse(`<!doct
 {{if .PublishedAt}}<time datetime="{{.PublishedAt.Format "2006-01-02T15:04:05Z07:00"}}">{{.PublishedAt.Format "2006-01-02"}}</time>{{end}}
 {{range .Images}}<img class="cover" src="{{.}}" alt="{{$.Title}}">{{end}}
 {{if .Summary}}<div class="summary">{{.Summary}}</div>{{end}}
+{{if .Items}}<section aria-label="在售商品"><h2>商品与当前售价</h2><ul>{{range .Items}}<li><a href="{{.Path}}">{{.Title}}</a> · {{.Price}} {{$.Site.Currency}} · {{if eq .Availability "https://schema.org/OutOfStock"}}暂时缺货{{else}}有货{{end}}</li>{{end}}</ul></section>{{end}}
 {{if eq .Kind "product"}}<p>售价：{{.Price}} {{.Site.Currency}} · {{if eq .Availability "https://schema.org/OutOfStock"}}暂时缺货{{else}}有货{{end}}</p>{{end}}
 {{if .Category}}<p>分类：{{.Category}}</p>{{end}}
 {{if .Facts}}<dl>{{range .Facts}}<dt>{{.Name}}</dt><dd>{{.Value}}</dd>{{end}}</dl>{{end}}
