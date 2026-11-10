@@ -1,0 +1,216 @@
+{
+  "status": "verified",
+  "checked_at": "2026-11-10T08:53:16.364993+00:00",
+  "release": "20261110-163649",
+  "source_commit": "466e48a57e85b04aa229ad1e27d5227327c80f18",
+  "source_tag": "production/seo-delivery-20261110-163649",
+  "source_dirty": false,
+  "binary_sha256": "9d41b69101b38554cf63d4acf4911bebd1de2a89cfd298e8fe1d69e58f163af5",
+  "binary_bytes": 134959266,
+  "ci": {
+    "id": 42783609836,
+    "conclusion": "success",
+    "url": "https://github.com/cqz-cio/ai-topup-hub/actions/runs/42783609836",
+    "jobs": {
+      "Verify installer": "success",
+      "Verify API": "success",
+      "Verify release config": "success",
+      "Verify fullstack build": "success"
+    }
+  },
+  "scope": [
+    "原购买公告完善交付、退款核查及售后说明",
+    "在售商品、GPT 主推页、六篇指南及关于页提供售后入口",
+    "Organization 退货政策链接及 Product / Offer 稳定标识、商家引用"
+  ],
+  "public_policy_url": "https://www.qzweb.cloud/blog/purchase-and-agent-guide",
+  "local_verification": {
+    "storefront_tests": 260,
+    "focused_go_tests_including_subcases": 26,
+    "seo_content_tests": 13,
+    "http_checks": 85,
+    "storefront_admin_types_and_production_builds": "passed",
+    "production_migration_apply_verify_rollback": "passed"
+  },
+  "public_http_checks_passed": 238,
+  "browser_views_and_interactions_checked": 15,
+  "browser_error_count": 0,
+  "viewports_verified": [
+    1920,
+    390,
+    320
+  ],
+  "browser_scope": [
+    "售后正文和内链",
+    "自动商品数量及结算、四种支付渠道及手续费",
+    "人工商品登录保护",
+    "游客查单表单",
+    "购物车空态",
+    "首页搜索与分类排序",
+    "关于页及客服窗口",
+    "手机正文和购买栏"
+  ],
+  "public_files_verified": 428,
+  "retained_storefront_files": 11533,
+  "admin_files_preserved": 1559,
+  "public_build_files_scanned": 551,
+  "nginx_files_preserved": 26,
+  "nginx_changed_files": [],
+  "backend_previous_release": "20261110-133230",
+  "storefront_previous_release": "20261110-133230",
+  "admin_preserved_release": "20261029-181554",
+  "support_preserved_release": "20261106-110800",
+  "paiplus_preserved_release": "20261103-153828",
+  "content_transaction": {
+    "changed_fields": 4,
+    "post_slug": "purchase-and-agent-guide",
+    "post_fields": [
+      "title_json",
+      "summary_json",
+      "content_json"
+    ],
+    "setting_key": "about_page_config",
+    "about_fields": [
+      "services[1].text.zh-CN",
+      "services[3].text.zh-CN",
+      "links[0].title.zh-CN"
+    ],
+    "tables_checked": 73,
+    "unlisted_fields_preserved": true
+  },
+  "content_verification": {
+    "existing_notice_updated": true,
+    "only_approved_about_fields_changed": true,
+    "other_posts_settings_and_translations_preserved": true
+  },
+  "private_configuration_preserved": true,
+  "prices_other_settings_payments_product_copy_mappings_preserved": true,
+  "redis_paiplus_support_pids_preserved": true,
+  "support_model_enabled": false,
+  "usdt_cny_rates": {
+    "/bsc_usdt": "6.65",
+    "/plasma_usdt": "6.65",
+    "/tron_usdt": "6.65"
+  },
+  "services": {
+    "nginx": "active",
+    "zhixiang-shop": "active",
+    "zhixiang-redis": "active",
+    "paiplus": "active",
+    "zhixiang-support": "active",
+    "zhixiang-stock-sync.timer": "active",
+    "zhixiang-86gamestore-stock-sync.timer": "active"
+  },
+  "stock_services": {
+    "zhixiang-stock-sync.service": {
+      "Result": "success",
+      "ExecMainStartTimestamp": "Tue 2026-11-10 16:47:09 CST",
+      "ExecMainExitTimestamp": "Tue 2026-11-10 16:47:19 CST",
+      "ExecMainStatus": "0"
+    },
+    "zhixiang-86gamestore-stock-sync.service": {
+      "Result": "success",
+      "ExecMainStartTimestamp": "Tue 2026-11-10 16:47:09 CST",
+      "ExecMainExitTimestamp": "Tue 2026-11-10 16:47:14 CST",
+      "ExecMainStatus": "0"
+    }
+  },
+  "business_tables_checked": 73,
+  "business_tables_unchanged": 62,
+  "reviewed_business_table_changes": {
+    "admins": {
+      "added": 0,
+      "removed": 0,
+      "changed_columns": [
+        "last_login_at"
+      ]
+    },
+    "admin_login_logs": {
+      "added": 1,
+      "removed": 0,
+      "changed_columns": []
+    },
+    "products": {
+      "added": 0,
+      "removed": 0,
+      "changed_columns": [
+        "manual_stock_total",
+        "updated_at"
+      ]
+    },
+    "product_skus": {
+      "added": 0,
+      "removed": 0,
+      "changed_columns": [
+        "manual_stock_total",
+        "updated_at"
+      ]
+    },
+    "posts": {
+      "added": 0,
+      "removed": 0,
+      "changed_columns": [
+        "content_json",
+        "summary_json",
+        "title_json"
+      ]
+    },
+    "settings": {
+      "added": 0,
+      "removed": 0,
+      "changed_columns": [
+        "value_json"
+      ]
+    },
+    "product_mappings": {
+      "added": 0,
+      "removed": 0,
+      "changed_columns": [
+        "last_synced_at",
+        "updated_at"
+      ]
+    },
+    "sku_mappings": {
+      "added": 0,
+      "removed": 0,
+      "changed_columns": [
+        "stock_synced_at",
+        "updated_at",
+        "upstream_stock"
+      ]
+    },
+    "chain_payment_cursors": {
+      "added": 0,
+      "removed": 0,
+      "changed_columns": [
+        "next_block",
+        "previous_hash",
+        "updated_at"
+      ]
+    },
+    "ellaix_catalog_meta": {
+      "added": 0,
+      "removed": 0,
+      "changed_columns": [
+        "last_at"
+      ]
+    },
+    "ellaix_catalog_items": {
+      "added": 0,
+      "removed": 0,
+      "changed_columns": [
+        "last_seen",
+        "missing_count"
+      ]
+    }
+  },
+  "backup": "/srv/zhixiang/backups/before-seo-delivery-20261110-163649",
+  "rollback": "协调恢复后端和商城 20261110-133230；使用备份中的 content_release.py 按比较更新回退本次四个字段，不恢复整个业务数据库。Nginx 未改。",
+  "database_uploaded": false,
+  "production_test_order_created": false,
+  "real_payment_purchase_refund_or_test_email": false,
+  "new_reviews_or_ratings": false,
+  "search_index_rank_or_ai_citation_verified": false,
+  "search_console_optional_review_warnings_may_remain": true,
+  "private_evidence": "work/codex-runtime/seo-delivery-release-20261110/verified-report.json"
+}
