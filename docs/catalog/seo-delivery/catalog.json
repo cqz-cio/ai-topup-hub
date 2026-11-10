@@ -1,0 +1,25 @@
+{
+  "slug": "purchase-and-agent-guide",
+  "title": "购买、交付与售后说明",
+  "summary": "了解数字商品的自动与人工交付、订单查询、卡密兑换、退款申请和异常核查流程。ChatGPT Plus 未使用卡密与掉订阅按所购商品规则处理；包含本站客服、开票与代理合作入口。",
+  "file": "purchase-and-agent-guide.html",
+  "before_sha256": {
+    "title": "5634657f3fb530626b43e2451cd571db34017eac6db38e7a6caed3fa27f6d388",
+    "summary": "cc7587218bdc6f52063ea49aa48c7f94fc6543225cd682860a9a001a10329888",
+    "content": "89bf11fd373b375a76b7d3a3079902f90d61bc558cc17e3b96ba8928e627245d"
+  },
+  "about": [
+    {
+      "section": "services", "index": 1, "field": "text", "identity": "付款后，查看交付进度",
+      "before": "标注“自动发货”的商品，系统确认付款后自动处理。卡密与交付状态可在订单中查看；如状态长时间未更新，请提供订单号联系客服核查。"
+    },
+    {
+      "section": "services", "index": 3, "field": "text", "identity": "遇到异常，协助核查处理",
+      "before": "卡密校验失败、兑换报错或充值状态异常时，请提供订单号、问题描述及必要截图。具体质保期限、适用范围和处理方式以对应商品说明为准。"
+    },
+    {
+      "section": "links", "index": 0, "field": "title", "identity": "/blog/purchase-and-agent-guide",
+      "before": "购买须知与代理合作"
+    }
+  ]
+}

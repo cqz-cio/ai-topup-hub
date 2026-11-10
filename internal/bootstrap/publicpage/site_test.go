@@ -62,7 +62,14 @@ func TestHomeUsesLiveAnonymousPricesAndWhitelistedSiteConfig(t *testing.T) {
 	if err != nil || site.Name != "π星卡社" || site.Logo != "/brand/logo.png" {
 		t.Fatal(site, err)
 	}
+	if site.ReturnPolicyPath != "/blog/purchase-and-agent-guide" {
+		t.Fatal("main-store policy missing")
+	}
 	ctx := reseller.WithTenantContext(context.Background(), reseller.ResellerTenantContext("tenant.example", 3, 4, "tenant.example"))
+	resellerSite, err := s.Site(ctx)
+	if err != nil || resellerSite.ReturnPolicyPath != "" {
+		t.Fatal("main-store policy crossed tenant boundary", resellerSite, err)
+	}
 	page, err = s.Home(ctx)
 	if err != nil || strings.Contains(page.Content, "保存邮箱") || len(page.Links) != 0 {
 		t.Fatal("main-home editorial content crossed tenant boundary")

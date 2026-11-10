@@ -23,7 +23,7 @@ import (
 
 var ErrNotFound = errors.New("public document not found")
 
-type Site struct{ Name, URL, Currency, Logo, Description string }
+type Site struct{ Name, URL, Currency, Logo, Description, ReturnPolicyPath string }
 type Link struct{ Title, Path string }
 type Fact struct{ Name, Value string }
 type Item struct{ Title, Path, Price, Availability, Summary, Category string }
@@ -192,8 +192,11 @@ func (h *Handler) serve(c *gin.Context, load func(context.Context, string) (Page
 		schema = map[string]any{"@context": "https://schema.org", "@type": "CollectionPage", "name": page.Title, "url": canonical, "description": data.Description, "mainEntity": map[string]any{"@type": "ItemList", "itemListElement": items}}
 	}
 	if page.Kind == "product" {
-		schema = map[string]any{"@context": "https://schema.org", "@type": "Product", "name": page.Title, "url": canonical, "description": data.Description,
-			"offers": map[string]any{"@type": "Offer", "price": page.Price, "priceCurrency": site.Currency, "availability": page.Availability, "url": canonical}}
+		offer := map[string]any{"@type": "Offer", "@id": canonical + "#offer", "price": page.Price, "priceCurrency": site.Currency, "availability": page.Availability, "url": canonical, "seller": map[string]string{"@id": origin + "/#organization"}}
+		if site.ReturnPolicyPath != "" {
+			offer["hasMerchantReturnPolicy"] = map[string]string{"@id": origin + site.ReturnPolicyPath + "#merchant-return-policy"}
+		}
+		schema = map[string]any{"@context": "https://schema.org", "@type": "Product", "@id": canonical + "#product", "name": page.Title, "url": canonical, "description": data.Description, "offers": offer}
 		if page.Category != "" {
 			schema["category"] = page.Category
 		}
@@ -216,6 +219,9 @@ func (h *Handler) serve(c *gin.Context, load func(context.Context, string) (Page
 	}
 	data.Schema = template.JS(raw)
 	identity := map[string]any{"@type": "Organization", "@id": origin + "/#organization", "name": site.Name, "url": origin + "/", "contactPoint": map[string]any{"@type": "ContactPoint", "contactType": "customer support", "url": origin + "/about"}}
+	if site.ReturnPolicyPath != "" {
+		identity["hasMerchantReturnPolicy"] = map[string]string{"@type": "MerchantReturnPolicy", "@id": origin + site.ReturnPolicyPath + "#merchant-return-policy", "merchantReturnLink": origin + site.ReturnPolicyPath}
+	}
 	if logo := absoluteImage(origin, site.Logo); logo != "" {
 		identity["logo"] = logo
 	}

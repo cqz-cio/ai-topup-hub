@@ -5,6 +5,7 @@ import { useHead } from '@unhead/vue'
 import { usePageSeo } from './usePageSeo'
 import { seoPlainText, seoText } from '../utils/seo'
 import { appendRechargeLinks } from '../utils/gptRecharge'
+import { appendDeliveryPolicy, offerMerchantIdentity } from '../utils/deliveryPolicy'
 import { useAppStore } from '../stores/app'
 import { productAPI } from '../api'
 import { getImageUrl } from '../utils/image'
@@ -67,10 +68,10 @@ export function useProductDetail(options: { onLoaded?: () => void } = {}) {
   const loading = ref(true)
   const refreshFailed = ref(false)
   const product = ref<any>(null)
-  const readingContent = computed(() => appendRechargeLinks(
+  const readingContent = computed(() => appendDeliveryPolicy(appendRechargeLinks(
     getLocalizedText(product.value?.content), 'product', product.value?.slug || '',
     product.value?.category?.slug || '', appStore.isResellerTenant,
-  ))
+  ), appStore.isResellerTenant))
   const contactFirst = computed(() => isContactFirstProduct(product.value?.slug))
   const { openContact } = useProductContact()
   const relatedPosts = computed<any[]>(() => product.value?.related_posts || [])
@@ -631,14 +632,19 @@ export function useProductDetail(options: { onLoaded?: () => void } = {}) {
       const description = productSeoDescription.value
       const priceAmount = product.value.effective_price_amount ?? product.value.price_amount ?? '0'
       const currency = siteCurrency.value || 'CNY'
+      const canonical = canonicalUrl.value || window.location.href
+      const origin = new URL(canonical).origin
 
       const jsonLd: Record<string, any> = {
         '@context': 'https://schema.org',
         '@type': 'Product',
+        '@id': canonical + '#product',
         name: title,
         url: canonicalUrl.value || window.location.href,
         offers: {
           '@type': 'Offer',
+          '@id': canonical + '#offer',
+          ...offerMerchantIdentity(origin, appStore.isResellerTenant),
           url: canonicalUrl.value || window.location.href,
           price: priceAmount,
           priceCurrency: currency,

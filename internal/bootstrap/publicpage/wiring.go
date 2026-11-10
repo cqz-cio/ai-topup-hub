@@ -65,7 +65,11 @@ func (s *source) Site(ctx context.Context) (publicpage.Site, error) {
 	if name == "" {
 		name = metadataText(seo["title"])
 	}
-	return publicpage.Site{Name: name, URL: origin, Currency: currency, Logo: metadataText(brand["site_logo"]), Description: metadataText(seo["description"])}, nil
+	site := publicpage.Site{Name: name, URL: origin, Currency: currency, Logo: metadataText(brand["site_logo"]), Description: metadataText(seo["description"])}
+	if isMainSite(ctx) {
+		site.ReturnPolicyPath = publiccontent.DeliveryAndReturns().Path
+	}
+	return site, nil
 }
 
 func (s *source) Product(ctx context.Context, slug string) (publicpage.Page, error) {
@@ -83,6 +87,7 @@ func (s *source) Product(ctx context.Context, slug string) (publicpage.Page, err
 	page := publicpage.Page{Kind: "product", Path: "/products/" + url.PathEscape(p.Slug), Title: localized(p.Title), Summary: localized(p.Description), Content: localized(p.Content), Price: price.String(), Category: localized(p.Category.Name), Images: p.Images, Availability: "https://schema.org/InStock"}
 	if isMainSite(ctx) {
 		page.Content = publiccontent.GPTRecharge().AppendRelated(page.Content, page.Kind, p.Slug, p.Category.Slug)
+		page.Content = publiccontent.DeliveryAndReturns().AppendLink(page.Content)
 	}
 	page.SEOTitle = metadataText(p.SeoMeta["title"])
 	page.SEODescription = metadataText(p.SeoMeta["description"])
