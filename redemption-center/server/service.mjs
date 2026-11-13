@@ -1,14 +1,33 @@
-import { Problem, id, newCard, normalizeCard, maskedCard, credential, terminal, safeURL } from './security.mjs';
+import { Problem, id, newCard, normalizeCard, maskedCard, maskedEmail, credential, terminal, safeURL } from './security.mjs';
 import { parseDelivery, customerDelivery } from './delivery.mjs';
 import { CardManagement } from './management.mjs';
+import { preflightDetails, preflightRestriction, legacyBlockedSummary } from './preflight-details.mjs';
 
 const active = s => ['submitting','queued','processing','uncertain'].includes(s);
 const string = (v,n=120) => typeof v==='string'?v.slice(0,n):null;
 const productName = v => ['gpt','grok','claude','x'].includes(v)?v:'unknown';
 const email = v => typeof v==='string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? v.slice(0,254) : null;
+function sessionEmail(session) {
+  try {
+    const doc=JSON.parse(session);
+    const token=doc?.sessionToken||doc?.session_token;
+    return typeof token==='string' && token.trim() ? email(doc.user?.email) : null;
+  } catch { return null; }
+}
 const nullableBoolean = v => typeof v==='boolean'?v:null;
 const amount = v => (typeof v==='number' && Number.isFinite(v)) || (typeof v==='string' && /^-?\d+(\.\d+)?$/.test(v)) ? v : null;
 const dateValue = v => typeof v==='number' && Number.isFinite(v) ? v : string(v,80);
+const blockingReasons = {
+  subscription:'预检提示原订阅需要处理，请处理后重新核验，或更换账号。',
+  plan_tier:'当前账号已有同档或更高套餐，暂时无法使用这张开通卡。请在原订阅结束后重新核验，或更换账号。',
+  unverified_plan:'未能核对账号当前的套餐，请重新核验或更换账号。',
+  unavailable:'本次预检未允许这张卡向该账号充值，请更换账号或联系客服核对。',
+};
+
+function verifiedPlanMismatch(card,details) {
+  return details.active===true && (details.active_until==null || details.active_until>Date.now())
+    && preflightRestriction({},card,details)==='plan_tier';
+}
 
 export class RedemptionService {
   constructor({store,vault,partner,publicOrigin,mock=false}) {
@@ -22,6 +41,15 @@ export class RedemptionService {
     store.run("UPDATE attempts SET state='uncertain',session_enc='' WHERE state='submitting'");
     store.run("UPDATE attempts SET state='preview_failed',session_enc='',preflight_enc='',confirmation_hash='' WHERE state IN ('preparing','checking')");
     this.expire();
+    // Old previews did not save the card's flow. Require one fresh card and
+    // account check before any of their unused GPT confirmations can be used.
+    store.transaction(()=>{
+      if(!store.run("INSERT OR IGNORE INTO meta(key,value) VALUES('gpt_opening_tiers_v1','1')").changes)return;
+      for(const a of store.all("SELECT id,data_enc FROM attempts WHERE submitted_at IS NULL AND state IN ('preview','checked','blocked')")){
+        if(this.data(a).product==='gpt')this.update(a,'preview_failed',{email:null,current_plan:null,has_active_subscription:null,restriction:null,blocked:false,confirmation:null},
+          {token_enc:'',session_enc:'',preflight_enc:'',confirmation_hash:'',checked_at:null});
+      }
+    });
     this.management=new CardManagement(this);
   }
   expire() {
@@ -35,15 +63,15 @@ export class RedemptionService {
     this.store.run(`UPDATE attempts SET ${Object.keys(patch).map(k=>`${k}=?`).join(',')},revision=revision+1 WHERE id=?`,...Object.values(patch),a.id);
     return this.store.get('SELECT * FROM attempts WHERE id=?',a.id);
   }
-  view(a,owned=true) {
+  view(a,owned=true,showAccount=false) {
     const d=this.data(a), c=this.store.get('SELECT code_enc,status FROM cards WHERE id=?',a.card_id);
     if(['revoked','revoking','invalid'].includes(c.status))return {attempt_id:a.id,state:c.status,code:maskedCard(this.vault.decrypt(c.code_enc)),confirmation:null,submitted:!!a.submitted_at,message:c.status==='revoked'?'该本站卡密已销毁，不能继续兑换。':c.status==='revoking'?'该卡密正在销毁核验，暂不能兑换。':'该卡密已失效，请联系客服。'};
     return {attempt_id:a.id,state:a.state,code:maskedCard(this.vault.decrypt(c.code_enc)),product:d.product||'unknown',plan:d.plan||null,
-      country:d.country||null,currency:d.currency||null,email:d.email||null,current_plan:d.current_plan||null,
+      country:d.country||null,currency:d.currency||null,email:owned&&showAccount?d.email||null:maskedEmail(d.email),current_plan:d.current_plan||null,
       has_active_subscription:d.has_active_subscription??null,blocked:!!d.blocked,
-      blocking_reason:d.blocked?'当前账号状态需要人工处理，暂时不能提交充值。':null,
+      blocking_reason:d.blocked?(blockingReasons[d.restriction] || blockingReasons.unavailable):null,
       confirmation:a.state==='checked' && owned && a.confirmation_hash?d.confirmation:null,
-      message:terminal(a.state)?(a.state==='completed'?'充值已完成。':'本次充值未完成，请联系客服核对。'):a.state==='uncertain'?'提交结果待确认，正在查询原记录，请勿重新兑换。':a.state==='blocked'?'账号状态需要人工核对。':active(a.state)?'已提交，正在确认充值结果。':null,
+      message:terminal(a.state)?(a.state==='completed'?'充值已完成。':'本次充值未完成，请联系客服核对。'):a.state==='uncertain'?'提交结果待确认，正在查询原记录，请勿重新兑换。':a.state==='blocked'?'本次账号预检未通过。':active(a.state)?'已提交，正在确认充值结果。':null,
       created_at:a.created_at,updated_at:a.updated_at,submitted:!!a.submitted_at,recover_by_code:!owned};
   }
   card(value) {
@@ -97,13 +125,23 @@ export class RedemptionService {
     this.assertUsable(c);
     let a=c.attempt_id?this.store.get('SELECT * FROM attempts WHERE id=?',c.attempt_id):null;
     if(a) {
-      if(a.device_hash!==this.vault.hash('device',device)) {
-        if(active(a.state)||terminal(a.state))return this.view(await this.pollRecord(a),false);
-        throw new Problem('OTHER_BROWSER','该卡密已在另一浏览器开始核验，请在原浏览器继续。',409);
+      const deviceHash=this.vault.hash('device',device), owned=a.device_hash===deviceHash;
+      if(a.submitted_at || active(a.state) || terminal(a.state))return this.view(await this.pollRecord(a),owned);
+      if(c.status!=='ready')throw new Problem('CARD_IN_USE','该卡密已使用或正在充值，请查询原记录。',409);
+      if(owned) {
+        if(a.state!=='preview_failed')return this.view(a);
+        a=this.update(a,'preparing',{}, {token_enc:'',preflight_enc:'',session_enc:'',confirmation_hash:''});
+      } else {
+        // device_hash owns the local check. Keep device_enc and request_id for the partner.
+        a=this.store.get(`UPDATE attempts SET device_hash=?, state='preparing', data_enc='',
+          token_enc='', preflight_enc='', session_enc='', confirmation_hash='', checked_at=NULL,
+          revision=revision+1, updated_at=?
+          WHERE id=? AND revision=? AND submitted_at IS NULL
+            AND state IN ('preview','preview_failed','checked','blocked')
+            AND EXISTS (SELECT 1 FROM cards WHERE id=? AND attempt_id=attempts.id AND status='ready')
+          RETURNING *`,deviceHash,Date.now(),a.id,a.revision,c.id);
+        if(!a)throw new Problem('CARD_BUSY','卡密正在核验，请稍后重新验证。',409);
       }
-      if(active(a.state)||terminal(a.state))return this.view(await this.pollRecord(a));
-      if(a.state!=='preview_failed')return this.view(a);
-      a=this.update(a,'preparing',{}, {token_enc:'',preflight_enc:'',session_enc:'',confirmation_hash:''});
     } else {
       const now=Date.now(), attemptID=id();
       this.store.transaction(()=>{
@@ -117,29 +155,80 @@ export class RedemptionService {
     try {
       const data=await this.partner.call('preview',{code:this.vault.decrypt(c.source_enc)},this.device(a));
       if(typeof data.redemption_token!=='string' || !data.redemption_token || data.redemption_token.length>2048 || productName(data.product)==='unknown')throw new Problem('PREVIEW_UNSUPPORTED','源头未返回可支持的商品信息，请联系客服核对。',422);
-      a=this.update(a,'preview',{product:productName(data.product),plan:string(data.plan,80),country:string(data.payment_country,10),currency:string(data.payment_currency,10)}, {token_enc:this.vault.encrypt(data.redemption_token)});
+      a=this.update(a,'preview',{product:productName(data.product),plan:string(data.plan,80),plan_flow:string(data.plan_flow,80),country:string(data.payment_country,10),currency:string(data.payment_currency,10)}, {token_enc:this.vault.encrypt(data.redemption_token)});
       return this.view(a);
     } catch(e) { this.update(a,'preview_failed'); throw e; }
   }
-  async preflight(attemptID,session,device) {
+  async matchingBilling(session,account,a,reserveBilling) {
+    if(!account || !reserveBilling)return null;
+    try {
+      reserveBilling();
+      const bill=await this.partner.call('billing',{token_input:session},this.device(a),{timeout:4500});
+      return email(bill?.summary?.email)?.toLowerCase()===account.toLowerCase()?bill:null;
+    } catch { return null; }
+  }
+  clearAccountCheck(a) {
+    return this.update(a,'preview',{email:null,current_plan:null,has_active_subscription:null,restriction:null,blocked:false,confirmation:null},
+      {preflight_enc:'',session_enc:'',confirmation_hash:'',checked_at:null});
+  }
+  async preflight(attemptID,session,device,reserveBilling,legacy=false,readOnlyOnError=false) {
     this.expire(); session=credential(session);
     let a=this.attempt(attemptID,device);
     if(!['preview','checked','blocked'].includes(a.state))throw new Problem('WRONG_STEP','请先验证卡密，处理中不能更换账号。',409);
     const c=this.store.get('SELECT * FROM cards WHERE id=?',a.card_id);
     this.assertUsable(c);
     if(c.status!=='ready')throw new Problem('CARD_IN_USE','该卡密已使用或正在充值，请查询原记录。',409);
-    if(!this.store.run("UPDATE attempts SET state='checking',revision=revision+1 WHERE id=? AND revision=?",a.id,a.revision).changes)throw new Problem('BUSY','账号正在核验，请稍后。',409);
+    if(!this.store.run("UPDATE attempts SET state='checking',session_enc='',preflight_enc='',confirmation_hash='',revision=revision+1 WHERE id=? AND revision=?",a.id,a.revision).changes)throw new Problem('BUSY','账号正在核验，请稍后。',409);
     a=this.store.get('SELECT * FROM attempts WHERE id=?',a.id);
     try {
-      const data=await this.partner.call('preflight',{code:this.vault.decrypt(c.source_enc),redemption_token:this.vault.decrypt(a.token_enc),credential:{mode:'session',session}},this.device(a));
-      const product=this.data(a).product, blocked=!!data.blocking_reason || data.subscription_recovery_required===true || data.can_redeem===false;
-      const account=email(data.email||data.account_email), ticket=string(data.preflight_token,65536);
+      const cardData=this.data(a), product=cardData.product;
+      let data,bill;
+      try {
+        data=await this.partner.call('preflight',{code:this.vault.decrypt(c.source_enc),redemption_token:this.vault.decrypt(a.token_enc),credential:{mode:'session',session}},this.device(a));
+      } catch(e) {
+        const readOnly=readOnlyOnError && e.permitsSeparateBilling===true;
+        if(product!=='gpt' || !reserveBilling || (e.code!=='UPSTREAM_REJECTED' && !readOnly))throw e;
+        bill=await this.matchingBilling(session,sessionEmail(session),a,reserveBilling);
+        if(!bill)throw e;
+        if(readOnly){
+          // Only this response gets the account and billing details. A future recharge needs a new check.
+          const pending=this.clearAccountCheck(a);
+          const details=preflightDetails({},bill);
+          return {...this.view(pending),subscription_only:true,email:email(bill.summary.email),
+            preflight_details:details,plan_mismatch:verifiedPlanMismatch(cardData,details)};
+        }
+        // A verified billing identity may explain a rejected check. It cannot authorize a charge.
+        data={email:bill.summary.email,can_redeem:false};
+      }
+      let details=preflightDetails(data,bill||{});
+      const restriction=preflightRestriction(data,cardData,details), blocked=restriction!==null;
+      let account=email(data.email||data.account_email);
+      const ticket=string(data.preflight_token,65536);
       if(!blocked && (!account || (product!=='grok' && !ticket)))throw new Problem('PREFLIGHT_INCOMPLETE','未能完整核对账号，请重新核验或联系客服。',422);
-      const confirmation=id();
-      a=this.update(a,blocked?'blocked':'checked',{email:account,current_plan:string(data.currentPlan||data.current_plan,80),has_active_subscription:nullableBoolean(data.has_active_subscription),blocked,confirmation},
+      if(!bill && product==='gpt' && reserveBilling && (!legacy || blocked)
+        && (!account || Object.values(details).includes(null) || /^(?:chatgpt[\s_-]*)?pro$/i.test(details.current_plan))) {
+        bill=await this.matchingBilling(session,account || (blocked && sessionEmail(session)),a,reserveBilling);
+        if(bill){
+          account=account || email(bill.summary.email);
+          details=preflightDetails(data,bill);
+        }
+      }
+      const confirmation=blocked?null:id();
+      a=this.update(a,blocked?'blocked':'checked',{email:account,current_plan:details.current_plan,has_active_subscription:details.active,restriction,blocked,confirmation},
         {preflight_enc:blocked?'':this.vault.encrypt(ticket),session_enc:!blocked && product==='grok'?this.vault.encrypt(session):'',confirmation_hash:blocked?'':this.vault.hash('confirmation',confirmation),checked_at:Date.now()});
-      return this.view(a);
-    } catch(e) { this.update(a,'preview',{}, {preflight_enc:'',session_enc:'',confirmation_hash:''}); throw e; }
+      // Only the fresh check receives detailed billing. History and recovery use the normal view.
+      const result={...this.view(a,true,true),preflight_details:details};
+      if(blocked && restriction!=='subscription')result.plan_mismatch=verifiedPlanMismatch(cardData,details);
+      if(legacy && product==='gpt' && blocked)result.blocking_reason=legacyBlockedSummary(result.blocking_reason,account,details);
+      return result;
+    } catch(e) {
+      this.clearAccountCheck(a);
+      if(e.code==='UPSTREAM_REJECTED')throw new Problem(e.code,'本次账号预检未通过，请核对账号凭证与充值套餐后重试。',422);
+      if(['UPSTREAM_ERROR','UPSTREAM_NETWORK','UPSTREAM_RESPONSE'].includes(e.code)){
+        throw new Problem(e.code,'本次账号核验未完成，尚未提交充值。请稍后重新粘贴完整 Session，再核验账号。',502);
+      }
+      throw e;
+    }
   }
   async redeem(attemptID,confirmation,confirmed,device) {
     this.expire(); let a=this.attempt(attemptID,device);
@@ -160,6 +249,9 @@ export class RedemptionService {
     const request={redemption_token:this.vault.decrypt(a.token_enc),client_request_id:a.request_id};
     if(this.data(a).product==='grok')request.credential={mode:'session',session:this.vault.decrypt(a.session_enc)};
     else request.preflight_token=this.vault.decrypt(a.preflight_enc);
+    // The request now owns the short-lived credential; it must not remain on disk
+    // while the upstream is slow, disconnected, or the process is interrupted.
+    this.store.run("UPDATE attempts SET session_enc='',preflight_enc='',confirmation_hash='' WHERE id=?",a.id);
     try {
       const response=await this.partner.call('redeem',request,this.device(a));
       return this.view(this.setResult(a,response));
@@ -213,25 +305,27 @@ export class RedemptionService {
     })();
     try {await this.reconciling;} finally {this.reconciling=null;}
   }
+  unsubmittedSummary(c) {
+    return {state:c.status==='ready'?'unused':c.status,code:maskedCard(this.vault.decrypt(c.code_enc)),submitted:false};
+  }
   results(values,device) {
     if(!Array.isArray(values)||!values.length||values.length>100)throw new Problem('RESULT_LIMIT','每批查询 1–100 条兑换记录。');
     return values.map(code=>{
       const c=this.card(code),a=c.attempt_id?this.store.get('SELECT * FROM attempts WHERE id=?',c.attempt_id):null;
       this.assertUsable(c);
-      if(!a)return {state:'unused',code:maskedCard(normalizeCard(code)),submitted:false};
-      const owned=a.device_hash===this.vault.hash('device',device);
-      if(!owned&&!a.submitted_at)throw new Problem('OTHER_BROWSER','请在原浏览器继续核验。',409);
+      const owned=a?.device_hash===this.vault.hash('device',device);
+      if(!a || (!owned && !a.submitted_at))return this.unsubmittedSummary(c);
       return this.view(a,owned);
     });
   }
   async recover(value,device) {
     const c=this.card(value), a=c.attempt_id?this.store.get('SELECT * FROM attempts WHERE id=?',c.attempt_id):null;
     this.assertUsable(c);
-    if(!a)return {state:'unused',code:maskedCard(normalizeCard(value)),submitted:false};
-    if(!active(a.state) && !terminal(a.state) && a.device_hash!==this.vault.hash('device',device))throw new Problem('OTHER_BROWSER','请在原浏览器继续核验。',409);
-    return this.view(await this.pollRecord(a),a.device_hash===this.vault.hash('device',device));
+    const owned=a?.device_hash===this.vault.hash('device',device);
+    if(!a || (!owned && !a.submitted_at))return this.unsubmittedSummary(c);
+    return this.view(await this.pollRecord(a),owned);
   }
-  recent(device) { return this.store.all('SELECT * FROM attempts WHERE device_hash=? ORDER BY created_at DESC LIMIT 30',this.vault.hash('device',device)).map(a=>this.view(a)); }
+  recent(device) { return this.store.all('SELECT * FROM attempts WHERE device_hash=? ORDER BY created_at DESC LIMIT 30',this.vault.hash('device',device)).map(a=>({...this.view(a),confirmation:null})); }
   async lookup(values,device) {
     if(!Array.isArray(values) || !values.length || values.length>100)throw new Problem('LOOKUP_LIMIT','每次查询 1–100 张卡密。');
     const results=[], groups=new Map();
@@ -241,7 +335,7 @@ export class RedemptionService {
         if(['disabled','revoked','revoking','invalid'].includes(c.status)) { results[i]={row:i+1,code:normalizeCard(values[i]),status:c.status,used:null,can_resubmit:false}; continue; }
         const d=a?this.device(a):device;
         if(!groups.has(d))groups.set(d,[]); groups.get(d).push({i,c,a});
-      } catch { results[i]={row:i+1,code:String(values[i]||'').slice(0,256),status:'unknown',used:null,can_resubmit:false}; }
+      } catch { let code;try{code=normalizeCard(values[i]);}catch{code='格式不正确';}results[i]={row:i+1,code,status:'unknown',used:null,can_resubmit:false}; }
     }
     for(const [d,items] of groups) {
       try {
@@ -252,7 +346,7 @@ export class RedemptionService {
           const result=data.results[n];
           if(result.cdk_code && result.cdk_code!==sourceCodes[n])throw new Error('Mismatched batch row');
           const localSubmitted=!!a?.submitted_at;
-          results[i]={row:i+1,code:normalizeCard(values[i]),status:localSubmitted?a.state:string(result.status,40)||'unknown',used:nullableBoolean(result.used),can_resubmit:!localSubmitted && result.can_resubmit===true,account_email:email(result.account_email),plan:string(result.plan,80),used_at:dateValue(result.used_at)};
+          results[i]={row:i+1,code:normalizeCard(values[i]),status:localSubmitted?a.state:string(result.status,40)||'unknown',used:nullableBoolean(result.used),can_resubmit:!localSubmitted && result.can_resubmit===true,account_email:maskedEmail(email(result.account_email)),plan:string(result.plan,80),used_at:dateValue(result.used_at)};
         });
       } catch { for(const {i,a} of items)results[i]={row:i+1,code:normalizeCard(values[i]),status:a?.submitted_at?a.state:'unavailable',used:null,can_resubmit:false}; }
     }
@@ -261,11 +355,16 @@ export class RedemptionService {
   async billing({code,session},device) {
     if(!!code===!!session)throw new Problem('BILLING_INPUT','请选择卡密或账号凭证中的一种查询方式。');
     let body,d=device;
-    if(code) { const c=this.card(code), a=c.attempt_id?this.store.get('SELECT * FROM attempts WHERE id=?',c.attempt_id):null; this.assertUsable(c); body={cdk_code:this.vault.decrypt(c.source_enc)}; if(a)d=this.device(a); }
+    if(code) {
+      const c=this.card(code),a=c.attempt_id?this.store.get('SELECT * FROM attempts WHERE id=?',c.attempt_id):null;
+      this.assertUsable(c);
+      if(!a?.submitted_at || a.device_hash!==this.vault.hash('device',device))throw new Problem('BILLING_PROOF_REQUIRED','请在原充值浏览器查询账单，或切换为账号凭证查询。',403);
+      body={cdk_code:this.vault.decrypt(c.source_enc)};d=this.device(a);
+    }
     else body={token_input:credential(session)};
     const data=await this.partner.call('billing',body,d), summary=data.summary||{};
     const payment=p=>p && typeof p==='object'?{amount:amount(p.amount),currency:string(p.currency,12),date:dateValue(p.date??p.paid_at??p.created_at),status:string(p.status,40),invoice_url:safeURL(p.invoice_url||p.hosted_invoice_url||p.url)}:null;
-    return {summary:{email:email(summary.email),plan_type:string(summary.plan_type,80),has_active_subscription:nullableBoolean(summary.has_active_subscription)},last_payment:payment(data.last_payment),invoices:Array.isArray(data.invoices)?data.invoices.slice(0,100).map(payment):null,invoice_url:safeURL(data.invoice_url),invoice_data_available:nullableBoolean(data.invoice_data_available)};
+    return {summary:{email:maskedEmail(email(summary.email)),plan_type:string(summary.plan_type,80),has_active_subscription:nullableBoolean(summary.has_active_subscription)},last_payment:payment(data.last_payment),invoices:Array.isArray(data.invoices)?data.invoices.slice(0,100).map(payment):null,invoice_url:safeURL(data.invoice_url),invoice_data_available:nullableBoolean(data.invoice_data_available)};
   }
   listCards(query='') {
     query=String(query).trim().slice(0,200);

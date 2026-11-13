@@ -1,4 +1,5 @@
 import type { Plugin } from 'vite'
+import { publicDocumentBootCss, publicDocumentBootScript } from './publicDocumentBoot.ts'
 
 // Backend HTML and frontend assets may be released independently. These stable,
 // uncached entry points always load the current frontend's content-hashed files.
@@ -18,8 +19,8 @@ export function publicDocumentSources(html: string) {
     }
   }
   return {
-    js: scripts.map(path => `import ${JSON.stringify(path)};`).join('\n') + '\n',
-    css: styles.map(path => `@import ${JSON.stringify(path)};`).join('\n') + '\n',
+    js: publicDocumentBootScript(scripts),
+    css: styles.map(path => `@import ${JSON.stringify(path)};`).join('\n') + '\n' + publicDocumentBootCss,
   }
 }
 
@@ -41,7 +42,7 @@ export function publicDocumentEntry(): Plugin {
         if (path !== '/storefront-entry.js' && path !== '/storefront-entry.css') return next()
         res.setHeader('Cache-Control', 'no-cache')
         res.setHeader('Content-Type', path.endsWith('.js') ? 'text/javascript' : 'text/css')
-        res.end(path.endsWith('.js') ? 'import "/@vite/client"; import "/src/main.ts";' : '/* Styles are imported by main.ts in development. */')
+        res.end(path.endsWith('.js') ? publicDocumentBootScript(['/@vite/client', '/src/main.ts']) : publicDocumentBootCss)
       })
     },
   }

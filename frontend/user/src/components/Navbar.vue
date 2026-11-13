@@ -77,12 +77,6 @@
           <LogOut class="w-4 h-4 shrink-0 opacity-70" />
           {{ t('navbar.logout') }}
         </Button>
-        <!-- Theme Switcher -->
-        <Button variant="ghost" size="icon" class="text-muted-foreground" :aria-label="t('shopUi.toggleTheme')" @click="toggleTheme">
-          <Sun v-if="theme === 'dark'" class="w-4 h-4" />
-          <Moon v-else class="w-4 h-4" />
-        </Button>
-
         <!-- Language Switcher (Desktop) -->
         <Popover v-model:open="langOpen">
           <PopoverTrigger as-child>
@@ -209,11 +203,10 @@ import { useI18n } from 'vue-i18n'
 import { useAppStore } from '../stores/app'
 import { useCartStore } from '../stores/cart'
 import { useUserAuthStore } from '../stores/userAuth'
-import { useTheme } from '../utils/theme'
 import { getImageUrl } from '../utils/image'
 import { useNavConfig } from '../composables/useNavConfig'
 import {
-  Sun, Moon, ShoppingCart, ClipboardList, LogIn, User, LogOut, Languages,
+  ShoppingCart, ClipboardList, LogIn, User, LogOut, Languages,
   EllipsisVertical, X,
 } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
@@ -223,7 +216,6 @@ const { t } = useI18n()
 const appStore = useAppStore()
 const cartStore = useCartStore()
 const userAuthStore = useUserAuthStore()
-const { theme, toggleTheme } = useTheme()
 const { primaryNavItems, secondaryNavItems } = useNavConfig()
 
 const showMobileMenu = ref(false)

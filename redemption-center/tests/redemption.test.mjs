@@ -96,6 +96,176 @@ test('background reconciliation completes submitted records after the page is cl
   assert.equal(f.partner.calls.filter(c=>c.operation==='redeem').length,1);
 });
 test('blocked subscription cannot be submitted',async()=>{const f=fixture('blocked'),a=await checked(f);assert.equal(a.state,'blocked');assert.equal(a.confirmation,null);await assert.rejects(f.service.redeem(a.attempt_id,'fake',true,device));assert.equal(f.partner.calls.filter(c=>c.operation==='redeem').length,0);});
+
+function partnerPlan(f,{target='plus',flow,current='pro',active=true,renew=true,extra={}}={}) {
+  const original=f.partner.call.bind(f.partner);
+  f.partner.call=async(op,...args)=>{
+    const data=await original(op,...args);
+    if(op==='preview')return {...data,plan:target,plan_flow:flow};
+    if(op==='preflight')return {...data,currentPlan:current,subscription_has_active:active,subscription_will_renew:renew,
+      subscription_active_until:new Date(Date.now()+(active===false?-1:23)*86400000).toISOString(),can_redeem:true,...extra};
+    return data;
+  };
+}
+
+for(const [name,params,expected] of [
+  ['active Pro to standard Plus',{},'blocked'],
+  ['cancelling renewal while Pro is still active',{renew:false},'blocked'],
+  ['same-tier Plus half-price card',{current:'plus',target:'plus_half'},'blocked'],
+  ['higher Pro tier to lower Pro tier',{current:'pro_20x',target:'pro_5x'},'blocked'],
+  ['partner plan aliases',{current:' ChatGPT ProLite ',target:'plus'},'blocked'],
+  ['known Pro with omitted active flag',{active:null},'blocked'],
+  ['explicitly inactive old Pro subscription',{active:false},'checked'],
+  ['free to Plus',{current:'free',active:false},'checked'],
+  ['lower tier to higher tier',{current:'plus',target:'pro_5x'},'checked'],
+  ['dedicated renewal card',{target:'pro_20x_renew',current:'pro_20x'},'checked'],
+  ['explicit card-attach flow',{flow:'card_attach'},'checked'],
+  ['explicit opening flow overrides renewal suffix',{flow:'checkout',target:'pro_20x_renew'},'blocked'],
+  ['explicit veto on a card-attach flow',{flow:'card_attach',extra:{can_redeem:false}},'blocked'],
+]){
+  test('GPT card eligibility: '+name,async t=>{
+    const f=fixture();
+    t.after(()=>f.store.close());
+    partnerPlan(f,params);
+    const a=await checked(f);
+    assert.equal(a.state,expected);
+    assert.equal(Boolean(a.confirmation),expected==='checked');
+    if(expected==='blocked'){
+      if(!params.extra)assert.match(a.blocking_reason,/同档或更高/);
+      const row=f.store.get('SELECT * FROM attempts');
+      assert.equal(row.preflight_enc,'');
+      assert.equal(row.confirmation_hash,'');
+      await assert.rejects(f.service.redeem(a.attempt_id,'stale-confirmation',true,device),{code:'CONFIRM_REQUIRED'});
+      assert.equal(f.partner.calls.filter(c=>c.operation==='redeem').length,0);
+    }else{
+      assert.equal((await f.service.redeem(a.attempt_id,a.confirmation,true,device)).state,'queued');
+    }
+  });
+}
+
+test('a new tier veto invalidates the previous account confirmation; the unused card can be rechecked',async t=>{
+  const f=fixture();
+  t.after(()=>f.store.close());
+  const first=await checked(f);
+  const original=f.partner.call.bind(f.partner);
+  partnerPlan(f);
+  const refused=await f.service.preflight(first.attempt_id,session,device);
+  assert.equal(refused.state,'blocked');
+  await assert.rejects(f.service.redeem(first.attempt_id,first.confirmation,true,device),{code:'CONFIRM_REQUIRED'});
+  assert.equal(f.store.get('SELECT status FROM cards').status,'ready');
+  f.partner.call=original;
+  const renewed=await f.service.preflight(first.attempt_id,session,device);
+  assert.equal(renewed.state,'checked');
+  assert.notEqual(renewed.confirmation,first.confirmation);
+  assert.equal(f.partner.calls.filter(c=>c.operation==='redeem').length,0);
+});
+
+test('unverified plan on a standard GPT card cannot be authorized by optional billing',async t=>{
+  const f=fixture();
+  t.after(()=>f.store.close());
+  partnerPlan(f,{current:null,active:null});
+  const preview=await f.service.preview(f.card.code,device);
+  for(const budget of [undefined,()=>{}]){
+    const check=await f.service.preflight(preview.attempt_id,session,device,budget);
+    assert.equal(check.confirmation,null);
+    assert.match(check.blocking_reason,/未能核对/);
+  }
+});
+
+test('upgrading invalidates legacy unsubmitted GPT checks once and preserves a submitted request',async t=>{
+  const f=fixture();
+  t.after(()=>f.store.close());
+  const legacy=await checked(f);
+  const secondSource='SYNTHETIC-ALREADY-SUBMITTED';
+  f.partner.seed(secondSource);
+  const [second]=f.service.issue([{reference:'second-card',source_code:secondSource}]);
+  const pending=await submitted({...f,card:second});
+  const prior=f.store.get('SELECT * FROM attempts WHERE id=?',pending.attempt_id);
+  f.store.run("DELETE FROM meta WHERE key='gpt_opening_tiers_v1'");
+  const restart=()=>new RedemptionService({store:f.store,vault:f.crypt,partner:f.partner,publicOrigin:'https://redeem.example.com',mock:true});
+  f.service=restart();
+  assert.deepEqual(f.store.get('SELECT * FROM attempts WHERE id=?',pending.attempt_id),prior);
+  const invalid=f.store.get('SELECT * FROM attempts WHERE id=?',legacy.attempt_id);
+  assert.equal(invalid.state,'preview_failed');
+  for(const field of ['confirmation_hash','preflight_enc','token_enc','session_enc'])assert.equal(invalid[field],'');
+  await assert.rejects(f.service.redeem(legacy.attempt_id,legacy.confirmation,true,device),{code:'CONFIRM_REQUIRED'});
+  const fresh=await checked(f);
+  assert.equal(fresh.state,'checked');
+  assert.notEqual(fresh.confirmation,legacy.confirmation);
+  f.service=restart();
+  assert.equal((await f.service.result(fresh.attempt_id,device)).confirmation,fresh.confirmation);
+});
+
+test('an explicit refusal, delinquency, or recovery requirement prevents submission even with a valid ticket',async t=>{
+  for(const flag of [{can_redeem:false},{subscription_is_delinquent:true},{subscription_recovery_required:true},{blocking_reason:'private-upstream-reason'}]){
+    const f=fixture(), call=f.partner.call.bind(f.partner);
+    t.after(()=>f.store.close());
+    f.partner.call=async(op,...rest)=>{
+      const value=await call(op,...rest);
+      return op==='preflight'?{...value,currentPlan:'free',subscription_has_active:false,...flag}:value;
+    };
+    const a=await checked(f);
+    assert.equal(a.state,'blocked');
+    assert.equal(a.confirmation,null);
+    assert.ok(a.blocking_reason);
+    assert.doesNotMatch(a.blocking_reason,/已满足|private-upstream-reason/);
+    await assert.rejects(f.service.redeem(a.attempt_id,'old',true,device),{code:'CONFIRM_REQUIRED'});
+    assert.equal(f.partner.calls.filter(c=>c.operation==='redeem').length,0);
+  }
+});
+
+test('optional billing fills only this verified account and never appears in a code lookup or history',async t=>{
+  const f=fixture(), call=f.partner.call.bind(f.partner), used=[];
+  t.after(()=>f.store.close());
+  f.partner.call=async(op,body,upstreamDevice,options)=>{
+    used.push(op);
+    if(op==='billing'){
+      assert.deepEqual(body,{token_input:session});
+      assert.equal(upstreamDevice,device);
+      assert.ok(options.timeout<=5000);
+      return {summary:{email:'BUYER@example.com',plan_type:'pro',subscription_plan:'pro_5x',has_active_subscription:true,active_until:'2026-11-26T19:00:44+08:00',will_renew:true,settlement_currency:'eur'},
+        last_payment:{paidAt:1792998000,currency:'USD',status:'paid'},payment_method:{brand:'visa',last4:'9876',number:'SECRET-PAYMENT-CANARY'}};
+    }
+    const value=await call(op,body,upstreamDevice);
+    return op==='preflight'?{...value,currentPlan:'pro',subscription_will_renew:false}:value;
+  };
+  const p=await f.service.preview(f.card.code,device);
+  let budget=0;
+  const a=await f.service.preflight(p.attempt_id,session,device,()=>{budget++;});
+  assert.equal(budget,1);
+  assert.deepEqual(used,['preview','preflight','billing']);
+  assert.deepEqual(a.preflight_details,{current_plan:'pro_5x',active:true,active_until:Date.parse('2026-11-26T11:00:44Z'),will_renew:false,
+    last_paid_at:1792998000000,settlement_currency:'EUR',payment_method:'Visa · 9876'});
+  assert.doesNotMatch(JSON.stringify(a),/SECRET-PAYMENT/);
+  for(const result of [f.service.recent(device),await f.service.result(a.attempt_id,device),await f.service.recover(f.card.code,other),f.service.results([f.card.code],other),f.service.data(f.store.get('SELECT * FROM attempts'))]){
+    assert.doesNotMatch(JSON.stringify(result),/preflight_details|last_paid_at|settlement_currency|9876/);
+  }
+});
+
+test('billing failure, a spent quota, or a different account or plan cannot change the checked card',async t=>{
+  for(const scenario of ['offline','limited','wrong-account','wrong-plan']){
+    const f=fixture(), call=f.partner.call.bind(f.partner);
+    t.after(()=>f.store.close());
+    let billed=0;
+    f.partner.call=async(op,...rest)=>{
+      if(op==='billing'){
+        billed++;
+        if(scenario==='offline')throw new Error('billing unavailable');
+        return {summary:{email:scenario==='wrong-account'?'different@example.com':'buyer@example.com',plan_type:scenario==='wrong-plan'?'plus':'pro',
+          has_active_subscription:true,expires_at:'2031-01-01T00:00:00Z',settlement_currency:'JPY'}};
+      }
+      const value=await call(op,...rest);
+      if(op==='preview')return {...value,plan:'pro_50x'};
+      return op==='preflight'?{...value,currentPlan:'pro',can_redeem:true,last_payment:{created_at:'2026-10-01T00:00:00Z',status:'open',currency:'CAD'}}:value;
+    };
+    const p=await f.service.preview(f.card.code,device);
+    const a=await f.service.preflight(p.attempt_id,session,device,()=>{if(scenario==='limited')throw Error('quota');});
+    assert.equal(billed,scenario==='limited'?0:1);
+    assert.equal(a.state,'checked');
+    assert.ok(a.confirmation);
+    assert.deepEqual(a.preflight_details,{current_plan:'pro',active:null,active_until:null,will_renew:null,last_paid_at:null,settlement_currency:null,payment_method:null});
+  }
+});
 test('Grok stores a short-lived encrypted credential, submits without a preflight ticket and clears it',async()=>{
   const f=fixture('success','grok'),a=await checked(f),row=f.store.get('SELECT * FROM attempts');assert.equal(row.preflight_enc,'');assert.notEqual(row.session_enc,session);assert.equal(f.crypt.decrypt(row.session_enc),session);
   const original=f.partner.call.bind(f.partner);let request;f.partner.call=async(op,body,d)=>{if(op==='redeem')request=body;return original(op,body,d);};await f.service.redeem(a.attempt_id,a.confirmation,true,device);
@@ -106,9 +276,96 @@ test('expired check and replaced account confirmation cannot redeem',async()=>{
   await assert.rejects(f.service.redeem(first.attempt_id,first.confirmation,true,device));
   f.store.run('UPDATE attempts SET checked_at=?',Date.now()-16*60000);await assert.rejects(f.service.redeem(second.attempt_id,second.confirmation,true,device));assert.equal(f.partner.calls.filter(c=>c.operation==='redeem').length,0);
 });
-test('device binding protects in-progress records; card holder can recover a submitted record with the original upstream device',async()=>{
-  const f=fixture(),a=await checked(f);await assert.rejects(f.service.preflight(a.attempt_id,session,other));await assert.rejects(f.service.preview(f.card.code,other));
+test('a submitted record stays with its owner and is recoverable by code with the original upstream device',async()=>{
+  const f=fixture(),a=await checked(f);await assert.rejects(f.service.preflight(a.attempt_id,session,other));
   await f.service.redeem(a.attempt_id,a.confirmation,true,device);f.store.run('UPDATE attempts SET last_poll=0');const recovered=await f.service.recover(f.card.code,other);assert.equal(recovered.recover_by_code,true);assert.equal(recovered.confirmation,null);assert.ok(f.partner.calls.every(c=>c.device===device));
+  assert.equal((await f.service.preview(f.card.code,other)).recover_by_code,true);
+  await assert.rejects(f.service.redeem(a.attempt_id,a.confirmation,true,other),{code:'ATTEMPT_NOT_FOUND'});
+  assert.equal(f.partner.calls.filter(c=>c.operation==='redeem').length,1);
+});
+test('another browser can restart an unsubmitted check but cannot inherit the verified account',async t=>{
+  const f=fixture('success','grok');
+  t.after(()=>f.store.close());
+  const first=await checked(f);
+  const requestID=f.store.get('SELECT request_id FROM attempts').request_id;
+
+  // Read-only recovery must neither reveal the previous check nor claim ownership.
+  const summary=await f.service.recover(f.card.code,other);
+  assert.deepEqual(summary,{code:first.code,state:'unused',submitted:false});
+  assert.deepEqual(f.service.results([f.card.code],other),[summary]);
+  assert.equal((await f.service.result(first.attempt_id,device)).state,'checked');
+
+  const next=await f.service.preview(f.card.code,other);
+  assert.equal(next.attempt_id,first.attempt_id);
+  assert.equal(next.state,'preview');
+  assert.equal(next.confirmation,null);
+  assert.equal(next.email,null);
+  assert.equal(next.current_plan,null);
+  const row=f.store.get('SELECT * FROM attempts');
+  assert.equal(row.request_id,requestID);
+  assert.equal(row.checked_at,null);
+  for(const key of ['session_enc','preflight_enc','confirmation_hash'])assert.equal(row[key],'');
+  assert.equal(f.service.data(row).confirmation,undefined);
+  assert.deepEqual(f.service.recent(device),[]);
+  await assert.rejects(f.service.preflight(first.attempt_id,session,device),{code:'ATTEMPT_NOT_FOUND'});
+  await assert.rejects(f.service.redeem(first.attempt_id,first.confirmation,true,device),{code:'ATTEMPT_NOT_FOUND'});
+  await assert.rejects(f.service.redeem(next.attempt_id,first.confirmation,true,other),{code:'CONFIRM_REQUIRED'});
+
+  const checkedAgain=await f.service.preflight(next.attempt_id,JSON.stringify({demo:true,email:'next@example.test'}),other);
+  assert.equal(checkedAgain.email,'next@example.test');
+  assert.notEqual(checkedAgain.confirmation,first.confirmation);
+  await assert.rejects(f.service.redeem(next.attempt_id,first.confirmation,true,other),{code:'CONFIRM_REQUIRED'});
+  await Promise.all([1,2].map(()=>f.service.redeem(next.attempt_id,checkedAgain.confirmation,true,other)));
+  assert.equal(f.partner.calls.filter(c=>c.operation==='redeem').length,1);
+  assert.ok(f.partner.calls.every(c=>c.device===device));
+  assert.equal((await f.service.preview(f.card.code,device)).recover_by_code,true);
+  await assert.rejects(f.service.billing({code:f.card.code},device),{code:'BILLING_PROOF_REQUIRED'});
+});
+test('a browser switch waits for in-flight checks and is retryable after a failed preview',async t=>{
+  const f=fixture();
+  t.after(()=>f.store.close());
+  const first=await f.service.preview(f.card.code,device);
+  const call=f.partner.call.bind(f.partner);
+  let resume;
+  f.partner.call=async(...args)=>{
+    if(args[0]==='preflight')await new Promise(resolve=>{resume=resolve;});
+    return call(...args);
+  };
+  const checking=f.service.preflight(first.attempt_id,session,device);
+  await assert.rejects(f.service.preview(f.card.code,other),{code:'CARD_BUSY'});
+  resume();
+  await checking;
+
+  f.partner.call=async()=>{throw new Error('synthetic preview failure');};
+  await assert.rejects(f.service.preview(f.card.code,other),/synthetic preview failure/);
+  const failed=f.store.get('SELECT * FROM attempts');
+  assert.equal(failed.state,'preview_failed');
+  assert.equal(failed.token_enc,'');
+  assert.equal(failed.preflight_enc,'');
+  assert.deepEqual(f.service.data(failed),{});
+  f.partner.call=call;
+  assert.equal((await f.service.preview(f.card.code,device)).state,'preview');
+  assert.equal((await f.service.preview(f.card.code,other)).state,'preview');
+  assert.equal(f.partner.calls.filter(c=>c.operation==='redeem').length,0);
+});
+test('a blocked account does not follow the card to a new browser; unavailable cards cannot be claimed',async t=>{
+  const f=fixture('blocked');
+  t.after(()=>f.store.close());
+  const first=await checked(f);
+  assert.equal(first.state,'blocked');
+  f.service.disable(f.card.id,true);
+  await assert.rejects(f.service.preview(f.card.code,other),{code:'CARD_DISABLED'});
+  f.service.disable(f.card.id,false);
+  f.store.run("UPDATE cards SET status='completed' WHERE id=?",f.card.id);
+  await assert.rejects(f.service.preview(f.card.code,other),{code:'CARD_IN_USE'});
+  assert.equal((await f.service.recover(f.card.code,other)).state,'completed');
+  f.store.run("UPDATE cards SET status='ready' WHERE id=?",f.card.id);
+  const fresh=await f.service.preview(f.card.code,other);
+  assert.equal(fresh.state,'preview');
+  assert.equal(fresh.blocked,false);
+  assert.equal(fresh.email,null);
+  assert.equal(fresh.blocking_reason,null);
+  assert.equal(f.partner.calls.filter(c=>c.operation==='redeem').length,0);
 });
 test('disabled cards cannot verify or redeem, and submitted cards cannot be re-enabled',async()=>{
   const f=fixture(),a=await checked(f);f.service.disable(f.card.id,true);await assert.rejects(f.service.redeem(a.attempt_id,a.confirmation,true,device));await assert.rejects(f.service.preview(f.card.code,device));f.service.disable(f.card.id,false);await f.service.redeem(a.attempt_id,a.confirmation,true,device);assert.throws(()=>f.service.disable(f.card.id,false));

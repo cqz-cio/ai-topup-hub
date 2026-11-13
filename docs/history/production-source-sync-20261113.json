@@ -1,0 +1,89 @@
+{
+  "status": "verified-before-main-update",
+  "date": "2026-11-13",
+  "base_main_commit": "c2800d11b7eefb5abd173cc12a63050fc7923a15",
+  "operation": "Archive previously deployed source in main; no production deployment",
+  "production": {
+    "checked_at": "2026-11-13T07:54:05.817525+00:00",
+    "frontend": "/srv/zhixiang-front/releases/20261111-150144",
+    "backend": "/srv/zhixiang/releases/20261110-163649",
+    "redemption": "/srv/paiplus/releases/20261103-153828",
+    "storefront": {
+      "checked": 197,
+      "mismatches": []
+    },
+    "redemption_files": {
+      "checked": 59,
+      "mismatches": []
+    },
+    "backend_sha256": "9d41b69101b38554cf63d4acf4911bebd1de2a89cfd298e8fe1d69e58f163af5"
+  },
+  "source_roots": {
+    "frontend/user": "work/codex-runtime/light-only-20261111/source/frontend/user",
+    "redemption-center": "work/codex-runtime/redemption-light-20261111/source"
+  },
+  "tests": {
+    "storefront": 260,
+    "redemption": 92,
+    "catalog_migration": 4
+  },
+  "storefront_typecheck": "passed",
+  "production_builds": "passed",
+  "artifact_comparison": {
+    "storefront": {
+      "built_files": 434,
+      "published_build_files": 434,
+      "changed": [],
+      "added": [],
+      "missing": []
+    },
+    "redemption": {
+      "built_files": 30,
+      "published_build_files": 30,
+      "changed": [],
+      "added": [],
+      "missing": []
+    }
+  },
+  "public_asset_scan": {
+    "passed": true,
+    "files": 464
+  },
+  "runtime_source_sha256": {
+    "frontend/user/build/publicDocumentBoot.ts": "ca482101d65e4d5cd8626aa2079b7aef6f4199ca25a1ffede6bd357fb96457ba",
+    "frontend/user/build/publicDocumentEntry.ts": "011064cf90d6635d8cb61d52f0000a5b65b6a98a1a2b55351d0ed132b3b1ee14",
+    "frontend/user/public/catalog-products/pro-usd-20261111/pro-100-eg.svg": "dcfbe01a77fd937fb9135202a3b2812fe01bf675dcae855603294df26909b7b1",
+    "frontend/user/public/catalog-products/pro-usd-20261111/pro-100-ph.svg": "37af570137de0c598c8a39333abec1e873bc526c8c2c940b63bd62d94d117188",
+    "frontend/user/public/catalog-products/pro-usd-20261111/pro-200-ph.svg": "673a2d0102a1125f4b65a3a8bd55e4f6ab855e9a4f0b5083409f344a840cc55c",
+    "frontend/user/public/catalog-products/pro-usd-20261111/pro-200-renew-ph.svg": "75c09e43c6862caf2cb68a18307544ba22304b93eab522d9cd6de30cc21d83c8",
+    "frontend/user/public/catalog-products/pro-usd-20261111/pro-500-eg.svg": "d5782745d48720bc43f91e435540bcbd14daa3282acfca694abd519650d06804",
+    "frontend/user/public/catalog-products/pro-usd-20261111/pro-500-ph.svg": "0842f9797c0e0f55e7e573019b88d03ab99fb79c9fec5f2fb89be4de826de0ff",
+    "frontend/user/src/components/Navbar.vue": "5544dc8362e87ef513ff22c2f59599208cc22f7fb5fda637f0c29c816b97e133",
+    "frontend/user/src/components/reseller-console/ResellerConsoleTopbar.vue": "f0e0a90374df3e7caa408a084a34e046bfebd51e4634478a6a9513302bc5713c",
+    "frontend/user/src/main.ts": "62de79bd8c8a1926cbd4b39a48f6ce28952c394d250f94a890d8c09ae94e855b",
+    "frontend/user/src/templates/vault/layout/VaultLayout.vue": "baf696007dcc34b09bdec37754a6dfeeffa03c1c7443ac4b8d36a1153ed70b49",
+    "frontend/user/src/utils/catalogGlass.ts": "6d9c8a33ac48b9a313064e3c0109cf69491d50c4ed8939a4a3f6717f605d9e8b",
+    "frontend/user/src/utils/theme.ts": "8ba80f0816d00cf5d26a9e449868a9ae3afdf075ada4e3cb4e871c5b731b56ea",
+    "frontend/user/tests/publicDocumentEntry.test.ts": "fb44d656a95f784d96a436e55d1e1ae54a998a85cc323fa41c02aa80fbebdcca",
+    "redemption-center/server/abuse.mjs": "79035ddb95aa2a1fc60184da46e3d73cc67fd68a0cc77cc41d41bcabd07a3d54",
+    "redemption-center/server/http.mjs": "e19aab79e04af389d6f5ec104731917bb2d151ee17c03ca600d27317b3cb0c3c",
+    "redemption-center/server/partner.mjs": "e23ea097deaba04f6bd702018884f326233d8500710e86230eb62db11f23bbb8",
+    "redemption-center/server/preflight-details.mjs": "b5057f7728ae61928e82bacf3724bf8a58cba2cbd58741d0020115ba1eb75386",
+    "redemption-center/server/security.mjs": "604d6673ac64490c25f62763a76845e83c37b016778f049b1abf4ef0c547f26b",
+    "redemption-center/server/service.mjs": "4224a504274b7d7b21719454afd4a0d32c065eca558b1b2f0f64c56a1f96196d",
+    "redemption-center/src/App.jsx": "edb3146eaeebc3f412c6398963f7a20a52cb548031b17527938e9ceccb0e6c92",
+    "redemption-center/src/ConfirmationPanel.jsx": "50a079b53863a2b8eba86fde6654f4e28a62cfd4b4863822e404fdc023768b0e",
+    "redemption-center/src/SessionGuide.jsx": "63fe9985d3930f5921d6aad6870033febcd503ed23cc05a7a13ac2ff8c9b0b41",
+    "redemption-center/src/api.js": "94bcf1b0c23b39be2e57dad001e63f4795a0729c254a178a24446ecd635f0ce8",
+    "redemption-center/src/confirmation.css": "8f8bc35c71a5c961e8cdf312941ef5eb2a0fa35e63921d3f6e3efc0b0781e1aa",
+    "redemption-center/src/main.jsx": "6b08ae537424c052f7b9d25546bb2b629427a34f598a7e1ee6b9f806773b4edc",
+    "redemption-center/src/session-guide.css": "30be61c85085c0cd6f98784b332b95960a115da93c030aa236aa49337bf09d13"
+  },
+  "database_uploaded_or_modified": false,
+  "services_restarted": false,
+  "production_deployed": false,
+  "real_payment_purchase_refund_or_redemption": false,
+  "prior_test_failure": "Initial redemption test run was blocked by sandbox loopback and directory junction permissions; same suite passed after environment permission correction. Original log retained.",
+  "verification_scope": "Offline/mock tests, reproducible frontend artifacts and read-only production hashes. No new browser or live transaction tests in this archive-only operation.",
+  "private_evidence": "work/codex-runtime/main-sync-20261113/"
+}

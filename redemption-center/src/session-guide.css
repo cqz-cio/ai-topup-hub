@@ -1,0 +1,29 @@
+.session-guide {
+  margin: 23px 0 25px;
+  padding: 19px 21px;
+  border: 1px solid var(--edge);
+  border-radius: 14px;
+  background: #f6fffa52;
+  color: var(--ink);
+}
+.session-guide-heading { font-size: 14px; font-weight: 700; margin-bottom: 16px; }
+.session-guide ol { list-style: none; padding: 0; margin: 0; display: grid; gap: 18px; }
+.session-guide li { display: grid; grid-template-columns: 25px minmax(0, 1fr); gap: 11px; align-items: start; }
+.session-guide-number { display: grid; place-items: center; height: 25px; width: 25px; border-radius: 50%; background: #21664f; color: white; font-size: 12px; font-weight: 700; }
+.session-guide h3 { font-size: 14px; line-height: 25px; letter-spacing: 0; font-weight: 700; margin: 0 0 4px; }
+.session-guide li p { font-size: 12px; color: var(--muted); line-height: 1.85; margin: 0; }
+.session-guide-link { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; padding: 9px 12px; margin-top: 9px; border: 1px solid #ffffffd9; border-radius: 9px; background: linear-gradient(130deg, #ffffff9c, #d2f8e877); width: fit-content; max-width: 100%; box-shadow: inset 0 1px #ffffffb3; }
+.session-guide-link strong { font-size: 12px; color: #14533d; text-decoration: underline; text-underline-offset: 3px; }
+.session-guide-link span { font-size: 11px; color: #355f55; overflow-wrap: anywhere; }
+.session-guide-link:hover { background: #ffffffb0; }
+.session-guide-link:focus-visible { outline: 2px solid #17664d; outline-offset: 3px; }
+.session-guide .session-guide-note { border-top: 1px solid var(--line); margin: 17px 0 0; padding-top: 12px; font-size: 11px; color: var(--muted); line-height: 1.85; }
+.dark .session-guide { background: #173e354d; }
+.dark .session-guide-link { background: #2b594a80; }
+.dark .session-guide-link strong, .dark .session-guide-link span { color: var(--ink); }
+@media (max-width: 600px) {
+  .session-guide { padding: 16px 13px; }
+  .session-guide li { gap: 9px; }
+  .session-guide-link { padding: 9px 10px; }
+  .session-guide-link strong { line-height: 1.7; }
+}

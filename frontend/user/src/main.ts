@@ -8,6 +8,9 @@ import i18n, { detectLocale, setI18nLocale } from './i18n'
 import { useTelegramMiniAppStore } from './stores/telegramMiniApp'
 import { initTemplateOverride } from './templates/registry'
 import { isRedemptionPath } from './utils/redemption'
+import { initializeLightTheme } from './utils/theme'
+
+initializeLightTheme()
 
 // 预览用：?template=vault 持久化激活模板（站长正式切换走站点配置）
 initTemplateOverride()
@@ -29,8 +32,12 @@ app.use(head)
 app.use(router)
 app.use(i18n)
 
-// 非默认语言的语言包为懒加载 chunk，挂载前并行加载，避免首屏文案闪现兜底语言
+const publicDocument = document.querySelector('#public-document')
+
+// Keep the server document until the first route, configuration and locale are
+// ready, so replacing it never exposes an empty router view.
 Promise.all([
+  publicDocument ? router.isReady() : Promise.resolve(),
   isRedemptionPath(window.location.pathname) ? Promise.resolve() : useTelegramMiniAppStore(pinia).init(),
   setI18nLocale(detectLocale()),
 ]).then(() => {
@@ -38,6 +45,12 @@ Promise.all([
   // only its head entries so Unhead owns subsequent navigation without duplicates.
   document.querySelectorAll('[data-public-page-seo]').forEach(node => node.remove())
   app.mount('#app')
+}).catch(() => {
+  // Preserve readable content if initialization fails after a partial mount.
+  if (publicDocument && !publicDocument.isConnected) {
+    document.querySelector('#app')?.replaceChildren(publicDocument)
+  }
+  document.documentElement.setAttribute('data-public-document-boot-failed', '')
 })
 
 void router.isReady().then(() => {

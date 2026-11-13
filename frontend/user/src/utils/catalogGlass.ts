@@ -20,9 +20,20 @@ const glassCoverNames = new Set([
   'codex-25000-ph-20261016.svg',
 ])
 
+// Approved USD labels retain the same transparent-cover treatment in both themes.
+const proUsdCovers = new Set([
+  '/catalog-products/pro-usd-20261111/pro-100-ph.svg',
+  '/catalog-products/pro-usd-20261111/pro-100-eg.svg',
+  '/catalog-products/pro-usd-20261111/pro-200-ph.svg',
+  '/catalog-products/pro-usd-20261111/pro-200-renew-ph.svg',
+  '/catalog-products/pro-usd-20261111/pro-500-ph.svg',
+  '/catalog-products/pro-usd-20261111/pro-500-eg.svg',
+])
+
 export function getCatalogGlassCover(image: string): string {
   const prefix = '/catalog-products/qzweb/'
   const path = image.split(/[?#]/, 1)[0] ?? ''
+  if (proUsdCovers.has(path)) return path
   if (!path.startsWith(prefix)) return ''
   const name = path.slice(prefix.length)
   return glassCoverNames.has(name) ? `/catalog-products/glass-20261019/${name}` : ''

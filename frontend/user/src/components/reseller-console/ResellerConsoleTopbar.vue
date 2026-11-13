@@ -33,17 +33,6 @@
           </RouterLink>
         </Button>
 
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          :aria-label="t('resellerConsole.common.toggleTheme')"
-          @click="toggleTheme"
-        >
-          <Sun v-if="theme === 'dark'" class="h-4 w-4" />
-          <Moon v-else class="h-4 w-4" />
-        </Button>
-
         <!-- Language switcher -->
         <Popover v-model:open="langOpen">
           <PopoverTrigger as-child>
@@ -189,15 +178,12 @@ import {
   Languages,
   LogOut,
   Menu,
-  Moon,
-  Sun,
   X,
 } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { useAppStore } from '../../stores/app'
 import { useUserAuthStore } from '../../stores/userAuth'
-import { useTheme } from '../../utils/theme'
 import { getImageUrl } from '../../utils/image'
 
 defineProps<{
@@ -209,7 +195,6 @@ const { t } = useI18n()
 const route = useRoute()
 const appStore = useAppStore()
 const userAuthStore = useUserAuthStore()
-const { theme, toggleTheme } = useTheme()
 
 const drawerOpen = ref(false)
 const langOpen = ref(false)
