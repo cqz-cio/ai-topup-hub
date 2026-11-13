@@ -2,6 +2,8 @@ package sitemaphttp
 
 import (
 	"context"
+	"net/http"
+	"strconv"
 
 	"github.com/dujiao-next/internal/logger"
 	"github.com/dujiao-next/internal/platform/http/siteurl"
@@ -33,7 +35,7 @@ func NewHandler(sitemap Generator, brand SiteBrandReader) *Handler {
 // GetSitemap GET /sitemap.xml
 func (h *Handler) GetSitemap(c *gin.Context) {
 	if h == nil || h.sitemap == nil {
-		c.String(503, "sitemap service unavailable")
+		writeDocument(c, 503, "text/plain; charset=utf-8", "sitemap service unavailable")
 		return
 	}
 
@@ -41,12 +43,12 @@ func (h *Handler) GetSitemap(c *gin.Context) {
 	xmlStr, err := h.sitemap.Generate(c.Request.Context(), baseURL)
 	if err != nil {
 		logger.Errorw("sitemap_generate_failed", "error", err)
-		c.String(500, "internal error")
+		writeDocument(c, 500, "text/plain; charset=utf-8", "internal error")
 		return
 	}
 
 	c.Header("Cache-Control", "public, max-age=300")
-	c.Data(200, "application/xml; charset=utf-8", []byte(xmlStr))
+	writeDocument(c, 200, "application/xml; charset=utf-8", xmlStr)
 }
 
 // GetRobots GET /robots.txt
@@ -59,7 +61,16 @@ func (h *Handler) GetRobots(c *gin.Context) {
 	}
 
 	c.Header("Cache-Control", "public, max-age=3600")
-	c.Data(200, "text/plain; charset=utf-8", []byte(body))
+	writeDocument(c, 200, "text/plain; charset=utf-8", body)
+}
+
+func writeDocument(c *gin.Context, status int, contentType, text string) {
+	body := []byte(text)
+	c.Header("Content-Length", strconv.Itoa(len(body)))
+	if c.Request.Method == http.MethodHead {
+		body = nil
+	}
+	c.Data(status, contentType, body)
 }
 
 // resolveBaseURL 与公开配置共用 URL 校验，避免将开发地址写入 sitemap。

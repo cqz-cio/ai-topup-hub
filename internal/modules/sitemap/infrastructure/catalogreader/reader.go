@@ -30,7 +30,7 @@ func (r *Reader) ListActiveCategories() ([]contract.Category, error) {
 	}
 	result := make([]contract.Category, 0, len(rows))
 	for _, row := range rows {
-		result = append(result, contract.Category{Slug: row.Slug, CreatedAt: row.CreatedAt})
+		result = append(result, contract.Category{ID: row.ID, ParentID: row.ParentID, Slug: row.Slug, CreatedAt: row.CreatedAt})
 	}
 	return result, nil
 }
@@ -47,7 +47,7 @@ func (r *Reader) ListActiveProducts(limit int) ([]contract.Product, error) {
 	}
 	result := make([]contract.Product, 0, len(rows))
 	for _, row := range rows {
-		result = append(result, contract.Product{Slug: row.Slug, UpdatedAt: row.UpdatedAt})
+		result = append(result, contract.Product{CategoryID: row.CategoryID, Slug: row.Slug, UpdatedAt: row.UpdatedAt})
 	}
 	return result, nil
 }

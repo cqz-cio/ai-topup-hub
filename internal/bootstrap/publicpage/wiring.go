@@ -66,8 +66,22 @@ func (s *source) Site(ctx context.Context) (publicpage.Site, error) {
 		name = metadataText(seo["title"])
 	}
 	site := publicpage.Site{Name: name, URL: origin, Currency: currency, Logo: metadataText(brand["site_logo"]), Description: metadataText(seo["description"])}
+	site.Icon, site.DefaultImage = metadataText(brand["site_icon"]), metadataText(seo["default_og_image"])
 	if isMainSite(ctx) {
 		site.ReturnPolicyPath = publiccontent.DeliveryAndReturns().Path
+		assets := publiccontent.PublicSEOAssets()
+		if site.Logo == assets.LegacyLogo {
+			site.Logo = assets.Logo
+		}
+		if site.Icon == "" || site.Icon == assets.LegacyLogo {
+			site.Icon = assets.Icon
+		}
+		if site.DefaultImage == "" {
+			site.DefaultImage = site.Logo
+		}
+		if site.DefaultImage == assets.LegacyLogo {
+			site.DefaultImage = assets.Logo
+		}
 	}
 	return site, nil
 }

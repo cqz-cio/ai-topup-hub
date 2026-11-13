@@ -25,6 +25,8 @@ func (s *source) publicConfig(ctx context.Context, about bool) (map[string]any, 
 		return nil, err
 	}
 	data := map[string]any{"brand": config["brand"], "seo": config["seo"], "about": config["about"], "contact": config["contact"]}
+	legal := configMap(config["legal"])
+	data["legal"] = map[string]any{"terms": legal["terms"], "privacy": legal["privacy"]}
 	// Normalize JSON aliases and detach nested maps before tenant overlays.
 	raw, err := json.Marshal(data)
 	if err != nil {
@@ -90,13 +92,25 @@ func (s *source) About(ctx context.Context) (publicpage.Page, error) {
 }
 
 func (s *source) BlogList(ctx context.Context, number int, search string) (publicpage.Page, error) {
+	return s.postList(ctx, constants.PostTypeBlog, number, search)
+}
+
+func (s *source) NoticeList(ctx context.Context, number int, search string) (publicpage.Page, error) {
+	return s.postList(ctx, constants.PostTypeNotice, number, search)
+}
+
+func (s *source) postList(ctx context.Context, postType string, number int, search string) (publicpage.Page, error) {
 	const pageSize = 12
-	posts, total, err := s.posts.ReadPublishedPosts(ctx, contentapp.PublicPostQuery{Type: constants.PostTypeBlog, Search: search, Page: number, PageSize: pageSize})
+	posts, total, err := s.posts.ReadPublishedPosts(ctx, contentapp.PublicPostQuery{Type: postType, Search: search, Page: number, PageSize: pageSize})
 	if err != nil {
 		return publicpage.Page{}, err
 	}
 	if number > 1 && int64((number-1)*pageSize) >= total {
 		return publicpage.Page{}, publicpage.ErrNotFound
+	}
+	basePath, kind, title, summary := "/blog", "blog", "博客", "最新文章和动态"
+	if postType == constants.PostTypeNotice {
+		basePath, kind, title, summary = "/notice", "notice-list", "公告", "购买、交付与售后服务公告"
 	}
 	pagePath := func(n int, filter string) string {
 		q := url.Values{}
@@ -107,13 +121,13 @@ func (s *source) BlogList(ctx context.Context, number int, search string) (publi
 			q.Set("search", filter)
 		}
 		if len(q) > 0 {
-			return "/blog?" + q.Encode()
+			return basePath + "?" + q.Encode()
 		}
-		return "/blog"
+		return basePath
 	}
-	page := publicpage.Page{Kind: "blog", Path: pagePath(number, ""), Title: "博客", Summary: "最新文章和动态", NoIndex: search != ""}
+	page := publicpage.Page{Kind: kind, Path: pagePath(number, ""), Title: title, Summary: summary, NoIndex: search != ""}
 	if page.NoIndex {
-		page.Path = "/blog"
+		page.Path = basePath
 	}
 	for _, post := range posts {
 		page.Entries = append(page.Entries, publicpage.Entry{Title: localized(post.Title), Path: "/blog/" + url.PathEscape(post.Slug), Summary: localized(post.Summary), PublishedAt: post.PublishedAt})
@@ -169,4 +183,30 @@ func isEditorial(slug string) bool {
 		}
 	}
 	return false
+}
+
+// Products reuses the same anonymous projection as the home and category pages.
+func (s *source) Products(ctx context.Context) (publicpage.Page, error) {
+	items, err := s.catalogItems(ctx, "")
+	return publicpage.Page{Kind: "products", Path: "/products", Title: "商品中心", Summary: "使用期限与质保期不同，购买前请分别确认。", Items: items}, err
+}
+
+func (s *source) Terms(ctx context.Context) (publicpage.Page, error) {
+	return s.legal(ctx, "terms", "服务条款")
+}
+
+func (s *source) Privacy(ctx context.Context) (publicpage.Page, error) {
+	return s.legal(ctx, "privacy", "隐私政策")
+}
+
+func (s *source) legal(ctx context.Context, key, title string) (publicpage.Page, error) {
+	config, err := s.publicConfig(ctx, false)
+	if err != nil {
+		return publicpage.Page{}, err
+	}
+	body := metadataText(configMap(config["legal"])[key])
+	if strings.TrimSpace(body) == "" {
+		return publicpage.Page{}, publicpage.ErrNotFound
+	}
+	return publicpage.Page{Kind: "legal", Path: "/" + key, Title: title, Content: body}, nil
 }

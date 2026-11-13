@@ -141,12 +141,34 @@ func (s *Service) collectURLs(ctx context.Context, baseURL string) ([]domain.URL
 		})
 	}
 
-	// 2. 启用的分类
+	// Read the visible product set once; empty categories have no public document.
+	products, err := s.catalog.ListActiveProducts(sitemapMaxFetch)
+	if err != nil {
+		return nil, fmt.Errorf("sitemap: list products: %w", err)
+	}
+	populated := make(map[uint]bool)
+	for _, product := range products {
+		if strings.TrimSpace(product.Slug) != "" {
+			populated[product.CategoryID] = true
+		}
+	}
+	// 2. 启用且有公开商品的分类
 	categories, err := s.catalog.ListActiveCategories()
 	if err != nil {
 		return nil, fmt.Errorf("sitemap: list categories: %w", err)
 	}
+	// The public catalog includes active immediate children of a root category.
+	// Use a separate set so category ordering cannot accidentally include deeper descendants.
+	withChildren := make(map[uint]bool)
 	for _, cat := range categories {
+		if cat.ParentID != 0 && populated[cat.ID] {
+			withChildren[cat.ParentID] = true
+		}
+	}
+	for _, cat := range categories {
+		if (!populated[cat.ID] && !(cat.ParentID == 0 && withChildren[cat.ID])) || strings.TrimSpace(cat.Slug) == "" {
+			continue
+		}
 		lastModified := cat.CreatedAt.UTC().Format("2006-01-02")
 		guide := publiccontent.GPTRecharge()
 		if cat.Slug == guide.CategorySlug && lastModified < guide.UpdatedAt {
@@ -161,11 +183,10 @@ func (s *Service) collectURLs(ctx context.Context, baseURL string) ([]domain.URL
 	}
 
 	// 3. 上架的商品（OnlyActive 已含分类启用过滤）
-	products, err := s.catalog.ListActiveProducts(sitemapMaxFetch)
-	if err != nil {
-		return nil, fmt.Errorf("sitemap: list products: %w", err)
-	}
 	for _, p := range products {
+		if strings.TrimSpace(p.Slug) == "" {
+			continue
+		}
 		entries = append(entries, domain.URL{
 			Location:        baseURL + "/products/" + url.PathEscape(p.Slug),
 			LastModified:    p.UpdatedAt.UTC().Format("2006-01-02"),

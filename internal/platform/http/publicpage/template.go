@@ -4,13 +4,14 @@ import "html/template"
 
 type document struct {
 	Page
-	Site                   Site
-	Canonical, Description string
-	MetadataTitle          string
-	Images                 []string
-	Body, Summary          template.HTML
-	Schema                 template.JS
-	Identity               template.JS
+	Site                          Site
+	Canonical, Description        string
+	MetadataTitle                 string
+	Icon, ShareImage, TwitterCard string
+	Images                        []string
+	Body, Summary                 template.HTML
+	Schema                        template.JS
+	Identity                      template.JS
 }
 
 // The visible HTML is identical for crawlers and visitors. Vue progressively
@@ -21,13 +22,18 @@ var documentTemplate = template.Must(template.New("public-detail").Parse(`<!doct
 <title data-public-page-seo>{{.MetadataTitle}}</title>
 <meta data-public-page-seo name="description" content="{{.Description}}">
 <link data-public-page-seo rel="canonical" href="{{.Canonical}}">
+{{if .Icon}}<link data-public-page-seo rel="icon" href="{{.Icon}}">{{end}}
 {{if .NoIndex}}<meta data-public-page-seo name="robots" content="noindex, follow">{{end}}
 <meta data-public-page-seo property="og:title" content="{{.MetadataTitle}}">
 <meta data-public-page-seo property="og:description" content="{{.Description}}">
 <meta data-public-page-seo property="og:url" content="{{.Canonical}}">
 <meta data-public-page-seo property="og:site_name" content="{{.Site.Name}}">
 <meta data-public-page-seo property="og:type" content="{{if eq .Kind "product"}}product{{else if or (eq .Kind "article") (eq .Kind "notice")}}article{{else}}website{{end}}">
-{{range .Images}}<meta data-public-page-seo property="og:image" content="{{.}}">{{end}}
+{{if .ShareImage}}<meta data-public-page-seo property="og:image" content="{{.ShareImage}}">{{end}}
+<meta data-public-page-seo name="twitter:card" content="{{.TwitterCard}}">
+<meta data-public-page-seo name="twitter:title" content="{{.MetadataTitle}}">
+<meta data-public-page-seo name="twitter:description" content="{{.Description}}">
+{{if .ShareImage}}<meta data-public-page-seo name="twitter:image" content="{{.ShareImage}}">{{end}}
 <script data-public-page-seo type="application/ld+json">{{.Schema}}</script>
 <script data-public-page-seo type="application/ld+json">{{.Identity}}</script>
 <link rel="stylesheet" href="/storefront-entry.css">
@@ -46,7 +52,7 @@ var documentTemplate = template.Must(template.New("public-detail").Parse(`<!doct
 {{if .Category}}<p>分类：{{.Category}}</p>{{end}}
 {{if .Facts}}<dl>{{range .Facts}}<dt>{{.Name}}</dt><dd>{{.Value}}</dd>{{end}}</dl>{{end}}
 <section aria-label="完整正文">{{.Body}}</section>
-{{if eq .Kind "blog"}}<section aria-label="已发布文章">{{range .Entries}}<article><h2><a href="{{.Path}}">{{.Title}}</a></h2>{{if .PublishedAt}}<time datetime="{{.PublishedAt.Format "2006-01-02T15:04:05Z07:00"}}">{{.PublishedAt.Format "2006-01-02"}}</time>{{end}}<p>{{.Summary}}</p></article>{{else}}<p>暂无匹配文章</p>{{end}}</section>{{end}}
+{{if or (eq .Kind "blog") (eq .Kind "notice-list")}}<section aria-label="已发布文章">{{range .Entries}}<article><h2><a href="{{.Path}}">{{.Title}}</a></h2>{{if .PublishedAt}}<time datetime="{{.PublishedAt.Format "2006-01-02T15:04:05Z07:00"}}">{{.PublishedAt.Format "2006-01-02"}}</time>{{end}}<p>{{.Summary}}</p></article>{{else}}<p>暂无匹配文章</p>{{end}}</section>{{end}}
 {{if .Pagination}}<nav aria-label="文章分页">{{range .Pagination}}<a href="{{.Path}}">{{.Title}}</a> {{end}}</nav>{{end}}
 {{if .Links}}<aside><h2>相关内容</h2><ul>{{range .Links}}<li><a href="{{.Path}}">{{.Title}}</a></li>{{end}}</ul></aside>{{end}}
 </article></main></div></body></html>`))

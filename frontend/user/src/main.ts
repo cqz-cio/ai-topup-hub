@@ -1,6 +1,6 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import { createHead } from '@unhead/vue/client'
+import { createHead, renderDOMHead } from '@unhead/vue/client'
 import './style.css'
 import App from './App.vue'
 import router, { warmupCommonRoutes } from './router'
@@ -24,15 +24,23 @@ brandLog?.(
 brandLog?.('%cGitHub → https://github.com/dujiao-next', 'color:#6e6e73;')
 
 const app = createApp(App)
-const head = createHead()
+const publicDocument = document.querySelector('#public-document')
+const publicDocumentHead = [...document.querySelectorAll('[data-public-page-seo]')]
+let clientHeadReady = !publicDocument
+const head = createHead({
+  hooks: {
+    // Router guards initialize the app store before mount. Do not let Unhead
+    // adopt the server's nodes until they have been handed over: removing an
+    // already-adopted node leaves its internal DOM reference detached.
+    'dom:beforeRender': context => { if (!clientHeadReady) context.shouldRender = false },
+  },
+})
 const pinia = createPinia()
 
 app.use(pinia)
 app.use(head)
 app.use(router)
 app.use(i18n)
-
-const publicDocument = document.querySelector('#public-document')
 
 // Keep the server document until the first route, configuration and locale are
 // ready, so replacing it never exposes an empty router view.
@@ -43,13 +51,17 @@ Promise.all([
 ]).then(() => {
   // The server document is visible until the interactive app is ready. Remove
   // only its head entries so Unhead owns subsequent navigation without duplicates.
-  document.querySelectorAll('[data-public-page-seo]').forEach(node => node.remove())
+  publicDocumentHead.forEach(node => node.remove())
+  clientHeadReady = true
   app.mount('#app')
+  return renderDOMHead(head)
 }).catch(() => {
   // Preserve readable content if initialization fails after a partial mount.
   if (publicDocument && !publicDocument.isConnected) {
     document.querySelector('#app')?.replaceChildren(publicDocument)
   }
+  clientHeadReady = false
+  publicDocumentHead.forEach(node => { if (!node.isConnected) document.head.appendChild(node) })
   document.documentElement.setAttribute('data-public-document-boot-failed', '')
 })
 

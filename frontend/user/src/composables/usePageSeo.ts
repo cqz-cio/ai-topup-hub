@@ -3,6 +3,7 @@ import { useHead } from '@unhead/vue'
 import { useAppStore } from '../stores/app'
 import { getImageUrl } from '../utils/image'
 import { seoText, seoTitle } from '../utils/seo'
+import { identityLogo, shareMetadata } from '../utils/shareSeo'
 
 export interface PageSeoOptions {
   /** 页面专属标题；若与站点名相同，仅展示站点名 */
@@ -56,7 +57,8 @@ export function usePageSeo(options: PageSeoOptions = {}) {
 
   const defaultImage = computed(() => {
     const seo = appStore.config?.seo as { default_og_image?: string } | undefined
-    return seo?.default_og_image ? String(seo.default_og_image).trim() : ''
+    const configured = String(seo?.default_og_image || '').trim()
+    return configured || (appStore.isResellerTenant ? '' : identityLogo(String(appStore.config?.brand?.site_logo || ''), true))
   })
 
   const pageTitle = computed(() => {
@@ -84,16 +86,12 @@ export function usePageSeo(options: PageSeoOptions = {}) {
     return baseUrl.value + path
   })
 
-  const fullImage = computed(() => {
+  const sharing = computed(() => {
     const raw = options.image?.()
-    if (raw && String(raw).trim()) {
-      return resolveImage(String(raw), baseUrl.value) || undefined
-    }
-    if (defaultImage.value) {
-      return resolveImage(defaultImage.value, baseUrl.value) || undefined
-    }
-    return undefined
+    return shareMetadata(baseUrl.value, raw ? [resolveImage(String(raw), baseUrl.value)] : [],
+      defaultImage.value ? resolveImage(defaultImage.value, baseUrl.value) : '')
   })
+  const fullImage = computed(() => sharing.value.image)
 
   useHead({
     title: () => fullTitle.value,
@@ -120,7 +118,7 @@ export function usePageSeo(options: PageSeoOptions = {}) {
       if (fullImage.value) tags.push({ property: 'og:image', content: fullImage.value })
       if (siteName.value) tags.push({ property: 'og:site_name', content: siteName.value })
 
-      tags.push({ name: 'twitter:card', content: 'summary_large_image' })
+      tags.push({ name: 'twitter:card', content: sharing.value.card })
       if (fullTitle.value) tags.push({ name: 'twitter:title', content: fullTitle.value })
       if (fullDescription.value) tags.push({ name: 'twitter:description', content: fullDescription.value })
       if (fullImage.value) tags.push({ name: 'twitter:image', content: fullImage.value })
