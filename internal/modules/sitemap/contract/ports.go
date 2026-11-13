@@ -7,14 +7,17 @@ import (
 
 // Category 是生成 Sitemap 所需的分类投影。
 type Category struct {
+	ID        uint
+	ParentID  uint
 	Slug      string
 	CreatedAt time.Time
 }
 
 // Product 是生成 Sitemap 所需的商品投影。
 type Product struct {
-	Slug      string
-	UpdatedAt time.Time
+	CategoryID uint
+	Slug       string
+	UpdatedAt  time.Time
 }
 
 // PublishedPost 是生成 Sitemap 所需的已发布文章投影。

@@ -399,12 +399,12 @@ useHead(() => {
       isPartOf: { '@id': origin + '/#website' }, about: { '@id': origin + '/#organization' },
     }) }] }
   }
-  if (!isRechargePage.value || initialLoading.value || loadFailed.value) return { script: [] }
+  if (!catalogOnly || initialLoading.value || loadFailed.value) return { script: [] }
   const origin = String(appStore.config?.brand?.site_url || window.location.origin).replace(/\/+$/, '')
-  const items = sortStorefrontProducts(products.value.filter(product => product.category?.slug === gptRecharge.categorySlug), 'asc')
+  const items = orderedProducts.value
   const schema = {
-    '@context': 'https://schema.org', '@type': 'CollectionPage', name: gptRecharge.title,
-    description: gptRecharge.summary, url: origin + gptRecharge.path,
+    '@context': 'https://schema.org', '@type': 'CollectionPage', name: isRechargePage.value ? gptRecharge.title : (selectedCategory.value || t('nav.products')),
+    description: isRechargePage.value ? gptRecharge.summary : t('shopUi.catalogHint'), url: origin + route.path,
     mainEntity: { '@type': 'ItemList', itemListElement: items.map((product, index) => ({
       '@type': 'ListItem', position: index + 1, name: productTitle(product), url: `${origin}/products/${encodeURIComponent(product.slug)}`,
     })) },

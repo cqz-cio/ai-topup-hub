@@ -17,15 +17,21 @@ type siteStub struct {
 	search string
 }
 
-func (s *siteStub) Home(context.Context) (Page, error)  { return s.page, s.err }
-func (s *siteStub) About(context.Context) (Page, error) { return s.page, s.err }
+func (s *siteStub) Home(context.Context) (Page, error)     { return s.page, s.err }
+func (s *siteStub) About(context.Context) (Page, error)    { return s.page, s.err }
+func (s *siteStub) Products(context.Context) (Page, error) { return s.page, s.err }
+func (s *siteStub) Terms(context.Context) (Page, error)    { return s.page, s.err }
+func (s *siteStub) Privacy(context.Context) (Page, error)  { return s.page, s.err }
+func (s *siteStub) NoticeList(ctx context.Context, number int, search string) (Page, error) {
+	return s.BlogList(ctx, number, search)
+}
 func (s *siteStub) BlogList(_ context.Context, number int, search string) (Page, error) {
 	s.number, s.search = number, search
 	return s.page, s.err
 }
 
 func TestSiteDocumentsServeSameCompleteHTMLForAllAgentsAndHEAD(t *testing.T) {
-	for _, path := range []string{"/", "/about", "/blog"} {
+	for _, path := range []string{"/", "/about", "/blog", "/products", "/notice", "/terms", "/privacy"} {
 		s := &siteStub{sourceStub: sourceStub{page: Page{Kind: "blog", Path: path, Title: "公开页面", Content: "<p>完整说明</p>", Entries: []Entry{{Title: "已发布标题", Path: "/blog/article", Summary: "<script>escaped summary</script>"}}, Pagination: []Link{{Title: "下一页", Path: "/blog?page=2"}}}}}
 		r := gin.New()
 		New(s).Register(r, nil)

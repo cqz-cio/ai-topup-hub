@@ -34,7 +34,7 @@ export function usePostList(
 
   usePageSeo({
     title: seo.title,
-    description: () => type === 'blog' ? '最新文章和动态' : undefined,
+    description: () => type === 'blog' ? '最新文章和动态' : '购买、交付与售后服务公告',
     canonicalPath: () => postListPath(seo.canonicalPath, searchKeyword.value.trim() ? 1 : currentPage.value),
     noindex: () => !!searchKeyword.value.trim(),
     followWhenNoindex: true,
@@ -113,17 +113,17 @@ export function usePostList(
   })
 
   useHead(() => {
-    if (type !== 'blog' || loading.value) return { script: [] }
+    if (loading.value) return { script: [] }
     const origin = String(appStore.config?.brand?.site_url || window.location.origin).replace(/\/+$/, '')
     const schema = {
-      '@context': 'https://schema.org', '@type': 'CollectionPage', name: seo.title(), description: '最新文章和动态',
+      '@context': 'https://schema.org', '@type': 'CollectionPage', name: seo.title(), description: type === 'blog' ? '最新文章和动态' : '购买、交付与售后服务公告',
       url: origin + postListPath(seo.canonicalPath, searchKeyword.value.trim() ? 1 : currentPage.value),
       inLanguage: appStore.locale, isPartOf: { '@id': origin + '/#website' }, about: { '@id': origin + '/#organization' },
       mainEntity: { '@type': 'ItemList', itemListElement: posts.value.map((post, i) => ({
         '@type': 'ListItem', position: i + 1, name: getLocalizedText(post.title), url: `${origin}/blog/${encodeURIComponent(post.slug)}`,
       })) },
     }
-    return { script: [{ key: 'blog-list', type: 'application/ld+json', innerHTML: schemaJSON(schema) }] }
+    return { script: [{ key: `${type}-list`, type: 'application/ld+json', innerHTML: schemaJSON(schema) }] }
   })
 
   onMounted(() => {

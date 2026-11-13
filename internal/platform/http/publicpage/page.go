@@ -9,7 +9,6 @@ import (
 	"errors"
 	"html"
 	"html/template"
-	"io/fs"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -23,7 +22,7 @@ import (
 
 var ErrNotFound = errors.New("public document not found")
 
-type Site struct{ Name, URL, Currency, Logo, Description, ReturnPolicyPath string }
+type Site struct{ Name, URL, Currency, Logo, Icon, DefaultImage, Description, ReturnPolicyPath string }
 type Link struct{ Title, Path string }
 type Fact struct{ Name, Value string }
 type Item struct{ Title, Path, Price, Availability, Summary, Category string }
@@ -55,7 +54,11 @@ type Source interface {
 type SitePages interface {
 	Home(context.Context) (Page, error)
 	About(context.Context) (Page, error)
+	Products(context.Context) (Page, error)
+	Terms(context.Context) (Page, error)
+	Privacy(context.Context) (Page, error)
 	BlogList(context.Context, int, string) (Page, error)
+	NoticeList(context.Context, int, string) (Page, error)
 }
 
 type Handler struct {
@@ -68,60 +71,6 @@ func New(source Source) *Handler {
 	// on fully qualified external links and the sanitizer's URL safety rules.
 	policy := bluemonday.UGCPolicy().RequireNoFollowOnLinks(false).RequireNoFollowOnFullyQualifiedLinks(true)
 	return &Handler{source: source, policy: policy}
-}
-
-// Register also preserves /products/* image files in embedded/fullstack mode.
-// The split frontend gateway performs the equivalent file check before proxying.
-func (h *Handler) Register(routes gin.IRoutes, assets fs.FS) {
-	if source, ok := h.source.(SitePages); ok {
-		for path, load := range map[string]func(context.Context) (Page, error){"/": source.Home, "/about": source.About} {
-			handler := func(c *gin.Context) {
-				h.serve(c, func(ctx context.Context, _ string) (Page, error) { return load(ctx) })
-			}
-			routes.GET(path, handler)
-			routes.HEAD(path, handler)
-		}
-		list := func(c *gin.Context) {
-			h.serve(c, func(ctx context.Context, _ string) (Page, error) {
-				page := 1
-				if raw := c.Query("page"); raw != "" {
-					value, err := strconv.Atoi(raw)
-					if err != nil || value < 1 || value > 100000 {
-						return Page{}, ErrNotFound
-					}
-					page = value
-				}
-				search := strings.TrimSpace(c.Query("search"))
-				if len([]rune(search)) > 200 {
-					return Page{}, ErrNotFound
-				}
-				return source.BlogList(ctx, page, search)
-			})
-		}
-		routes.GET("/blog", list)
-		routes.HEAD("/blog", list)
-	}
-	for _, kind := range []string{"products", "blog", "categories"} {
-		load := h.source.Product
-		if kind == "blog" {
-			load = h.source.Post
-		}
-		if kind == "categories" {
-			load = h.source.Category
-		}
-		handler := func(c *gin.Context) {
-			if assets != nil {
-				if info, err := fs.Stat(assets, strings.TrimPrefix(c.Request.URL.Path, "/")); err == nil && !info.IsDir() {
-					c.Header("Cache-Control", "no-cache")
-					http.FileServer(http.FS(assets)).ServeHTTP(c.Writer, c.Request)
-					return
-				}
-			}
-			h.serve(c, load)
-		}
-		routes.GET("/"+kind+"/:slug", handler)
-		routes.HEAD("/"+kind+"/:slug", handler)
-	}
 }
 
 func (h *Handler) serve(c *gin.Context, load func(context.Context, string) (Page, error)) {
@@ -156,6 +105,8 @@ func (h *Handler) serve(c *gin.Context, load func(context.Context, string) (Page
 		Summary:     template.HTML(h.policy.Sanitize(page.Summary)),
 		Description: plainText(page.Summary),
 	}
+	data.Icon = absoluteImage(origin, site.Icon)
+	data.ShareImage, data.TwitterCard = shareImage(origin, page.Images, site.DefaultImage)
 	if description := plainText(page.SEODescription); description != "" {
 		data.Description = description
 	}
@@ -173,10 +124,10 @@ func (h *Handler) serve(c *gin.Context, load func(context.Context, string) (Page
 	if page.Kind == "notice" {
 		schema["@type"] = "Article"
 	}
-	if page.Kind == "home" || page.Kind == "about" || page.Kind == "blog" {
-		kind := map[string]string{"home": "WebPage", "about": "AboutPage", "blog": "CollectionPage"}[page.Kind]
+	if page.Kind == "home" || page.Kind == "about" || (page.Kind == "blog" || page.Kind == "notice-list" || page.Kind == "legal") {
+		kind := map[string]string{"home": "WebPage", "about": "AboutPage", "blog": "CollectionPage", "notice-list": "CollectionPage", "legal": "WebPage"}[page.Kind]
 		schema = map[string]any{"@context": "https://schema.org", "@type": kind, "name": page.Title, "url": canonical, "description": data.Description, "inLanguage": "zh-CN", "isPartOf": map[string]string{"@id": origin + "/#website"}, "about": map[string]string{"@id": origin + "/#organization"}}
-		if page.Kind == "blog" {
+		if page.Kind == "blog" || page.Kind == "notice-list" {
 			items := make([]map[string]any, 0, len(page.Entries))
 			for i, entry := range page.Entries {
 				items = append(items, map[string]any{"@type": "ListItem", "position": i + 1, "name": entry.Title, "url": origin + entry.Path})
@@ -184,7 +135,7 @@ func (h *Handler) serve(c *gin.Context, load func(context.Context, string) (Page
 			schema["mainEntity"] = map[string]any{"@type": "ItemList", "itemListElement": items}
 		}
 	}
-	if page.Kind == "category" {
+	if page.Kind == "category" || page.Kind == "products" {
 		items := make([]map[string]any, 0, len(page.Items))
 		for i, item := range page.Items {
 			items = append(items, map[string]any{"@type": "ListItem", "position": i + 1, "name": item.Title, "url": origin + item.Path})

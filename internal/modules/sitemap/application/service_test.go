@@ -12,6 +12,7 @@ import (
 type catalogStub struct {
 	calls      int
 	categories []contract.Category
+	products   []contract.Product
 }
 
 func (c *catalogStub) ListActiveCategories() ([]contract.Category, error) {
@@ -21,9 +22,9 @@ func (c *catalogStub) ListActiveCategories() ([]contract.Category, error) {
 
 func TestRechargeCategoryKeepsURLAndUsesActualEditorialDate(t *testing.T) {
 	catalog := &catalogStub{categories: []contract.Category{
-		{Slug: "qzweb-category-4", CreatedAt: time.Date(2026, 10, 1, 0, 0, 0, 0, time.UTC)},
-		{Slug: "other", CreatedAt: time.Date(2026, 10, 2, 0, 0, 0, 0, time.UTC)},
-	}}
+		{ID: 1, Slug: "qzweb-category-4", CreatedAt: time.Date(2026, 10, 1, 0, 0, 0, 0, time.UTC)},
+		{ID: 2, Slug: "other", CreatedAt: time.Date(2026, 10, 2, 0, 0, 0, 0, time.UTC)},
+	}, products: []contract.Product{{CategoryID: 1, Slug: "plus"}, {CategoryID: 2, Slug: "other"}}}
 	service, err := NewService(catalog, &postStub{}, &cacheStub{})
 	if err != nil {
 		t.Fatal(err)
@@ -44,7 +45,7 @@ func TestRechargeCategoryKeepsURLAndUsesActualEditorialDate(t *testing.T) {
 
 func (c *catalogStub) ListActiveProducts(int) ([]contract.Product, error) {
 	c.calls++
-	return nil, nil
+	return c.products, nil
 }
 
 type postStub struct {
@@ -119,5 +120,48 @@ func TestGenerateCachesRenderedDocument(t *testing.T) {
 	}
 	if catalog.calls != 2 || posts.calls != 1 {
 		t.Fatalf("cache miss source calls: catalog=%d posts=%d", catalog.calls, posts.calls)
+	}
+}
+
+func TestSitemapOmitsEmptyCategoriesWithoutScanningProductsTwice(t *testing.T) {
+	catalog := &catalogStub{
+		categories: []contract.Category{{ID: 1, Slug: "visible"}, {ID: 2, Slug: "empty"}, {ID: 3, Slug: "only-invalid-slug"}},
+		products:   []contract.Product{{CategoryID: 1, Slug: "available"}, {CategoryID: 1, Slug: "sold-out"}, {CategoryID: 3, Slug: " "}},
+	}
+	service, err := NewService(catalog, &postStub{}, &cacheStub{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	xml, err := service.Generate(context.Background(), "https://example.com")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, want := range []string{"/categories/visible", "/products/available", "/products/sold-out"} {
+		if !strings.Contains(xml, want) {
+			t.Fatal("missing visible URL", want)
+		}
+	}
+	for _, forbidden := range []string{"/categories/empty", "/categories/only-invalid-slug", "/products/%20"} {
+		if strings.Contains(xml, forbidden) {
+			t.Fatal("included empty category or invalid URL", forbidden)
+		}
+	}
+	if catalog.calls != 2 {
+		t.Fatal("duplicate catalog scan", catalog.calls)
+	}
+}
+
+func TestSitemapMatchesPublicRootCategoryExpansion(t *testing.T) {
+	catalog := &catalogStub{
+		categories: []contract.Category{{ID: 1, Slug: "parent"}, {ID: 2, ParentID: 1, Slug: "child"}, {ID: 3, Slug: "empty"}},
+		products:   []contract.Product{{CategoryID: 2, Slug: "child-product"}},
+	}
+	service, err := NewService(catalog, &postStub{}, &cacheStub{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	xml, err := service.Generate(context.Background(), "https://example.com")
+	if err != nil || !strings.Contains(xml, "/categories/parent") || !strings.Contains(xml, "/categories/child") || strings.Contains(xml, "/categories/empty") {
+		t.Fatal(xml, err)
 	}
 }

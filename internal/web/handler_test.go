@@ -308,31 +308,6 @@ func TestRegisterUser_ReservedPathsStay404(t *testing.T) {
 	}
 }
 
-// TestRegisterUser_NonReservedLookalikeStillServesSPA 确认保留前缀判断是按路径段
-// 匹配的，不会误伤 /apiary 这类只是恰好同前缀的前端路由。
-func TestRegisterUser_NonReservedLookalikeStillServesSPA(t *testing.T) {
-	gin.SetMode(gin.TestMode)
-	r := gin.New()
-	if err := RegisterUser(r, newUserFS()); err != nil {
-		t.Fatalf("RegisterUser: %v", err)
-	}
-
-	for _, p := range []string{"/apiary", "/uploads-guide", "/healthy"} {
-		t.Run(p, func(t *testing.T) {
-			req := httptest.NewRequest(http.MethodGet, p, nil)
-			w := httptest.NewRecorder()
-			r.ServeHTTP(w, req)
-
-			if w.Code != http.StatusOK {
-				t.Fatalf("status = %d, want 200", w.Code)
-			}
-			if !strings.Contains(w.Body.String(), "user-spa") {
-				t.Fatalf("expected SPA fallback, got: %s", w.Body.String())
-			}
-		})
-	}
-}
-
 func TestRegisterUser_DoesNotShadowExistingRoutes(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	r := gin.New()

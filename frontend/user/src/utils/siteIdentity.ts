@@ -1,5 +1,6 @@
 import identity from '../../../../internal/platform/publiccontent/site-identity.json' with { type: 'json' }
 import { merchantReturnPolicy } from './deliveryPolicy.ts'
+import { identityLogo } from './shareSeo.ts'
 
 export const identityStatement = identity.statement
 export function siteIdentitySchema(brand: { site_name?: string; site_url?: string; site_logo?: string } | undefined, originFallback: string, description = '', mainSite = false) {
@@ -13,7 +14,7 @@ export function siteIdentitySchema(brand: { site_name?: string; site_url?: strin
   if (mainSite) organization.hasMerchantReturnPolicy = merchantReturnPolicy(origin)
   if (brand?.site_logo) {
     try {
-      const logo = new URL(brand.site_logo, origin + '/')
+      const logo = new URL(identityLogo(brand.site_logo, mainSite), origin + '/')
       if (['https:', 'http:'].includes(logo.protocol) && !logo.username && !logo.password) organization.logo = logo.href
     } catch { /* Invalid optional logo is omitted. */ }
   }

@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"path"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -98,6 +99,10 @@ const (
 // serveIndex 返回 SPA 入口，并禁止浏览器与中间 CDN 长期缓存。
 func serveIndex(c *gin.Context, body []byte) {
 	c.Header("Cache-Control", indexCacheControl)
+	c.Header("Content-Length", strconv.Itoa(len(body)))
+	if c.Request.Method == http.MethodHead {
+		body = nil
+	}
 	c.Data(http.StatusOK, "text/html; charset=utf-8", body)
 }
 
@@ -176,6 +181,10 @@ func RegisterUser(r *gin.Engine, fsys fs.FS) error {
 	fileServer := http.FileServer(http.FS(fsys))
 
 	r.NoRoute(func(c *gin.Context) {
+		if c.Request.Method != http.MethodGet && c.Request.Method != http.MethodHead {
+			c.Status(http.StatusNotFound)
+			return
+		}
 		// 后端保留前缀下的未命中请求必须保持 404，不能被 SPA 兜底成 200 HTML：
 		// 否则调用了不存在的接口的客户端会拿到 index.html 当响应体去解析 JSON。
 		// 这也让单二进制部署与「nginx 反代 + 独立前端」的分离部署行为保持一致。
@@ -193,7 +202,21 @@ func RegisterUser(r *gin.Engine, fsys fs.FS) error {
 			serveAsset(c, fileServer, fp)
 			return
 		}
-		serveIndex(c, indexCached)
+		if isUserRoute(c.Request.URL.Path) {
+			if privateUserRoute.MatchString(c.Request.URL.Path) {
+				c.Header("X-Robots-Tag", "noindex, nofollow")
+			}
+			serveIndex(c, indexCached)
+			return
+		}
+		c.Header("X-Robots-Tag", "noindex")
+		c.Header("Cache-Control", "no-store")
+		body := []byte(`<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="robots" content="noindex"><title>页面不存在</title></head><body><h1>页面不存在</h1><a href="/">返回首页</a></body></html>`)
+		c.Header("Content-Length", strconv.Itoa(len(body)))
+		if c.Request.Method == http.MethodHead {
+			body = nil
+		}
+		c.Data(http.StatusNotFound, "text/html; charset=utf-8", body)
 	})
 	return nil
 }

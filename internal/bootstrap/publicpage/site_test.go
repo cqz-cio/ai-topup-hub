@@ -103,3 +103,48 @@ func TestBlogListSharesPublishedQueryPaginationAndErrorSemantics(t *testing.T) {
 		t.Fatal("database failure misclassified", err)
 	}
 }
+
+func TestProductsAndLegalReadOnlyPublicContent(t *testing.T) {
+	f := fixture()
+	settings := siteSettings{values: map[string]jsonmap.JSON{constants.SettingKeySiteConfig: {
+		"legal":   jsonmap.JSON{"terms": jsonmap.JSON{"zh-CN": "<h2>真实服务条款</h2>"}, "privacy": jsonmap.JSON{"en-US": "<p>Privacy policy</p>"}, "internal_notes": "secret"},
+		"scripts": jsonmap.JSON{"private": "secret"},
+	}}}
+	s := source{products: f, catalog: f, settings: settings}
+	page, err := s.Products(context.Background())
+	if err != nil || page.Kind != "products" || page.Path != "/products" || len(page.Items) != 2 || page.Items[1].Price != "120.00" {
+		t.Fatal(page, err)
+	}
+	page, err = s.Terms(context.Background())
+	if err != nil || page.Content != "<h2>真实服务条款</h2>" || page.Kind != "legal" {
+		t.Fatal(page, err)
+	}
+	page, err = s.Privacy(context.Background())
+	if err != nil || page.Content != "<p>Privacy policy</p>" {
+		t.Fatal(page, err)
+	}
+	config, err := s.publicConfig(context.Background(), false)
+	if err != nil || config["scripts"] != nil || configMap(config["legal"])["internal_notes"] != nil {
+		t.Fatal("private data escaped whitelist", config, err)
+	}
+	settings.values[constants.SettingKeySiteConfig]["legal"] = nil
+	if _, err = s.Terms(context.Background()); !errors.Is(err, publicpage.ErrNotFound) {
+		t.Fatal("empty policy must not return success", err)
+	}
+}
+
+func TestNoticeListUsesPublishedNoticeQueryAndOwnPagination(t *testing.T) {
+	f := &postListFixture{}
+	s := source{posts: contenthttp.NewPublicHandler(f, nil, nil)}
+	page, err := s.NoticeList(context.Background(), 1, "")
+	if err != nil || f.query.Type != "notice" || page.Kind != "notice-list" || page.Pagination[0].Path != "/notice?page=2" || page.Entries[0].Path != "/blog/published" {
+		t.Fatal(page, f.query, err)
+	}
+	page, err = s.NoticeList(context.Background(), 2, "售后")
+	if err != nil || !page.NoIndex || page.Path != "/notice" || f.query.Search != "售后" {
+		t.Fatal(page, err)
+	}
+	if _, err = s.NoticeList(context.Background(), 3, ""); !errors.Is(err, publicpage.ErrNotFound) {
+		t.Fatal(err)
+	}
+}
