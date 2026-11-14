@@ -34,6 +34,8 @@
 
 验证命令：`python -B scripts/test_sync_86gamestore_stock.py`。覆盖锁定数保护、缺货/补货、重复执行、上游消失、库存上限、配置冲突拒绝、晚期数据库错误回滚和下单接口阻断。首次应用使用 `--audit` 对所有业务表的非库存字段逐一核对，私有证据位于 `deployment/local/second-supplier-stock-20261018/`。
 
+2026-11-14 SEO 改名兼容：公开 slug 不再参与库存身份判断。脚本常量 `ALLOWED_IDENTITIES` 固定原导入的 `(local_product_id, local_sku_id, upstream_product_id, upstream_sku_id)`，SKU 编码附加核对；不从当前 slug、别名表或运行时映射自动生成名单。身份不在名单内仍整批回滚。以后增加不同 ID 的导入必须独立核查和维护名单，不能自动放宽。库存计算、供货映射、停用连接/映射保护和禁止采购保持。
+
 ## 首次拆分为两个一级分类（2026-10-18）
 
 用户指定将截图中的八件商品分为两个新一级分类：

@@ -25,7 +25,7 @@ class StockTests(unittest.TestCase):
             db.executescript("""
             CREATE TABLE site_connections(id INTEGER PRIMARY KEY,base_url TEXT,api_key TEXT,protocol TEXT,status TEXT,auto_sync_price INTEGER,deleted_at TEXT,api_secret TEXT);
             CREATE TABLE products(id INTEGER PRIMARY KEY,slug TEXT,fulfillment_type TEXT,is_mapped INTEGER,is_active INTEGER,manual_stock_total INTEGER,manual_stock_locked INTEGER,manual_stock_sold INTEGER,price_amount TEXT,updated_at TEXT,deleted_at TEXT);
-            CREATE TABLE product_skus(id INTEGER PRIMARY KEY,product_id INTEGER,is_active INTEGER,manual_stock_total INTEGER,manual_stock_locked INTEGER,manual_stock_sold INTEGER,price_amount TEXT,updated_at TEXT,deleted_at TEXT);
+            CREATE TABLE product_skus(id INTEGER PRIMARY KEY,product_id INTEGER,is_active INTEGER,manual_stock_total INTEGER,manual_stock_locked INTEGER,manual_stock_sold INTEGER,price_amount TEXT,updated_at TEXT,deleted_at TEXT,sku_code TEXT);
             CREATE TABLE product_mappings(id INTEGER PRIMARY KEY,connection_id INTEGER,local_product_id INTEGER,upstream_product_id INTEGER,is_active INTEGER,stock_limit INTEGER,upstream_status TEXT,last_synced_at TEXT,updated_at TEXT,deleted_at TEXT);
             CREATE TABLE sku_mappings(id INTEGER PRIMARY KEY,product_mapping_id INTEGER,local_sku_id INTEGER,upstream_sku_id INTEGER,upstream_stock INTEGER,upstream_is_active INTEGER,stock_synced_at TEXT,updated_at TEXT,deleted_at TEXT,upstream_price TEXT);
             CREATE TABLE orders(id INTEGER PRIMARY KEY,status TEXT,amount TEXT);
@@ -34,8 +34,8 @@ class StockTests(unittest.TestCase):
             INSERT INTO products VALUES(1,'existing','upstream',1,1,99,2,3,'100','old',NULL);
             INSERT INTO products VALUES(52,'86gamestore-66','manual',1,0,0,0,0,'15','old',NULL);
             INSERT INTO products VALUES(53,'86gamestore-77','manual',1,1,0,0,0,'50','old',NULL);
-            INSERT INTO product_skus VALUES(52,52,1,0,3,7,'15','old',NULL);
-            INSERT INTO product_skus VALUES(53,53,1,0,0,0,'50','old',NULL);
+            INSERT INTO product_skus VALUES(52,52,1,0,3,7,'15','old',NULL,'86gamestore-66');
+            INSERT INTO product_skus VALUES(53,53,1,0,0,0,'50','old',NULL,'86gamestore-77');
             INSERT INTO product_mappings VALUES(20,2,52,66,0,0,'active','old','old',NULL);
             INSERT INTO product_mappings VALUES(21,2,53,77,0,0,'active','old','old',NULL);
             INSERT INTO sku_mappings VALUES(20,20,52,66,0,1,'old','old',NULL,'15');
@@ -90,7 +90,11 @@ class StockTests(unittest.TestCase):
         for sql in ["UPDATE products SET fulfillment_type='upstream' WHERE id=53",
                     "UPDATE site_connections SET status='active' WHERE id=2",
                     "UPDATE product_mappings SET is_active=1 WHERE id=21",
-                    "DELETE FROM sku_mappings WHERE id=21"]:
+                    "DELETE FROM sku_mappings WHERE id=21",
+                    "UPDATE product_mappings SET upstream_product_id=88 WHERE id=21",
+                    "UPDATE sku_mappings SET upstream_sku_id=88 WHERE id=21",
+                    "UPDATE product_skus SET sku_code='foreign-77' WHERE id=53",
+                    "UPDATE sku_mappings SET local_sku_id=52 WHERE id=21"]:
             with self.subTest(sql=sql):
                 saved = self.snapshot()
                 self.execute(sql)
@@ -110,6 +114,24 @@ class StockTests(unittest.TestCase):
         self.execute("CREATE TRIGGER abort_last BEFORE UPDATE ON product_skus WHEN OLD.id=53 BEGIN SELECT RAISE(ABORT,'test'); END")
         before = self.snapshot()
         with self.assertRaises(sqlite3.IntegrityError):
+            self.apply()
+        self.assertEqual(self.snapshot(), before)
+
+    def test_public_url_rename_preserves_supplier_identity_without_alias_tables(self):
+        self.execute("UPDATE products SET slug='readable-manual-product' WHERE id=52")
+        report = self.apply()
+        self.assertTrue(report['non_stock_fields_preserved'])
+        self.assertEqual(self.execute("SELECT slug,price_amount FROM products WHERE id=52"), [('readable-manual-product', '15')])
+        self.assertEqual(self.execute("SELECT manual_stock_total,manual_stock_locked,manual_stock_sold FROM product_skus WHERE id=52"), [(9, 3, 7)])
+        self.assertEqual(self.execute("SELECT upstream_product_id FROM product_mappings WHERE id=20"), [(66,)])
+
+    def test_mapping_cannot_move_to_another_manual_product_with_the_same_sku_code(self):
+        self.execute("INSERT INTO products SELECT 99,'another-manual',fulfillment_type,is_mapped,is_active,manual_stock_total,manual_stock_locked,manual_stock_sold,price_amount,updated_at,deleted_at FROM products WHERE id=53")
+        self.execute("INSERT INTO product_skus SELECT 99,99,is_active,manual_stock_total,manual_stock_locked,manual_stock_sold,price_amount,updated_at,deleted_at,sku_code FROM product_skus WHERE id=53")
+        self.execute("UPDATE product_mappings SET local_product_id=99 WHERE id=21")
+        self.execute("UPDATE sku_mappings SET local_sku_id=99 WHERE id=21")
+        before = self.snapshot()
+        with self.assertRaisesRegex(ValueError, 'allowlist'):
             self.apply()
         self.assertEqual(self.snapshot(), before)
 
