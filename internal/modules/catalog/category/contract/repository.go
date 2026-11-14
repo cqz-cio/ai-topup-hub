@@ -1,6 +1,11 @@
 package categorycontract
 
-import categorydomain "github.com/dujiao-next/internal/modules/catalog/category/domain"
+import (
+	"errors"
+	categorydomain "github.com/dujiao-next/internal/modules/catalog/category/domain"
+)
+
+var ErrSlugExists = errors.New("category slug exists")
 
 // Repository 定义 Category 应用服务和相邻 Catalog 子域共享的持久化契约。
 type Repository interface {

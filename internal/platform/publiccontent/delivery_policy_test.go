@@ -15,7 +15,7 @@ func TestDeliveryPolicyPreservesRulesSectionsAndExistingLinks(t *testing.T) {
 	if p.AppendLink(result) != result {
 		t.Fatal("duplicate policy entry")
 	}
-	gpt := GPTRecharge().AppendRelated(input, "product", "qzweb-5", "qzweb-category-4")
+	gpt := GPTRecharge().AppendRelated(input, "product", "qzweb-5", "gpt-recharge")
 	if p.AppendLink(gpt) != gpt {
 		t.Fatal("GPT guide already links to the policy")
 	}

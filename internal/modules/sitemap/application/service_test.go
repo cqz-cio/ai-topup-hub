@@ -20,9 +20,9 @@ func (c *catalogStub) ListActiveCategories() ([]contract.Category, error) {
 	return c.categories, nil
 }
 
-func TestRechargeCategoryKeepsURLAndUsesActualEditorialDate(t *testing.T) {
+func TestRechargeCategoryUsesCanonicalURLAndActualEditorialDate(t *testing.T) {
 	catalog := &catalogStub{categories: []contract.Category{
-		{ID: 1, Slug: "qzweb-category-4", CreatedAt: time.Date(2026, 10, 1, 0, 0, 0, 0, time.UTC)},
+		{ID: 1, Slug: "gpt-recharge", CreatedAt: time.Date(2026, 10, 1, 0, 0, 0, 0, time.UTC)},
 		{ID: 2, Slug: "other", CreatedAt: time.Date(2026, 10, 2, 0, 0, 0, 0, time.UTC)},
 	}, products: []contract.Product{{CategoryID: 1, Slug: "plus"}, {CategoryID: 2, Slug: "other"}}}
 	service, err := NewService(catalog, &postStub{}, &cacheStub{})
@@ -34,7 +34,7 @@ func TestRechargeCategoryKeepsURLAndUsesActualEditorialDate(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, entry := range entries {
-		if strings.HasSuffix(entry.Location, "/categories/qzweb-category-4") && entry.LastModified != "2026-11-10" {
+		if strings.HasSuffix(entry.Location, "/categories/gpt-recharge") && entry.LastModified != "2026-11-10" {
 			t.Fatal(entry)
 		}
 		if strings.HasSuffix(entry.Location, "/categories/other") && entry.LastModified != "2026-10-02" {

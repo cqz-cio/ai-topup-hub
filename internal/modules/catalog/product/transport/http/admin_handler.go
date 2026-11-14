@@ -16,6 +16,7 @@ import (
 	"github.com/dujiao-next/internal/modules/catalog/product/manualform"
 	"github.com/dujiao-next/internal/platform/http/ginutil"
 	"github.com/dujiao-next/internal/platform/http/response"
+	catalogslug "github.com/dujiao-next/internal/shared/slug"
 
 	"github.com/gin-gonic/gin"
 	"github.com/shopspring/decimal"
@@ -90,6 +91,26 @@ func NewAdminProductHandler(
 
 // GetAdminProducts 获取商品列表 (Admin)
 func (h *AdminProductHandler) GetAdminProducts(c *gin.Context) {
+	if title, asked := c.GetQuery("suggest_slug"); asked {
+		generator, ok := h.writer.(interface {
+			SuggestSlug(string, *string) (string, error)
+		})
+		if !ok {
+			ginutil.RespondError(c, response.CodeInternal, "error.product_fetch_failed", nil)
+			return
+		}
+		var exclude *string
+		if value := c.Query("exclude_id"); value != "" {
+			exclude = &value
+		}
+		value, err := generator.SuggestSlug(title, exclude)
+		if err != nil {
+			ginutil.RespondError(c, response.CodeInternal, "error.product_fetch_failed", err)
+			return
+		}
+		response.Success(c, gin.H{"slug": value})
+		return
+	}
 	page, pageSize := ginutil.ParsePagination(c)
 	categoryID := c.Query("category_id")
 	search := c.Query("search")
@@ -311,6 +332,10 @@ func (h *AdminProductHandler) CreateProduct(c *gin.Context) {
 		SortOrder:            req.SortOrder,
 	})
 	if err != nil {
+		if errors.Is(err, catalogslug.ErrInvalid) {
+			ginutil.RespondError(c, response.CodeBadRequest, "error.bad_request", err)
+			return
+		}
 		if errors.Is(err, productcontract.ErrSlugExists) {
 			ginutil.RespondError(c, response.CodeBadRequest, "error.slug_exists", nil)
 			return
@@ -405,6 +430,10 @@ func (h *AdminProductHandler) UpdateProduct(c *gin.Context) {
 	if err != nil {
 		if errors.Is(err, productcontract.ErrNotFound) {
 			ginutil.RespondError(c, response.CodeNotFound, "error.product_not_found", nil)
+			return
+		}
+		if errors.Is(err, catalogslug.ErrInvalid) {
+			ginutil.RespondError(c, response.CodeBadRequest, "error.bad_request", err)
 			return
 		}
 		if errors.Is(err, productcontract.ErrSlugExists) {

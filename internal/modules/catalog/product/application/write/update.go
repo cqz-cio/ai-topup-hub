@@ -12,12 +12,16 @@ import (
 	"github.com/dujiao-next/internal/shared/jsonmap"
 	"github.com/dujiao-next/internal/shared/jsonslice"
 	"github.com/dujiao-next/internal/shared/money"
+	catalogslug "github.com/dujiao-next/internal/shared/slug"
 
 	"github.com/shopspring/decimal"
 )
 
 // Update 更新商品
 func (s *WriteService) Update(id string, input CreateProductInput) (*productdomain.Product, error) {
+	if err := catalogslug.Validate(input.Slug); err != nil {
+		return nil, err
+	}
 	priceAmount := input.PriceAmount.Round(2)
 	if len(input.SKUs) == 0 && priceAmount.LessThanOrEqual(decimal.Zero) {
 		return nil, productcontract.ErrProductPriceInvalid

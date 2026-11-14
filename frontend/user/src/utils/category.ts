@@ -1,6 +1,8 @@
 export interface PublicCategory {
   id: number
   slug?: string
+  slug_aliases?: string[]
+  seo_meta?: Record<string, unknown>
   name?: unknown
   icon?: string | null
   parent_id?: number | null

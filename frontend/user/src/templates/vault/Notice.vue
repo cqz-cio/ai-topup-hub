@@ -1,7 +1,7 @@
 <template>
   <div class="mx-auto w-full max-w-[1180px] px-6 pb-10 pt-2">
     <header class="my-6 flex flex-col items-start gap-2">
-      <h1 class="text-[34px] font-extrabold">{{ t('nav.notice') }}</h1>
+      <h1 class="text-[34px] font-extrabold">{{ t('shopUi.noticeTitle') }}</h1>
       <p class="text-muted-foreground">{{ t('notice.subtitle') }}</p>
     </header>
 
@@ -29,7 +29,7 @@
           </div>
           <div class="min-w-0 flex-1">
             <div class="mb-1.5 flex items-center gap-2.5">
-              <Badge variant="warning" size="sm" class="rounded-full">{{ t('nav.notice') }}</Badge>
+              <Badge variant="warning" size="sm" class="rounded-full">{{ t('shopUi.noticeTitle') }}</Badge>
               <span class="text-xs font-semibold text-muted-foreground">{{ formatDate(notice.published_at) }}</span>
             </div>
             <h2 class="truncate text-lg font-bold">{{ getLocalizedText(notice.title) }}</h2>
@@ -67,5 +67,5 @@ const { t } = useI18n()
 const {
   loading, posts: notices, currentPage, totalPages,
   getLocalizedText, formatDate, goToPost: goToNotice, changePage,
-} = usePostList('notice', { title: () => t('nav.notice'), canonicalPath: '/notice' })
+} = usePostList('notice', { title: () => t('shopUi.noticeTitle'), canonicalPath: '/notice' })
 </script>

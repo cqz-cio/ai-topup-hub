@@ -51,6 +51,14 @@ type Service struct {
 	stock      StockCounter
 }
 
+// ResolvePublicSlug keeps historical URL compatibility out of domain lookups.
+func (s *Service) ResolvePublicSlug(value string) (string, error) {
+	if aliases, ok := s.products.(interface{ ResolvePublicSlug(string) (string, error) }); ok {
+		return aliases.ResolvePublicSlug(value)
+	}
+	return value, nil
+}
+
 // NewService 创建 Product 读取应用服务。
 func NewService(options Options) *Service {
 	return &Service{

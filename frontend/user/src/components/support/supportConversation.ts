@@ -1,5 +1,5 @@
 export type SupportFamily = 'gpt' | 'codex' | 'gemini'
-export type SupportProduct = { slug: string; title: string; family: SupportFamily; delivery: 'auto' | 'manual' | 'unknown' }
+export type SupportProduct = { slug: string; slug_aliases?: string[]; title: string; family: SupportFamily; delivery: 'auto' | 'manual' | 'unknown' }
 export type SupportLink = { label: string; to: string }
 type Choice = { label: string; value: string; kind: 'family' | 'goal' | 'product' | 'step' }
 export type SupportConversation = { family?: SupportFamily; product?: SupportProduct; goal?: 'buy' | 'use'; variant?: 'ios'; step?: string; choices?: Choice[] }
@@ -113,7 +113,7 @@ export function normalizeSupportProducts(rows: unknown, locale: string): Support
     const family = detectSupportFamily(Object.values(typeof item.title === 'object' && item.title ? item.title : { title }).filter(value => typeof value === 'string').join(' '))
     if (!family) continue
     seen.add(item.slug)
-    result.push({ slug: item.slug, title: title.trim().slice(0, 160), family, delivery: item.fulfillment_type === 'auto' ? 'auto' : item.fulfillment_type === 'manual' ? 'manual' : 'unknown' })
+    result.push({ slug: item.slug, ...(Array.isArray(item.slug_aliases) ? { slug_aliases: item.slug_aliases.filter((value: unknown) => typeof value === 'string' && /^[a-z0-9-]{1,80}$/.test(value)) } : {}), title: title.trim().slice(0, 160), family, delivery: item.fulfillment_type === 'auto' ? 'auto' : item.fulfillment_type === 'manual' ? 'manual' : 'unknown' })
   }
   return result
 }
@@ -121,11 +121,12 @@ export function normalizeSupportProducts(rows: unknown, locale: string): Support
 const activation = new Set(['qzweb-5', 'qzweb-6', 'qzweb-55', 'qzweb-56', 'qzweb-57', 'qzweb-58'])
 const credits = new Set(['qzweb-73', 'qzweb-74', 'qzweb-75', 'qzweb-76', 'qzweb-77', 'qzweb-78'])
 function productRule(product: SupportProduct, copy: GuideCopy): string {
+  const slug = product.slug_aliases?.find(value => /^qzweb-/.test(value)) || product.slug
   if (/\bios\b/i.test(product.title)) return copy.rules.ios
-  if (activation.has(product.slug)) return copy.rules.activation
-  if (product.slug === 'qzweb-7') return copy.rules.renewal
-  if (credits.has(product.slug)) return copy.rules.credits
-  if (['qzweb-50', 'qzweb-51', 'qzweb-52', 'qzweb-53'].includes(product.slug)) return copy.rules.gemini
+  if (activation.has(slug)) return copy.rules.activation
+  if (slug === 'qzweb-7') return copy.rules.renewal
+  if (credits.has(slug)) return copy.rules.credits
+  if (['qzweb-50', 'qzweb-51', 'qzweb-52', 'qzweb-53'].includes(slug)) return copy.rules.gemini
   return ''
 }
 

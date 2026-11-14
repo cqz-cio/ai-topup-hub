@@ -181,8 +181,11 @@ export function useProductList(options: UseProductListOptions = {}) {
     const slugParam = route.params.slug as string | undefined
     if (!slugParam || categories.value.length === 0) return false
 
-    const matched = categories.value.find((category) => category.slug === slugParam)
+    const matched = categories.value.find((category) => category.slug === slugParam || category.slug_aliases?.includes(slugParam))
     if (!matched) return false
+    if (matched.slug !== slugParam) {
+      void router.replace({ name: categoryRouteName, params: { ...route.params, slug: matched.slug }, query: route.query, hash: route.hash })
+    }
 
     if (selectedCategory.value !== matched.id) {
       selectedCategory.value = matched.id

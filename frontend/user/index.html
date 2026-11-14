@@ -13,8 +13,12 @@
       if (['www.qzweb.cloud', 'qzweb.cloud', 'localhost', '127.0.0.1'].includes(location.hostname) &&
           location.pathname === '/' && template !== 'vault') {
         const hint = document.createElement('link');
-        hint.rel = 'preload'; hint.as = 'image'; hint.type = 'image/webp'; hint.fetchPriority = 'high';
-        hint.href = '/media/storefront-20261020/jellyfishing.webp';
+        const width = matchMedia('(max-width: 1280px)').matches ? '1280' : '1672';
+        // One format hint only. Browsers without AVIF skip its typed preload and
+        // select WebP from the same CSS image-set, avoiding duplicate downloads.
+        const format = CSS.supports('background-image', "image-set(url('x.avif') type('image/avif'))") ? 'avif' : 'webp';
+        hint.rel = 'preload'; hint.as = 'image'; hint.type = 'image/' + format; hint.fetchPriority = 'high';
+        hint.href = '/media/storefront-20261114/jellyfishing-' + width + '.' + format;
         document.head.appendChild(hint);
       }
     } catch {}

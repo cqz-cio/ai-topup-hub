@@ -2,6 +2,10 @@ package application
 
 import (
 	"bytes"
+	"image"
+	"image/color"
+	"image/jpeg"
+	"image/png"
 	"io"
 	"mime/multipart"
 	"path/filepath"
@@ -231,4 +235,33 @@ func createMultipartFile(t *testing.T, filename string, content []byte) *multipa
 		t.Fatalf("expected one file, got %d", len(files))
 	}
 	return files[0]
+}
+
+func TestShareJPEGGeneratesLetterboxedRaster(t *testing.T) {
+	input := image.NewNRGBA(image.Rect(0, 0, 100, 200))
+	for y := 50; y < 150; y++ {
+		for x := 20; x < 80; x++ {
+			input.Set(x, y, color.NRGBA{R: 240, A: 255})
+		}
+	}
+	var raw bytes.Buffer
+	png.Encode(&raw, input)
+	output, err := shareJPEG(bytes.NewReader(raw.Bytes()))
+	if err != nil {
+		t.Fatal(err)
+	}
+	img, err := jpeg.Decode(bytes.NewReader(output))
+	if err != nil || img.Bounds().Dx() != 1200 || img.Bounds().Dy() != 630 {
+		t.Fatal(img, err)
+	}
+	if len(output) > 200_000 {
+		t.Fatal("oversized generated share")
+	}
+	red, green, _, _ := img.At(600, 315).RGBA()
+	if red <= green {
+		t.Fatal("image content lost")
+	}
+	if _, err = shareJPEG(bytes.NewReader([]byte("<svg/>"))); err == nil {
+		t.Fatal("SVG accepted as raster")
+	}
 }

@@ -335,9 +335,9 @@ void main(){vec2 p=aPos-uPivot;
         window.addEventListener('pageshow', pageShow);
         observer.observe(canvas);
         Promise.all([
-            load('/media/storefront-20261020/clean-plate.webp'),
-            load('/media/storefront-20261020/foreground.webp'),
-            load('/media/storefront-20261020/jellyfishing.webp'),
+            load('/media/storefront-20261114/clean-plate.webp'),
+            load('/media/storefront-20261114/foreground.webp'),
+            load('/media/storefront-20261114/jellyfishing-1672.webp'),
         ]).then(([clean, fg, original]) => {
             if (disposed)
                 return;

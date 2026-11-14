@@ -10,12 +10,16 @@ import (
 	"github.com/dujiao-next/internal/shared/jsonmap"
 	"github.com/dujiao-next/internal/shared/jsonslice"
 	"github.com/dujiao-next/internal/shared/money"
+	catalogslug "github.com/dujiao-next/internal/shared/slug"
 
 	"github.com/shopspring/decimal"
 )
 
 // Create 创建商品
 func (s *WriteService) Create(input CreateProductInput) (*productdomain.Product, error) {
+	if err := catalogslug.Validate(input.Slug); err != nil {
+		return nil, err
+	}
 	if err := productdomain.ValidateCategoryAssignment(s.categories, input.CategoryID, 0, productcontract.ErrProductCategoryInvalid); err != nil {
 		return nil, err
 	}

@@ -1,0 +1,16 @@
+--- a/cardnet-qzweb-www.conf
++++ b/cardnet-qzweb-www.conf
+@@ -84,0 +85,13 @@
++    # SEO v3: new immutable raster assets; existing resources are preserved.
++    location ^~ /media/storefront-20261114/ {
++        try_files $uri =404;
++        types { image/avif avif; image/webp webp; }
++        add_header X-Content-Type-Options nosniff always;
++        add_header Cache-Control "public, max-age=31536000, immutable";
++    }
++    location ^~ /media/seo-share/ {
++        try_files $uri =404;
++        add_header X-Content-Type-Options nosniff always;
++        add_header Cache-Control "public, max-age=31536000, immutable";
++    }
++

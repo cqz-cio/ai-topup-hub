@@ -22,7 +22,15 @@ import (
 
 var ErrNotFound = errors.New("public document not found")
 
-type Site struct{ Name, URL, Currency, Logo, Icon, DefaultImage, Description, ReturnPolicyPath string }
+// Redirect is returned only after the source has verified public visibility.
+type Redirect struct{ Path string }
+
+func (r Redirect) Error() string { return "canonical public URL: " + r.Path }
+
+type Site struct {
+	Name, URL, Currency, Logo, Icon, DefaultImage, Description, ReturnPolicyPath string
+	CatalogLinks                                                                 map[string]string
+}
 type Link struct{ Title, Path string }
 type Fact struct{ Name, Value string }
 type Item struct{ Title, Path, Price, Availability, Summary, Category string }
@@ -35,6 +43,8 @@ type Page struct {
 	SEOTitle, SEODescription            string
 	Price, Category, Availability       string
 	Images                              []string
+	ShareImage                          string
+	ShareImageWidth, ShareImageHeight   int
 	Facts                               []Fact
 	Links                               []Link
 	Items                               []Item
@@ -42,6 +52,7 @@ type Page struct {
 	Entries                             []Entry
 	Pagination                          []Link
 	NoIndex, Editorial                  bool
+	PreloadScene                        bool
 }
 
 type Source interface {
@@ -78,10 +89,32 @@ func (h *Handler) serve(c *gin.Context, load func(context.Context, string) (Page
 	c.Header("X-Content-Type-Options", "nosniff")
 	c.Header("Content-Language", "zh-CN")
 	ctx := c.Request.Context()
+	if source, ok := h.source.(interface {
+		PrepareContext(context.Context) (context.Context, error)
+	}); ok {
+		var err error
+		ctx, err = source.PrepareContext(ctx)
+		if err != nil {
+			h.failure(c, err)
+			return
+		}
+	}
 	page, err := load(ctx, c.Param("slug"))
 	if err != nil {
+		var redirect Redirect
+		if errors.As(err, &redirect) && strings.HasPrefix(redirect.Path, "/") && !strings.HasPrefix(redirect.Path, "//") {
+			target := redirect.Path
+			if c.Request.URL.RawQuery != "" {
+				target += "?" + c.Request.URL.RawQuery
+			}
+			c.Redirect(http.StatusMovedPermanently, target)
+			return
+		}
 		h.failure(c, err)
 		return
+	}
+	if c.Request.URL.Query().Has("search") {
+		page.NoIndex = true
 	}
 	site, err := h.source.Site(ctx)
 	if err != nil {
@@ -105,8 +138,19 @@ func (h *Handler) serve(c *gin.Context, load func(context.Context, string) (Page
 		Summary:     template.HTML(h.policy.Sanitize(page.Summary)),
 		Description: plainText(page.Summary),
 	}
+	catalogLinks, _ := json.Marshal(site.CatalogLinks)
+	data.CatalogLinks = template.JS(catalogLinks) // JSON encoding escapes HTML delimiters.
 	data.Icon = absoluteImage(origin, site.Icon)
-	data.ShareImage, data.TwitterCard = shareImage(origin, page.Images, site.DefaultImage)
+	shareImages := append([]string{page.ShareImage}, page.Images...)
+	sharing := shareImage(origin, shareImages, site.DefaultImage, page.Title)
+	if sharing.Alt == "" {
+		sharing.Alt = site.Name
+	}
+	if sharing.Image != "" && sharing.Image == RasterShareURL(origin, page.ShareImage) && page.ShareImageWidth > 0 && page.ShareImageHeight > 0 {
+		sharing.Width, sharing.Height = page.ShareImageWidth, page.ShareImageHeight
+	}
+	data.ShareImage, data.TwitterCard, data.ShareImageAlt = sharing.Image, sharing.Card, sharing.Alt
+	data.ShareImageWidth, data.ShareImageHeight = sharing.Width, sharing.Height
 	if description := plainText(page.SEODescription); description != "" {
 		data.Description = description
 	}
@@ -117,7 +161,7 @@ func (h *Handler) serve(c *gin.Context, load func(context.Context, string) (Page
 	if data.MetadataTitle == "" {
 		data.MetadataTitle = page.Title
 	}
-	if site.Name != "" && data.MetadataTitle != site.Name && page.Kind != "home" {
+	if site.Name != "" && !strings.Contains(data.MetadataTitle, site.Name) && page.Kind != "home" {
 		data.MetadataTitle += " - " + site.Name
 	}
 	schema := map[string]any{"@context": "https://schema.org", "@type": "BlogPosting", "headline": page.Title, "url": canonical, "mainEntityOfPage": canonical, "description": data.Description, "inLanguage": "zh-CN"}
@@ -193,6 +237,12 @@ func (h *Handler) serve(c *gin.Context, load func(context.Context, string) (Page
 		h.failure(c, err)
 		return
 	}
+	// These documents use anonymous projections even for authenticated requests.
+	// Still bypass shared caching whenever credentials or search are present.
+	c.Writer.Header().Add("Vary", "Cookie, Authorization")
+	if !page.NoIndex && !c.Request.URL.Query().Has("search") && c.Request.Header.Get("Cookie") == "" && c.Request.Header.Get("Authorization") == "" {
+		c.Header("Cache-Control", "public, max-age=60, s-maxage=120, stale-while-revalidate=300")
+	}
 	c.Data(http.StatusOK, "text/html; charset=utf-8", headBody(c, out.Bytes()))
 }
 
@@ -216,7 +266,10 @@ func headBody(c *gin.Context, body []byte) []byte {
 }
 
 func absoluteImage(origin, raw string) string {
-	base, _ := url.Parse(origin + "/")
+	base, baseErr := url.Parse(origin + "/")
+	if baseErr != nil || base.Host == "" || (base.Scheme != "http" && base.Scheme != "https") {
+		return ""
+	}
 	u, err := url.Parse(strings.TrimSpace(raw))
 	if err != nil || raw == "" {
 		return ""

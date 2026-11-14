@@ -233,6 +233,8 @@
   :root #app.brand-scene .storefront:not(.storefront-products) .catalog-title { padding-right: 56px; }
   :root #app.brand-scene .storefront:not(.storefront-products) .catalog-group:first-of-type > .catalog-group-heading { position: absolute; top: 10px; right: 10px; margin: 0; }
   :root #app.brand-scene .storefront:not(.storefront-products) .catalog-group:first-of-type > .catalog-group-heading h3 { display: none; }
+  :root #app.brand-scene .storefront:not(.storefront-products) .catalog-group:first-of-type > .catalog-group-heading > .store-text-link { display: none; }
+  :root #app.brand-scene .mobile-recharge-link { display: flex; margin-bottom: 10px; }
   :root #app.brand-scene .storefront:not(.storefront-products) .catalog-group:first-of-type .ocean-sort-trigger { min-width: 50px; min-height: 36px; gap: 2px; }
   :root #app.brand-scene .storefront:not(.storefront-products) .catalog-group:first-of-type .ocean-sort-value { display: none; }
   :root #app.brand-scene .storefront:not(.storefront-products) .full-delivery-hint { display: none; }

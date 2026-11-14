@@ -8,11 +8,11 @@ import (
 func TestRelatedLinksPreserveContentAndAvoidDuplicates(t *testing.T) {
 	g := GPTRecharge()
 	input := `<p>保留购买条件</p><a href="/blog/chatgpt-payment-methods">已有教程</a>`
-	result := g.AppendRelated(input, "product", "qzweb-5", "qzweb-category-4")
+	result := g.AppendRelated(input, "product", "qzweb-5", "gpt-recharge")
 	if !strings.HasPrefix(result, input) || !strings.Contains(result, g.Path) || strings.Count(result, `href="/blog/chatgpt-payment-methods"`) != 1 {
 		t.Fatal(result)
 	}
-	if g.AppendRelated(result, "product", "qzweb-5", "qzweb-category-4") != result {
+	if g.AppendRelated(result, "product", "qzweb-5", "gpt-recharge") != result {
 		t.Fatal("not idempotent")
 	}
 	article := g.AppendRelated("", "article", "chatgpt-payment-methods", "")

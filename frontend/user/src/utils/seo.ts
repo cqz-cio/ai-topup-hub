@@ -15,7 +15,7 @@ export function seoText(value: unknown, locale = 'zh-CN'): string {
 export function seoTitle(title: string, brand: string): string {
   const page = title.trim()
   const site = brand.trim()
-  return page && site && page !== site ? `${page} - ${site}` : page || site
+  return page && site && !page.includes(site) ? `${page} - ${site}` : page || site
 }
 
 export function seoPlainText(value: string): string {

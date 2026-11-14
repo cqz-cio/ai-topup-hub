@@ -10,6 +10,7 @@ import (
 
 	"github.com/dujiao-next/internal/constants"
 	productcontract "github.com/dujiao-next/internal/modules/catalog/product/contract"
+	productpresenter "github.com/dujiao-next/internal/modules/catalog/product/transport/presenter"
 	contentapp "github.com/dujiao-next/internal/modules/content/application"
 	reseller "github.com/dujiao-next/internal/modules/reseller/contract"
 	"github.com/dujiao-next/internal/platform/http/publicpage"
@@ -70,8 +71,11 @@ func (s *source) Home(ctx context.Context) (publicpage.Page, error) {
 	seo, brand := configMap(config["seo"]), configMap(config["brand"])
 	page := publicpage.Page{Kind: "home", Path: "/", Title: metadataText(brand["site_name"]), SEOTitle: metadataText(seo["title"]), SEODescription: metadataText(seo["description"])}
 	if isMainSite(ctx) {
+		page.PreloadScene = true
 		page.Title, page.Summary, page.Content = publiccontent.HomeCopy()
-		page.Links = []publicpage.Link{{Title: "GPT 充值方案与购买须知", Path: publiccontent.GPTRecharge().Path}}
+		if path := publiccontent.GPTRecharge().Resolve(publiccontent.CatalogLinks(ctx)).Path; path != "" {
+			page.Links = []publicpage.Link{{Title: "GPT 充值方案与购买须知", Path: path}}
+		}
 	} else {
 		page.Summary = page.SEODescription
 	}
@@ -88,7 +92,11 @@ func (s *source) About(ctx context.Context) (publicpage.Page, error) {
 	if title == "" {
 		title = "关于我们"
 	}
-	return publicpage.Page{Kind: "about", Path: "/about", Title: title, SEOTitle: "关于", Summary: summary, Content: body}, nil
+	seoTitle := title
+	if isMainSite(ctx) {
+		seoTitle = publiccontent.PageTitle("aboutTitle")
+	}
+	return publicpage.Page{Kind: "about", Path: "/about", Title: title, SEOTitle: seoTitle, Summary: summary, Content: body}, nil
 }
 
 func (s *source) BlogList(ctx context.Context, number int, search string) (publicpage.Page, error) {
@@ -108,9 +116,9 @@ func (s *source) postList(ctx context.Context, postType string, number int, sear
 	if number > 1 && int64((number-1)*pageSize) >= total {
 		return publicpage.Page{}, publicpage.ErrNotFound
 	}
-	basePath, kind, title, summary := "/blog", "blog", "博客", "最新文章和动态"
+	basePath, kind, title, summary := "/blog", "blog", publiccontent.PageTitle("blogTitle"), "最新文章和动态"
 	if postType == constants.PostTypeNotice {
-		basePath, kind, title, summary = "/notice", "notice-list", "公告", "购买、交付与售后服务公告"
+		basePath, kind, title, summary = "/notice", "notice-list", publiccontent.PageTitle("noticeTitle"), "购买、交付与售后服务公告"
 	}
 	pagePath := func(n int, filter string) string {
 		q := url.Values{}
@@ -147,18 +155,11 @@ func (s *source) catalogItems(ctx context.Context, category string) ([]publicpag
 		if err := ctx.Err(); err != nil {
 			return nil, err
 		}
-		rows, total, err := s.catalog.ListAnonymousProductSlugs(ctx, category, number, 100)
+		rows, total, err := s.catalogProducts(ctx, category, number, 100)
 		if err != nil {
 			return nil, err
 		}
-		for _, slug := range rows {
-			item, err := s.products.ReadAnonymousProduct(ctx, slug)
-			if errors.Is(err, productcontract.ErrNotFound) || errors.Is(err, productcontract.ErrResellerProductNotListed) {
-				continue
-			}
-			if err != nil {
-				return nil, err
-			}
+		for _, item := range rows {
 			price := item.PriceAmount
 			if item.EffectivePriceAmount != nil {
 				price = *item.EffectivePriceAmount
@@ -176,6 +177,31 @@ func (s *source) catalogItems(ctx context.Context, category string) ([]publicpag
 	return items, nil
 }
 
+func (s *source) catalogProducts(ctx context.Context, category string, number, size int) ([]productpresenter.Product, int64, error) {
+	if batch, ok := s.catalog.(interface {
+		ListAnonymousProducts(context.Context, string, int, int) ([]productpresenter.Product, int64, error)
+	}); ok {
+		return batch.ListAnonymousProducts(ctx, category, number, size)
+	}
+	// Compatibility for alternate sources; the production adapter uses the batch.
+	slugs, total, err := s.catalog.ListAnonymousProductSlugs(ctx, category, number, size)
+	if err != nil {
+		return nil, 0, err
+	}
+	items := make([]productpresenter.Product, 0, len(slugs))
+	for _, slug := range slugs {
+		item, err := s.products.ReadAnonymousProduct(ctx, slug)
+		if errors.Is(err, productcontract.ErrNotFound) || errors.Is(err, productcontract.ErrResellerProductNotListed) {
+			continue
+		}
+		if err != nil {
+			return nil, 0, err
+		}
+		items = append(items, item)
+	}
+	return items, total, nil
+}
+
 func isEditorial(slug string) bool {
 	for _, candidate := range publiccontent.GPTRecharge().BlogSlugs {
 		if strings.EqualFold(slug, candidate) {
@@ -188,7 +214,7 @@ func isEditorial(slug string) bool {
 // Products reuses the same anonymous projection as the home and category pages.
 func (s *source) Products(ctx context.Context) (publicpage.Page, error) {
 	items, err := s.catalogItems(ctx, "")
-	return publicpage.Page{Kind: "products", Path: "/products", Title: "商品中心", Summary: "使用期限与质保期不同，购买前请分别确认。", Items: items}, err
+	return publicpage.Page{Kind: "products", Path: "/products", Title: publiccontent.PageTitle("productsTitle"), Summary: "使用期限与质保期不同，购买前请分别确认。", Items: items}, err
 }
 
 func (s *source) Terms(ctx context.Context) (publicpage.Page, error) {

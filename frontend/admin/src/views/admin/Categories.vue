@@ -3,7 +3,7 @@ import { computed, ref, reactive, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { adminAPI } from '@/api/admin'
-import type { AdminCategory, LocalizedText } from '@/api/types'
+import type { AdminCategory, CatalogSeoMeta, LocalizedText } from '@/api/types'
 import IdCell from '@/components/IdCell.vue'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -11,6 +11,7 @@ import { Dialog, DialogScrollContent, DialogHeader, DialogTitle } from '@/compon
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import TableSkeleton from '@/components/TableSkeleton.vue'
+import SeoShareImage from '@/components/admin/SeoShareImage.vue'
 import MediaPicker from '@/components/admin/MediaPicker.vue'
 import { getLocalizedText } from '@/utils/format'
 import { getImageUrl } from '@/utils/image'
@@ -34,10 +35,28 @@ const languages = computed(() => [
   { code: 'en-US', name: t('admin.common.lang.enUS') },
 ])
 
+const generatingSlug = ref(false)
+const generateSlug = async () => {
+  const title = form.name['zh-CN'] || form.name[currentLang.value] || form.name['en-US']
+  if (!title?.trim()) { notifyError('请先填写商品或分类名称'); return }
+  generatingSlug.value = true
+  try {
+    const response = await adminAPI.getCategories({ suggest_slug: title, ...(form.id ? { exclude_id: form.id } : {}) })
+    form.slug = response.data.data.slug
+  } catch (err) { notifyError((err as Error)?.message || '生成失败') }
+  finally { generatingSlug.value = false }
+}
+const updateShareImage = (value: string) => {
+  form.seo_meta.og_image = value
+  form.seo_meta.og_image_width = value ? 1200 : 0
+  form.seo_meta.og_image_height = value ? 630 : 0
+}
+
 const form = reactive({
   id: 0,
   parent_id: 0,
   name: { 'zh-CN': '', 'zh-TW': '', 'en-US': '' } as LocalizedText,
+  seo_meta: {} as CatalogSeoMeta,
   slug: '',
   icon: '',
   sort_order: 0,
@@ -105,7 +124,8 @@ const openCreateModal = () => {
     id: 0,
     parent_id: 0,
     name: { 'zh-CN': '', 'zh-TW': '', 'en-US': '' },
-    slug: '',
+    seo_meta: {} as CatalogSeoMeta,
+  slug: '',
     icon: '',
     sort_order: 0,
   })
@@ -123,6 +143,7 @@ const openEditModal = (category: AdminCategory) => {
     id: category.id,
     parent_id: category.parent_id || 0,
     name,
+    seo_meta: { ...(category.seo_meta || {}) },
     slug: category.slug,
     icon: category.icon || '',
     sort_order: category.sort_order,
@@ -311,7 +332,8 @@ watch(
 
           <div>
             <label class="block text-xs font-medium text-muted-foreground mb-1.5">{{ t('admin.categories.form.slug') }}</label>
-            <Input v-model="form.slug" :placeholder="t('admin.categories.form.slugPlaceholder')" />
+            <Button type="button" variant="outline" size="sm" class="mb-2" :disabled="generatingSlug" @click="generateSlug">根据名称生成</Button>
+            <Input v-model="form.slug" pattern="[a-z0-9]+(-[a-z0-9]+)*" maxlength="80" :placeholder="t('admin.categories.form.slugPlaceholder')" />
             <p v-if="errors.slug" class="text-xs text-destructive mt-1">{{ errors.slug }}</p>
           </div>
 
@@ -338,7 +360,8 @@ watch(
 
           <div>
             <label class="block text-xs font-medium text-muted-foreground mb-1.5">{{ t('admin.categories.form.icon') }}</label>
-            <MediaPicker v-model="form.icon" scene="category" />
+            <SeoShareImage :model-value="form.seo_meta.og_image" class="mb-4" @update:model-value="updateShareImage" />
+              <MediaPicker v-model="form.icon" scene="category" />
           </div>
 
           <div>

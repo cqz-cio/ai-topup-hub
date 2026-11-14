@@ -56,8 +56,8 @@ func newProductServiceForResellerPublicTest(t *testing.T) (catalogproductbootstr
 	}
 	if err := db.AutoMigrate(
 		&userdomain.User{},
-		&categorydomain.Category{},
-		&productdomain.Product{},
+		&categorydomain.Category{}, &categorydomain.CategorySlugAlias{},
+		&productdomain.Product{}, &productdomain.ProductSlugAlias{},
 		&productdomain.ProductSKU{},
 		&cardsecretdomain.Secret{},
 		&cardsecretdomain.Batch{},

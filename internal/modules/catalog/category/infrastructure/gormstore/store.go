@@ -2,6 +2,7 @@ package gormstore
 
 import (
 	"errors"
+	"github.com/dujiao-next/internal/persistence/slugregistry"
 	"time"
 
 	productdomain "github.com/dujiao-next/internal/modules/catalog/product/domain"
@@ -36,7 +37,7 @@ func (r *CategoryStore) List() ([]categorydomain.Category, error) {
 // ListActive 启用的分类列表
 func (r *CategoryStore) ListActive() ([]categorydomain.Category, error) {
 	var categories []categorydomain.Category
-	if err := r.db.Where("deleted_at IS NULL AND is_active = ?", true).Order("sort_order DESC, id ASC").Find(&categories).Error; err != nil {
+	if err := r.db.Preload("CategorySlugAliases").Where("deleted_at IS NULL AND is_active = ?", true).Order("sort_order DESC, id ASC").Find(&categories).Error; err != nil {
 		return nil, err
 	}
 	return categories, nil
@@ -56,12 +57,46 @@ func (r *CategoryStore) GetByID(id string) (*categorydomain.Category, error) {
 
 // Create 创建分类
 func (r *CategoryStore) Create(category *categorydomain.Category) error {
-	return r.db.Create(category).Error
+	return r.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Omit("CategorySlugAliases").Create(category).Error; err != nil {
+			return err
+		}
+		return reserveCategorySlug(tx, category.Slug, category.ID)
+	})
 }
 
 // Update 更新分类
 func (r *CategoryStore) Update(category *categorydomain.Category) error {
-	return r.db.Save(category).Error
+	return r.db.Transaction(func(tx *gorm.DB) error {
+		var old categorydomain.Category
+		if err := tx.Select("id", "slug").First(&old, category.ID).Error; err != nil {
+			return err
+		}
+		for _, value := range []string{old.Slug, category.Slug} {
+			if err := reserveCategorySlug(tx, value, category.ID); err != nil {
+				return err
+			}
+		}
+		return tx.Omit("CategorySlugAliases").Save(category).Error
+	})
+}
+
+func reserveCategorySlug(db *gorm.DB, value string, id uint) error {
+	err := slugregistry.ReserveSlug(db, "category_slug_aliases", "category_id", value, id)
+	if errors.Is(err, slugregistry.ErrSlugReserved) {
+		return categorycontract.ErrSlugExists
+	}
+	return err
+}
+
+func (r *CategoryStore) ResolvePublicSlug(value string) (string, error) {
+	var canonical string
+	err := r.db.Table("category_slug_aliases AS a").Select("c.slug").Joins("JOIN categories c ON c.id = a.category_id").
+		Where("a.slug = ? AND c.deleted_at IS NULL AND c.is_active = ?", value, true).Limit(1).Scan(&canonical).Error
+	if canonical == "" {
+		canonical = value
+	}
+	return canonical, err
 }
 
 // UpdateActive 更新启用状态
@@ -77,14 +112,18 @@ func (r *CategoryStore) Delete(id string) error {
 // CountBySlug 统计 slug 数量
 func (r *CategoryStore) CountBySlug(slug string, excludeID *string) (int64, error) {
 	var count int64
-	query := r.db.Model(&categorydomain.Category{}).Where("deleted_at IS NULL AND slug = ?", slug)
+	query := r.db.Model(&categorydomain.Category{}).Where("slug = ?", slug)
 	if excludeID != nil {
 		query = query.Where("id != ?", *excludeID)
 	}
 	if err := query.Count(&count).Error; err != nil {
 		return 0, err
 	}
-	return count, nil
+	reserved, err := slugregistry.CountReservedSlugs(r.db, "category_slug_aliases", "category_id", slug, excludeID)
+	if count > 0 {
+		return count, err
+	}
+	return reserved, err
 }
 
 // CountChildren 统计某分类的子分类数量

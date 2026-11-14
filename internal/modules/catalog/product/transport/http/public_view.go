@@ -119,6 +119,11 @@ func (v *publicProductView) toProductResp() productpresenter.Product {
 		PromotionRules:       v.PromotionRules,
 		MemberPrices:         v.MemberPrices,
 	}
+	for _, alias := range v.Product.ProductSlugAliases {
+		if alias.Slug != v.Product.Slug {
+			resp.SlugAliases = append(resp.SlugAliases, alias.Slug)
+		}
+	}
 	return resp
 }
 

@@ -260,8 +260,56 @@ func (h *PublicHandler) ListAnonymousProductSlugs(ctx context.Context, category 
 	return slugs, total, nil
 }
 
+// ListAnonymousProducts batches catalog and stock reads for SSR. It deliberately
+// supplies no member level or per-user prices and reuses the API's decorators.
+func (h *PublicHandler) ListAnonymousProducts(ctx context.Context, category string, page, pageSize int) ([]productpresenter.Product, int64, error) {
+	tenant, ok := reseller.TenantFromContext(ctx)
+	if !ok {
+		tenant = reseller.MainTenantContext("")
+	}
+	rows, total, err := h.products.ListPublicForTenant(tenant, category, "", page, pageSize)
+	if err != nil {
+		return nil, 0, err
+	}
+	if err := h.products.ApplyAutoStockCounts(rows); err != nil {
+		return nil, 0, err
+	}
+	var batch *reseller.DisplayPricingBatch
+	if isResellerTenant(tenant) {
+		if h.pricer == nil {
+			return nil, 0, productcontract.ErrResellerProductNotListed
+		}
+		batch, err = h.pricer.LoadDisplayPricingBatch(tenant, rows)
+		if err != nil {
+			return nil, 0, err
+		}
+	}
+	items := make([]productpresenter.Product, 0, len(rows))
+	for i := range rows {
+		if err := ctx.Err(); err != nil {
+			return nil, 0, err
+		}
+		item, err := h.decoratePublicProductForTenant(&rows[i], h.promotions, tenant, batch, nil)
+		if errors.Is(err, productcontract.ErrResellerProductNotListed) {
+			continue
+		}
+		if err != nil {
+			return nil, 0, err
+		}
+		items = append(items, item)
+	}
+	return items, total, nil
+}
+
 func (h *PublicHandler) readPublicProduct(ctx context.Context, tenant reseller.TenantContext, slug string, level *memberleveldomain.MemberLevel) (productpresenter.Product, uint, error) {
 	empty := productpresenter.Product{}
+	if resolver, ok := h.products.(interface{ ResolvePublicSlug(string) (string, error) }); ok {
+		canonical, err := resolver.ResolvePublicSlug(slug)
+		if err != nil {
+			return empty, 0, err
+		}
+		slug = canonical
+	}
 	product, err := h.products.GetPublicBySlugForTenant(tenant, slug)
 	if err != nil {
 		return empty, 0, err

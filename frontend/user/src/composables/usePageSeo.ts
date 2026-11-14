@@ -3,7 +3,7 @@ import { useHead } from '@unhead/vue'
 import { useAppStore } from '../stores/app'
 import { getImageUrl } from '../utils/image'
 import { seoText, seoTitle } from '../utils/seo'
-import { identityLogo, shareMetadata } from '../utils/shareSeo'
+import { defaultShareImage, shareMetadata } from '../utils/shareSeo'
 
 export interface PageSeoOptions {
   /** 页面专属标题；若与站点名相同，仅展示站点名 */
@@ -12,6 +12,9 @@ export interface PageSeoOptions {
   description?: () => string | undefined | null
   /** 分享图：可填绝对 URL、相对路径或上传图 key（自动走 getImageUrl） */
   image?: () => string | undefined | null
+  imageWidth?: () => number | undefined
+  imageHeight?: () => number | undefined
+  imageAlt?: () => string | undefined
   /** 规范化路径（如 /products/foo），缺省时取当前 location.pathname */
   canonicalPath?: () => string | undefined | null
   /** og:type，默认 website */
@@ -58,7 +61,7 @@ export function usePageSeo(options: PageSeoOptions = {}) {
   const defaultImage = computed(() => {
     const seo = appStore.config?.seo as { default_og_image?: string } | undefined
     const configured = String(seo?.default_og_image || '').trim()
-    return configured || (appStore.isResellerTenant ? '' : identityLogo(String(appStore.config?.brand?.site_logo || ''), true))
+    return defaultShareImage(configured, baseUrl.value, !appStore.isResellerTenant)
   })
 
   const pageTitle = computed(() => {
@@ -88,8 +91,15 @@ export function usePageSeo(options: PageSeoOptions = {}) {
 
   const sharing = computed(() => {
     const raw = options.image?.()
-    return shareMetadata(baseUrl.value, raw ? [resolveImage(String(raw), baseUrl.value)] : [],
-      defaultImage.value ? resolveImage(defaultImage.value, baseUrl.value) : '')
+    const sharing = shareMetadata(baseUrl.value, raw ? [resolveImage(String(raw), baseUrl.value)] : [],
+      defaultImage.value ? resolveImage(defaultImage.value, baseUrl.value) : '', options.imageAlt?.() || pageTitle.value || siteName.value)
+    const width = options.imageWidth?.()
+    const height = options.imageHeight?.()
+    if (raw && sharing.image === resolveImage(String(raw), baseUrl.value) && width && height && width > 0 && height > 0 && width <= 10000 && height <= 10000) {
+      sharing.width = width
+      sharing.height = height
+    }
+    return sharing
   })
   const fullImage = computed(() => sharing.value.image)
 
@@ -115,13 +125,17 @@ export function usePageSeo(options: PageSeoOptions = {}) {
       if (fullTitle.value) tags.push({ property: 'og:title', content: fullTitle.value })
       if (fullDescription.value) tags.push({ property: 'og:description', content: fullDescription.value })
       if (fullCanonical.value) tags.push({ property: 'og:url', content: fullCanonical.value })
-      if (fullImage.value) tags.push({ property: 'og:image', content: fullImage.value })
+      if (fullImage.value) {
+        tags.push({ property: 'og:image', content: fullImage.value }, { property: 'og:image:alt', content: sharing.value.alt })
+        if (sharing.value.width) tags.push({ property: 'og:image:width', content: String(sharing.value.width) })
+        if (sharing.value.height) tags.push({ property: 'og:image:height', content: String(sharing.value.height) })
+      }
       if (siteName.value) tags.push({ property: 'og:site_name', content: siteName.value })
 
       tags.push({ name: 'twitter:card', content: sharing.value.card })
       if (fullTitle.value) tags.push({ name: 'twitter:title', content: fullTitle.value })
       if (fullDescription.value) tags.push({ name: 'twitter:description', content: fullDescription.value })
-      if (fullImage.value) tags.push({ name: 'twitter:image', content: fullImage.value })
+      if (fullImage.value) tags.push({ name: 'twitter:image', content: fullImage.value }, { name: 'twitter:image:alt', content: sharing.value.alt })
 
       return tags
     },

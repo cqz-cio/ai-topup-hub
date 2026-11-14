@@ -11,9 +11,18 @@
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background: linear-gradient(rgba(255, 255, 255, var(--brand-scene-wash)), rgba(255, 255, 255, var(--brand-scene-wash))), url('/media/storefront-20261020/jellyfishing.webp') center / cover no-repeat;
+  background: linear-gradient(rgba(255, 255, 255, var(--brand-scene-wash)), rgba(255, 255, 255, var(--brand-scene-wash))), var(--brand-scene-image, url('/media/storefront-20261114/jellyfishing-1672.webp')) center / cover no-repeat;
   filter: saturate(.9);
   opacity: var(--brand-scene-opacity);
+}
+@supports (background-image: image-set(url('x.avif') type('image/avif'))) {
+  .brand-scene { --brand-scene-image: image-set(url('/media/storefront-20261114/jellyfishing-1672.avif') type('image/avif'), url('/media/storefront-20261114/jellyfishing-1672.webp') type('image/webp')); }
+}
+@media (max-width: 1280px) {
+  .brand-scene { --brand-scene-image: url('/media/storefront-20261114/jellyfishing-1280.webp'); }
+  @supports (background-image: image-set(url('x.avif') type('image/avif'))) {
+    .brand-scene { --brand-scene-image: image-set(url('/media/storefront-20261114/jellyfishing-1280.avif') type('image/avif'), url('/media/storefront-20261114/jellyfishing-1280.webp') type('image/webp')); }
+  }
 }
 .dark .brand-scene { --brand-scene-wash: 0; }
 .dark .brand-scene::before { filter: brightness(.4) saturate(.88); }

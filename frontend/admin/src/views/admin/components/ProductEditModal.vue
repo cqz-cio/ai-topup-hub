@@ -3,6 +3,7 @@ import { computed, ref, reactive, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { adminAPI } from '@/api/admin'
 import type { AdminProduct, AdminCategory, AdminProductSKU, AdminPaymentChannel, LocalizedText } from '@/api/types'
+import SeoShareImage from '@/components/admin/SeoShareImage.vue'
 import MediaPicker from '@/components/admin/MediaPicker.vue'
 import RichEditor from '@/components/RichEditor.vue'
 // image utils removed - MediaPicker handles image display
@@ -138,11 +139,28 @@ const createSKUFormItem = (raw?: Partial<AdminProductSKU>): SKUFormItem => ({
   sort_order: Number(raw?.sort_order || 0),
 })
 
+const generatingSlug = ref(false)
+const generateSlug = async () => {
+  const title = form.title['zh-CN'] || form.title[currentLang.value] || form.title['en-US']
+  if (!title?.trim()) { notifyError('请先填写商品或分类名称'); return }
+  generatingSlug.value = true
+  try {
+    const response = await adminAPI.getProducts({ suggest_slug: title, ...(form.id ? { exclude_id: form.id } : {}) })
+    form.slug = response.data.data.slug
+  } catch (err) { notifyError((err as Error)?.message || '生成失败') }
+  finally { generatingSlug.value = false }
+}
+const updateShareImage = (value: string) => {
+  form.seo_meta.og_image = value
+  form.seo_meta.og_image_width = value ? 1200 : 0
+  form.seo_meta.og_image_height = value ? 630 : 0
+}
+
 const form = reactive({
   id: 0,
   title: { 'zh-CN': '', 'zh-TW': '', 'en-US': '' } as LocalizedText,
   slug: '',
-  seo_meta: { keywords: { 'zh-CN': '', 'zh-TW': '', 'en-US': '' }, description: { 'zh-CN': '', 'zh-TW': '', 'en-US': '' } } as { keywords: LocalizedText; description: LocalizedText; [key: string]: LocalizedText },
+  seo_meta: { keywords: { 'zh-CN': '', 'zh-TW': '', 'en-US': '' }, description: { 'zh-CN': '', 'zh-TW': '', 'en-US': '' } } as { keywords: LocalizedText; description: LocalizedText; title?: LocalizedText; og_image?: string; og_image_width?: number; og_image_height?: number; [key: string]: unknown },
   description: { 'zh-CN': '', 'zh-TW': '', 'en-US': '' } as LocalizedText,
   content: { 'zh-CN': '', 'zh-TW': '', 'en-US': '' } as LocalizedText,
   instructions: { 'zh-CN': '', 'zh-TW': '', 'en-US': '' } as LocalizedText,
@@ -203,19 +221,20 @@ const getCurrentLangName = () => {
 
 const emptyI18nString = () => ({ 'zh-CN': '', 'zh-TW': '', 'en-US': '' })
 
-const normalizeSeoMeta = (raw: Record<string, LocalizedText> | null | undefined) => {
+const normalizeSeoMeta = (raw: Record<string, unknown> | null | undefined) => {
   if (!raw) return { keywords: emptyI18nString(), description: emptyI18nString() }
-  const normalize = (val: string | LocalizedText | null | undefined) => {
+  const normalize = (val: unknown) => {
     if (!val) return emptyI18nString()
     if (typeof val === 'string') {
       return { 'zh-CN': val, 'zh-TW': '', 'en-US': '' }
     }
     if (typeof val === 'object') {
-      return { 'zh-CN': val['zh-CN'] || '', 'zh-TW': val['zh-TW'] || '', 'en-US': val['en-US'] || '' }
+      return { 'zh-CN': (val as LocalizedText)['zh-CN'] || '', 'zh-TW': (val as LocalizedText)['zh-TW'] || '', 'en-US': (val as LocalizedText)['en-US'] || '' }
     }
     return emptyI18nString()
   }
   return {
+    ...raw,
     keywords: normalize(raw.keywords),
     description: normalize(raw.description),
   }
@@ -740,7 +759,8 @@ watch(
 
           <div class="col-span-1">
             <label class="block text-xs font-medium text-muted-foreground mb-1.5">{{ t('admin.products.form.slug') }}</label>
-            <Input v-model="form.slug" required :placeholder="t('admin.products.form.slugPlaceholder')" />
+            <Button type="button" variant="outline" size="sm" class="mb-2" :disabled="generatingSlug" @click="generateSlug">根据名称生成</Button>
+            <Input v-model="form.slug" pattern="[a-z0-9]+(-[a-z0-9]+)*" maxlength="80" required :placeholder="t('admin.products.form.slugPlaceholder')" />
             <p class="mt-1 text-xs text-muted-foreground">{{ t('admin.products.form.slugTip') }}</p>
           </div>
 
@@ -749,6 +769,8 @@ watch(
             <Input v-model="form.seo_meta.keywords[currentLang]" :placeholder="t('admin.products.form.seoMetaKeywordsPlaceholder')" />
             <p class="mt-1 text-xs text-muted-foreground">{{ t('admin.products.form.seoMetaKeywordsTip') }}</p>
           </div>
+
+          <div class="col-span-1 md:col-span-2"><SeoShareImage :model-value="form.seo_meta.og_image" @update:model-value="updateShareImage" /></div>
 
           <div class="col-span-1 md:col-span-2">
             <label class="block text-xs font-medium text-muted-foreground mb-1.5">{{ t('admin.products.form.seoMetaDescription', { lang: getCurrentLangName() }) }}</label>

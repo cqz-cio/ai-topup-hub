@@ -1,8 +1,10 @@
 package publicconfigwiring
 
 import (
+	"context"
 	"github.com/dujiao-next/internal/app/container"
 	publicconfigtransport "github.com/dujiao-next/internal/modules/settings/transport/http/public"
+	"github.com/dujiao-next/internal/platform/publiccontent"
 )
 
 func NewHandler(c *container.Container) *publicconfigtransport.Handler {
@@ -46,5 +48,7 @@ func NewHandler(c *container.Container) *publicconfigtransport.Handler {
 		googleFallback,
 		overlay,
 		func() map[string]bool { return map[string]bool{"redemption": c.RuntimeFeatures().Redemption.Available} },
-	)
+	).WithCatalogLinks(func(ctx context.Context) (map[string]string, error) {
+		return c.ProductRepo.PublicCatalogLinks(ctx, publiccontent.GPTRecharge().CatalogIdentities)
+	})
 }

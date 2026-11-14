@@ -1,7 +1,7 @@
 <template>
   <div class="mx-auto w-full max-w-[1180px] px-6 pb-10 pt-2">
     <header class="mt-6 flex flex-col items-start gap-2">
-      <h1 class="text-[34px] font-extrabold">{{ t('nav.blog') }}</h1>
+      <h1 class="text-[34px] font-extrabold">{{ t('shopUi.blogTitle') }}</h1>
       <p class="text-muted-foreground">{{ t('blog.subtitle') }}</p>
     </header>
 
@@ -29,7 +29,7 @@
             <img :src="getImageUrl(post.thumbnail)" :alt="getLocalizedText(post.title)" loading="lazy" class="h-full w-full object-cover" />
           </div>
           <div class="mb-1 flex items-center gap-2.5">
-            <Badge :variant="post.type === 'blog' ? 'info' : 'warning'" size="sm" class="rounded-full">{{ post.type === 'blog' ? t('nav.blog') : t('nav.notice') }}</Badge>
+            <Badge :variant="post.type === 'blog' ? 'info' : 'warning'" size="sm" class="rounded-full">{{ post.type === 'blog' ? t('shopUi.blogTitle') : t('nav.notice') }}</Badge>
             <span class="text-xs font-semibold text-muted-foreground">{{ formatDate(post.published_at) }}</span>
           </div>
           <h3 class="text-lg font-bold">{{ getLocalizedText(post.title) }}</h3>
@@ -69,5 +69,5 @@ const { t } = useI18n()
 const {
   loading, posts, currentPage, totalPages, searchKeyword,
   getLocalizedText, formatDate, changePage,
-} = usePostList('blog', { title: () => t('nav.blog'), canonicalPath: '/blog' })
+} = usePostList('blog', { title: () => t('shopUi.blogTitle'), canonicalPath: '/blog' })
 </script>

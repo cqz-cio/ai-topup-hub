@@ -60,7 +60,7 @@
                   <h2>{{ t('productDetail.description') }}</h2>
                   <p>{{ getLocalizedText(product.description) }}</p>
                 </section>
-                <ProductPurchaseGuide :slug="product.slug" hide-redemption class="product-conditions product-conditions-desktop" />
+                <ProductPurchaseGuide :slug="product.slug" :aliases="product.slug_aliases" hide-redemption class="product-conditions product-conditions-desktop" />
               </div>
             </div>
 
@@ -268,9 +268,9 @@
                 <h2><FileText :size="19" />{{ t('productDetail.description') }}</h2>
                 <p>{{ getLocalizedText(product.description) }}</p>
               </section>
-              <ProductPurchaseGuide :slug="product.slug" hide-redemption class="product-conditions product-conditions-mobile ocean-reading-surface" />
+              <ProductPurchaseGuide :slug="product.slug" :aliases="product.slug_aliases" hide-redemption class="product-conditions product-conditions-mobile ocean-reading-surface" />
 
-              <ProductRedemptionGuide :slug="product.slug" class="product-delivery-note ocean-reading-surface" />
+              <ProductRedemptionGuide :slug="product.slug" :aliases="product.slug_aliases" class="product-delivery-note ocean-reading-surface" />
 
               <!-- Quantity Selector -->
                 <div v-if="!contactFirst" class="product-quantity">

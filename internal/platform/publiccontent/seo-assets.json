@@ -1,5 +1,9 @@
 {
   "legacyLogo": "/brand/patrick-logo.png",
   "logo": "/media/storefront-20261020/patrick-logo.webp",
-  "icon": "/media/storefront-20261020/patrick-icon.png"
+  "icon": "/media/storefront-20261020/patrick-icon.png",
+  "shareImage": "/media/seo-share/qzweb-og-1200x630.jpg",
+  "shareImageWidth": 1200,
+  "shareImageHeight": 630,
+  "shareImageAlt": "π星卡社｜AI 订阅与充值"
 }

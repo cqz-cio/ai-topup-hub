@@ -4,14 +4,17 @@ import "html/template"
 
 type document struct {
 	Page
-	Site                          Site
-	Canonical, Description        string
-	MetadataTitle                 string
-	Icon, ShareImage, TwitterCard string
-	Images                        []string
-	Body, Summary                 template.HTML
-	Schema                        template.JS
-	Identity                      template.JS
+	Site                              Site
+	Canonical, Description            string
+	MetadataTitle                     string
+	Icon, ShareImage, TwitterCard     string
+	ShareImageAlt                     string
+	ShareImageWidth, ShareImageHeight int
+	Images                            []string
+	Body, Summary                     template.HTML
+	Schema                            template.JS
+	Identity                          template.JS
+	CatalogLinks                      template.JS
 }
 
 // The visible HTML is identical for crawlers and visitors. Vue progressively
@@ -19,6 +22,20 @@ type document struct {
 var documentTemplate = template.Must(template.New("public-detail").Parse(`<!doctype html>
 <html lang="zh-CN"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<script id="public-catalog-links" type="application/json">{{.CatalogLinks}}</script>
+{{if .PreloadScene}}<script data-cfasync="false">
+try {
+  const template = new URLSearchParams(location.search).get('template') || localStorage.getItem('dj-storefront-template');
+  if (location.pathname === '/' && template !== 'vault') {
+    const width = matchMedia('(max-width: 1280px)').matches ? '1280' : '1672';
+    const format = CSS.supports('background-image', "image-set(url('x.avif') type('image/avif'))") ? 'avif' : 'webp';
+    const hint = document.createElement('link');
+    hint.rel = 'preload'; hint.as = 'image'; hint.type = 'image/' + format; hint.fetchPriority = 'high';
+    hint.href = '/media/storefront-20261114/jellyfishing-' + width + '.' + format;
+    document.head.appendChild(hint);
+  }
+} catch {}
+</script>{{end}}
 <title data-public-page-seo>{{.MetadataTitle}}</title>
 <meta data-public-page-seo name="description" content="{{.Description}}">
 <link data-public-page-seo rel="canonical" href="{{.Canonical}}">
@@ -29,11 +46,15 @@ var documentTemplate = template.Must(template.New("public-detail").Parse(`<!doct
 <meta data-public-page-seo property="og:url" content="{{.Canonical}}">
 <meta data-public-page-seo property="og:site_name" content="{{.Site.Name}}">
 <meta data-public-page-seo property="og:type" content="{{if eq .Kind "product"}}product{{else if or (eq .Kind "article") (eq .Kind "notice")}}article{{else}}website{{end}}">
-{{if .ShareImage}}<meta data-public-page-seo property="og:image" content="{{.ShareImage}}">{{end}}
+{{if .ShareImage}}<meta data-public-page-seo property="og:image" content="{{.ShareImage}}">
+{{if .ShareImageWidth}}<meta data-public-page-seo property="og:image:width" content="{{.ShareImageWidth}}">{{end}}
+{{if .ShareImageHeight}}<meta data-public-page-seo property="og:image:height" content="{{.ShareImageHeight}}">{{end}}
+<meta data-public-page-seo property="og:image:alt" content="{{.ShareImageAlt}}">{{end}}
 <meta data-public-page-seo name="twitter:card" content="{{.TwitterCard}}">
 <meta data-public-page-seo name="twitter:title" content="{{.MetadataTitle}}">
 <meta data-public-page-seo name="twitter:description" content="{{.Description}}">
-{{if .ShareImage}}<meta data-public-page-seo name="twitter:image" content="{{.ShareImage}}">{{end}}
+{{if .ShareImage}}<meta data-public-page-seo name="twitter:image" content="{{.ShareImage}}">
+<meta data-public-page-seo name="twitter:image:alt" content="{{.ShareImageAlt}}">{{end}}
 <script data-public-page-seo type="application/ld+json">{{.Schema}}</script>
 <script data-public-page-seo type="application/ld+json">{{.Identity}}</script>
 <link rel="stylesheet" href="/storefront-entry.css">

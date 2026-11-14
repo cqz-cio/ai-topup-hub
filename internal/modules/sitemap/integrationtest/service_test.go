@@ -45,8 +45,8 @@ func newSitemapServiceForTest(t *testing.T, reader sitemapcontract.PublishedPost
 		t.Fatalf("open sqlite failed: %v", err)
 	}
 	if err := db.AutoMigrate(
-		&categorydomain.Category{},
-		&productdomain.Product{},
+		&categorydomain.Category{}, &categorydomain.CategorySlugAlias{},
+		&productdomain.Product{}, &productdomain.ProductSlugAlias{},
 		&productdomain.ProductSKU{},
 		&contentdomain.Post{},
 	); err != nil {
