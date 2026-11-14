@@ -1,17 +1,17 @@
 import { computed } from 'vue'
 import { useHead } from '@unhead/vue'
 import { useAppStore } from '../stores/app'
-import { getImageUrl } from '../utils/image'
 import { seoText, seoTitle } from '../utils/seo'
-import { defaultShareImage, shareMetadata } from '../utils/shareSeo'
+import { defaultShareImage, rasterShareUrl, shareMetadata } from '../utils/shareSeo'
 
 export interface PageSeoOptions {
   /** 页面专属标题；若与站点名相同，仅展示站点名 */
   title?: () => string | undefined | null
   /** 页面描述；缺省时回落到站点全局描述 */
   description?: () => string | undefined | null
-  /** 分享图：可填绝对 URL、相对路径或上传图 key（自动走 getImageUrl） */
+  /** 原始分享图 URL；不应用商品展示图的透明替换规则。 */
   image?: () => string | undefined | null
+  images?: () => string[] | undefined | null
   imageWidth?: () => number | undefined
   imageHeight?: () => number | undefined
   imageAlt?: () => string | undefined
@@ -25,17 +25,6 @@ export interface PageSeoOptions {
 }
 
 const trimSlashEnd = (s: string) => s.replace(/\/+$/, '')
-
-const resolveImage = (raw: string, baseUrl: string): string => {
-  const trimmed = raw.trim()
-  if (!trimmed) return ''
-  if (/^https?:\/\//i.test(trimmed)) return trimmed
-  // 优先走 getImageUrl 处理 uploads 路径，得到的可能是相对 /uploads/...
-  const resolved = getImageUrl(trimmed) || trimmed
-  if (/^https?:\/\//i.test(resolved)) return resolved
-  if (baseUrl && resolved.startsWith('/')) return baseUrl + resolved
-  return resolved
-}
 
 export function usePageSeo(options: PageSeoOptions = {}) {
   const appStore = useAppStore()
@@ -91,11 +80,12 @@ export function usePageSeo(options: PageSeoOptions = {}) {
 
   const sharing = computed(() => {
     const raw = options.image?.()
-    const sharing = shareMetadata(baseUrl.value, raw ? [resolveImage(String(raw), baseUrl.value)] : [],
-      defaultImage.value ? resolveImage(defaultImage.value, baseUrl.value) : '', options.imageAlt?.() || pageTitle.value || siteName.value)
+    const candidates = [...(raw ? [String(raw)] : []), ...(options.images?.() || [])]
+    const sharing = shareMetadata(baseUrl.value, candidates, defaultImage.value,
+      options.imageAlt?.() || pageTitle.value || siteName.value)
     const width = options.imageWidth?.()
     const height = options.imageHeight?.()
-    if (raw && sharing.image === resolveImage(String(raw), baseUrl.value) && width && height && width > 0 && height > 0 && width <= 10000 && height <= 10000) {
+    if (raw && sharing.image === rasterShareUrl(baseUrl.value, String(raw)) && width && height && width > 0 && height > 0 && width <= 10000 && height <= 10000) {
       sharing.width = width
       sharing.height = height
     }
