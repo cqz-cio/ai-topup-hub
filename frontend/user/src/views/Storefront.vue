@@ -26,7 +26,7 @@
 
     <main id="catalog-content" class="catalog-section" tabindex="-1">
       <div class="catalog-toolbar">
-        <div><p class="commerce-eyebrow">{{ t('shopUi.catalog') }}</p><component :is="catalogOnly ? 'h1' : 'h2'" class="catalog-title">{{ isRechargePage ? gptRecharge.title : (search.trim() ? t('shopUi.searchResults') : (selectedCategory || t('shopUi.allProducts'))) }}<span v-if="!initialLoading && !loadFailed" role="status">{{ t('shopUi.productCount', { count: visibleProducts.length }) }}</span></component></div>
+        <div><p class="commerce-eyebrow">{{ t('shopUi.catalog') }}</p><component :is="catalogOnly ? 'h1' : 'h2'" class="catalog-title">{{ isRechargePage ? gptRecharge.title : (search.trim() ? t('shopUi.searchResults') : (categoryHeading || (catalogOnly ? t('shopUi.productsTitle') : t('shopUi.allProducts')))) }}<span v-if="!initialLoading && !loadFailed" role="status">{{ t('shopUi.productCount', { count: visibleProducts.length }) }}</span></component></div>
         <label class="catalog-search">
           <Search :size="18" aria-hidden="true" /><span class="sr-only">{{ t('shopUi.search') }}</span>
           <input v-model="search" type="search" :placeholder="t('shopUi.search')" />
@@ -56,6 +56,7 @@
           </div>
         </aside>
         <div class="catalog-main">
+          <RouterLink v-if="!catalogOnly && !appStore.isResellerTenant && gptRecharge.path" :to="gptRecharge.path" class="mobile-recharge-link store-text-link">GPT 充值方案与购买须知<ArrowUpRight :size="14" aria-hidden="true" /></RouterLink>
           <p v-if="isRechargePage" class="recharge-intro">{{ gptRecharge.summary }} <a class="store-text-link" href="#gpt-recharge-guide">查看购买须知<ArrowRight :size="14" aria-hidden="true" /></a></p>
           <div class="delivery-notice"><Info :size="15" aria-hidden="true" /><p><span class="full-delivery-hint">{{ t('shopUi.deliveryNotice') }}</span><span class="compact-delivery-hint">{{ t('shopUi.chooseProductHint') }}</span></p></div>
           <div v-if="initialLoading" class="product-grid" :aria-label="t('shopUi.loading')" aria-busy="true">
@@ -125,8 +126,10 @@ import { useUserAuthStore } from '../stores/userAuth'
 import { usePageSeo } from '../composables/usePageSeo'
 import { useHead } from '@unhead/vue'
 import { schemaJSON } from '../utils/siteIdentity'
+import { categoryPageTitle } from '../utils/pageTitles'
+import type { PublicCategory } from '../utils/category'
 import { seoText } from '../utils/seo'
-import { gptRecharge, gptRechargeHtml } from '../utils/gptRecharge'
+import { resolveRechargeGuide, rechargeHtml } from '../utils/gptRecharge'
 import ProductDetailContent from '../components/product/ProductDetailContent.vue'
 import AnnouncementModal from '../components/AnnouncementModal.vue'
 import CodexCreditsSection from '../components/commerce/CodexCreditsSection.vue'
@@ -156,7 +159,9 @@ const { catalogOnly = false } = defineProps<{ catalogOnly?: boolean }>()
 const route = useRoute()
 const router = useRouter()
 const appStore = useAppStore()
-const isRechargePage = computed(() => catalogOnly && route.params.slug === gptRecharge.categorySlug && !appStore.isResellerTenant)
+const gptRecharge = computed(() => resolveRechargeGuide(appStore.config?.catalog_links || {}))
+const gptRechargeHtml = computed(() => rechargeHtml(gptRecharge.value))
+const isRechargePage = computed(() => catalogOnly && route.params.slug === gptRecharge.value.categorySlug && !appStore.isResellerTenant)
 const { shouldShow } = useAnnouncement()
 const activeAnnouncement = computed<HomeAnnouncement | undefined>(() => appStore.config?.announcement)
 const announcementVisible = ref(false)
@@ -175,12 +180,14 @@ const supportWechat = computed(
     (appStore.isResellerTenant ? '' : 'Cqz0924ttxk'),
 )
 const products = ref<StorefrontProduct[]>([])
-const categoryRows = ref<Array<{ name?: unknown; slug?: string }>>([])
+const categoryRows = ref<PublicCategory[]>([])
 const categoryDirectoryLoaded = ref(false)
 const initialLoading = ref(true)
 const refreshing = ref(false)
 const loadFailed = ref(false)
 const selectedCategory = ref('')
+const currentCategory = computed(() => categoryRows.value.find(row => row.slug === route.params.slug || row.slug_aliases?.includes(String(route.params.slug))))
+const categoryHeading = computed(() => categoryPageTitle(selectedCategory.value, appStore.locale))
 const moreCategories = ref<HTMLDetailsElement | null>(null)
 const closeMoreCategories = () => {
   const menu = moreCategories.value
@@ -213,8 +220,11 @@ const syncCategoryFromRoute = () => {
     return
   }
   const category = route.name === 'category-products'
-    ? categoryRows.value.find((row) => row.slug === route.params.slug)
+    ? categoryRows.value.find((row) => row.slug === route.params.slug || row.slug_aliases?.includes(String(route.params.slug)))
     : undefined
+  if (category?.slug && category.slug !== route.params.slug) {
+    void router.replace({ name: 'category-products', params: { ...route.params, slug: category.slug }, query: route.query, hash: route.hash })
+  }
   const name = category
     ? storefrontText(category.name, appStore.locale)
     : ''
@@ -386,9 +396,13 @@ const copyWechat = async () => {
   }, 3000)
 }
 usePageSeo({
-  title: () => isRechargePage.value ? gptRecharge.seoTitle : catalogOnly ? (selectedCategory.value || t('nav.products')) : undefined,
-  description: () => isRechargePage.value ? gptRecharge.summary : catalogOnly ? t('shopUi.catalogHint') : undefined,
-  canonicalPath: () => isRechargePage.value ? gptRecharge.path : catalogOnly ? route.path : '/',
+  title: () => isRechargePage.value ? gptRecharge.value.seoTitle : catalogOnly ? (seoText(currentCategory.value?.seo_meta?.title, appStore.locale) || categoryHeading.value || t('shopUi.productsTitle')) : undefined,
+  description: () => isRechargePage.value ? gptRecharge.value.summary : catalogOnly ? (seoText(currentCategory.value?.seo_meta?.description, appStore.locale) || t('shopUi.catalogHint')) : undefined,
+  image: () => seoText(currentCategory.value?.seo_meta?.og_image, appStore.locale) || currentCategory.value?.icon || '',
+  imageWidth: () => Number(currentCategory.value?.seo_meta?.og_image_width) || 0,
+  imageHeight: () => Number(currentCategory.value?.seo_meta?.og_image_height) || 0,
+  imageAlt: () => isRechargePage.value ? gptRecharge.value.title : catalogOnly ? (categoryHeading.value || t('shopUi.productsTitle')) : t('shopUi.heroTitle') + t('shopUi.heroAccent'),
+  canonicalPath: () => currentCategory.value?.slug ? '/categories/' + currentCategory.value.slug : catalogOnly ? route.path : '/',
 })
 useHead(() => {
   if (!catalogOnly && !appStore.isResellerTenant) {
@@ -403,8 +417,8 @@ useHead(() => {
   const origin = String(appStore.config?.brand?.site_url || window.location.origin).replace(/\/+$/, '')
   const items = orderedProducts.value
   const schema = {
-    '@context': 'https://schema.org', '@type': 'CollectionPage', name: isRechargePage.value ? gptRecharge.title : (selectedCategory.value || t('nav.products')),
-    description: isRechargePage.value ? gptRecharge.summary : t('shopUi.catalogHint'), url: origin + route.path,
+    '@context': 'https://schema.org', '@type': 'CollectionPage', name: isRechargePage.value ? gptRecharge.value.title : (seoText(currentCategory.value?.seo_meta?.title, appStore.locale) || categoryHeading.value || t('shopUi.productsTitle')),
+    description: isRechargePage.value ? gptRecharge.value.summary : t('shopUi.catalogHint'), url: origin + route.path,
     mainEntity: { '@type': 'ItemList', itemListElement: items.map((product, index) => ({
       '@type': 'ListItem', position: index + 1, name: productTitle(product), url: `${origin}/products/${encodeURIComponent(product.slug)}`,
     })) },
@@ -465,6 +479,7 @@ onUnmounted(() => {
 .catalog-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 25px; padding-top: 32px; border-top: 1px solid var(--ui-border); margin-bottom: 28px; }
 .catalog-toolbar .commerce-eyebrow { margin-bottom: 8px; }
 .catalog-title { font-size: 25px; font-weight: 700; }
+.mobile-recharge-link { display: none; }
 .catalog-title span { font-size: 10px; font-weight: 400; color: var(--ui-text-muted); margin-left: 16px; vertical-align: middle; }
 .catalog-search { display: flex; align-items: center; gap: 10px; border: 1px solid var(--ui-border); background: var(--ui-bg-elevated); padding: 12px 14px; border-radius: 9px; color: var(--ui-text-muted); width: 290px; }
 .catalog-search input { width: 100%; min-width: 0; background: transparent; font-size: 12px; border: none; outline: none; color: var(--ui-text-primary); }

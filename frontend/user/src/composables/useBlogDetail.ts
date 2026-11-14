@@ -41,7 +41,7 @@ export function useBlogDetail() {
   }
 
   const readingContent = computed(() => appendRechargeLinks(
-    getLocalizedText(post.value?.content), 'article', post.value?.slug || '', '', appStore.isResellerTenant,
+    getLocalizedText(post.value?.content), 'article', post.value?.slug || '', '', appStore.isResellerTenant, appStore.config?.catalog_links || {},
   ))
 
   usePageSeo({

@@ -7,6 +7,8 @@ import (
 	categorydomain "github.com/dujiao-next/internal/modules/catalog/category/domain"
 	"github.com/dujiao-next/internal/platform/http/ginutil"
 	"github.com/dujiao-next/internal/platform/http/response"
+	"github.com/dujiao-next/internal/shared/jsonmap"
+	catalogslug "github.com/dujiao-next/internal/shared/slug"
 
 	"github.com/gin-gonic/gin"
 )
@@ -34,6 +36,26 @@ func NewAdminCategoryHandler(service CategoryService) *AdminCategoryHandler {
 
 // GetAdminCategories 获取分类列表 (Admin)
 func (h *AdminCategoryHandler) GetAdminCategories(c *gin.Context) {
+	if title, asked := c.GetQuery("suggest_slug"); asked {
+		generator, ok := h.service.(interface {
+			SuggestSlug(string, *string) (string, error)
+		})
+		if !ok {
+			ginutil.RespondError(c, response.CodeInternal, "error.category_fetch_failed", nil)
+			return
+		}
+		var exclude *string
+		if value := c.Query("exclude_id"); value != "" {
+			exclude = &value
+		}
+		value, err := generator.SuggestSlug(title, exclude)
+		if err != nil {
+			ginutil.RespondError(c, response.CodeInternal, "error.category_fetch_failed", err)
+			return
+		}
+		response.Success(c, gin.H{"slug": value})
+		return
+	}
 	categories, err := h.service.List()
 	if err != nil {
 		ginutil.RespondError(c, response.CodeInternal, "error.category_fetch_failed", err)
@@ -47,11 +69,12 @@ func (h *AdminCategoryHandler) GetAdminCategories(c *gin.Context) {
 
 // CreateCategoryRequest 创建分类请求
 type CreateCategoryRequest struct {
-	ParentID  uint                   `json:"parent_id"`
-	Slug      string                 `json:"slug" binding:"required"`
-	NameJSON  map[string]interface{} `json:"name" binding:"required"`
-	Icon      string                 `json:"icon"`
-	SortOrder int                    `json:"sort_order"`
+	SeoMetaJSON jsonmap.JSON           `json:"seo_meta"`
+	ParentID    uint                   `json:"parent_id"`
+	Slug        string                 `json:"slug" binding:"required"`
+	NameJSON    map[string]interface{} `json:"name" binding:"required"`
+	Icon        string                 `json:"icon"`
+	SortOrder   int                    `json:"sort_order"`
 }
 
 // CreateCategory 创建分类
@@ -63,13 +86,18 @@ func (h *AdminCategoryHandler) CreateCategory(c *gin.Context) {
 	}
 
 	category, err := h.service.Create(categoryapp.UpsertInput{
-		ParentID:  req.ParentID,
-		Slug:      req.Slug,
-		NameJSON:  req.NameJSON,
-		Icon:      req.Icon,
-		SortOrder: req.SortOrder,
+		SeoMetaJSON: req.SeoMetaJSON,
+		ParentID:    req.ParentID,
+		Slug:        req.Slug,
+		NameJSON:    req.NameJSON,
+		Icon:        req.Icon,
+		SortOrder:   req.SortOrder,
 	})
 	if err != nil {
+		if errors.Is(err, catalogslug.ErrInvalid) {
+			ginutil.RespondError(c, response.CodeBadRequest, "error.bad_request", err)
+			return
+		}
 		if errors.Is(err, categoryapp.ErrSlugExists) {
 			ginutil.RespondError(c, response.CodeBadRequest, "error.slug_exists", nil)
 			return
@@ -96,11 +124,12 @@ func (h *AdminCategoryHandler) UpdateCategory(c *gin.Context) {
 	}
 
 	category, err := h.service.Update(id, categoryapp.UpsertInput{
-		ParentID:  req.ParentID,
-		Slug:      req.Slug,
-		NameJSON:  req.NameJSON,
-		Icon:      req.Icon,
-		SortOrder: req.SortOrder,
+		SeoMetaJSON: req.SeoMetaJSON,
+		ParentID:    req.ParentID,
+		Slug:        req.Slug,
+		NameJSON:    req.NameJSON,
+		Icon:        req.Icon,
+		SortOrder:   req.SortOrder,
 	})
 	if err != nil {
 		if errors.Is(err, categoryapp.ErrNotFound) {
@@ -109,6 +138,10 @@ func (h *AdminCategoryHandler) UpdateCategory(c *gin.Context) {
 		}
 		if errors.Is(err, categoryapp.ErrSlugExists) {
 			ginutil.RespondError(c, response.CodeBadRequest, "error.slug_used", nil)
+			return
+		}
+		if errors.Is(err, catalogslug.ErrInvalid) {
+			ginutil.RespondError(c, response.CodeBadRequest, "error.bad_request", err)
 			return
 		}
 		if errors.Is(err, categoryapp.ErrParentInvalid) {

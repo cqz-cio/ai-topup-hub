@@ -1,9 +1,10 @@
 export interface StorefrontProduct {
   id: number
   slug: string
+  slug_aliases?: string[]
   title: unknown
   description?: unknown
-  category?: { name?: unknown; slug?: string }
+  category?: { name?: unknown; slug?: string; slug_aliases?: string[] }
   images?: string[] | { images?: string[] }
   price_amount: unknown
   effective_price_amount?: unknown

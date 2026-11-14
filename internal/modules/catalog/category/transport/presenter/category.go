@@ -13,10 +13,19 @@ type Category struct {
 	Name      jsonmap.JSON `json:"name"`
 	Icon      string       `json:"icon,omitempty"`
 	SortOrder int          `json:"sort_order"`
+	Aliases   []string     `json:"slug_aliases,omitempty"`
+	SeoMeta   jsonmap.JSON `json:"seo_meta,omitempty"`
 }
 
 func New(category *categorydomain.Category) Category {
+	var aliases []string
+	for _, alias := range category.CategorySlugAliases {
+		if alias.Slug != category.Slug {
+			aliases = append(aliases, alias.Slug)
+		}
+	}
 	return Category{
+		Aliases: aliases, SeoMeta: category.SeoMetaJSON,
 		ID:        category.ID,
 		ParentID:  category.ParentID,
 		Slug:      category.Slug,

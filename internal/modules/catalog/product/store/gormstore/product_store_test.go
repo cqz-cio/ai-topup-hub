@@ -1,6 +1,7 @@
 package gormstore
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 	"testing"
@@ -25,6 +26,54 @@ import (
 	"gorm.io/gorm"
 )
 
+func TestProductURLAliasesAreAtomicPermanentAndPublicOnly(t *testing.T) {
+	repo, db := setupProductStoreTest(t)
+	first := &productdomain.Product{CategoryID: 1, Slug: "old-url", TitleJSON: jsonmap.JSON{"zh-CN": "first"}, IsActive: true}
+	second := &productdomain.Product{CategoryID: 1, Slug: "second", TitleJSON: jsonmap.JSON{"zh-CN": "second"}, IsActive: true}
+	if err := repo.Create(first); err != nil {
+		t.Fatal(err)
+	}
+	if err := repo.Create(second); err != nil {
+		t.Fatal(err)
+	}
+	first.Slug = "readable"
+	if err := repo.Update(first); err != nil {
+		t.Fatal(err)
+	}
+	first.Slug = "final-url"
+	if err := repo.Update(first); err != nil {
+		t.Fatal(err)
+	}
+	for _, value := range []string{"old-url", "readable", "final-url"} {
+		canonical, err := repo.ResolvePublicSlug(value)
+		if err != nil || canonical != "final-url" {
+			t.Fatal(value, canonical, err)
+		}
+	}
+	// Exact catalog lookup used by non-public integrations remains exact.
+	if old, err := repo.GetBySlug("old-url", false); err != nil || old != nil {
+		t.Fatal("alias entered domain lookup", old, err)
+	}
+	second.Slug = "old-url"
+	if err := repo.Update(second); !errors.Is(err, productcontract.ErrSlugExists) {
+		t.Fatal("alias was reused", err)
+	}
+	var saved productdomain.Product
+	db.First(&saved, second.ID)
+	if saved.Slug != "second" {
+		t.Fatal("failed rename partially committed")
+	}
+	if err := repo.Delete(fmt.Sprint(first.ID)); err != nil {
+		t.Fatal(err)
+	}
+	if canonical, err := repo.ResolvePublicSlug("old-url"); err != nil || canonical != "old-url" {
+		t.Fatal("deleted alias redirects", canonical, err)
+	}
+	if count, err := repo.CountBySlug("old-url", nil); err != nil || count != 1 {
+		t.Fatal("deleted URL released", count, err)
+	}
+}
+
 func setupProductStoreTest(t *testing.T) (*ProductStore, *gorm.DB) {
 	t.Helper()
 	dsn := fmt.Sprintf("file:product_repository_test_%d?mode=memory&cache=shared", time.Now().UnixNano())
@@ -33,8 +82,8 @@ func setupProductStoreTest(t *testing.T) (*ProductStore, *gorm.DB) {
 		t.Fatalf("open sqlite failed: %v", err)
 	}
 	if err := db.AutoMigrate(
-		&categorydomain.Category{},
-		&productdomain.Product{},
+		&categorydomain.Category{}, &categorydomain.CategorySlugAlias{},
+		&productdomain.Product{}, &productdomain.ProductSlugAlias{},
 		&productdomain.ProductSKU{},
 		&cardsecretdomain.Secret{},
 		&siteconnectiondomain.Connection{},
@@ -274,8 +323,8 @@ func TestProductStoreSoftDeleteHidesProductAndRejectsStockMutations(t *testing.T
 		t.Fatalf("soft-deleted product must be absent from list, total=%d rows=%#v", total, rows)
 	}
 	count, err := repo.CountBySlug(product.Slug, nil)
-	if err != nil || count != 0 {
-		t.Fatalf("soft-deleted product must be absent from slug count, count=%d err=%v", count, err)
+	if err != nil || count != 1 {
+		t.Fatalf("soft-deleted product URL must remain reserved, count=%d err=%v", count, err)
 	}
 
 	for operation, mutate := range map[string]func() (int64, error){

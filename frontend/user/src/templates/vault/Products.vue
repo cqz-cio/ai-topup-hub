@@ -94,10 +94,12 @@ import { useI18n } from 'vue-i18n'
 import { ChevronLeft, ChevronRight, PackageOpen, Search, SearchX, X } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { useProductList } from '../../composables/useProductList'
+import { categoryPageTitle } from '../../utils/pageTitles'
+import { seoText } from '../../utils/seo'
 import { usePageSeo } from '../../composables/usePageSeo'
 import { useLocalized } from '../../composables/useProduct'
 import { useAppStore } from '../../stores/app'
-import { gptRecharge, gptRechargeHtml } from '../../utils/gptRecharge'
+import { resolveRechargeGuide, rechargeHtml } from '../../utils/gptRecharge'
 import ProductDetailContent from '../../components/product/ProductDetailContent.vue'
 import type { PublicCategory } from '../../utils/category'
 import VaultProductCard from './components/VaultProductCard.vue'
@@ -109,7 +111,9 @@ import { splitCodexCredits } from '../../utils/codexCredits'
 const { t } = useI18n()
 const route = useRoute()
 const appStore = useAppStore()
-const isRechargePage = computed(() => route.params.slug === gptRecharge.categorySlug && !appStore.isResellerTenant)
+const gptRecharge = computed(() => resolveRechargeGuide(appStore.config?.catalog_links || {}))
+const gptRechargeHtml = computed(() => rechargeHtml(gptRecharge.value))
+const isRechargePage = computed(() => route.params.slug === gptRecharge.value.categorySlug && !appStore.isResellerTenant)
 const { getLocalizedText } = useLocalized()
 
 const quickBuyProduct = ref<any>(null)
@@ -151,9 +155,9 @@ const selectedCategoryName = computed(() => {
 })
 
 const pageTitle = computed(() => {
-  if (isRechargePage.value) return gptRecharge.title
-  if (route.name === 'category-products') return selectedCategoryName.value || t('nav.products')
-  return t('nav.products')
+  if (isRechargePage.value) return gptRecharge.value.title
+  if (route.name === 'category-products') return categoryPageTitle(selectedCategoryName.value, appStore.locale) || t('shopUi.productsTitle')
+  return t('shopUi.productsTitle')
 })
 
 // 分页窗口：当前页前后各 2 页
@@ -174,9 +178,13 @@ const resetFilters = () => {
 }
 
 usePageSeo({
-  canonicalPath: () => isRechargePage.value ? gptRecharge.path : route.path,
-  title: () => isRechargePage.value ? gptRecharge.seoTitle : pageTitle.value,
-  description: () => isRechargePage.value ? gptRecharge.summary : undefined,
+  canonicalPath: () => isRechargePage.value ? gptRecharge.value.path : route.path,
+  title: () => isRechargePage.value ? gptRecharge.value.seoTitle : seoText(categoryMap.value.get(selectedCategory.value || 0)?.seo_meta?.title, appStore.locale) || pageTitle.value,
+  image: () => seoText(categoryMap.value.get(selectedCategory.value || 0)?.seo_meta?.og_image, appStore.locale) || categoryMap.value.get(selectedCategory.value || 0)?.icon || '',
+  imageWidth: () => Number(categoryMap.value.get(selectedCategory.value || 0)?.seo_meta?.og_image_width) || 0,
+  imageHeight: () => Number(categoryMap.value.get(selectedCategory.value || 0)?.seo_meta?.og_image_height) || 0,
+  imageAlt: () => pageTitle.value,
+  description: () => isRechargePage.value ? gptRecharge.value.summary : seoText(categoryMap.value.get(selectedCategory.value || 0)?.seo_meta?.description, appStore.locale) || undefined,
 })
 
 onMounted(() => { void initialize() })

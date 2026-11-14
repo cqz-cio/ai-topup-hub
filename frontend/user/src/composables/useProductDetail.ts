@@ -70,7 +70,7 @@ export function useProductDetail(options: { onLoaded?: () => void } = {}) {
   const product = ref<any>(null)
   const readingContent = computed(() => appendDeliveryPolicy(appendRechargeLinks(
     getLocalizedText(product.value?.content), 'product', product.value?.slug || '',
-    product.value?.category?.slug || '', appStore.isResellerTenant,
+    product.value?.category?.slug || '', appStore.isResellerTenant, appStore.config?.catalog_links || {},
   ), appStore.isResellerTenant))
   const contactFirst = computed(() => isContactFirstProduct(product.value?.slug))
   const { openContact } = useProductContact()
@@ -565,6 +565,10 @@ export function useProductDetail(options: { onLoaded?: () => void } = {}) {
       const response = await productAPI.detail(slug)
       if (disposed || request !== productRequest || token !== userAuthStore.token || slug !== route.params.slug) return
       product.value = response.data.data || null
+      if (product.value?.slug && product.value.slug !== slug) {
+        await router.replace({ name: route.name!, params: { ...route.params, slug: product.value.slug }, query: route.query, hash: route.hash })
+        return
+      }
       refreshFailed.value = false
       if (!images.value.includes(currentImage.value)) {
         currentImage.value = images.value[0] || ''
@@ -615,8 +619,11 @@ export function useProductDetail(options: { onLoaded?: () => void } = {}) {
       ? seoText(product.value.seo_meta?.title, appStore.locale) || getLocalizedText(product.value.title)
       : '',
     description: () => productSeoDescription.value,
-    canonicalPath: () => `/products/${encodeURIComponent(String(route.params.slug || ''))}`,
-    image: () => images.value[0] || '',
+    canonicalPath: () => `/products/${encodeURIComponent(product.value?.slug || String(route.params.slug || ''))}`,
+    image: () => seoText(product.value?.seo_meta?.og_image, appStore.locale) || images.value[0] || '',
+    imageWidth: () => Number(product.value?.seo_meta?.og_image_width) || 0,
+    imageHeight: () => Number(product.value?.seo_meta?.og_image_height) || 0,
+    imageAlt: () => product.value ? getLocalizedText(product.value.title) : '',
     type: () => 'product',
   })
 

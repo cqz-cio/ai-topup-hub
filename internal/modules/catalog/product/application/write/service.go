@@ -2,6 +2,7 @@ package productwrite
 
 import (
 	paymentdomain "github.com/dujiao-next/internal/modules/payment/domain"
+	catalogslug "github.com/dujiao-next/internal/shared/slug"
 
 	productdomain "github.com/dujiao-next/internal/modules/catalog/product/domain"
 
@@ -15,6 +16,13 @@ type ProductRepository interface {
 	Update(item *productdomain.Product) error
 	CountBySlug(slug string, excludeID *string) (int64, error)
 	QuickUpdate(id string, fields map[string]interface{}) error
+}
+
+func (s *WriteService) SuggestSlug(title string, excludeID *string) (string, error) {
+	return catalogslug.Unique(catalogslug.Generate(title), func(value string) (bool, error) {
+		count, err := s.products.CountBySlug(value, excludeID)
+		return count > 0, err
+	})
 }
 
 // SKURepository 是商品写入用例所需的 SKU 持久化端口。

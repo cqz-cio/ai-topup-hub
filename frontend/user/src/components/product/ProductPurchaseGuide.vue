@@ -6,10 +6,10 @@ import ProductRedemptionGuide from './ProductRedemptionGuide.vue'
 import { productPurchaseGuide } from '../../utils/productPurchaseGuide'
 import { purchaseClarityCopy } from '../../i18n/purchaseClarity'
 
-const props = defineProps<{ slug: string; hideRedemption?: boolean }>()
+const props = defineProps<{ slug: string; aliases?: string[]; hideRedemption?: boolean }>()
 const { locale } = useI18n()
 const copy = computed(() => purchaseClarityCopy[locale.value] || purchaseClarityCopy['zh-CN']!)
-const guide = computed(() => productPurchaseGuide(props.slug))
+const guide = computed(() => productPurchaseGuide(props.slug, props.aliases))
 </script>
 
 <template>
@@ -20,6 +20,6 @@ const guide = computed(() => productPurchaseGuide(props.slug))
     </ul>
     <p class="mt-3 text-muted-foreground">{{ copy.help }}</p>
     <SupportContacts />
-    <ProductRedemptionGuide v-if="!hideRedemption" :slug="slug" class="mt-3 border-t pt-3" />
+    <ProductRedemptionGuide v-if="!hideRedemption" :slug="slug" :aliases="aliases" class="mt-3 border-t pt-3" />
   </section>
 </template>

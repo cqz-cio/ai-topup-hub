@@ -4,7 +4,7 @@
     <div class="container mx-auto px-4 relative z-10">
       <!-- Page Header -->
       <div class="mb-16 mt-12 text-center">
-        <h1 class="text-4xl md:text-6xl font-black mb-6 tracking-tight text-foreground">{{ t('nav.blog') }}</h1>
+        <h1 class="text-4xl md:text-6xl font-black mb-6 tracking-tight text-foreground">{{ t('shopUi.blogTitle') }}</h1>
         <p
           class="text-muted-foreground max-w-2xl mx-auto text-lg leading-relaxed border-b pb-8">
           {{ t('blog.subtitle') }}
@@ -47,7 +47,7 @@
             <div class="p-8 flex flex-col flex-1">
               <div class="flex items-center justify-between mb-6">
                 <Badge :variant="post.type === 'blog' ? 'accent' : 'info'" class="uppercase tracking-wider">
-                  {{ post.type === 'blog' ? t('nav.blog') : t('nav.notice') }}
+                  {{ post.type === 'blog' ? t('shopUi.blogTitle') : t('nav.notice') }}
                 </Badge>
                 <time class="text-xs text-muted-foreground font-mono">
                   {{ formatDate(post.published_at) }}
@@ -107,7 +107,7 @@ const { t } = useI18n()
 const {
   loading, posts, currentPage, totalPages, searchKeyword,
   getLocalizedText, formatDate, changePage, pageHref,
-} = usePostList('blog', { title: () => t('nav.blog'), canonicalPath: '/blog' })
+} = usePostList('blog', { title: () => t('shopUi.blogTitle'), canonicalPath: '/blog' })
 </script>
 
 <style scoped>

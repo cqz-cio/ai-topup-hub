@@ -80,6 +80,7 @@ type ResellerOverlay interface {
 
 // Handler 处理公开站点配置 HTTP 请求。
 type Handler struct {
+	catalogLinks   func(context.Context) (map[string]string, error)
 	cache          ConfigCache
 	settings       Settings
 	payments       PaymentChannels
@@ -90,6 +91,27 @@ type Handler struct {
 	googleFallback GoogleAuthFallback
 	overlay        ResellerOverlay
 	features       func() map[string]bool
+}
+
+// WithCatalogLinks installs an anonymous link-only projection outside the
+// configuration cache, so a catalog rename is reflected immediately.
+func (h *Handler) WithCatalogLinks(resolve func(context.Context) (map[string]string, error)) *Handler {
+	h.catalogLinks = resolve
+	return h
+}
+
+func (h *Handler) applyCatalogLinks(c *gin.Context, data map[string]interface{}) bool {
+	data["catalog_links"] = map[string]string{}
+	tenant, _ := reseller.TenantFromContext(c.Request.Context())
+	if h.catalogLinks != nil && tenant.ResellerID == nil {
+		links, err := h.catalogLinks(c.Request.Context())
+		if err != nil {
+			ginutil.RespondError(c, response.CodeInternal, "error.config_fetch_failed", err)
+			return false
+		}
+		data["catalog_links"] = links
+	}
+	return true
 }
 
 func NewHandler(
@@ -152,6 +174,9 @@ func (h *Handler) GetConfig(c *gin.Context) {
 		cached["server_time"] = time.Now().UnixMilli()
 		cached["app_version"] = version.Version
 		h.applyFeatures(cached)
+		if !h.applyCatalogLinks(c, cached) {
+			return
+		}
 		response.Success(c, cached)
 		return
 	}
@@ -262,6 +287,9 @@ func (h *Handler) GetConfig(c *gin.Context) {
 	data["server_time"] = time.Now().UnixMilli()
 	data["app_version"] = version.Version
 	h.applyFeatures(data)
+	if !h.applyCatalogLinks(c, data) {
+		return
+	}
 	response.Success(c, data)
 }
 

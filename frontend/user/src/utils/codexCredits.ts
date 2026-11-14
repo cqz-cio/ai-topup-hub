@@ -8,11 +8,11 @@ const creditPoints: Readonly<Record<string, number>> = {
   'qzweb-78': 25000,
 }
 
-export function codexCreditPoints(product: { slug?: string }): number | undefined {
-  return creditPoints[product.slug || '']
+export function codexCreditPoints(product: { slug?: string; slug_aliases?: string[] }): number | undefined {
+  return creditPoints[product.slug || ''] ?? product.slug_aliases?.map(slug => creditPoints[slug]).find(points => points !== undefined)
 }
 
-export function splitCodexCredits<T extends { slug?: string }>(products: readonly T[]) {
+export function splitCodexCredits<T extends { slug?: string; slug_aliases?: string[] }>(products: readonly T[]) {
   return {
     credits: products.filter(product => codexCreditPoints(product) !== undefined)
       .sort((a, b) => codexCreditPoints(a)! - codexCreditPoints(b)!),

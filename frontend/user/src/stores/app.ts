@@ -81,6 +81,13 @@ export const useAppStore = defineStore('app', () => {
             const requestTime = Date.now()
             const response = await configAPI.get()
             config.value = response.data.data
+            const publicLinks = document.getElementById('public-catalog-links')
+            if (publicLinks) {
+                try {
+                    const links = JSON.parse(publicLinks.textContent || '{}')
+                    if (!isResellerTenant.value && links && typeof links === 'object') config.value.catalog_links = links
+                } finally { publicLinks.remove() }
+            }
             // 计算服务器与客户端的时间偏移量
             if (config.value?.server_time) {
                 const responseTime = Date.now()

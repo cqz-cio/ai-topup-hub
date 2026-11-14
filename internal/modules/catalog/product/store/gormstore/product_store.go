@@ -1,6 +1,7 @@
 package gormstore
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"strconv"
@@ -11,6 +12,7 @@ import (
 	productdomain "github.com/dujiao-next/internal/modules/catalog/product/domain"
 
 	"github.com/dujiao-next/internal/persistence/gormutil"
+	"github.com/dujiao-next/internal/persistence/slugregistry"
 
 	"gorm.io/gorm"
 )
@@ -21,6 +23,44 @@ type ProductStore struct {
 }
 
 var _ productcontract.Repository = (*ProductStore)(nil)
+
+// PublicCatalogLinks resolves a small editorial reference set in one query.
+// Aliases remain bound to IDs; only active, visible catalog rows can be linked.
+func (r *ProductStore) PublicCatalogLinks(ctx context.Context, identities map[string]string) (map[string]string, error) {
+	products, categories := []string{}, []string{}
+	for _, path := range identities {
+		if strings.HasPrefix(path, "/products/") {
+			products = append(products, strings.TrimPrefix(path, "/products/"))
+		}
+		if strings.HasPrefix(path, "/categories/") {
+			categories = append(categories, strings.TrimPrefix(path, "/categories/"))
+		}
+	}
+	var rows []struct{ Kind, Slug, Canonical string }
+	err := r.db.WithContext(ctx).Raw(`
+SELECT 'products' AS kind, a.slug, p.slug AS canonical
+FROM product_slug_aliases a JOIN products p ON p.id=a.product_id JOIN categories c ON c.id=p.category_id
+WHERE a.slug IN ? AND p.is_active=true AND p.deleted_at IS NULL AND c.is_active=true AND c.deleted_at IS NULL
+UNION ALL
+SELECT 'categories' AS kind, a.slug, c.slug AS canonical
+FROM category_slug_aliases a JOIN categories c ON c.id=a.category_id
+WHERE a.slug IN ? AND c.is_active=true AND c.deleted_at IS NULL
+AND EXISTS (SELECT 1 FROM products p WHERE p.category_id=c.id AND p.is_active=true AND p.deleted_at IS NULL)`, products, categories).Scan(&rows).Error
+	if err != nil {
+		return nil, err
+	}
+	resolved := map[string]string{}
+	for _, row := range rows {
+		resolved["/"+row.Kind+"/"+row.Slug] = "/" + row.Kind + "/" + row.Canonical
+	}
+	result := map[string]string{}
+	for reference, identity := range identities {
+		if path := resolved[identity]; path != "" {
+			result[reference] = path
+		}
+	}
+	return result, nil
+}
 
 func NewProductStore(db *gorm.DB) *ProductStore {
 	return &ProductStore{db: db}
@@ -50,6 +90,7 @@ func (r *ProductStore) List(filter productcontract.ListFilter) ([]productdomain.
 		query = query.Preload("Category", "deleted_at IS NULL")
 	}
 	if filter.OnlyActive {
+		query = query.Preload("ProductSlugAliases").Preload("Category.CategorySlugAliases")
 		query = query.Where("products.is_active = ?", true)
 		query = query.Where("EXISTS (SELECT 1 FROM categories c WHERE c.id = products.category_id AND c.is_active = ? AND c.deleted_at IS NULL)", true)
 		query = query.Preload("SKUs", func(db *gorm.DB) *gorm.DB {
@@ -185,6 +226,7 @@ func applyStockStatusFilter(query *gorm.DB, status string, lowStockThreshold int
 func (r *ProductStore) GetBySlug(slug string, onlyActive bool) (*productdomain.Product, error) {
 	query := r.db.Preload("Category", "deleted_at IS NULL").Where("products.deleted_at IS NULL AND products.slug = ?", slug)
 	if onlyActive {
+		query = query.Preload("ProductSlugAliases").Preload("Category.CategorySlugAliases")
 		query = query.Where("products.is_active = ?", true)
 		query = query.Where("EXISTS (SELECT 1 FROM categories c WHERE c.id = products.category_id AND c.is_active = ? AND c.deleted_at IS NULL)", true)
 		query = query.Preload("SKUs", func(db *gorm.DB) *gorm.DB {
@@ -254,12 +296,37 @@ func (r *ProductStore) ListByIDs(ids []uint) ([]productdomain.Product, error) {
 
 // Create 创建商品
 func (r *ProductStore) Create(product *productdomain.Product) error {
-	return r.db.Create(product).Error
+	return r.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Omit("ProductSlugAliases").Create(product).Error; err != nil {
+			return err
+		}
+		if err := slugregistry.ReserveSlug(tx, "product_slug_aliases", "product_id", product.Slug, product.ID); err != nil {
+			if errors.Is(err, slugregistry.ErrSlugReserved) {
+				return productcontract.ErrSlugExists
+			}
+			return err
+		}
+		return nil
+	})
 }
 
 // Update 更新商品
 func (r *ProductStore) Update(product *productdomain.Product) error {
-	return r.db.Save(product).Error
+	return r.db.Transaction(func(tx *gorm.DB) error {
+		var old productdomain.Product
+		if err := tx.Select("id", "slug").First(&old, product.ID).Error; err != nil {
+			return err
+		}
+		for _, value := range []string{old.Slug, product.Slug} {
+			if err := slugregistry.ReserveSlug(tx, "product_slug_aliases", "product_id", value, product.ID); err != nil {
+				if errors.Is(err, slugregistry.ErrSlugReserved) {
+					return productcontract.ErrSlugExists
+				}
+				return err
+			}
+		}
+		return tx.Omit("ProductSlugAliases").Save(product).Error
+	})
 }
 
 // QuickUpdate 快速更新商品指定字段
@@ -275,14 +342,31 @@ func (r *ProductStore) Delete(id string) error {
 // CountBySlug 统计 slug 数量
 func (r *ProductStore) CountBySlug(slug string, excludeID *string) (int64, error) {
 	var count int64
-	query := r.db.Model(&productdomain.Product{}).Where("deleted_at IS NULL AND slug = ?", slug)
+	query := r.db.Model(&productdomain.Product{}).Where("slug = ?", slug)
 	if excludeID != nil {
 		query = query.Where("id != ?", *excludeID)
 	}
 	if err := query.Count(&count).Error; err != nil {
 		return 0, err
 	}
-	return count, nil
+	reserved, err := slugregistry.CountReservedSlugs(r.db, "product_slug_aliases", "product_id", slug, excludeID)
+	if count > 0 {
+		return count, err
+	}
+	return reserved, err
+}
+
+// ResolvePublicSlug is used only by public HTTP readers, never procurement.
+func (r *ProductStore) ResolvePublicSlug(value string) (string, error) {
+	var canonical string
+	err := r.db.Table("product_slug_aliases AS a").Select("p.slug").
+		Joins("JOIN products p ON p.id = a.product_id").
+		Where("a.slug = ? AND p.deleted_at IS NULL AND p.is_active = ?", value, true).
+		Limit(1).Scan(&canonical).Error
+	if canonical == "" {
+		canonical = value
+	}
+	return canonical, err
 }
 
 // ReserveManualStock 预占手动库存

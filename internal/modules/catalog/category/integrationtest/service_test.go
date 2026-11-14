@@ -25,7 +25,7 @@ func newCategoryServiceForTest(t *testing.T) (*categoryapp.Service, *gorm.DB) {
 	if err != nil {
 		t.Fatalf("open sqlite failed: %v", err)
 	}
-	if err := db.AutoMigrate(&categorydomain.Category{}, &productdomain.Product{}); err != nil {
+	if err := db.AutoMigrate(&categorydomain.Category{}, &categorydomain.CategorySlugAlias{}, &productdomain.Product{}, &productdomain.ProductSlugAlias{}); err != nil {
 		t.Fatalf("auto migrate category/product failed: %v", err)
 	}
 

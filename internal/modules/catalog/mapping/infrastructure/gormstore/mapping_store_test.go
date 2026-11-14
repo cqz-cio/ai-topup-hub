@@ -31,8 +31,8 @@ func setupMappingStoreTest(t *testing.T) (*MappingStore, *SKUMappingStore, *gorm
 		t.Fatalf("open sqlite failed: %v", err)
 	}
 	if err := db.AutoMigrate(
-		&categorydomain.Category{},
-		&productdomain.Product{},
+		&categorydomain.Category{}, &categorydomain.CategorySlugAlias{},
+		&productdomain.Product{}, &productdomain.ProductSlugAlias{},
 		&productdomain.ProductSKU{},
 		&siteconnectiondomain.Connection{},
 		&mappingdomain.Mapping{},

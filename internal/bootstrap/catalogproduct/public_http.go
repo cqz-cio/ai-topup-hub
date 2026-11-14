@@ -46,6 +46,10 @@ func (adapter publicProductAdapter) ApplyAutoStockCounts(products []productdomai
 	return adapter.products.ApplyAutoStockCounts(products)
 }
 
+func (adapter publicProductAdapter) ResolvePublicSlug(value string) (string, error) {
+	return adapter.products.ResolvePublicSlug(value)
+}
+
 // NewPublicHTTP 装配公开 Product HTTP Handler。
 func NewPublicHTTP(dependencies PublicHTTPDependencies) *producthttp.PublicHandler {
 	var promotions producthttp.ProductPromotionDecorator

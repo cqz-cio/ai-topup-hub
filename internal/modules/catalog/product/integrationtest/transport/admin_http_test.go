@@ -124,8 +124,8 @@ func setupAdminProductHandlerTest(t *testing.T) (*producthttp.AdminProductHandle
 		t.Fatalf("open sqlite failed: %v", err)
 	}
 	if err := db.AutoMigrate(
-		&categorydomain.Category{},
-		&productdomain.Product{},
+		&categorydomain.Category{}, &categorydomain.CategorySlugAlias{},
+		&productdomain.Product{}, &productdomain.ProductSlugAlias{},
 		&productdomain.ProductSKU{},
 		&cardsecretdomain.Secret{},
 		&cardsecretdomain.Batch{},

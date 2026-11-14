@@ -47,9 +47,20 @@ type Product struct {
 	DeletedAt            *time.Time          `gorm:"index" json:"-"`                                                      // 软删除时间
 
 	// 关联
-	Category categorydomain.Category `gorm:"foreignKey:CategoryID" json:"category,omitempty"` // 分类信息
-	SKUs     []ProductSKU            `gorm:"foreignKey:ProductID" json:"skus,omitempty"`      // SKU 列表
+	Category           categorydomain.Category `gorm:"foreignKey:CategoryID" json:"category,omitempty"` // 分类信息
+	SKUs               []ProductSKU            `gorm:"foreignKey:ProductID" json:"skus,omitempty"`      // SKU 列表
+	ProductSlugAliases []ProductSlugAlias      `gorm:"foreignKey:ProductID" json:"-"`
 }
+
+// ProductSlugAlias keeps historical public URLs bound to the original product ID.
+// The canonical name is also reserved here; no order or procurement fields move.
+type ProductSlugAlias struct {
+	Slug      string `gorm:"primaryKey;size:255"`
+	ProductID uint   `gorm:"not null;index"`
+	CreatedAt time.Time
+}
+
+func (ProductSlugAlias) TableName() string { return "product_slug_aliases" }
 
 // TableName 指定表名
 func (Product) TableName() string {

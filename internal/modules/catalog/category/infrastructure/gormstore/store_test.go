@@ -18,7 +18,7 @@ func setupCategoryStoreTest(t *testing.T) *CategoryStore {
 	if err != nil {
 		t.Fatalf("open sqlite failed: %v", err)
 	}
-	if err := db.AutoMigrate(&categorydomain.Category{}); err != nil {
+	if err := db.AutoMigrate(&categorydomain.Category{}, &categorydomain.CategorySlugAlias{}); err != nil {
 		t.Fatalf("migrate category failed: %v", err)
 	}
 	return NewCategoryStore(db)

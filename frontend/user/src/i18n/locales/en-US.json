@@ -7,7 +7,7 @@
     "retry": "Try again",
     "failed": "Unable to load delivery. Check your sign-in or order lookup credentials and try again.",
     "verified": "Order access verified"
-},
+  },
   "walletEarnings": {
     "title": "Earnings and withdrawals",
     "rule": "Settled affiliate and reseller earnings enter your wallet for purchases or withdrawals. Recharge, gift and gift-card funds are spendable only and are used first for purchases.",
@@ -118,8 +118,8 @@
     "productCount": "{count} products",
     "searchResults": "Search results",
     "heroEyebrow": "MAKE EVERY DAY A LITTLE SMARTER",
-    "heroTitle": "Better digital services.",
-    "heroAccent": "Within easy reach.",
+    "heroTitle": "ChatGPT, Grok, Gemini and more.",
+    "heroAccent": "AI subscriptions made simple.",
     "heroDescription": "Choose your service and plan, then pay online. Collect your account or license key here once payment is confirmed.",
     "browse": "Explore products",
     "lookupAction": "Track order · Collect keys",
@@ -210,7 +210,11 @@
     "manualDelivery": "Check your delivery information below",
     "copyPartialHint": "Only a preview is shown. Download the file for the complete delivery.",
     "continueShopping": "Continue shopping",
-    "orderDetailsAction": "Order details · Collect keys"
+    "orderDetailsAction": "Order details · Collect keys",
+    "productsTitle": "AI subscriptions and top-ups",
+    "blogTitle": "Usage tutorials and buying guides",
+    "noticeTitle": "Purchase, delivery and support notices",
+    "aboutTitle": "About π星卡社 | Independent AI digital goods"
   },
   "common": {
     "siteName": "Dujiao-Next",

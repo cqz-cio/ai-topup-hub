@@ -87,8 +87,8 @@ func setupAdminHandlerTest(t *testing.T, upstreamHandler http.HandlerFunc) (*map
 		t.Fatalf("open sqlite failed: %v", err)
 	}
 	if err := db.AutoMigrate(
-		&categorydomain.Category{},
-		&productdomain.Product{},
+		&categorydomain.Category{}, &categorydomain.CategorySlugAlias{},
+		&productdomain.Product{}, &productdomain.ProductSlugAlias{},
 		&productdomain.ProductSKU{},
 		&siteconnectiondomain.Connection{},
 		&mappingdomain.Mapping{},

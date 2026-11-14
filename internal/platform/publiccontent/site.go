@@ -18,6 +18,28 @@ var aboutDefaultsJSON []byte
 //go:embed home-copy.json
 var homeCopyJSON []byte
 
+//go:embed page-titles.json
+var pageTitlesJSON []byte
+
+func PageTitle(key string) string {
+	var values map[string]map[string]any
+	if err := json.Unmarshal(pageTitlesJSON, &values); err != nil {
+		panic(err)
+	}
+	return text(values["zh-CN"][key])
+}
+
+func CategoryTitle(name string) string {
+	var values map[string]map[string]any
+	if err := json.Unmarshal(pageTitlesJSON, &values); err != nil {
+		panic(err)
+	}
+	if title := text(object(values["zh-CN"]["categoryTitles"])[name]); title != "" {
+		return title
+	}
+	return name
+}
+
 //go:embed site-identity.json
 var identityJSON []byte
 

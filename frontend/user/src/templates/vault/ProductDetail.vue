@@ -155,7 +155,7 @@
             <p v-if="requiresSKUSelection" class="mt-2 text-[13px] text-warning">{{ t('productDetail.skuRequired') }}</p>
           </div>
 
-          <ProductPurchaseGuide :slug="product.slug" />
+          <ProductPurchaseGuide :slug="product.slug" :aliases="product.slug_aliases" />
 
           <!-- 数量 -->
           <div v-if="!contactFirst" class="my-5">

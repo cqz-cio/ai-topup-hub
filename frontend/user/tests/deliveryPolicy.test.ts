@@ -27,7 +27,7 @@ test('visible policy entry preserves existing conditions and section layout, and
   assert.ok(content.startsWith(original))
   assert.equal(content.match(/<h2>/g)?.length, 1)
   assert.equal(appendDeliveryPolicy(content, false), content)
-  const gpt = appendRechargeLinks(original, 'product', 'qzweb-5', 'qzweb-category-4', false)
+  const gpt = appendRechargeLinks(original, 'product', 'qzweb-5', 'gpt-recharge', false)
   assert.equal(appendDeliveryPolicy(gpt, false), gpt)
   assert.equal(gpt.match(/href="\/blog\/purchase-and-agent-guide"/g)?.length, 1)
 })

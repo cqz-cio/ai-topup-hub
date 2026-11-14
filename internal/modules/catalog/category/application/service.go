@@ -7,11 +7,12 @@ import (
 	categorycontract "github.com/dujiao-next/internal/modules/catalog/category/contract"
 	categorydomain "github.com/dujiao-next/internal/modules/catalog/category/domain"
 	"github.com/dujiao-next/internal/shared/jsonmap"
+	catalogslug "github.com/dujiao-next/internal/shared/slug"
 )
 
 var (
 	ErrNotFound      = errors.New("category not found")
-	ErrSlugExists    = errors.New("category slug exists")
+	ErrSlugExists    = categorycontract.ErrSlugExists
 	ErrParentInvalid = errors.New("category parent invalid")
 	ErrInUse         = errors.New("category in use")
 )
@@ -27,11 +28,26 @@ func NewService(repository categorycontract.Repository) *Service {
 
 // UpsertInput 是创建与更新分类的应用层输入。
 type UpsertInput struct {
-	ParentID  uint
-	Slug      string
-	NameJSON  map[string]interface{}
-	Icon      string
-	SortOrder int
+	ParentID    uint
+	Slug        string
+	NameJSON    map[string]interface{}
+	Icon        string
+	SortOrder   int
+	SeoMetaJSON map[string]interface{}
+}
+
+func (service *Service) SuggestSlug(title string, excludeID *string) (string, error) {
+	return catalogslug.Unique(catalogslug.Generate(title), func(value string) (bool, error) {
+		count, err := service.repository.CountBySlug(value, excludeID)
+		return count > 0, err
+	})
+}
+
+func (service *Service) ResolvePublicSlug(value string) (string, error) {
+	if aliases, ok := service.repository.(interface{ ResolvePublicSlug(string) (string, error) }); ok {
+		return aliases.ResolvePublicSlug(value)
+	}
+	return value, nil
 }
 
 func (service *Service) List() ([]categorydomain.Category, error) {
@@ -61,6 +77,9 @@ func (service *Service) SetActive(id string, active bool) (*categorydomain.Categ
 }
 
 func (service *Service) Create(input UpsertInput) (*categorydomain.Category, error) {
+	if err := catalogslug.Validate(input.Slug); err != nil {
+		return nil, err
+	}
 	if err := service.validateParent(nil, input.ParentID); err != nil {
 		return nil, err
 	}
@@ -72,12 +91,13 @@ func (service *Service) Create(input UpsertInput) (*categorydomain.Category, err
 		return nil, ErrSlugExists
 	}
 	category := categorydomain.Category{
-		ParentID:  input.ParentID,
-		Slug:      input.Slug,
-		NameJSON:  jsonmap.JSON(input.NameJSON),
-		Icon:      input.Icon,
-		SortOrder: input.SortOrder,
-		IsActive:  true,
+		ParentID:    input.ParentID,
+		Slug:        input.Slug,
+		NameJSON:    jsonmap.JSON(input.NameJSON),
+		Icon:        input.Icon,
+		SortOrder:   input.SortOrder,
+		IsActive:    true,
+		SeoMetaJSON: jsonmap.JSON(input.SeoMetaJSON),
 	}
 	if err := service.repository.Create(&category); err != nil {
 		return nil, err
@@ -86,6 +106,9 @@ func (service *Service) Create(input UpsertInput) (*categorydomain.Category, err
 }
 
 func (service *Service) Update(id string, input UpsertInput) (*categorydomain.Category, error) {
+	if err := catalogslug.Validate(input.Slug); err != nil {
+		return nil, err
+	}
 	category, err := service.repository.GetByID(id)
 	if err != nil {
 		return nil, err
@@ -108,6 +131,9 @@ func (service *Service) Update(id string, input UpsertInput) (*categorydomain.Ca
 	category.NameJSON = jsonmap.JSON(input.NameJSON)
 	category.Icon = input.Icon
 	category.SortOrder = input.SortOrder
+	if input.SeoMetaJSON != nil {
+		category.SeoMetaJSON = jsonmap.JSON(input.SeoMetaJSON)
+	}
 	if err := service.repository.Update(category); err != nil {
 		return nil, err
 	}

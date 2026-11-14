@@ -1,6 +1,12 @@
 {
-  "categorySlug": "qzweb-category-4",
-  "path": "/categories/qzweb-category-4",
+  "catalogIdentities": {
+    "/categories/gpt-recharge": "/categories/qzweb-category-4",
+    "/categories/gpt-overwrite-topup": "/categories/gpt-overwrite-topup",
+    "/products/chatgpt-plus-code": "/products/qzweb-5",
+    "/products/chatgpt-plus-manual": "/products/86gamestore-88"
+  },
+  "categorySlug": "gpt-recharge",
+  "path": "/categories/gpt-recharge",
   "updatedAt": "2026-11-10",
   "title": "GPT 充值",
   "seoTitle": "GPT充值｜ChatGPT Plus、Pro 方案与购买须知",
@@ -8,7 +14,7 @@
   "sections": [
     {
       "title": "Plus、Pro 充值怎么选？",
-      "html": "<p>给自己的 ChatGPT 账号充值，请先区分自助兑换和人工充值。本站提供独立第三方服务，不是 OpenAI 官方网站，也不代表官方授权。</p><ul><li><a href=\"/products/qzweb-5\">ChatGPT Plus 自助兑换码</a>：付款后在订单内领取，按说明完成账号预检和兑换。</li><li><a href=\"/products/86gamestore-88\">ChatGPT Plus 人工充值</a>：适用条件、覆盖方式和交付时间请以该商品说明为准。</li><li>ChatGPT Pro：本页商品按地区、套餐档位与新开通／续费区分；如需人工处理，可查看<a href=\"/categories/gpt-overwrite-topup\">GPT 人工及覆盖充值商品</a>。</li></ul><p>这些商品用于 ChatGPT 订阅，不是 OpenAI API 余额，也不是给现有账号购买 Codex 点数。</p>"
+      "html": "<p>给自己的 ChatGPT 账号充值，请先区分自助兑换和人工充值。本站提供独立第三方服务，不是 OpenAI 官方网站，也不代表官方授权。</p><ul><li><a href=\"/products/chatgpt-plus-code\">ChatGPT Plus 自助兑换码</a>：付款后在订单内领取，按说明完成账号预检和兑换。</li><li><a href=\"/products/chatgpt-plus-manual\">ChatGPT Plus 人工充值</a>：适用条件、覆盖方式和交付时间请以该商品说明为准。</li><li>ChatGPT Pro：本页商品按地区、套餐档位与新开通／续费区分；如需人工处理，可查看<a href=\"/categories/gpt-overwrite-topup\">GPT 人工及覆盖充值商品</a>。</li></ul><p>这些商品用于 ChatGPT 订阅，不是 OpenAI API 余额，也不是给现有账号购买 Codex 点数。</p>"
     },
     {
       "title": "充值前需要确认什么？",
@@ -28,7 +34,7 @@
     }
   ],
   "productCategories": [
-    "qzweb-category-4",
+    "gpt-recharge",
     "gpt-overwrite-topup"
   ],
   "blogSlugs": [
@@ -43,7 +49,7 @@
   "relatedLinks": [
     {
       "title": "GPT 充值方案与购买须知",
-      "path": "/categories/qzweb-category-4"
+      "path": "/categories/gpt-recharge"
     },
     {
       "title": "ChatGPT 充值方式与账号条件",

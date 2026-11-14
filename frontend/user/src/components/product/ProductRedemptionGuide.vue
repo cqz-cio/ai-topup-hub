@@ -4,10 +4,10 @@ import { useI18n } from 'vue-i18n'
 import { productPurchaseGuide } from '../../utils/productPurchaseGuide'
 import { purchaseClarityCopy } from '../../i18n/purchaseClarity'
 
-const props = defineProps<{ slug: string }>()
+const props = defineProps<{ slug: string; aliases?: string[] }>()
 const { locale } = useI18n()
 const copy = computed(() => purchaseClarityCopy[locale.value] || purchaseClarityCopy['zh-CN']!)
-const guide = computed(() => productPurchaseGuide(props.slug))
+const guide = computed(() => productPurchaseGuide(props.slug, props.aliases))
 </script>
 
 <template>

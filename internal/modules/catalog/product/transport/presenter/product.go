@@ -14,6 +14,7 @@ import (
 
 // Product 是公开商品响应。
 type Product struct {
+	SlugAliases          []string          `json:"slug_aliases,omitempty"`
 	ID                   uint              `json:"id"`
 	CategoryID           uint              `json:"category_id"`
 	Slug                 string            `json:"slug"`

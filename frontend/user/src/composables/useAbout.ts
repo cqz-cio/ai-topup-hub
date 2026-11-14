@@ -15,7 +15,8 @@ export function useAbout() {
   const appStore = useAppStore()
 
   usePageSeo({
-    title: () => t('nav.about'),
+    title: () => appStore.isResellerTenant ? t('nav.about') : t('shopUi.aboutTitle'),
+    imageAlt: () => appStore.isResellerTenant ? heroTitle.value : resolveAboutPage(appStore.config?.about_page, appStore.config?.about, locale.value, appStore.config?.contact).title,
     description: () => appStore.isResellerTenant ? '' : resolveAboutPage(appStore.config?.about_page, appStore.config?.about, locale.value, appStore.config?.contact).subtitle,
     canonicalPath: () => '/about',
   })

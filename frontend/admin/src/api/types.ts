@@ -14,7 +14,18 @@ export interface ApiResponse<T = unknown> {
 export type LocalizedText = Record<string, string>
 
 // --- Category ---
+export interface CatalogSeoMeta {
+  title?: LocalizedText
+  keywords?: LocalizedText
+  description?: LocalizedText
+  og_image?: string
+  og_image_width?: number
+  og_image_height?: number
+  [key: string]: unknown
+}
+
 export interface AdminCategory {
+  seo_meta?: CatalogSeoMeta
   id: number
   parent_id: number
   slug: string
@@ -55,7 +66,7 @@ export interface AdminProduct {
   id: number
   category_id: number
   slug: string
-  seo_meta: Record<string, LocalizedText>
+  seo_meta: CatalogSeoMeta
   title: LocalizedText
   description: LocalizedText
   content: LocalizedText

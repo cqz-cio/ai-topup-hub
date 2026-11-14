@@ -23,14 +23,15 @@ import (
 )
 
 var allowedUploadScenes = map[string]struct{}{
-	"product":  {},
-	"post":     {},
-	"banner":   {},
-	"editor":   {},
-	"common":   {},
-	"category": {},
-	"telegram": {},
-	"reseller": {},
+	"seo-share": {},
+	"product":   {},
+	"post":      {},
+	"banner":    {},
+	"editor":    {},
+	"common":    {},
+	"category":  {},
+	"telegram":  {},
+	"reseller":  {},
 }
 
 // Service 文件上传服务。
@@ -152,12 +153,23 @@ func (s *Service) SaveFileWithMeta(file *multipart.FileHeader, scene string) (*c
 		return nil, err
 	}
 	// 生成唯一文件名
+	var source io.Reader = src
+	size, displayName := file.Size, file.Filename
+	if normalizedScene == "seo-share" {
+		encoded, err := shareJPEG(src)
+		if err != nil {
+			return nil, err
+		}
+		source = bytes.NewReader(encoded)
+		ext, contentType, imgWidth, imgHeight = ".jpg", "image/jpeg", 1200, 630
+		size, displayName = int64(len(encoded)), strings.TrimSuffix(file.Filename, filepath.Ext(file.Filename))+"-1200x630.jpg"
+	}
 	filename := fmt.Sprintf("%s%s", uuid.New().String(), ext)
 	now := time.Now()
 	year := now.Format("2006")
 	month := now.Format("01")
 	storedURL, err := s.store.Save(contract.StoreInput{
-		Source:   src,
+		Source:   source,
 		Scene:    normalizedScene,
 		Year:     year,
 		Month:    month,
@@ -169,9 +181,9 @@ func (s *Service) SaveFileWithMeta(file *multipart.FileHeader, scene string) (*c
 
 	return &contract.Result{
 		URL:      storedURL,
-		Filename: file.Filename,
+		Filename: displayName,
 		MimeType: contentType,
-		Size:     file.Size,
+		Size:     size,
 		Width:    imgWidth,
 		Height:   imgHeight,
 	}, nil

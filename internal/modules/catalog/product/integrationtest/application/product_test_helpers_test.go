@@ -72,7 +72,7 @@ func newProductServiceForTest(t *testing.T) (catalogproductbootstrap.Services, *
 	if err != nil {
 		t.Fatalf("open sqlite failed: %v", err)
 	}
-	if err := db.AutoMigrate(&categorydomain.Category{}, &productdomain.Product{}, &productdomain.ProductSKU{}, &cardsecretdomain.Secret{}, &cardsecretdomain.Batch{}, &memberleveldomain.MemberLevelPrice{}, &cartdomain.Item{}, &mappingdomain.Mapping{}, &mappingdomain.SKUMapping{}, &orderdomain.Order{}, &orderdomain.OrderItem{}, &paymentdomain.PaymentChannel{}); err != nil {
+	if err := db.AutoMigrate(&categorydomain.Category{}, &categorydomain.CategorySlugAlias{}, &productdomain.Product{}, &productdomain.ProductSlugAlias{}, &productdomain.ProductSKU{}, &cardsecretdomain.Secret{}, &cardsecretdomain.Batch{}, &memberleveldomain.MemberLevelPrice{}, &cartdomain.Item{}, &mappingdomain.Mapping{}, &mappingdomain.SKUMapping{}, &orderdomain.Order{}, &orderdomain.OrderItem{}, &paymentdomain.PaymentChannel{}); err != nil {
 		t.Fatalf("auto migrate product service tables failed: %v", err)
 	}
 

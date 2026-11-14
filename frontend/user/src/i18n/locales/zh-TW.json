@@ -7,7 +7,7 @@
     "retry": "重新查看",
     "failed": "暫時無法讀取交付內容，請確認登入或訂單查詢憑證後重試。",
     "verified": "已驗證訂單權限"
-},
+  },
   "walletEarnings": {
     "title": "收益與提現",
     "rule": "已結算的返利和分销收益統一進入錢包，可消費或申請提現。充值、贈送和禮品卡餘額僅可消費；消費時優先使用不可提現餘額。",
@@ -118,8 +118,8 @@
     "productCount": "共 {count} 款商品",
     "searchResults": "搜尋結果",
     "heroEyebrow": "智享日常，從這裡開始",
-    "heroTitle": "好用的數位服務，",
-    "heroAccent": "輕鬆擁有。",
+    "heroTitle": "ChatGPT、Grok、Gemini 等 AI 訂閱與儲值，",
+    "heroAccent": "輕鬆選購",
     "heroDescription": "選擇適合你的服務與規格，線上完成付款。到帳確認後，在本站查看並領取帳號或卡密。",
     "browse": "瀏覽商品",
     "lookupAction": "查訂單 · 領卡密",
@@ -210,7 +210,11 @@
     "manualDelivery": "請按下方說明查看交付資訊",
     "copyPartialHint": "內容較多，頁面僅顯示預覽；請下載完整交付檔案。",
     "continueShopping": "繼續選購",
-    "orderDetailsAction": "訂單詳情 · 領取卡密"
+    "orderDetailsAction": "訂單詳情 · 領取卡密",
+    "productsTitle": "AI 訂閱與儲值商品",
+    "blogTitle": "使用教學與購買指南",
+    "noticeTitle": "購買、交付與售後公告",
+    "aboutTitle": "關於 π星卡社｜第三方 AI 數位商品"
   },
   "common": {
     "siteName": "Dujiao-Next",

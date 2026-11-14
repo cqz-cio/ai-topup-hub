@@ -1,6 +1,7 @@
 package migrations
 
 import (
+	"github.com/dujiao-next/internal/bootstrap/database/migrations/catalogslugs"
 	"github.com/dujiao-next/internal/constants"
 	affiliatedomain "github.com/dujiao-next/internal/modules/affiliate/domain"
 	apicredentialdomain "github.com/dujiao-next/internal/modules/apicredential/domain"
@@ -82,7 +83,9 @@ func AutoMigrate() error {
 		&coupondomain.CouponUsage{},
 		&promotiondomain.Promotion{},
 		&categorydomain.Category{},
+		&categorydomain.CategorySlugAlias{},
 		&productdomain.Product{},
+		&productdomain.ProductSlugAlias{},
 		&productdomain.ProductSKU{},
 		&contentdomain.Post{},
 		&contentdomain.PostProduct{},
@@ -127,6 +130,9 @@ func AutoMigrate() error {
 		return err
 	}
 	if err := ensureCategoryParentMigration(); err != nil {
+		return err
+	}
+	if err := catalogslugs.Run(db); err != nil {
 		return err
 	}
 	if err := ensurePaymentProviderBepusdtRenameMigration(); err != nil {

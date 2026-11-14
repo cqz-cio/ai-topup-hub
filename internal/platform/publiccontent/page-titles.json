@@ -1,0 +1,23 @@
+{
+  "zh-CN": {
+    "productsTitle": "AI 订阅与充值商品",
+    "blogTitle": "使用教程与购买指南",
+    "noticeTitle": "购买、交付与售后公告",
+    "aboutTitle": "关于 π星卡社｜第三方 AI 数字商品",
+    "categoryTitles": { "Gemini": "Gemini 订阅与充值", "Grok": "Grok 订阅与充值", "Claude": "Claude 订阅与充值", "Telegram": "Telegram 会员订阅" }
+  },
+  "zh-TW": {
+    "productsTitle": "AI 訂閱與儲值商品",
+    "blogTitle": "使用教學與購買指南",
+    "noticeTitle": "購買、交付與售後公告",
+    "aboutTitle": "關於 π星卡社｜第三方 AI 數位商品",
+    "categoryTitles": { "Gemini": "Gemini 訂閱與儲值", "Grok": "Grok 訂閱與儲值", "Claude": "Claude 訂閱與儲值", "Telegram": "Telegram 會員訂閱" }
+  },
+  "en-US": {
+    "productsTitle": "AI subscriptions and top-ups",
+    "blogTitle": "Usage tutorials and buying guides",
+    "noticeTitle": "Purchase, delivery and support notices",
+    "aboutTitle": "About π星卡社 | Independent AI digital goods",
+    "categoryTitles": { "Gemini": "Gemini subscriptions and top-ups", "Grok": "Grok subscriptions and top-ups", "Claude": "Claude subscriptions and top-ups", "Telegram": "Telegram Premium subscriptions" }
+  }
+}
