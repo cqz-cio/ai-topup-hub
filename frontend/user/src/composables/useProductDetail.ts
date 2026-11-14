@@ -350,7 +350,7 @@ export function useProductDetail(options: { onLoaded?: () => void } = {}) {
     return category ? getLocalizedText(category) : ''
   })
 
-  const images = computed(() => {
+  const sourceImages = computed(() => {
     if (!product.value?.images) return []
     let imageArray: string[] = []
     if (Array.isArray(product.value.images)) {
@@ -358,8 +358,9 @@ export function useProductDetail(options: { onLoaded?: () => void } = {}) {
     } else if (product.value.images.images && Array.isArray(product.value.images.images)) {
       imageArray = product.value.images.images
     }
-    return imageArray.map(img => getImageUrl(img))
+    return imageArray
   })
+  const images = computed(() => sourceImages.value.map(img => getImageUrl(img)))
 
   const skuDisplayText = (sku: any) => {
     return buildSkuDisplayText({
@@ -620,7 +621,8 @@ export function useProductDetail(options: { onLoaded?: () => void } = {}) {
       : '',
     description: () => productSeoDescription.value,
     canonicalPath: () => `/products/${encodeURIComponent(product.value?.slug || String(route.params.slug || ''))}`,
-    image: () => seoText(product.value?.seo_meta?.og_image, appStore.locale) || images.value[0] || '',
+    image: () => seoText(product.value?.seo_meta?.og_image, appStore.locale),
+    images: () => sourceImages.value,
     imageWidth: () => Number(product.value?.seo_meta?.og_image_width) || 0,
     imageHeight: () => Number(product.value?.seo_meta?.og_image_height) || 0,
     imageAlt: () => product.value ? getLocalizedText(product.value.title) : '',
