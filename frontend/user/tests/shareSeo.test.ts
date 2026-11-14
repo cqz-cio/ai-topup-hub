@@ -32,3 +32,13 @@ test('organization logo stays independent of share card and reseller branding', 
   assert.equal(identityLogo('/brand/patrick-logo.png', true), '/media/storefront-20261020/patrick-logo.webp')
   assert.equal(identityLogo('/brand/patrick-logo.png', false), '/brand/patrick-logo.png')
 })
+
+test('published upload covers use exported wide cards during hydration', () => {
+  for (const name of ['c779fc65589ae19c7ff2', 'f0bb72279d34b2b14d08']) {
+    const card = shareMetadata(origin, ['/uploads/86gamestore/' + name + '.jpg'], assets.shareImage, '人工充值')
+    assert.equal(card.image, origin + '/media/seo-share/catalog-' + name + '-1200x630.jpg')
+    assert.equal(card.width, 1200)
+    assert.equal(card.height, 630)
+    assert.equal(card.card, 'summary_large_image')
+  }
+})

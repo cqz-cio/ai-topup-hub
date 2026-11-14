@@ -128,6 +128,16 @@ func TestShareCardDimensionsAndExplicitUncroppedImage(t *testing.T) {
 			t.Fatal("missing", want)
 		}
 	}
+	for _, name := range []string{"c779fc65589ae19c7ff2", "f0bb72279d34b2b14d08"} {
+		s.page.Images = []string{"/uploads/86gamestore/" + name + ".jpg"}
+		w = httptest.NewRecorder()
+		r.ServeHTTP(w, httptest.NewRequest("GET", "/products/item", nil))
+		for _, want := range []string{"/media/seo-share/catalog-" + name + "-1200x630.jpg", `property="og:image:width" content="1200"`, `property="og:image:height" content="630"`} {
+			if !strings.Contains(w.Body.String(), want) {
+				t.Fatal("uploaded cover missing wide export", want)
+			}
+		}
+	}
 	s.page.Images = []string{"/uncropped-long.png"}
 	w = httptest.NewRecorder()
 	r.ServeHTTP(w, httptest.NewRequest("GET", "/products/item", nil))

@@ -18,6 +18,16 @@ import urllib.request
 SUPPLIER_URL = "https://faka.redeemgpt.com"
 MERCHANT_ID = "26113"
 PREFIX = "86gamestore-"
+# Original 2026-10-17 import pairs, verified against local and production records.
+# (local product ID, local SKU ID, upstream product ID, upstream SKU ID)
+# URL aliases and editable slugs are deliberately not identity sources.
+ALLOWED_IDENTITIES = {
+    (52, 52, 66, 66), (53, 53, 77, 77), (54, 54, 82, 82),
+    (55, 55, 83, 83), (56, 56, 84, 84), (57, 57, 88, 88),
+    (58, 58, 10007, 10007), (59, 59, 10010, 10010),
+    (60, 60, 10004, 10004), (61, 61, 10005, 10005),
+    (62, 62, 10006, 10006),
+}
 
 
 def require(condition, message):
@@ -135,12 +145,19 @@ def apply_inventory(database, inventory, connection_id, audit=False):
             require(not mapping["is_active"] and mapping["stock_limit"] >= 0, "Automatic mapping or invalid stock limit")
             product = db.execute("SELECT * FROM products WHERE id=? AND deleted_at IS NULL", (mapping["local_product_id"],)).fetchone()
             require(product is not None and product["fulfillment_type"] == "manual" and product["is_mapped"]
-                    and product["slug"] == PREFIX + str(mapping["upstream_product_id"]), "Manual product identity changed")
+                    and product["id"] == mapping["local_product_id"], "Manual product identity changed")
             products[product["id"]] = product
             rows = db.execute("SELECT * FROM product_skus WHERE product_id=? AND deleted_at IS NULL", (product["id"],)).fetchall()
             links = db.execute("SELECT * FROM sku_mappings WHERE product_mapping_id=? AND deleted_at IS NULL", (mapping["id"],)).fetchall()
             require(rows and len(rows) == len(links) and {s["id"] for s in rows} == {s["local_sku_id"] for s in links},
                     "Incomplete SKU mapping; preserve existing inventory")
+            require(all((mapping["local_product_id"], link["local_sku_id"],
+                         mapping["upstream_product_id"], link["upstream_sku_id"]) in ALLOWED_IDENTITIES
+                        for link in links), "Supplier identity is outside the original import allowlist")
+            # The import's SKU code is independent of editable public URLs.
+            # Keep the original supplier identity guard without consulting aliases.
+            require(all(s["sku_code"] == PREFIX + str(mapping["upstream_product_id"]) for s in rows),
+                    "Manual SKU identity changed")
             require(all(s["manual_stock_locked"] >= 0 and s["manual_stock_sold"] >= 0 for s in rows), "Invalid local stock counters")
             sku_rows.update({s["id"]: s for s in rows})
             sku_mappings[mapping["id"]] = links

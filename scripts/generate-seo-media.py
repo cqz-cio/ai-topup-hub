@@ -40,26 +40,39 @@ def write_new(image: Image.Image, path: Path, **options: object) -> None:
     path.write_bytes(data)
 
 
-def generate(share_source: Path | None) -> None:
+def generate(share_source: Path | None, upload_covers: Path | None = None) -> None:
     if share_source:
         with Image.open(share_source) as image:
             card = ImageOps.fit(image.convert("RGB"), (1200, 630), Image.Resampling.LANCZOS)
             write_new(card, SHARE / "qzweb-og-1200x630.jpg", quality=86, optimize=True, progressive=True)
-    manifest: dict[str, str] = {}
+    manifest_path = ROOT / "internal/platform/publiccontent/seo-share-images.json"
+    manifest: dict[str, str] = json.loads(manifest_path.read_text(encoding="utf-8")) if manifest_path.exists() else {}
+    sources: list[tuple[str, Path]] = []
     for directory in (PUBLIC / "products", PUBLIC / "catalog-products"):
         for path in sorted(directory.rglob("*")):
             if path.suffix.lower() not in (".png", ".jpg", ".jpeg", ".webp"):
                 continue
-            try:
-                digest = hashlib.sha256(path.read_bytes()).hexdigest()[:20]
-                target = SHARE / f"catalog-{digest}-1200x630.jpg"
-                with Image.open(path) as image:
-                    write_new(letterbox(image), target, quality=84, optimize=True, progressive=True)
-                manifest["/" + path.relative_to(PUBLIC).as_posix()] = "/" + target.relative_to(PUBLIC).as_posix()
-            except (OSError, ValueError, Image.DecompressionBombError):
-                continue
-    (ROOT / "internal/platform/publiccontent/seo-share-images.json").write_text(
-        json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+            sources.append(("/" + path.relative_to(PUBLIC).as_posix(), path))
+    if upload_covers:
+        # Explicitly listed public covers only; never enumerate private uploads.
+        for url in json.loads(upload_covers.read_text(encoding="utf-8")):
+            source = (ROOT / str(url).lstrip("/")).resolve()
+            if not str(url).startswith("/uploads/") or not source.is_relative_to(ROOT / "uploads"):
+                raise ValueError("Expected a public /uploads/ cover path")
+            if source.suffix.lower() not in (".png", ".jpg", ".jpeg", ".webp"):
+                raise ValueError("Expected a raster cover")
+            sources.append((url, source))
+    for url, path in sources:
+        try:
+            digest = hashlib.sha256(path.read_bytes()).hexdigest()[:20]
+            target = SHARE / f"catalog-{digest}-1200x630.jpg"
+            with Image.open(path) as image:
+                write_new(letterbox(image), target, quality=84, optimize=True, progressive=True)
+            manifest[url] = "/" + target.relative_to(PUBLIC).as_posix()
+        except (OSError, ValueError, Image.DecompressionBombError):
+            continue
+    manifest_path.write_text(
+        json.dumps(dict(sorted(manifest.items())), indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
     )
     old = PUBLIC / "media/storefront-20261020"
     with Image.open(old / "jellyfishing.webp") as image:
@@ -82,4 +95,6 @@ def generate(share_source: Path | None) -> None:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--share-source", type=Path)
-    generate(parser.parse_args().share_source)
+    parser.add_argument("--upload-covers", type=Path, help="JSON list of verified public /uploads/ raster URLs already copied locally")
+    args = parser.parse_args()
+    generate(args.share_source, args.upload_covers)
