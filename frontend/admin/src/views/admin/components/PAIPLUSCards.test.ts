@@ -12,7 +12,7 @@ vi.mock('@/components/ui/dialog', () => {
 })
 vi.mock('@/components/ui/checkbox', () => ({ Checkbox: { props: ['modelValue'], emits: ['update:modelValue'], template: '<input type="checkbox" :checked="modelValue" @change="$emit(\'update:modelValue\', $event.target.checked)" />' } }))
 
-const card = { id: 'test-card-12345678', code: 'PAIPLUS-••••••••••-••••••AB23', source_code: '••••••CD45', reference: 'shop:1:order:100:1', order_id: 100, order_no: 'ORDER-100', product_id: 30, sku_id: 30, label: 'ChatGPT Plus', status: 'unused', local_status: 'ready', created_at: 1, updated_at: 1, revoked_at: 0, upstream_checked_at: 0, upstream: null, submitted: false, attempt_state: null }
+const card = { id: 'test-card-12345678', code: 'PAIPLUS-••••••••••-••••••AB23', source_code: '••••••CD45', reference: 'shop:1:order:100:1', order_id: 100, order_no: 'ORDER-100', product_id: 30, sku_id: 30, label: 'ChatGPT Plus', status: 'unused', local_status: 'ready', created_at: 1, updated_at: 1, revoked_at: 0, upstream_checked_at: 0, upstream: null, submitted: false, attempt_state: null, capabilities: { status_scope: 'card', can_revoke: true, revoke_message: null } }
 const full = { ...card, code: 'PAIPLUS-ABCDEFGH23-ABCDEFGH45', source_code: 'SOURCE-PRIVATE-TEST', operations: [], audit: [] }
 let app: App | undefined
 async function flush() { for (let i = 0; i < 5; i++) { await Promise.resolve(); await nextTick() } }
@@ -61,5 +61,33 @@ describe('PAIPLUS cards in shop administration', () => {
   })
   it('read-only permissions do not expose pair details or revoke actions', async () => {
     mock.allowed = false; const host = await mount(); expect(button(host, '查看双码与管理')).toBeUndefined(); expect(mock.reveal).not.toHaveBeenCalled()
+  })
+  it('queries v2 records without presenting missing records as refundable or exposing destruction', async () => {
+    const capabilities = { status_scope: 'partner_order', can_revoke: false, revoke_message: '当前接口不提供未使用证明，请人工核对。' }
+    mock.list.mockResolvedValue({ cards: [{ ...card, capabilities }], total: 1, counts: { unused: 1 }, capabilities })
+    mock.reveal.mockResolvedValue({ ...full, capabilities })
+    mock.check.mockResolvedValue({ ...card, capabilities, upstream_checked_at: 1000, upstream: { status: 'no_record', used: null, can_resubmit: false, scope: 'partner_order', message: '未查到本代理的兑换记录；不能据此退款。' } })
+    const host = await mount(); button(host, '查看双码与管理').click(); await flush()
+    expect(host.textContent).toContain('本站待兑换')
+    expect(button(host, '检查并销毁本站卡密')).toBeUndefined()
+    expect(host.querySelector('#paiplus-revoke-reason')).toBeNull()
+    button(host, '查询上游记录').click(); await flush()
+    expect(mock.check).toHaveBeenCalledWith(card.id)
+    expect(host.textContent).toContain('未查到本代理兑换记录')
+    expect(host.textContent).toContain('不能据此退款')
+    expect(host.textContent).toContain(full.code); expect(host.textContent).toContain(full.source_code)
+    expect(host.querySelector('[role="alert"]')).toBeNull()
+    expect(mock.revoke).not.toHaveBeenCalled()
+  })
+  it('keeps confirmed results when a later query fails and clears late query responses on close', async () => {
+    mock.reveal.mockResolvedValue({ ...full, upstream: { status: 'succeeded', used: true, can_resubmit: false, scope: 'partner_order' } })
+    const host = await mount(); button(host, '查看双码与管理').click(); await flush()
+    mock.check.mockRejectedValueOnce(new Error('查询暂不可用'))
+    button(host, '核验上游状态').click(); await flush()
+    expect(host.textContent).toContain('兑换成功'); expect(host.textContent).toContain('查询暂不可用')
+    let resolve!: (value: unknown) => void; mock.check.mockReturnValueOnce(new Promise(done => { resolve = done }))
+    button(host, '核验上游状态').click(); await flush(); button(host, '关闭并隐藏卡密').click()
+    resolve({ ...card, upstream: { status: 'no_record' } }); await flush()
+    expect(host.textContent).not.toContain(full.code); expect(host.textContent).not.toContain('未查到本代理兑换记录')
   })
 })
