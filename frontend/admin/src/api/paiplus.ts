@@ -1,5 +1,10 @@
 import { api } from './client'
 
+export interface PAIPLUSCapabilities {
+  status_scope: 'card' | 'partner_order'
+  can_revoke: boolean
+  revoke_message: string | null
+}
 export interface PAIPLUSCard {
   id: string
   code: string
@@ -16,7 +21,8 @@ export interface PAIPLUSCard {
   updated_at: number
   revoked_at: number
   upstream_checked_at: number
-  upstream: { status: string; used: boolean; can_resubmit: boolean; plan: string; used_at: string | number } | null
+  upstream: { status: string; used: boolean | null; can_resubmit: boolean; plan?: string; used_at?: string | number; scope?: 'partner_order'; message?: string } | null
+  capabilities?: PAIPLUSCapabilities
   submitted: boolean
   attempt_state: string | null
 }
@@ -30,6 +36,7 @@ export interface PAIPLUSList {
   page: number
   page_size: number
   counts: Record<string, number>
+  capabilities?: PAIPLUSCapabilities
 }
 const options = { cache: 'no-store', timeout: 35000 }
 export const paiplusAPI = {
