@@ -202,6 +202,7 @@
       </section>
 
       <!-- 相关文章 -->
+      <GrokRelatedProducts :product="product" />
       <section v-if="relatedPosts.length" class="py-9">
         <div class="mb-[22px]"><h2 class="text-2xl font-extrabold">{{ t('productDetail.relatedPosts') }}</h2></div>
         <div class="grid gap-4 grid-cols-[repeat(auto-fill,minmax(228px,1fr))]">
@@ -253,6 +254,7 @@
 
 <script setup lang="ts">
 import ProductPurchaseGuide from '../../components/product/ProductPurchaseGuide.vue'
+import GrokRelatedProducts from '../../components/product/GrokRelatedProducts.vue'
 import ProductContactButton from '../../components/product/ProductContactButton.vue'
 import ProductInvoiceNotice from '../../components/commerce/ProductInvoiceNotice.vue'
 import { computed, onUnmounted, ref } from 'vue'

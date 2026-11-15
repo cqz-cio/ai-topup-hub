@@ -74,6 +74,29 @@ func TestProductURLAliasesAreAtomicPermanentAndPublicOnly(t *testing.T) {
 	}
 }
 
+func TestPublicContentSaveAdvancesUpdatedAtWithoutChangingOffer(t *testing.T) {
+	repo, db := setupProductStoreTest(t)
+	old := time.Date(2026, 11, 5, 0, 0, 0, 0, time.UTC)
+	product := &productdomain.Product{CategoryID: 1, Slug: "grok-copy", TitleJSON: jsonmap.JSON{"zh-CN": "Grok"}, ContentJSON: jsonmap.JSON{"zh-CN": "old"}, PriceAmount: money.FromDecimal(decimal.NewFromInt(88)), IsActive: true, UpdatedAt: old}
+	if err := repo.Create(product); err != nil {
+		t.Fatal(err)
+	}
+	if err := db.Model(product).UpdateColumn("updated_at", old).Error; err != nil {
+		t.Fatal(err)
+	}
+	product.ContentJSON = jsonmap.JSON{"zh-CN": "independent reviewed content"}
+	if err := repo.Update(product); err != nil {
+		t.Fatal(err)
+	}
+	var saved productdomain.Product
+	if err := db.First(&saved, product.ID).Error; err != nil {
+		t.Fatal(err)
+	}
+	if !saved.UpdatedAt.After(old) || saved.ContentJSON["zh-CN"] != "independent reviewed content" || saved.PriceAmount.String() != "88.00" || !saved.IsActive {
+		t.Fatal(saved)
+	}
+}
+
 func setupProductStoreTest(t *testing.T) (*ProductStore, *gorm.DB) {
 	t.Helper()
 	dsn := fmt.Sprintf("file:product_repository_test_%d?mode=memory&cache=shared", time.Now().UnixNano())

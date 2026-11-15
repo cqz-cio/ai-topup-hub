@@ -19,10 +19,51 @@ type sourceStub struct {
 	page             Page
 	err, siteErr     error
 	returnPolicyPath string
+	defaultImage     string
 }
 
 func (s *sourceStub) Site(context.Context) (Site, error) {
-	return Site{Name: "青栀商城", URL: "http://127.0.0.1:4170", Currency: "CNY", ReturnPolicyPath: s.returnPolicyPath}, s.siteErr
+	return Site{Name: "青栀商城", URL: "http://127.0.0.1:4170", Currency: "CNY", ReturnPolicyPath: s.returnPolicyPath, DefaultImage: s.defaultImage}, s.siteErr
+}
+
+func TestSVGProductUsesRasterSchemaImageAndPreservesSoldOutOffer(t *testing.T) {
+	s := &sourceStub{defaultImage: "/media/seo-share/qzweb-og-1200x630.jpg", page: Page{
+		Kind: "product", Path: "/products/ellaix-grok-plus-monthly", Title: "Grok Plus 月付兑换码",
+		Images: []string{"/uploads/grok-plus-monthly.svg"}, Price: "88.00", Availability: "https://schema.org/OutOfStock",
+	}}
+	w := request(t, s, "GET", s.page.Path, "plain")
+	doc, err := html.Parse(strings.NewReader(w.Body.String()))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var product map[string]any
+	var walk func(*html.Node)
+	walk = func(n *html.Node) {
+		if n.Type == html.ElementNode && n.Data == "script" && n.FirstChild != nil {
+			var value map[string]any
+			if json.Unmarshal([]byte(n.FirstChild.Data), &value) == nil && value["@type"] == "Product" {
+				product = value
+			}
+		}
+		for child := n.FirstChild; child != nil; child = child.NextSibling {
+			walk(child)
+		}
+	}
+	walk(doc)
+	if product == nil {
+		t.Fatal("Product JSON-LD missing")
+	}
+	image := product["image"].([]any)
+	if len(image) != 1 || image[0] != "https://www.qzweb.cloud/media/seo-share/qzweb-og-1200x630.jpg" {
+		t.Fatal(image)
+	}
+	offer := product["offers"].(map[string]any)
+	if offer["price"] != "88.00" || offer["priceCurrency"] != "CNY" || offer["availability"] != "https://schema.org/OutOfStock" {
+		t.Fatal(offer)
+	}
+	if !strings.Contains(w.Body.String(), `src="https://www.qzweb.cloud/uploads/grok-plus-monthly.svg"`) {
+		t.Fatal("visible SVG cover changed")
+	}
 }
 func (s *sourceStub) Product(context.Context, string) (Page, error)  { return s.page, s.err }
 func (s *sourceStub) Post(context.Context, string) (Page, error)     { return s.page, s.err }

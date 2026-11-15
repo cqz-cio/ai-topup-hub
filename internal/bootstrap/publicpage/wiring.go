@@ -116,6 +116,13 @@ func (s *source) Product(ctx context.Context, slug string) (publicpage.Page, err
 		guide := publiccontent.GPTRecharge().Resolve(publiccontent.CatalogLinks(ctx))
 		page.Content = guide.AppendRelated(guide.RewriteLinks(page.Content, publiccontent.CatalogLinks(ctx)), page.Kind, p.Slug, p.Category.Slug)
 		page.Content = publiccontent.DeliveryAndReturns().AppendLink(page.Content)
+		if publiccontent.IsGrokProduct(p.Slug, p.SlugAliases) {
+			page.RelatedProducts, err = s.grokAlternatives(ctx, p)
+			if err != nil {
+				return publicpage.Page{}, err
+			}
+			page.RelatedProductsTitle = "其他 Grok 档位"
+		}
 	}
 	page.SEOTitle = metadataText(p.SeoMeta["title"])
 	page.SEODescription = metadataText(p.SeoMeta["description"])
@@ -152,6 +159,30 @@ func (s *source) Product(ctx context.Context, slug string) (publicpage.Page, err
 		page.Links = append(page.Links, publicpage.Link{Title: localized(post.Title), Path: "/blog/" + url.PathEscape(post.Slug)})
 	}
 	return page, nil
+}
+
+func (s *source) grokAlternatives(ctx context.Context, current productpresenter.Product) ([]publicpage.Item, error) {
+	// This small category is read once through the anonymous batch projection.
+	rows, _, err := s.catalogProducts(ctx, strconv.Itoa(int(current.Category.ID)), 1, 100)
+	if err != nil {
+		return nil, err
+	}
+	var items []publicpage.Item
+	for _, item := range rows {
+		if item.ID == current.ID || item.Slug == current.Slug || !publiccontent.IsGrokProduct(item.Slug, item.SlugAliases) {
+			continue
+		}
+		price := item.PriceAmount
+		if item.EffectivePriceAmount != nil {
+			price = *item.EffectivePriceAmount
+		}
+		availability := "https://schema.org/InStock"
+		if item.IsSoldOut {
+			availability = "https://schema.org/OutOfStock"
+		}
+		items = append(items, publicpage.Item{Title: localized(item.Title), Path: "/products/" + url.PathEscape(item.Slug), Price: price.String(), Availability: availability})
+	}
+	return items, nil
 }
 
 func (s *source) Post(ctx context.Context, slug string) (publicpage.Page, error) {

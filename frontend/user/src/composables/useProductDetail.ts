@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { useHead } from '@unhead/vue'
 import { usePageSeo } from './usePageSeo'
 import { seoPlainText, seoText } from '../utils/seo'
+import { defaultShareImage, productSchemaImages } from '../utils/shareSeo'
 import { appendRechargeLinks } from '../utils/gptRecharge'
 import { appendDeliveryPolicy, offerMerchantIdentity } from '../utils/deliveryPolicy'
 import { useAppStore } from '../stores/app'
@@ -663,9 +664,10 @@ export function useProductDetail(options: { onLoaded?: () => void } = {}) {
         },
       }
       if (description) jsonLd.description = description
-      if (images.value.length > 0) {
-        jsonLd.image = images.value.map(image => new URL(image, canonicalUrl.value || window.location.href).href)
-      }
+      const schemaImages = productSchemaImages(origin, sourceImages.value,
+        seoText(product.value?.seo_meta?.og_image, appStore.locale),
+        defaultShareImage(seoText(appStore.config?.seo?.default_og_image, appStore.locale), origin, !appStore.isResellerTenant))
+      if (schemaImages.length) jsonLd.image = schemaImages
       if (product.value.category?.name) {
         jsonLd.category = getLocalizedText(product.value.category.name)
       }

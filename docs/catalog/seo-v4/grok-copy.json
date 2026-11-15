@@ -1,0 +1,20 @@
+{
+  "status": "pending_operator_confirmation",
+  "scope": "Eight existing full-price Grok products; Chinese public copy only",
+  "confirmed_basis": "2026-11-15 public product records and the v4 report: tier/period labels, redemption-code delivery in this store order details, no finished account, eligibility and benefits checked on the redemption page. No new official benefits or warranty terms.",
+  "confirmation_required": [
+    "Review every proposed description, SEO title/description and HTML body before publication.",
+    "Confirm the existing own-account redemption workflow remains correct for all eight products.",
+    "These drafts deliberately make no promise about new/expired accounts, stacking, renewal, model permissions, quotas, regions, activation time, warranty period or refund formula. Any such added facts need separate operational confirmation."
+  ],
+  "products": [
+    {"id":66,"slug":"ellaix-grok-plus-monthly","title":"Grok Plus 月付兑换码","description":"已核对需要 Plus 月付的用户，可先确认目标账号能否兑换，再按本页库存选择。这里区分 Plus 年付与 Premium 月付，说明订单领码和套餐核对，不提供成品账号。","seo_title":"Grok Plus 月付兑换码：短周期选择与账号核对","seo_description":"购买 Grok Plus 月付前核对档位与周期；了解它和 Plus 年付、Premium 月付的区别，查看订单领码、缺货选择及兑换结果常见问题。","file":"plus-monthly.html"},
+    {"id":67,"slug":"ellaix-grok-plus-yearly","title":"Grok Plus 年付兑换码","description":"选择 Plus 年付时，先把较长周期的安排与账号适用条件核实清楚。本页说明年付标签如何核对、与月付及 Premium 年付如何区分，以及兑换后应保存哪些记录。","seo_title":"Grok Plus 年付兑换码：年度周期与套餐确认","seo_description":"Grok Plus 年付选购说明：区分档位和周期，比较同档月付与 Premium 年付；核对目标账号、订单交付和账号端套餐信息，不承诺续费叠加。","file":"plus-yearly.html"},
+    {"id":68,"slug":"ellaix-grok-premium-monthly","title":"Grok Premium 月付兑换码","description":"Premium 月付面向已确认兑换目标为该档月付套餐的购买者。选购重点是不要将它与 Plus 或 Super 的月付码混用，也不要误选 Premium 年付；本文逐步说明核验顺序。","seo_title":"Grok Premium 月付兑换码：相邻档位与兑换选择","seo_description":"核实 Grok Premium 月付与 Plus、Super 月付的档位区别，确认是否需要改选年付；包含付款后查看交付、目标账号检查和选错套餐的处理建议。","file":"premium-monthly.html"},
+    {"id":69,"slug":"ellaix-grok-premium-yearly","title":"Grok Premium 年付兑换码","description":"Premium 年付需要同时匹配 Premium 档位和年付周期。这里围绕长期使用计划整理购买核对表，区分 Plus、Super 年付及本档月付，并说明待核实账号条件时应如何处理。","seo_title":"Grok Premium 年付兑换码：购买核对表与使用边界","seo_description":"查看 Grok Premium 年付的商品身份、相邻年付档位和月付差别；准备自有账号与订单记录，按兑换页验证资格，不把其他商品售后规则套入本套餐。","file":"premium-yearly.html"},
+    {"id":70,"slug":"ellaix-grok-super-monthly","title":"Grok Super 月付兑换码","description":"已确认要兑换 Super 月付时，本页帮助你在提交前逐项检查套餐名称、周期和目标账号。Premium、Ultra 月付属于不同档位，Super 年付则是另一周期，不能只按名称相近来选码。","seo_title":"Grok Super 月付兑换码：提交前的套餐检查","seo_description":"Grok Super 月付兑换步骤与 FAQ，重点核对相邻 Premium、Ultra 档位和同档年付选项，说明订单领码、结果比对及出现不匹配时的核查路径。","file":"super-monthly.html"},
+    {"id":71,"slug":"ellaix-grok-super-yearly","title":"Grok Super 年付兑换码","description":"Super 年付适合在核实账号条件后，明确选择该档年付标识的购买安排。本文将购买前的信息准备与兑换后的结果检查分开，说明与 Premium、Ultra 年付以及 Super 月付的选择差异。","seo_title":"Grok Super 年付兑换码：年付安排与结果核验","seo_description":"了解 Grok Super 年付如何确认档位、周期和账号，避免把年付理解为多份月付或自动续费承诺；含交付查看、处理结果及保留订单信息的说明。","file":"super-yearly.html"},
+    {"id":72,"slug":"ellaix-grok-ultra-monthly","title":"Grok Ultra 月付兑换码","description":"Ultra 月付的选购依据是明确的档位与周期，不是由更高售价推断未列出的权益。本文说明它与 Super 月付、Ultra 年付的关系，并列出购买前应向兑换页确认的问题。","seo_title":"Grok Ultra 月付兑换码：档位确认与权益边界","seo_description":"Grok Ultra 月付购买指引：对照 Super 月付和 Ultra 年付，先查账号资格与页面权益，再领取订单兑换码；不把档位名称解释为未承诺的额度或服务。","file":"ultra-monthly.html"},
+    {"id":73,"slug":"ellaix-grok-ultra-yearly","title":"Grok Ultra 年付兑换码","description":"准备选择 Ultra 年付时，请在购买前完成档位、周期与账号三项确认。本页解释与 Super 年付和 Ultra 月付如何区分，集中回答长期周期选择、交付内容及兑换完成后的记录问题。","seo_title":"Grok Ultra 年付兑换码：完整选购与交付核对","seo_description":"核对 Grok Ultra 年付的套餐标签、目标账号和兑换结果；与 Super 年付、Ultra 月付分别比较档位和周期，查看交付及异常核查 FAQ，不新增退款或质保承诺。","file":"ultra-yearly.html"}
+  ]
+}

@@ -349,6 +349,7 @@
         </div>
 
         <!-- Related Posts -->
+        <GrokRelatedProducts :product="product" />
         <section v-if="relatedPosts.length"
           class="bg-card backdrop-blur-xl border rounded-3xl overflow-hidden mb-12 p-6 md:p-8 lg:p-12 relative">
           <h2 class="text-2xl font-bold text-foreground mb-8 flex items-center gap-3 border-b pb-6">
@@ -433,6 +434,7 @@
 
 <script setup lang="ts">
 import ProductPurchaseGuide from '../components/product/ProductPurchaseGuide.vue'
+import GrokRelatedProducts from '../components/product/GrokRelatedProducts.vue'
 import OceanPurchaseButton from '../components/product/OceanPurchaseButton.vue'
 import ProductContactButton from '../components/product/ProductContactButton.vue'
 import ProductRedemptionGuide from '../components/product/ProductRedemptionGuide.vue'

@@ -42,3 +42,8 @@ export function shareMetadata(origin: string, images: string[], fallback = '', a
   }
   return result
 }
+
+export function productSchemaImages(origin: string, images: string[], preferred = '', fallback = ''): string[] {
+  const share = shareMetadata(origin, [preferred, ...images], fallback)
+  return share.image ? [share.image] : []
+}
