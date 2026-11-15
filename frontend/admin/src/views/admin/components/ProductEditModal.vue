@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { adminAPI } from '@/api/admin'
 import type { AdminProduct, AdminCategory, AdminProductSKU, AdminPaymentChannel, LocalizedText } from '@/api/types'
 import SeoShareImage from '@/components/admin/SeoShareImage.vue'
+import ProductContentCheck from '@/components/admin/ProductContentCheck.vue'
 import MediaPicker from '@/components/admin/MediaPicker.vue'
 import RichEditor from '@/components/RichEditor.vue'
 // image utils removed - MediaPicker handles image display
@@ -1087,6 +1088,7 @@ watch(
             <label class="block text-xs font-medium text-muted-foreground mb-1.5">{{ t('admin.products.form.content', { lang: getCurrentLangName() }) }}</label>
             <RichEditor :model-value="form.content[currentLang] || ''" @update:model-value="(v: string) => form.content[currentLang] = v" :placeholder="t('admin.products.form.contentPlaceholder')" />
             <p class="mt-1 text-xs text-muted-foreground">{{ t('admin.products.form.contentTip') }}</p>
+            <ProductContentCheck :product-id="props.productId" :category-id="form.category_id" :content="form.content[currentLang] || ''" :language="currentLang" />
           </div>
 
           <div class="col-span-1 md:col-span-2">

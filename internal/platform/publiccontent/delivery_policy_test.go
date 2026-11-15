@@ -9,6 +9,9 @@ func TestDeliveryPolicyPreservesRulesSectionsAndExistingLinks(t *testing.T) {
 	p := DeliveryAndReturns()
 	input := "<h2>原有条件</h2><p>原有售后约定</p>"
 	result := p.AppendLink(input)
+	if result != input+`<p>售后与退款流程见<a href="/blog/purchase-and-agent-guide">交付与售后说明</a>。</p>` {
+		t.Fatal("policy entry must remain one short sentence: ", result)
+	}
 	if !strings.HasPrefix(result, input) || strings.Count(result, "<h2>") != 1 || !strings.Contains(result, `href="/blog/purchase-and-agent-guide"`) {
 		t.Fatal(result)
 	}

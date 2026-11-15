@@ -48,6 +48,8 @@ type Page struct {
 	Facts                               []Fact
 	Links                               []Link
 	Items                               []Item
+	RelatedProducts                     []Item
+	RelatedProductsTitle                string
 	PublishedAt                         *time.Time
 	Entries                             []Entry
 	Pagination                          []Link
@@ -198,7 +200,13 @@ func (h *Handler) serve(c *gin.Context, load func(context.Context, string) (Page
 	} else if page.PublishedAt != nil {
 		schema["datePublished"] = page.PublishedAt.Format(time.RFC3339)
 	}
-	if len(images) > 0 {
+	if page.Kind == "product" {
+		// Structured product images use the same verified raster candidate as
+		// sharing metadata. SVG covers remain available in the visible page.
+		if sharing.Image != "" {
+			schema["image"] = []string{sharing.Image}
+		}
+	} else if len(images) > 0 {
 		schema["image"] = images
 	}
 	if page.Kind == "article" || page.Kind == "notice" {

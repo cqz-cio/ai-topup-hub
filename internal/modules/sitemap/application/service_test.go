@@ -15,6 +15,33 @@ type catalogStub struct {
 	products   []contract.Product
 }
 
+func TestProductLastmodTracksContentUpdateUsingUTCAndCurrentSlug(t *testing.T) {
+	catalog := &catalogStub{products: []contract.Product{{Slug: "ellaix-grok-plus-monthly", UpdatedAt: time.Date(2026, 11, 5, 0, 0, 0, 0, time.UTC)}}}
+	service, err := NewService(catalog, &postStub{}, &cacheStub{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, updated := range []time.Time{catalog.products[0].UpdatedAt, time.Date(2026, 11, 15, 23, 15, 0, 0, time.FixedZone("CST", 8*3600))} {
+		catalog.products[0].UpdatedAt = updated
+		entries, err := service.collectURLs(context.Background(), "https://www.qzweb.cloud")
+		if err != nil {
+			t.Fatal(err)
+		}
+		found := false
+		for _, entry := range entries {
+			if strings.HasSuffix(entry.Location, "/products/ellaix-grok-plus-monthly") {
+				found = true
+				if entry.LastModified != updated.UTC().Format("2006-01-02") {
+					t.Fatal(entry)
+				}
+			}
+		}
+		if !found {
+			t.Fatal("current product URL missing")
+		}
+	}
+}
+
 func (c *catalogStub) ListActiveCategories() ([]contract.Category, error) {
 	c.calls++
 	return c.categories, nil

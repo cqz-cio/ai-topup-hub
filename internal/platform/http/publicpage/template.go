@@ -73,6 +73,7 @@ try {
 {{if .Category}}<p>分类：{{.Category}}</p>{{end}}
 {{if .Facts}}<dl>{{range .Facts}}<dt>{{.Name}}</dt><dd>{{.Value}}</dd>{{end}}</dl>{{end}}
 <section aria-label="完整正文">{{.Body}}</section>
+{{if .RelatedProducts}}<aside aria-label="{{.RelatedProductsTitle}}"><h2>{{.RelatedProductsTitle}}</h2><ul>{{range .RelatedProducts}}<li><a href="{{.Path}}">{{.Title}}</a> · {{.Price}} {{$.Site.Currency}} · {{if eq .Availability "https://schema.org/OutOfStock"}}暂时缺货{{else}}有货{{end}}</li>{{end}}</ul></aside>{{end}}
 {{if or (eq .Kind "blog") (eq .Kind "notice-list")}}<section aria-label="已发布文章">{{range .Entries}}<article><h2><a href="{{.Path}}">{{.Title}}</a></h2>{{if .PublishedAt}}<time datetime="{{.PublishedAt.Format "2006-01-02T15:04:05Z07:00"}}">{{.PublishedAt.Format "2006-01-02"}}</time>{{end}}<p>{{.Summary}}</p></article>{{else}}<p>暂无匹配文章</p>{{end}}</section>{{end}}
 {{if .Pagination}}<nav aria-label="文章分页">{{range .Pagination}}<a href="{{.Path}}">{{.Title}}</a> {{end}}</nav>{{end}}
 {{if .Links}}<aside><h2>相关内容</h2><ul>{{range .Links}}<li><a href="{{.Path}}">{{.Title}}</a></li>{{end}}</ul></aside>{{end}}

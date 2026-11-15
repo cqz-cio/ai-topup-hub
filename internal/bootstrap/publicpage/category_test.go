@@ -38,6 +38,57 @@ func (f *batchCategoryFixture) ListAnonymousProducts(_ context.Context, _ string
 
 type unexpectedDetailReader struct{}
 
+type grokCatalogFixture struct {
+	rows  []productpresenter.Product
+	calls int
+}
+
+func (f *grokCatalogFixture) ReadAnonymousProduct(_ context.Context, slug string) (productpresenter.Product, error) {
+	for _, p := range f.rows {
+		if p.Slug == slug {
+			return p, nil
+		}
+	}
+	return productpresenter.Product{}, productcontract.ErrNotFound
+}
+func (f *grokCatalogFixture) ListAnonymousProductSlugs(context.Context, string, int, int) ([]string, int64, error) {
+	panic("unexpected per-product reads")
+}
+func (f *grokCatalogFixture) ListAnonymousProducts(_ context.Context, category string, _, _ int) ([]productpresenter.Product, int64, error) {
+	if category != "23" {
+		panic("wrong category")
+	}
+	f.calls++
+	return f.rows, int64(len(f.rows)), nil
+}
+func TestGrokAlternativesUseSevenCurrentPublicURLsAndOneBatch(t *testing.T) {
+	f := &grokCatalogFixture{}
+	for i, tier := range []string{"plus", "premium", "super", "ultra"} {
+		for j, period := range []string{"monthly", "yearly"} {
+			f.rows = append(f.rows, productpresenter.Product{ID: uint(66 + i*2 + j), Slug: "ellaix-grok-" + tier + "-" + period, Title: jsonmap.JSON{"zh-CN": tier + period}, PriceAmount: money.FromDecimal(decimal.NewFromInt(88)), IsSoldOut: i == 0 && j == 0})
+		}
+	}
+	for i := range f.rows {
+		f.rows[i].Category.ID = 23
+	}
+	// Alias identification survives a future rename; only the canonical URL is emitted.
+	f.rows[7].SlugAliases = []string{f.rows[7].Slug}
+	f.rows[7].Slug = "ultra-year-current"
+	s := source{products: f, catalog: f}
+	for _, current := range f.rows {
+		before := f.calls
+		page, err := s.Product(context.Background(), current.Slug)
+		if err != nil || len(page.RelatedProducts) != 7 || f.calls != before+1 {
+			t.Fatal(page, err, f.calls)
+		}
+		for _, peer := range page.RelatedProducts {
+			if peer.Path == page.Path || peer.Path == "/products/ellaix-grok-ultra-yearly" || peer.Price != "88.00" {
+				t.Fatal(peer)
+			}
+		}
+	}
+}
+
 func (unexpectedDetailReader) ReadAnonymousProduct(context.Context, string) (productpresenter.Product, error) {
 	panic("N+1 detail lookup in batched catalog")
 }
