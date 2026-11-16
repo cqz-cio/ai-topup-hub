@@ -26,7 +26,7 @@
           <!-- Icon Column -->
           <div
             class="hidden sm:flex flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden bg-secondary border items-center justify-center text-primary group-hover:scale-105 transition-transform">
-            <img v-if="notice.thumbnail" :src="getImageUrl(notice.thumbnail)" :alt="getLocalizedText(notice.title)"
+            <img v-if="notice.thumbnail" :src="getImageUrl(notice.thumbnail)" v-bind="imageDimensions(getImageUrl(notice.thumbnail))" :alt="getLocalizedText(notice.title)"
               loading="lazy" class="w-full h-full object-cover">
             <Bell v-else class="w-8 h-8" />
           </div>
@@ -79,6 +79,7 @@
 import { useI18n } from 'vue-i18n'
 import { RouterLink } from 'vue-router'
 import { Bell, ChevronRight } from 'lucide-vue-next'
+import { imageDimensions } from '../utils/imageDimensions'
 import { getImageUrl } from '../utils/image'
 import { Badge } from '@/components/ui/badge'
 import EmptyState from '../components/EmptyState.vue'

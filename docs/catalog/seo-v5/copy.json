@@ -1,0 +1,164 @@
+{
+  "status": "pending_operator_confirmation",
+  "baseline": "main b77fdfc9716f3c0714838d4105432e6d466654e0",
+  "source": "https://www.qzweb.cloud/api/v1/public/products/ (2026-11-16 read-only)",
+  "requires_confirmation": [
+    "13 篇逐页文案及 Gemini 图片字段",
+    "Telegram 单账号次数、转赠及已有会员叠加，不作新承诺",
+    "Pro 倍数官方权益和地区资格差异不作新承诺",
+    "Go 自动发码不套用 Pro 十分钟条件；Go 人工仅按现有 iOS 说明",
+    "原有适用条件、退款公式、责任及售后段落逐字保留"
+  ],
+  "products": [
+    {
+      "id": 60,
+      "slug": "telegram-premium-3m",
+      "category_id": 19,
+      "title": "Telegram Premium 3 个月｜礼品激活链接｜人工发货",
+      "description": "Telegram Premium 三个月商品交付礼品激活链接，建议使用当前未开通会员的账号。订单由人工发货，仅保证链接正常激活，激活后不提供质保；已有会员能否叠加需购买前咨询客服，本页说明账号核对与未激活时的处理条件。",
+      "seo_title": "Telegram Premium 3 个月｜礼品激活链接｜人工发货",
+      "seo_description": "Telegram Premium 三个月商品交付礼品激活链接，建议使用当前未开通会员的账号。订单由人工发货，仅保证链接正常激活，激活后不提供质保；已有会员能否叠加需购买前咨询客服，本页说明账号核对与未激活时的处理条件。",
+      "file": "telegram-premium-3m.html"
+    },
+    {
+      "id": 61,
+      "slug": "telegram-premium-6m",
+      "category_id": 19,
+      "title": "Telegram Premium 6 个月｜礼品激活链接｜人工发货",
+      "description": "Telegram Premium 六个月商品交付的是礼品链接，由人工在订单中发放。本页重点说明已有会员能否叠加、私密保存链接及激活前核验的方法；请勿转发给群聊或他人，激活后的会员时长不等于售后质保期。",
+      "seo_title": "Telegram Premium 6 个月｜礼品激活链接｜人工发货",
+      "seo_description": "Telegram Premium 六个月商品交付的是礼品链接，由人工在订单中发放。本页重点说明已有会员能否叠加、私密保存链接及激活前核验的方法；请勿转发给群聊或他人，激活后的会员时长不等于售后质保期。",
+      "file": "telegram-premium-6m.html"
+    },
+    {
+      "id": 62,
+      "slug": "telegram-premium-12m",
+      "category_id": 19,
+      "title": "Telegram Premium 12 个月｜礼品激活链接｜人工发货",
+      "description": "十二个月 Telegram Premium 礼品链接适用于需要该会员时长并已核对账号条件的用户。本页提供 Telegram 内打开链接的办法、人工发货与实际激活的区别，以及未发货和未激活退款的核实流程，不承诺当天开通。",
+      "seo_title": "Telegram Premium 12 个月｜礼品激活链接｜人工发货",
+      "seo_description": "十二个月 Telegram Premium 礼品链接适用于需要该会员时长并已核对账号条件的用户。本页提供 Telegram 内打开链接的办法、人工发货与实际激活的区别，以及未发货和未激活退款的核实流程，不承诺当天开通。",
+      "file": "telegram-premium-12m.html"
+    },
+    {
+      "id": 45,
+      "slug": "chatgpt-pro-100-ph",
+      "category_id": 9,
+      "title": "ChatGPT Pro 100美金 兑换码｜菲区｜自动发码",
+      "description": "这款菲区 ChatGPT Pro 100美金商品对应 Pro 5x 自动发码，充值到您自己的账号。本页先核对新账号或到期条件，再说明订单取码、预检和结果确认；收到 PAIPLUS 卡密仍需兑换，未到期覆盖请另看人工方案。",
+      "seo_title": "ChatGPT Pro 100美金 兑换码｜菲区｜自动发码",
+      "seo_description": "这款菲区 ChatGPT Pro 100美金商品对应 Pro 5x 自动发码，充值到您自己的账号。本页先核对新账号或到期条件，再说明订单取码、预检和结果确认；收到 PAIPLUS 卡密仍需兑换，未到期覆盖请另看人工方案。",
+      "file": "chatgpt-pro-100-ph.html"
+    },
+    {
+      "id": 31,
+      "slug": "chatgpt-pro-200-ph",
+      "category_id": 9,
+      "title": "ChatGPT Pro 200美金 兑换码｜菲区｜自动发码",
+      "description": "菲区 ChatGPT Pro 200美金自动发码页对应 Pro 10x 开通方案，与仍持有 Pro 10x 的续费绑卡商品分别适用。购买前检查订阅状态，领取订单卡密后按入口预检；本页同时保留订阅质保和剩余时长退款说明。",
+      "seo_title": "ChatGPT Pro 200美金 兑换码｜菲区｜自动发码",
+      "seo_description": "菲区 ChatGPT Pro 200美金自动发码页对应 Pro 10x 开通方案，与仍持有 Pro 10x 的续费绑卡商品分别适用。购买前检查订阅状态，领取订单卡密后按入口预检；本页同时保留订阅质保和剩余时长退款说明。",
+      "file": "chatgpt-pro-200-ph.html"
+    },
+    {
+      "id": 33,
+      "slug": "chatgpt-pro-500-ph",
+      "category_id": 9,
+      "title": "ChatGPT Pro 500美金 兑换码｜菲区｜自动发码",
+      "description": "查看菲区 ChatGPT Pro 500美金、即 Pro 25x 兑换码的购买核对步骤。本站自动交付 PAIPLUS 卡密，目标为用户自有账号；先确认套餐标识与预检资格，再查看开通结果，订阅保障不包含账号封禁或免费补开承诺。",
+      "seo_title": "ChatGPT Pro 500美金 兑换码｜菲区｜自动发码",
+      "seo_description": "查看菲区 ChatGPT Pro 500美金、即 Pro 25x 兑换码的购买核对步骤。本站自动交付 PAIPLUS 卡密，目标为用户自有账号；先确认套餐标识与预检资格，再查看开通结果，订阅保障不包含账号封禁或免费补开承诺。",
+      "file": "chatgpt-pro-500-ph.html"
+    },
+    {
+      "id": 37,
+      "slug": "chatgpt-pro-100-egypt",
+      "category_id": 9,
+      "title": "ChatGPT Pro 100美金 兑换码｜埃及｜自动发码",
+      "description": "埃及 EG／EGP 渠道的 ChatGPT Pro 100美金兑换码对应 Pro 5x，自有账号通过预检后使用。阅读本页可核对地区标识、自动发码与兑换步骤，以及未用卡密的退款条件；渠道名称不代表成功率或到账速度保证。",
+      "seo_title": "ChatGPT Pro 100美金 兑换码｜埃及｜自动发码",
+      "seo_description": "埃及 EG／EGP 渠道的 ChatGPT Pro 100美金兑换码对应 Pro 5x，自有账号通过预检后使用。阅读本页可核对地区标识、自动发码与兑换步骤，以及未用卡密的退款条件；渠道名称不代表成功率或到账速度保证。",
+      "file": "chatgpt-pro-100-egypt.html"
+    },
+    {
+      "id": 35,
+      "slug": "chatgpt-pro-500-egypt",
+      "category_id": 9,
+      "title": "ChatGPT Pro 500美金 兑换码｜埃及｜自动发码",
+      "description": "埃及 ChatGPT Pro 500美金商品对应 Pro 25x 自动发码，使用 EG／EGP 渠道。本页区分档位、地区和自有账号三项核对信息，说明预检、异常取证与订阅售后；卡密到账不等于开通，具体使用结果请按订单入口查询。",
+      "seo_title": "ChatGPT Pro 500美金 兑换码｜埃及｜自动发码",
+      "seo_description": "埃及 ChatGPT Pro 500美金商品对应 Pro 25x 自动发码，使用 EG／EGP 渠道。本页区分档位、地区和自有账号三项核对信息，说明预检、异常取证与订阅售后；卡密到账不等于开通，具体使用结果请按订单入口查询。",
+      "file": "chatgpt-pro-500-egypt.html"
+    },
+    {
+      "id": 29,
+      "slug": "chatgpt-go-code-egypt",
+      "category_id": 9,
+      "title": "ChatGPT Go 兑换码｜埃及｜自动发码",
+      "description": "这款埃及兑换码充值的是 ChatGPT Go，付款后自动发放本站 PAIPLUS 卡密，面向客户自己的账号。本页说明 Go 与 Pro 商品的区分、预检资格及到账结果核验；Go 是否适用其他套餐的等待规则，需店主确认。",
+      "seo_title": "ChatGPT Go 兑换码｜埃及｜自动发码",
+      "seo_description": "这款埃及兑换码充值的是 ChatGPT Go，付款后自动发放本站 PAIPLUS 卡密，面向客户自己的账号。本页说明 Go 与 Pro 商品的区分、预检资格及到账结果核验；Go 是否适用其他套餐的等待规则，需店主确认。",
+      "file": "chatgpt-go-code-egypt.html"
+    },
+    {
+      "id": 32,
+      "slug": "chatgpt-pro-200-renew-ph",
+      "category_id": 9,
+      "title": "ChatGPT Pro 200美金 续费绑卡｜菲区｜自动发码",
+      "description": "ChatGPT Pro 200美金续费绑卡方案面向当前仍为 Pro 10x 的自有账号。付款后自动发放本站卡密，请依订单指引绑卡并联系客服确认；本页重点说明续费资格与确认步骤，不将它写成新账号开通或到期充值方案。",
+      "seo_title": "ChatGPT Pro 200美金 续费绑卡｜菲区｜自动发码",
+      "seo_description": "ChatGPT Pro 200美金续费绑卡方案面向当前仍为 Pro 10x 的自有账号。付款后自动发放本站卡密，请依订单指引绑卡并联系客服确认；本页重点说明续费资格与确认步骤，不将它写成新账号开通或到期充值方案。",
+      "file": "chatgpt-pro-200-renew-ph.html"
+    },
+    {
+      "id": 54,
+      "slug": "chatgpt-pro-200-manual",
+      "category_id": 20,
+      "title": "ChatGPT Pro 200美金｜代充｜人工发货",
+      "description": "ChatGPT Pro 200美金人工代充对应 Pro 10x，渠道为 iOS／Google，充值到客户自己的账号。可覆盖充值会从本次成功起重新计时，原有剩余时长不保留；本页说明覆盖选择、人工交付及订阅质保的具体边界。",
+      "seo_title": "ChatGPT Pro 200美金｜代充｜人工发货",
+      "seo_description": "ChatGPT Pro 200美金人工代充对应 Pro 10x，渠道为 iOS／Google，充值到客户自己的账号。可覆盖充值会从本次成功起重新计时，原有剩余时长不保留；本页说明覆盖选择、人工交付及订阅质保的具体边界。",
+      "file": "chatgpt-pro-200-manual.html"
+    },
+    {
+      "id": 55,
+      "slug": "chatgpt-pro-100-manual",
+      "category_id": 20,
+      "title": "ChatGPT Pro 100美金｜代充｜人工发货",
+      "description": "Pro 100美金人工代充为 ChatGPT Pro 5x 方案，现有充值渠道为 iOS／Google。购买前可核对跨套餐覆盖、手机号验证和未发货退款条件；人工交付不保证即时开通，订阅期与退款按实际开通和掉订阅时间核算。",
+      "seo_title": "ChatGPT Pro 100美金｜代充｜人工发货",
+      "seo_description": "Pro 100美金人工代充为 ChatGPT Pro 5x 方案，现有充值渠道为 iOS／Google。购买前可核对跨套餐覆盖、手机号验证和未发货退款条件；人工交付不保证即时开通，订阅期与退款按实际开通和掉订阅时间核算。",
+      "file": "chatgpt-pro-100-manual.html"
+    },
+    {
+      "id": 59,
+      "slug": "chatgpt-go-manual",
+      "category_id": 20,
+      "title": "ChatGPT Go｜代充｜人工发货",
+      "description": "本页为 ChatGPT Go 人工代充，现有说明的渠道是 iOS，目标为客户自有账号。阅读购买前的覆盖规则与验证要求，确认原剩余时间不会保留；人工发货通常在付款当天内完成，实际开通和售后结果以核实记录为准。",
+      "seo_title": "ChatGPT Go｜代充｜人工发货",
+      "seo_description": "本页为 ChatGPT Go 人工代充，现有说明的渠道是 iOS，目标为客户自有账号。阅读购买前的覆盖规则与验证要求，确认原剩余时间不会保留；人工发货通常在付款当天内完成，实际开通和售后结果以核实记录为准。",
+      "file": "chatgpt-go-manual.html"
+    }
+  ],
+  "media": [
+    {
+      "table": "products",
+      "id": 40,
+      "slug": "gemini-pro-18m-warranty",
+      "image": "/media/seo-share/catalog-d7d4c32af9652177616a-1200x630.jpg"
+    },
+    {
+      "table": "products",
+      "id": 41,
+      "slug": "gemini-pro-18m-no-warranty",
+      "image": "/media/seo-share/catalog-d7d4c32af9652177616a-1200x630.jpg"
+    },
+    {
+      "table": "categories",
+      "id": 11,
+      "slug": "gemini",
+      "image": "/media/seo-share/catalog-d7d4c32af9652177616a-1200x630.jpg"
+    }
+  ]
+}

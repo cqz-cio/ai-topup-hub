@@ -1,0 +1,5 @@
+[
+  {"key":"telegram","title":"其他时长","slugs":["telegram-premium-3m","telegram-premium-6m","telegram-premium-12m"],"extra":[]},
+  {"key":"automatic","title":"其他自动发码方案","slugs":["chatgpt-pro-100-ph","chatgpt-pro-200-ph","chatgpt-pro-500-ph","chatgpt-pro-100-egypt","chatgpt-pro-500-egypt","chatgpt-go-code-egypt","chatgpt-pro-200-renew-ph"],"extra":["chatgpt-plus-code"]},
+  {"key":"manual","title":"其他代充方案","slugs":["chatgpt-pro-200-manual","chatgpt-pro-100-manual","chatgpt-go-manual"],"extra":["chatgpt-plus-manual"]}
+]

@@ -3,11 +3,11 @@
     <div class="container mx-auto">
       <div class="brand-footer-top">
         <div>
-          <RouterLink to="/" class="brand-footer-name"><img v-if="brandLogo" :src="brandLogo" :alt="brandSiteName" class="inline-block h-12 max-w-[120px] object-contain mr-3" />{{ brandSiteName }}</RouterLink>
+          <RouterLink to="/" class="brand-footer-name"><img v-if="brandLogo" :src="brandLogo" v-bind="imageDimensions(brandLogo)" :alt="brandSiteName" class="inline-block h-12 max-w-[120px] object-contain mr-3" />{{ brandSiteName }}</RouterLink>
           <p class="brand-footer-description">{{ brandDescription || t('shopUi.brandDescription') }}</p>
         </div>
         <div class="brand-footer-links">
-          <div><h4>{{ t('shopUi.catalog') }}</h4><router-link v-for="item in quickLinks" :key="item.path" :to="item.path">{{ t(item.label) }}</router-link></div>
+          <div><h4>{{ t('shopUi.catalog') }}</h4><router-link v-for="item in quickLinks" :key="item.path" :to="item.path">{{ t(item.label) }}</router-link><router-link v-for="item in categoryLinks" :key="item.path" :to="item.path">{{ item.title }}</router-link></div>
           <div><h4>{{ t('shopUi.lookupAction') }}</h4><router-link to="/me/orders">{{ t('shopUi.memberOrders') }}</router-link><router-link to="/guest/orders">{{ t('shopUi.guestOrders') }}</router-link><router-link to="/cart">{{ t('navbar.cart') }}</router-link></div>
           <div v-if="!appStore.isResellerTenant || supportWechat || config?.contact?.qq || config?.contact?.telegram || config?.contact?.whatsapp"><h4>{{ t('shopUi.support') }}</h4><button v-if="supportWechat" type="button" class="flex items-center gap-2 text-left" @click="copyWechat">{{ t('shopUi.wechat') }}<Copy :size="12" /></button><span v-if="supportWechat" class="font-semibold">{{ supportWechat }}</span><SupportContacts /><a v-if="config?.contact?.whatsapp" :href="config.contact.whatsapp" target="_blank" rel="noopener noreferrer">WhatsApp</a></div>
         </div>
@@ -22,6 +22,8 @@
 
 <script setup lang="ts">
 import SupportContacts from './SupportContacts.vue'
+import { useFooterCategories } from '../composables/useFooterCategories'
+import { imageDimensions } from '../utils/imageDimensions'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Copy, Home, LayoutGrid, Newspaper, Info } from 'lucide-vue-next'
@@ -33,6 +35,7 @@ import { getLocalizedText } from '../utils/resellerSiteConfig'
 
 const { t } = useI18n()
 const appStore = useAppStore()
+const categoryLinks = useFooterCategories()
 
 const config = computed(() => appStore.config)
 
@@ -62,6 +65,7 @@ const navConfig = computed(() => config.value?.nav_config as { builtin?: Record<
 const quickLinks = computed(() => {
   const items = [
     { path: '/', label: 'nav.home', icon: Home },
+    { path: '/notice', label: 'nav.notice', icon: Newspaper },
   ]
   if (!isListMode.value) {
     items.push({ path: '/products', label: 'nav.products', icon: LayoutGrid })

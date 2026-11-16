@@ -2,6 +2,12 @@ package publicpage
 
 import "html/template"
 
+type cover struct {
+	URL           string
+	Width, Height int
+	Lazy          bool
+}
+
 type document struct {
 	Page
 	Site                              Site
@@ -15,6 +21,10 @@ type document struct {
 	Schema                            template.JS
 	Identity                          template.JS
 	CatalogLinks                      template.JS
+	Semantics                         template.JS
+	Styles                            []string
+	Covers                            []cover
+	FooterCategories                  template.JS
 }
 
 // The visible HTML is identical for crawlers and visitors. Vue progressively
@@ -23,6 +33,7 @@ var documentTemplate = template.Must(template.New("public-detail").Parse(`<!doct
 <html lang="zh-CN"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <script id="public-catalog-links" type="application/json">{{.CatalogLinks}}</script>
+<script id="public-footer-categories" type="application/json">{{.FooterCategories}}</script>
 {{if .PreloadScene}}<script data-cfasync="false">
 try {
   const template = new URLSearchParams(location.search).get('template') || localStorage.getItem('dj-storefront-template');
@@ -57,7 +68,8 @@ try {
 <meta data-public-page-seo name="twitter:image:alt" content="{{.ShareImageAlt}}">{{end}}
 <script data-public-page-seo type="application/ld+json">{{.Schema}}</script>
 <script data-public-page-seo type="application/ld+json">{{.Identity}}</script>
-<link rel="stylesheet" href="/storefront-entry.css">
+{{if .Semantics}}<script data-public-page-seo type="application/ld+json">{{.Semantics}}</script>{{end}}
+{{range .Styles}}<link data-public-document-style rel="stylesheet" href="{{.}}">{{end}}
 <style data-public-page-seo>
 #public-document{max-width:960px;margin:32px auto;padding:24px;color:#173b36;background:#fff;font:16px/1.8 system-ui,sans-serif;overflow-wrap:anywhere}#public-document h1{font-size:28px;font-weight:700}#public-document h2{font-size:22px;font-weight:600;margin:1em 0 .5em}#public-document h3{font-size:18px;font-weight:600}#public-document a{color:#17675a;text-decoration:underline}#public-document p{margin:.8em 0}#public-document ul{list-style:disc;padding-left:24px}#public-document ol{list-style:decimal;padding-left:24px}#public-document img{max-width:100%;height:auto}#public-document .cover{max-height:240px;object-fit:contain}#public-document table{display:block;max-width:100%;overflow:auto;border-collapse:collapse}#public-document td,#public-document th{border:1px solid #bbb;padding:8px}#public-document dt{font-weight:600}#public-document dd{margin-bottom:8px}
 </style>
@@ -66,15 +78,15 @@ try {
 <nav aria-label="网站导航"><a href="/">{{.Site.Name}}</a> · <a href="/products">商品中心</a> · <a href="/blog">文章</a> · <a href="/about">关于我们</a></nav>
 <article><h1>{{.Title}}</h1>
 {{if .PublishedAt}}<time datetime="{{.PublishedAt.Format "2006-01-02T15:04:05Z07:00"}}">{{.PublishedAt.Format "2006-01-02"}}</time>{{end}}
-{{range .Images}}<img class="cover" src="{{.}}" alt="{{$.Title}}">{{end}}
+{{range .Covers}}<img class="cover" src="{{.URL}}" alt="{{$.Title}}"{{if .Width}} width="{{.Width}}" height="{{.Height}}"{{end}}{{if .Lazy}} loading="lazy"{{end}}>{{end}}
 {{if .Summary}}<div class="summary">{{.Summary}}</div>{{end}}
 {{if .Items}}<section aria-label="在售商品"><h2>商品与当前售价</h2><ul>{{range .Items}}<li><a href="{{.Path}}">{{.Title}}</a> · {{.Price}} {{$.Site.Currency}} · {{if eq .Availability "https://schema.org/OutOfStock"}}暂时缺货{{else}}有货{{end}}{{if .Category}} · {{.Category}}{{end}}{{if .Summary}}<p>{{.Summary}}</p>{{end}}</li>{{end}}</ul></section>{{end}}
 {{if eq .Kind "product"}}<p>售价：{{.Price}} {{.Site.Currency}} · {{if eq .Availability "https://schema.org/OutOfStock"}}暂时缺货{{else}}有货{{end}}</p>{{end}}
-{{if .Category}}<p>分类：{{.Category}}</p>{{end}}
+{{if .Category}}<p>分类：{{if .CategoryPath}}<a href="{{.CategoryPath}}">{{.Category}}</a>{{else}}{{.Category}}{{end}}</p>{{end}}
 {{if .Facts}}<dl>{{range .Facts}}<dt>{{.Name}}</dt><dd>{{.Value}}</dd>{{end}}</dl>{{end}}
 <section aria-label="完整正文">{{.Body}}</section>
 {{if .RelatedProducts}}<aside aria-label="{{.RelatedProductsTitle}}"><h2>{{.RelatedProductsTitle}}</h2><ul>{{range .RelatedProducts}}<li><a href="{{.Path}}">{{.Title}}</a> · {{.Price}} {{$.Site.Currency}} · {{if eq .Availability "https://schema.org/OutOfStock"}}暂时缺货{{else}}有货{{end}}</li>{{end}}</ul></aside>{{end}}
 {{if or (eq .Kind "blog") (eq .Kind "notice-list")}}<section aria-label="已发布文章">{{range .Entries}}<article><h2><a href="{{.Path}}">{{.Title}}</a></h2>{{if .PublishedAt}}<time datetime="{{.PublishedAt.Format "2006-01-02T15:04:05Z07:00"}}">{{.PublishedAt.Format "2006-01-02"}}</time>{{end}}<p>{{.Summary}}</p></article>{{else}}<p>暂无匹配文章</p>{{end}}</section>{{end}}
 {{if .Pagination}}<nav aria-label="文章分页">{{range .Pagination}}<a href="{{.Path}}">{{.Title}}</a> {{end}}</nav>{{end}}
 {{if .Links}}<aside><h2>相关内容</h2><ul>{{range .Links}}<li><a href="{{.Path}}">{{.Title}}</a></li>{{end}}</ul></aside>{{end}}
-</article></main></div></body></html>`))
+</article><footer aria-label="公开页面导航"><nav><a href="/products">商品中心</a> · <a href="/blog">博客</a> · <a href="/notice">公告</a> · <a href="/about">关于我们</a>{{range .Site.FooterCategories}} · <a href="{{.Path}}">{{.Title}}</a>{{end}} · <a href="/terms">服务条款</a> · <a href="/privacy">隐私政策</a></nav></footer></main></div></body></html>`))

@@ -30,8 +30,8 @@
           class="ocean-article-card backdrop-blur-xl rounded-3xl p-8 md:p-12 shadow-2xl relative overflow-hidden">
           <!-- Featured Image -->
           <div v-if="post.thumbnail" class="mb-12 relative h-64 md:h-96 rounded-2xl overflow-hidden group">
-            <img :src="getImageUrl(post.thumbnail)" :alt="getLocalizedText(post.title)"
-              loading="lazy" class="w-full h-full object-cover">
+            <img :src="getImageUrl(post.thumbnail)" v-bind="imageDimensions(getImageUrl(post.thumbnail))" :alt="getLocalizedText(post.title)"
+              class="w-full h-full object-cover">
             <div class="absolute inset-0 bg-black/20 dark:bg-black/35"></div>
           </div>
 
@@ -57,7 +57,7 @@
           </header>
 
           <!-- Post Content -->
-          <div v-html="processHtmlForDisplay(readingContent)"
+          <div v-html="processPublicHtmlForDisplay(readingContent)"
             class="prose prose-lg max-w-none dark:prose-invert theme-prose">
           </div>
 
@@ -77,7 +77,7 @@
               >
                 <div v-if="rp.image"
                   class="h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-muted">
-                  <img :src="getImageUrl(rp.image)" :alt="getLocalizedText(rp.title)" loading="lazy"
+                  <img :src="getImageUrl(rp.image)" v-bind="imageDimensions(getImageUrl(rp.image))" :alt="getLocalizedText(rp.title)" loading="lazy"
                     class="h-full w-full object-cover transition-transform group-hover:scale-110" />
                 </div>
                 <div class="min-w-0 flex-1">
@@ -121,8 +121,9 @@
 import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ArrowLeft, AlertCircle, ChevronDown } from 'lucide-vue-next'
+import { imageDimensions } from '../utils/imageDimensions'
 import { getImageUrl } from '../utils/image'
-import { processHtmlForDisplay } from '../utils/content'
+import { processPublicHtmlForDisplay } from '../utils/content'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'

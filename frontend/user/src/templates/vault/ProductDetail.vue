@@ -24,7 +24,7 @@
         <!-- 图区 -->
         <div>
           <div class="relative grid h-[380px] place-items-center overflow-hidden rounded-xl" :class="images.length ? '' : 'bg-[linear-gradient(135deg,#7b74f2,var(--red))]'">
-            <img v-if="currentImage" :src="currentImage" :alt="getLocalizedText(product.title)" class="absolute inset-0 h-full w-full object-cover" />
+            <img v-if="currentImage" :src="currentImage" v-bind="imageDimensions(currentImage)" :alt="getLocalizedText(product.title)" class="absolute inset-0 h-full w-full object-cover" />
             <Package v-else class="h-[110px] w-[110px] text-white/95" />
           </div>
           <div v-if="images.length > 1" class="mt-3.5 flex flex-wrap gap-3">
@@ -35,14 +35,14 @@
               :class="img === currentImage ? 'border-primary' : 'border-border'"
               @click="currentImage = img"
             >
-              <img :src="img" :alt="`${idx + 1}`" loading="lazy" class="h-full w-full object-cover" />
+              <img :src="img" v-bind="imageDimensions(img)" :alt="`${idx + 1}`" loading="lazy" class="h-full w-full object-cover" />
             </button>
           </div>
         </div>
 
         <!-- 购买区 -->
         <div>
-          <span v-if="categoryName" class="block truncate text-[13px] font-semibold text-muted-foreground">{{ categoryName }}</span>
+          <span v-if="categoryName" class="block truncate text-[13px] font-semibold text-muted-foreground"><RouterLink v-if="product.category?.slug" :to="`/categories/${encodeURIComponent(product.category.slug)}`" class="underline">{{ categoryName }}</RouterLink><span v-else>{{ categoryName }}</span></span>
           <h1 class="my-2 mb-3 text-[32px] font-extrabold">{{ getLocalizedText(product.title) }}</h1>
 
           <div class="mb-1.5 flex flex-wrap gap-2">
@@ -197,7 +197,7 @@
         </div>
         <div class="prose max-w-none dark:prose-invert prose-a:text-primary prose-img:rounded-md">
           <p v-if="getLocalizedText(product.description)">{{ getLocalizedText(product.description) }}</p>
-          <div v-if="product.content" v-html="processHtmlForDisplay(readingContent)"></div>
+          <div v-if="product.content" v-html="processPublicHtmlForDisplay(readingContent)"></div>
         </div>
       </section>
 
@@ -253,6 +253,7 @@
 </template>
 
 <script setup lang="ts">
+import { imageDimensions } from '../../utils/imageDimensions'
 import ProductPurchaseGuide from '../../components/product/ProductPurchaseGuide.vue'
 import GrokRelatedProducts from '../../components/product/GrokRelatedProducts.vue'
 import ProductContactButton from '../../components/product/ProductContactButton.vue'
@@ -264,7 +265,7 @@ import {
   RotateCw, ShoppingCart, Tag, TicketCheck, UserPlus, Zap,
 } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
-import { processHtmlForDisplay } from '../../utils/content'
+import { processPublicHtmlForDisplay } from '../../utils/content'
 import { useProductDetail } from '../../composables/useProductDetail'
 import VaultProductMobileBar from './components/VaultProductMobileBar.vue'
 

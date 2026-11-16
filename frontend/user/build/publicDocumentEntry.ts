@@ -1,4 +1,5 @@
 import type { Plugin } from 'vite'
+import { createHash } from 'node:crypto'
 import { publicDocumentBootCss, publicDocumentBootScript } from './publicDocumentBoot.ts'
 
 // Backend HTML and frontend assets may be released independently. These stable,
@@ -18,9 +19,13 @@ export function publicDocumentSources(html: string) {
       throw new Error(`Unexpected public document asset: ${path}`)
     }
   }
+  const bootStyle = '/assets/public-document-' + createHash('sha256').update(publicDocumentBootCss).digest('hex').slice(0, 16) + '.css'
+  const currentStyles = [...styles, bootStyle]
   return {
-    js: publicDocumentBootScript(scripts),
-    css: styles.map(path => `@import ${JSON.stringify(path)};`).join('\n') + '\n' + publicDocumentBootCss,
+    js: publicDocumentBootScript(scripts, currentStyles),
+    css: publicDocumentBootCss,
+    styles: currentStyles,
+    bootStyle,
   }
 }
 
@@ -33,7 +38,10 @@ export function publicDocumentEntry(): Plugin {
       if (!index || index.type !== 'asset') throw new Error('Public document index.html missing')
       const source = typeof index.source === 'string' ? index.source : new TextDecoder().decode(index.source)
       const entry = publicDocumentSources(source)
+      this.emitFile({ type: 'asset', fileName: entry.bootStyle.slice(1), source: entry.css })
+      this.emitFile({ type: 'asset', fileName: 'storefront-assets.json', source: JSON.stringify({ version: 1, styles: entry.styles }) })
       this.emitFile({ type: 'asset', fileName: 'storefront-entry.js', source: entry.js })
+      // Tiny boot fallback for old HTML/backends, never a copy of application CSS.
       this.emitFile({ type: 'asset', fileName: 'storefront-entry.css', source: entry.css })
     },
     configureServer(server) {

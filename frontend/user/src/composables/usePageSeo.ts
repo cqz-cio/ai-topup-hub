@@ -3,6 +3,8 @@ import { useHead } from '@unhead/vue'
 import { useAppStore } from '../stores/app'
 import { seoText, seoTitle } from '../utils/seo'
 import { defaultShareImage, rasterShareUrl, shareMetadata } from '../utils/shareSeo'
+import { breadcrumbSchema } from '../utils/publicSemantics'
+import { schemaJSON } from '../utils/siteIdentity'
 
 export interface PageSeoOptions {
   /** 页面专属标题；若与站点名相同，仅展示站点名 */
@@ -22,6 +24,7 @@ export interface PageSeoOptions {
   /** 标识页面不该被索引（私密页/动态查询页） */
   noindex?: () => boolean
   followWhenNoindex?: boolean
+  breadcrumbParents?: () => {title: string; path: string}[]
 }
 
 const trimSlashEnd = (s: string) => s.replace(/\/+$/, '')
@@ -94,6 +97,11 @@ export function usePageSeo(options: PageSeoOptions = {}) {
   const fullImage = computed(() => sharing.value.image)
 
   useHead({
+    script: () => {
+      if (options.noindex?.() || !baseUrl.value) return []
+      const schema = breadcrumbSchema(baseUrl.value, pageTitle.value, fullCanonical.value.slice(baseUrl.value.length), options.breadcrumbParents?.() || [])
+      return schema ? [{key:'page-breadcrumb',type:'application/ld+json',innerHTML:schemaJSON(schema)}] : []
+    },
     title: () => fullTitle.value,
     link: () => {
       if (!fullCanonical.value) return []

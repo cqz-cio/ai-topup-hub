@@ -23,9 +23,13 @@ type Product struct {
 // PublishedPost 是生成 Sitemap 所需的已发布文章投影。
 type PublishedPost struct {
 	Slug        string
+	Type        string
 	CreatedAt   time.Time
 	PublishedAt *time.Time
 }
+
+// StaticDateReader supplies editorial dates only; absent dates stay absent.
+type StaticDateReader func(context.Context) (map[string]time.Time, error)
 
 // CatalogReader 提供 Sitemap 所需的可索引商品和分类。
 type CatalogReader interface {

@@ -15,9 +15,10 @@ import (
 
 // Service 生成 sitemap.xml / robots.txt 内容。
 type Service struct {
-	catalog contract.CatalogReader
-	posts   contract.PublishedPostReader
-	cache   contract.Cache
+	catalog     contract.CatalogReader
+	posts       contract.PublishedPostReader
+	cache       contract.Cache
+	staticDates contract.StaticDateReader
 }
 
 // NewService 创建 sitemap 服务。
@@ -25,15 +26,20 @@ func NewService(
 	catalog contract.CatalogReader,
 	posts contract.PublishedPostReader,
 	cacheStore contract.Cache,
+	staticDates ...contract.StaticDateReader,
 ) (*Service, error) {
 	if catalog == nil || posts == nil || cacheStore == nil {
 		return nil, fmt.Errorf("sitemap: required dependency is nil")
 	}
-	return &Service{
+	service := &Service{
 		catalog: catalog,
 		posts:   posts,
 		cache:   cacheStore,
-	}, nil
+	}
+	if len(staticDates) > 0 {
+		service.staticDates = staticDates[0]
+	}
+	return service, nil
 }
 
 const (
@@ -117,6 +123,16 @@ type urlSet struct {
 
 func (s *Service) collectURLs(ctx context.Context, baseURL string) ([]domain.URL, error) {
 	entries := make([]domain.URL, 0, 64)
+	staticDates := map[string]time.Time{}
+	if s.staticDates != nil {
+		dates, err := s.staticDates(ctx)
+		if err != nil {
+			return nil, fmt.Errorf("sitemap: read content dates: %w", err)
+		}
+		for path, date := range dates {
+			staticDates[path] = date
+		}
+	}
 
 	// 1. 静态页面
 	staticPages := []struct {
@@ -134,7 +150,8 @@ func (s *Service) collectURLs(ctx context.Context, baseURL string) ([]domain.URL
 	}
 	for _, p := range staticPages {
 		entries = append(entries, domain.URL{
-			Location: baseURL + p.Path,
+			Location:     baseURL + p.Path,
+			LastModified: dateOnly(staticDates[p.Path]),
 			// Unknown content modification time: omit rather than emit today's date.
 			ChangeFrequency: p.ChangeFreq,
 			Priority:        p.Priority,
@@ -147,9 +164,18 @@ func (s *Service) collectURLs(ctx context.Context, baseURL string) ([]domain.URL
 		return nil, fmt.Errorf("sitemap: list products: %w", err)
 	}
 	populated := make(map[uint]bool)
+	var catalogDate time.Time
 	for _, product := range products {
 		if strings.TrimSpace(product.Slug) != "" {
 			populated[product.CategoryID] = true
+			if product.UpdatedAt.After(catalogDate) {
+				catalogDate = product.UpdatedAt
+			}
+		}
+	}
+	for i := range entries {
+		if entries[i].Location == baseURL+"/" || entries[i].Location == baseURL+"/products" {
+			entries[i].LastModified = dateOnly(catalogDate)
 		}
 	}
 	// 2. 启用且有公开商品的分类
@@ -200,21 +226,46 @@ func (s *Service) collectURLs(ctx context.Context, baseURL string) ([]domain.URL
 	if err != nil {
 		return nil, fmt.Errorf("sitemap: list posts: %w", err)
 	}
+	listDates := map[string]time.Time{}
 	for _, post := range posts {
+		if strings.TrimSpace(post.Slug) == "" {
+			continue
+		}
 		lastmod := post.CreatedAt
 		if post.PublishedAt != nil {
 			lastmod = *post.PublishedAt
 		}
+		listPath := "/blog"
+		if post.Type == "notice" {
+			listPath = "/notice"
+		}
+		if lastmod.After(listDates[listPath]) {
+			listDates[listPath] = lastmod
+		}
 		// blog 与 notice 共用 /blog/:slug 详情页（user 前台 Notice.vue 跳转到 /blog/{slug}）
 		entries = append(entries, domain.URL{
 			Location:        baseURL + "/blog/" + url.PathEscape(post.Slug),
-			LastModified:    lastmod.UTC().Format("2006-01-02"),
+			LastModified:    dateOnly(lastmod),
 			ChangeFrequency: "monthly",
 			Priority:        "0.5",
 		})
 	}
+	for i := range entries {
+		for path, date := range listDates {
+			if entries[i].Location == baseURL+path {
+				entries[i].LastModified = dateOnly(date)
+			}
+		}
+	}
 
 	return entries, nil
+}
+
+func dateOnly(date time.Time) string {
+	if date.IsZero() {
+		return ""
+	}
+	return date.UTC().Format("2006-01-02")
 }
 
 func renderSitemapXML(entries []domain.URL) (string, error) {

@@ -1,0 +1,72 @@
+{
+  "/uploads/86gamestore/c779fc65589ae19c7ff2.jpg": {
+    "width": 420,
+    "height": 420,
+    "sha256": "c779fc65589ae19c7ff25c2993f80d6bbfd4d82ccafd389a88b0092266f7f1ab",
+    "verified_at": "2026-11-16",
+    "source": "https://www.qzweb.cloud/uploads/86gamestore/c779fc65589ae19c7ff2.jpg"
+  },
+  "/uploads/86gamestore/f0bb72279d34b2b14d08.jpg": {
+    "width": 1024,
+    "height": 1024,
+    "sha256": "f0bb72279d34b2b14d08e36fdfb106b2237a515273a6a6c64b0becf5e59de817",
+    "verified_at": "2026-11-16",
+    "source": "https://www.qzweb.cloud/uploads/86gamestore/f0bb72279d34b2b14d08.jpg"
+  },
+  "/uploads/catalog/grok-20261023/grok-plus-monthly.svg": {
+    "width": 960,
+    "height": 540,
+    "sha256": "1ce7f519d22a14f009a7d8cf60f28429dc6bd006f6fb1ca5e88f489abcccad90",
+    "verified_at": "2026-11-16",
+    "source": "https://www.qzweb.cloud/uploads/catalog/grok-20261023/grok-plus-monthly.svg"
+  },
+  "/uploads/catalog/grok-20261023/grok-plus-yearly.svg": {
+    "width": 960,
+    "height": 540,
+    "sha256": "7d71167a7c2b6957d7c2faa06ba0fa2497e6560d69c4aedc737487e1cdbcdd4f",
+    "verified_at": "2026-11-16",
+    "source": "https://www.qzweb.cloud/uploads/catalog/grok-20261023/grok-plus-yearly.svg"
+  },
+  "/uploads/catalog/grok-20261023/grok-premium-monthly.svg": {
+    "width": 960,
+    "height": 540,
+    "sha256": "ab3064c6f54c2de85f70475195c7d7aeb65616f7f138b5e228e40a08792b7220",
+    "verified_at": "2026-11-16",
+    "source": "https://www.qzweb.cloud/uploads/catalog/grok-20261023/grok-premium-monthly.svg"
+  },
+  "/uploads/catalog/grok-20261023/grok-premium-yearly.svg": {
+    "width": 960,
+    "height": 540,
+    "sha256": "a6e660387b04ef3d6671d928adb8ec90aa03de8728cf3083ad8b9293569bd409",
+    "verified_at": "2026-11-16",
+    "source": "https://www.qzweb.cloud/uploads/catalog/grok-20261023/grok-premium-yearly.svg"
+  },
+  "/uploads/catalog/grok-20261023/grok-super-monthly.svg": {
+    "width": 960,
+    "height": 540,
+    "sha256": "bd9f0e1a4f8253ceeeca5d6575750bcaf45fca2b399354d000b05a69a8b10183",
+    "verified_at": "2026-11-16",
+    "source": "https://www.qzweb.cloud/uploads/catalog/grok-20261023/grok-super-monthly.svg"
+  },
+  "/uploads/catalog/grok-20261023/grok-super-yearly.svg": {
+    "width": 960,
+    "height": 540,
+    "sha256": "f4d9ffbbd53c98748823d0f16cf1e794f7e14e1a82a291b70786289621260e2b",
+    "verified_at": "2026-11-16",
+    "source": "https://www.qzweb.cloud/uploads/catalog/grok-20261023/grok-super-yearly.svg"
+  },
+  "/uploads/catalog/grok-20261023/grok-ultra-monthly.svg": {
+    "width": 960,
+    "height": 540,
+    "sha256": "1ff92aae30dc40efd37c7bc23ea97483d700fe685d898bd8e2cea24b95cd4d3a",
+    "verified_at": "2026-11-16",
+    "source": "https://www.qzweb.cloud/uploads/catalog/grok-20261023/grok-ultra-monthly.svg"
+  },
+  "/uploads/catalog/grok-20261023/grok-ultra-yearly.svg": {
+    "width": 960,
+    "height": 540,
+    "sha256": "faecfd3931d82bb4cf9f505f2b9df79326a89d443d5fa0cb2dc8dcf391477c1a",
+    "verified_at": "2026-11-16",
+    "source": "https://www.qzweb.cloud/uploads/catalog/grok-20261023/grok-ultra-yearly.svg"
+  }
+}

@@ -58,6 +58,29 @@ export const publicDocumentBootCss = `
 }
 `
 
-export function publicDocumentBootScript(scripts: string[]): string {
-  return `Promise.all([${scripts.map(path => `import(${JSON.stringify(path)})`).join(',')}]).catch(() => { document.documentElement.setAttribute('data-public-document-boot-failed', ''); });\n`
+export function publicDocumentBootScript(scripts: string[], styles: string[] = []): string {
+  // HTML can outlive a static release. The current stable entry ensures its
+  // matching styles are loaded before replacing the readable document.
+  return `const currentStyles = ${JSON.stringify(styles)};
+Promise.all(currentStyles.map(href => new Promise((resolve, reject) => {
+    const existing = Array.from(document.querySelectorAll('link[rel="stylesheet"]')).find(link => link.getAttribute('href') === href);
+    // Chromium can expose an empty sheet even when the request was aborted.
+    // The application bundle is nonempty; only actual rules prove it loaded.
+    try { if (existing && existing.sheet && existing.sheet.cssRules.length > 0) return resolve(); } catch {}
+    // A prior link may already have emitted an error before this module runs.
+    // A fresh link guarantees load/error handlers cover the current attempt.
+    const link = document.createElement('link');
+    link.rel = 'stylesheet'; link.href = href; link.setAttribute('data-public-document-style', '');
+    link.addEventListener('load', resolve, {once:true}); link.addEventListener('error', reject, {once:true});
+    document.head.appendChild(link);
+  }))).then(() => {
+    // A cached document may still link the previous release. Remove only its
+    // owned styles after every replacement loaded; retain them on load failure.
+    if (currentStyles.length) for (const link of document.querySelectorAll('link[rel="stylesheet"]')) {
+      const href = link.getAttribute('href') || '';
+      const owned = link.hasAttribute('data-public-document-style') || /^\\/assets\\/index-[A-Za-z0-9_-]+\\.css$/.test(href);
+      if (owned && !currentStyles.includes(href)) link.remove();
+    }
+    return Promise.all([${scripts.map(path => `import(${JSON.stringify(path)})`).join(',')}]);
+  }).catch(() => { document.documentElement.setAttribute('data-public-document-boot-failed', ''); });\n`
 }

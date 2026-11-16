@@ -5,6 +5,7 @@ import { usePageSeo } from './usePageSeo'
 import { useHead } from '@unhead/vue'
 import { resolveAboutPage } from '../../../shared/aboutPage'
 import { schemaJSON } from '../utils/siteIdentity'
+import { pageDescription } from '../utils/publicDescriptions'
 
 /**
  * 关于页共享逻辑（classic + vault 双模板共用）。
@@ -17,7 +18,7 @@ export function useAbout() {
   usePageSeo({
     title: () => appStore.isResellerTenant ? t('nav.about') : t('shopUi.aboutTitle'),
     imageAlt: () => appStore.isResellerTenant ? heroTitle.value : resolveAboutPage(appStore.config?.about_page, appStore.config?.about, locale.value, appStore.config?.contact).title,
-    description: () => appStore.isResellerTenant ? '' : resolveAboutPage(appStore.config?.about_page, appStore.config?.about, locale.value, appStore.config?.contact).subtitle,
+    description: () => appStore.isResellerTenant ? '' : pageDescription('about'),
     canonicalPath: () => '/about',
   })
 
@@ -73,7 +74,7 @@ export function useAbout() {
     const schema = {
       '@context': 'https://schema.org', '@type': 'AboutPage',
       name: appStore.isResellerTenant ? heroTitle.value : copy.title,
-      description: appStore.isResellerTenant ? heroSubtitle.value : copy.subtitle,
+      description: appStore.isResellerTenant ? heroSubtitle.value : pageDescription('about'),
       url: origin + '/about', inLanguage: appStore.locale,
       isPartOf: { '@id': origin + '/#website' }, about: { '@id': origin + '/#organization' },
     }

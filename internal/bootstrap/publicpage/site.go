@@ -96,7 +96,11 @@ func (s *source) About(ctx context.Context) (publicpage.Page, error) {
 	if isMainSite(ctx) {
 		seoTitle = publiccontent.PageTitle("aboutTitle")
 	}
-	return publicpage.Page{Kind: "about", Path: "/about", Title: title, SEOTitle: seoTitle, Summary: summary, Content: body}, nil
+	page := publicpage.Page{Kind: "about", Path: "/about", Title: title, SEOTitle: seoTitle, Summary: summary, Content: body}
+	if isMainSite(ctx) {
+		page.SEODescription = publiccontent.PageDescription("about")
+	}
+	return page, nil
 }
 
 func (s *source) BlogList(ctx context.Context, number int, search string) (publicpage.Page, error) {
@@ -139,6 +143,17 @@ func (s *source) postList(ctx context.Context, postType string, number int, sear
 	}
 	for _, post := range posts {
 		page.Entries = append(page.Entries, publicpage.Entry{Title: localized(post.Title), Path: "/blog/" + url.PathEscape(post.Slug), Summary: localized(post.Summary), PublishedAt: post.PublishedAt})
+	}
+	if isMainSite(ctx) {
+		if postType == constants.PostTypeNotice {
+			page.SEODescription = publiccontent.PageDescription("notice")
+		} else {
+			names := make([]string, 0, len(posts))
+			for _, post := range posts {
+				names = append(names, localized(post.Title))
+			}
+			page.SEODescription = publiccontent.BlogDescription(names)
+		}
 	}
 	if number > 1 {
 		page.Pagination = append(page.Pagination, publicpage.Link{Title: "上一页", Path: pagePath(number-1, search)})
@@ -202,6 +217,43 @@ func (s *source) catalogProducts(ctx context.Context, category string, number, s
 	return items, total, nil
 }
 
+// Only categories backed by the tenant's anonymous public catalog are linked.
+func (s *source) footerCategories(ctx context.Context) ([]publicpage.Link, error) {
+	if s.categories == nil || s.catalog == nil {
+		return nil, nil
+	}
+	categories, err := s.categories.ListActive()
+	if err != nil {
+		return nil, err
+	}
+	populated := map[uint]bool{}
+	for number := 1; ; number++ {
+		rows, total, err := s.catalogProducts(ctx, "", number, 100)
+		if err != nil {
+			return nil, err
+		}
+		for _, item := range rows {
+			populated[item.Category.ID] = true
+		}
+		if len(rows) == 0 || int64(number*100) >= total {
+			break
+		}
+	}
+	parents := map[uint]bool{}
+	for _, category := range categories {
+		if category.ParentID != 0 && populated[category.ID] {
+			parents[category.ParentID] = true
+		}
+	}
+	var links []publicpage.Link
+	for _, category := range categories {
+		if category.Slug != "" && (populated[category.ID] || (category.ParentID == 0 && parents[category.ID])) {
+			links = append(links, publicpage.Link{Title: localized(category.NameJSON), Path: "/categories/" + url.PathEscape(category.Slug)})
+		}
+	}
+	return links, nil
+}
+
 func isEditorial(slug string) bool {
 	for _, candidate := range publiccontent.GPTRecharge().BlogSlugs {
 		if strings.EqualFold(slug, candidate) {
@@ -214,7 +266,7 @@ func isEditorial(slug string) bool {
 // Products reuses the same anonymous projection as the home and category pages.
 func (s *source) Products(ctx context.Context) (publicpage.Page, error) {
 	items, err := s.catalogItems(ctx, "")
-	return publicpage.Page{Kind: "products", Path: "/products", Title: publiccontent.PageTitle("productsTitle"), Summary: "使用期限与质保期不同，购买前请分别确认。", Items: items}, err
+	return publicpage.Page{Kind: "products", Path: "/products", Title: publiccontent.PageTitle("productsTitle"), Summary: "使用期限与质保期不同，购买前请分别确认。", SEODescription: publiccontent.PageDescription("products"), Items: items}, err
 }
 
 func (s *source) Terms(ctx context.Context) (publicpage.Page, error) {
@@ -234,5 +286,9 @@ func (s *source) legal(ctx context.Context, key, title string) (publicpage.Page,
 	if strings.TrimSpace(body) == "" {
 		return publicpage.Page{}, publicpage.ErrNotFound
 	}
-	return publicpage.Page{Kind: "legal", Path: "/" + key, Title: title, Content: body}, nil
+	page := publicpage.Page{Kind: "legal", Path: "/" + key, Title: title, Content: body}
+	if isMainSite(ctx) {
+		page.SEODescription = publiccontent.PageDescription(key)
+	}
+	return page, nil
 }

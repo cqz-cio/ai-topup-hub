@@ -2,7 +2,7 @@
   <span class="support-pet-art" :data-motion="phase" :data-renderer="rendererReady ? 'illustrated-depth' : 'original'">
     <span ref="shadowElement" class="support-pet-shadow" aria-hidden="true" />
     <span ref="poseElement" class="support-pet-pose">
-      <img v-show="!rendererReady" :src="rig" alt="" class="support-pet-layer" />
+      <img v-show="!rendererReady" :src="rig" width="480" height="600" alt="" class="support-pet-layer" />
       <canvas v-show="rendererReady" ref="canvas" width="480" height="600" class="support-pet-layer" aria-hidden="true" />
       <span v-for="side in ['left', 'right']" :key="side" class="support-pet-layer support-pet-glint-cover" :class="`support-pet-glint-${side}`" :style="{ opacity: blinkVisible ? 1 : 0 }" />
       <span v-for="side in ['left', 'right']" :key="`glint-${side}`" class="support-pet-layer" :class="`support-pet-glint-${side}`" :style="{ backgroundImage: `url(${rig})`, opacity: blinkVisible ? 1 : 0, transform: `scaleY(${glintScale})` }" />

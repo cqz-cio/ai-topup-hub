@@ -1,0 +1,639 @@
+{
+  "schema_version": 1,
+  "verified_at": "2026-11-16T09:12:43.812563+00:00",
+  "base_commit": "b77fdfc9716f3c0714838d4105432e6d466654e0",
+  "branch": "codex/seo-engineering-v5-20261116",
+  "scope": "本地实现、检查与分支推送；未合并、未部署、未写生产数据库。",
+  "remote_ci": "未运行；普通 codex 分支推送不匹配现有 main/dev 的 push 触发条件。",
+  "draft_catalog": {
+    "status": "pending_operator_confirmation",
+    "copy_sha256": "b5ca033580c0321b38727cd5d900ec859aa1e42843d4c30b518d38abe8006c7c",
+    "product_pages": 13,
+    "production_approval_created": false
+  },
+  "tests": {
+    "storefront_passed": 278,
+    "admin_passed": 86,
+    "content_python_passed": 22,
+    "builds": [
+      "storefront typecheck and build",
+      "admin typecheck and build",
+      "backend build"
+    ],
+    "go_vet": "passed",
+    "go_windows": {
+      "passed_packages": 217,
+      "passed_test_events": 3707,
+      "failed_tests": [
+        {
+          "package": "github.com/dujiao-next/internal/logger",
+          "test": "TestNewReleaseWritesToConfiguredFile"
+        },
+        {
+          "package": "github.com/dujiao-next/internal/selfupdate",
+          "test": "TestDetectBlocksSourceBuild"
+        },
+        {
+          "package": "github.com/dujiao-next/internal/selfupdate",
+          "test": "TestDetectReleaseBuild"
+        },
+        {
+          "package": "github.com/dujiao-next/internal/selfupdate",
+          "test": "TestDirWritable"
+        },
+        {
+          "package": "github.com/dujiao-next/internal/selfupdate",
+          "test": "TestBinaryLockIsExclusive"
+        },
+        {
+          "package": "github.com/dujiao-next/internal/selfupdate",
+          "test": "TestConcurrentRollbacksDoNotBothSucceed"
+        },
+        {
+          "package": "github.com/dujiao-next/internal/selfupdate",
+          "test": "TestManagerStartHoldsBinaryLockDuringReleaseFetch"
+        },
+        {
+          "package": "github.com/dujiao-next/internal/selfupdate",
+          "test": "TestStartupGuardReadOnlyStateFailsClosedBeforeMigration"
+        },
+        {
+          "package": "github.com/dujiao-next/internal/selfupdate",
+          "test": "TestStartupGuardBlocksConcurrentRollback"
+        },
+        {
+          "package": "github.com/dujiao-next/internal/selfupdate",
+          "test": "TestExtractBinaryRejectsTruncatedEntry"
+        }
+      ],
+      "failed_packages_rechecked_on_linux": [
+        "internal/logger",
+        "internal/selfupdate"
+      ]
+    }
+  },
+  "http": {
+    "status": "passed",
+    "requests": 69,
+    "pages": 24,
+    "static_dates": {
+      "/": "2026-11-16",
+      "/products": "2026-11-16",
+      "/blog": "2026-11-10",
+      "/notice": "2026-10-13",
+      "/terms": "2026-10-14",
+      "/privacy": "2026-10-13",
+      "/about": null
+    }
+  },
+  "v4_regression": {
+    "status": "passed",
+    "requests": 30,
+    "grok_pages": 8
+  },
+  "browser": {
+    "status": "passed",
+    "views": 29,
+    "default_views": 16,
+    "vault_views": 13,
+    "richtext_cases": 4,
+    "missing_dimensions": 0,
+    "broken_images": 0,
+    "console_errors": 0,
+    "horizontal_overflow": 0
+  },
+  "browser_cases": [
+    {
+      "path": "/",
+      "template": "classic",
+      "viewport": 1440
+    },
+    {
+      "path": "/products/chatgpt-pro-100-ph",
+      "template": "classic",
+      "viewport": 1440
+    },
+    {
+      "path": "/products/chatgpt-go-manual",
+      "template": "classic",
+      "viewport": 1440
+    },
+    {
+      "path": "/products/telegram-premium-3m",
+      "template": "classic",
+      "viewport": 1440
+    },
+    {
+      "path": "/products/gemini-pro-18m-warranty",
+      "template": "classic",
+      "viewport": 1440
+    },
+    {
+      "path": "/categories/gpt-recharge",
+      "template": "classic",
+      "viewport": 1440
+    },
+    {
+      "path": "/categories/telegram-premium-links",
+      "template": "classic",
+      "viewport": 1440
+    },
+    {
+      "path": "/blog",
+      "template": "classic",
+      "viewport": 1440
+    },
+    {
+      "path": "/terms",
+      "template": "classic",
+      "viewport": 1440
+    },
+    {
+      "path": "/privacy",
+      "template": "classic",
+      "viewport": 1440
+    },
+    {
+      "path": "/",
+      "template": "classic",
+      "viewport": 390
+    },
+    {
+      "path": "/products/telegram-premium-3m",
+      "template": "classic",
+      "viewport": 390
+    },
+    {
+      "path": "/products/gemini-pro-18m-warranty",
+      "template": "classic",
+      "viewport": 390
+    },
+    {
+      "path": "/",
+      "template": "classic",
+      "viewport": 320
+    },
+    {
+      "path": "/products/telegram-premium-3m",
+      "template": "classic",
+      "viewport": 320
+    },
+    {
+      "path": "/products/gemini-pro-18m-warranty",
+      "template": "classic",
+      "viewport": 320
+    },
+    {
+      "path": "/",
+      "template": "vault",
+      "viewport": 1440
+    },
+    {
+      "path": "/products",
+      "template": "vault",
+      "viewport": 1440
+    },
+    {
+      "path": "/products/telegram-premium-3m",
+      "template": "vault",
+      "viewport": 1440
+    },
+    {
+      "path": "/products/gemini-pro-18m-warranty",
+      "template": "vault",
+      "viewport": 1440
+    },
+    {
+      "path": "/blog",
+      "template": "vault",
+      "viewport": 1440
+    },
+    {
+      "path": "/blog/chatgpt-plus-code-guide",
+      "template": "vault",
+      "viewport": 1440
+    },
+    {
+      "path": "/notice",
+      "template": "vault",
+      "viewport": 1440
+    },
+    {
+      "path": "/",
+      "template": "vault",
+      "viewport": 390
+    },
+    {
+      "path": "/products/telegram-premium-3m",
+      "template": "vault",
+      "viewport": 390
+    },
+    {
+      "path": "/blog/chatgpt-plus-code-guide",
+      "template": "vault",
+      "viewport": 390
+    },
+    {
+      "path": "/",
+      "template": "vault",
+      "viewport": 320
+    },
+    {
+      "path": "/products/telegram-premium-3m",
+      "template": "vault",
+      "viewport": 320
+    },
+    {
+      "path": "/blog/chatgpt-plus-code-guide",
+      "template": "vault",
+      "viewport": 320
+    }
+  ],
+  "browser_failure_recovery": {
+    "css_failure": "failed head stylesheet restored the readable document",
+    "blocked_script": "CSS deadline restored complete content when JavaScript was blocked",
+    "release_styles": {
+      "stale": "",
+      "partner": "retained",
+      "oldLink": false
+    }
+  },
+  "richtext_fixture_cases": [
+    {
+      "template": "classic",
+      "target": "/products/telegram-premium-3m",
+      "known": [
+        "1200",
+        "630"
+      ],
+      "unknown": [
+        "31",
+        "17"
+      ],
+      "errors": []
+    },
+    {
+      "template": "classic",
+      "target": "/blog/chatgpt-plus-code-guide",
+      "known": [
+        "1200",
+        "630"
+      ],
+      "unknown": [
+        "31",
+        "17"
+      ],
+      "errors": []
+    },
+    {
+      "template": "vault",
+      "target": "/products/telegram-premium-3m",
+      "known": [
+        "1200",
+        "630"
+      ],
+      "unknown": [
+        "31",
+        "17"
+      ],
+      "errors": []
+    },
+    {
+      "template": "vault",
+      "target": "/blog/chatgpt-plus-code-guide",
+      "known": [
+        "1200",
+        "630"
+      ],
+      "unknown": [
+        "31",
+        "17"
+      ],
+      "errors": []
+    }
+  ],
+  "similarity": {
+    "status": "passed",
+    "algorithm": "existing productContentSimilarity.ts 3-gram Jaccard",
+    "threshold": 0.85
+  },
+  "similarity_groups": [
+    {
+      "cluster": "telegram",
+      "maximum_body": 0.573414422241529,
+      "maximum_full_visible": 0.5581912527798369
+    },
+    {
+      "cluster": "automatic",
+      "maximum_body": 0.648471615720524,
+      "maximum_full_visible": 0.6206459784673845
+    },
+    {
+      "cluster": "manual",
+      "maximum_body": 0.691970802919708,
+      "maximum_full_visible": 0.6729641693811075
+    }
+  ],
+  "nginx": {
+    "status": "passed",
+    "cache_cases": [
+      {
+        "path": "/catalog-products/qzweb/aa16fb0f3bb8f6933985a4c8df660946.jpg",
+        "status": 200,
+        "cache_control": "public, max-age=31536000, immutable"
+      },
+      {
+        "path": "/catalog-products/qzweb/categories/7-aa16fb0f3bb8f6933985a4c8df660946.jpg",
+        "status": 200,
+        "cache_control": "public, max-age=31536000, immutable"
+      },
+      {
+        "path": "/catalog-products/glass-20261019/sample.webp",
+        "status": 200,
+        "cache_control": "public, max-age=31536000, immutable"
+      },
+      {
+        "path": "/catalog-products/pro-usd-20261111/sample.webp",
+        "status": 200,
+        "cache_control": "public, max-age=31536000, immutable"
+      },
+      {
+        "path": "/catalog-products/transparent-icons-20261020/sample.webp",
+        "status": 200,
+        "cache_control": "public, max-age=31536000, immutable"
+      },
+      {
+        "path": "/catalog-products/mutable.jpg",
+        "status": 200,
+        "cache_control": "no-cache"
+      },
+      {
+        "path": "/uploads/current.jpg",
+        "status": 200,
+        "cache_control": "no-cache"
+      },
+      {
+        "path": "/storefront-assets.json",
+        "status": 200,
+        "cache_control": "no-cache"
+      }
+    ],
+    "missing_hashed_image": "404 without immutable cache",
+    "production_changed": false
+  },
+  "public_asset_scan": {
+    "status": "passed",
+    "files": 313,
+    "hits": [],
+    "scope": "all built text assets; binary source media unchanged"
+  },
+  "review": {
+    "standards": {
+      "initial_findings": 1,
+      "unresolved": 0
+    },
+    "spec": {
+      "initial_findings": 3,
+      "unresolved": 0
+    }
+  },
+  "limits": [
+    "不包含真实充值、付款、采购、退款或邮件验证。",
+    "Windows 全量 Go 的两个失败包在 Linux 完整复验通过；并非全量 Linux 套件或远端 CI。",
+    "13 篇文案仍待运营确认；没有生产审批文件。",
+    "关于页没有可靠更新时间，省略 lastmod；目标机无 Brotli，保留 gzip。"
+  ],
+  "failed_attempts_retained": [
+    "review-user-tests startup timeout",
+    "review-user-build startup timeout",
+    "review-backend startup/cleanup timeout",
+    "review-process-check self-match",
+    "review-browser Vault notice overflow; fixed and repeated"
+  ],
+  "local_log_evidence": [
+    {
+      "check": "user-tests-final",
+      "status": "passed",
+      "exit_code": 0,
+      "elapsed_seconds": 14.19,
+      "log_name": "20261116-164622-seo-v5-user-tests-final.log",
+      "log_sha256": "f76608af3f756b2357dc0af1ac5ef2bda6f4aec1c529afcee81179f8d2771948"
+    },
+    {
+      "check": "admin-tests",
+      "status": "passed",
+      "exit_code": 0,
+      "elapsed_seconds": 29.04,
+      "log_name": "20261116-162110-seo-v5-admin-tests.log",
+      "log_sha256": "edcd636fcc94c987de2df7fe8651ee170a471ecc99ddfd736db2bc534ab8fa3a"
+    },
+    {
+      "check": "user-build-lf",
+      "status": "passed",
+      "exit_code": 0,
+      "elapsed_seconds": 48.83,
+      "log_name": "20261116-164613-seo-v5-user-build-lf.log",
+      "log_sha256": "cf1ac584642fb7ce76525a53763d63fae2555d1c5a8f52fe11d18367ccd285e8"
+    },
+    {
+      "check": "admin-build",
+      "status": "passed",
+      "exit_code": 0,
+      "elapsed_seconds": 55.2,
+      "log_name": "20261116-162438-seo-v5-admin-build.log",
+      "log_sha256": "cf2e97cfb7667ea0cb6191d99566c4c99b82c1141782dddc73c546148119c01f"
+    },
+    {
+      "check": "go-full-diagnostic",
+      "status": "failed",
+      "exit_code": 1,
+      "elapsed_seconds": 211.92,
+      "log_name": "20261116-162412-seo-v5-go-full-diagnostic.log",
+      "log_sha256": "9b554db1863a94992a2ae6696d4f8a35f8f8da2c76c2d2d80f893eb59298fe54"
+    },
+    {
+      "check": "linux-baseline",
+      "status": "passed",
+      "exit_code": 0,
+      "elapsed_seconds": 17.06,
+      "log_name": "20261116-163309-seo-v5-linux-baseline.log",
+      "log_sha256": "eb1c2a0c199240102ff0f3020b590889ad3cc33e7432ce81b84ae124b9ee4dea"
+    },
+    {
+      "check": "backend-scope-final",
+      "status": "passed",
+      "exit_code": 0,
+      "elapsed_seconds": 28.31,
+      "log_name": "20261116-164623-seo-v5-backend-scope-final.log",
+      "log_sha256": "9f3a4fbcd1bc0ba17911431fc5e7a8231c94e6c7fde7dfae2108184b6d869c35"
+    },
+    {
+      "check": "vet",
+      "status": "passed",
+      "exit_code": 0,
+      "elapsed_seconds": 35.24,
+      "log_name": "20261116-163821-seo-v5-vet.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "check": "content-regression-temp",
+      "status": "passed",
+      "exit_code": 0,
+      "elapsed_seconds": 0.51,
+      "log_name": "20261116-162303-seo-v5-content-regression-temp.log",
+      "log_sha256": "0aa6f33e51d232166e59eb6107133a0663aa943bc6ca701a7fdc02e33d4942c5"
+    },
+    {
+      "check": "http-final",
+      "status": "passed",
+      "exit_code": 0,
+      "elapsed_seconds": 2.02,
+      "log_name": "20261116-164348-seo-v5-http-final.log",
+      "log_sha256": "2492023e49914a7bff6e44b5d41ad4aa678045553cf6bc364e670b0d4f2eb968"
+    },
+    {
+      "check": "v4-regression",
+      "status": "passed",
+      "exit_code": 0,
+      "elapsed_seconds": 1.02,
+      "log_name": "20261116-163627-seo-v5-v4-regression.log",
+      "log_sha256": "fe4b4ee49db5cdb544ba5642a8179dd3c8e393bf6b3da676c09501348c5ce34e"
+    },
+    {
+      "check": "browser-final",
+      "status": "passed",
+      "exit_code": 0,
+      "elapsed_seconds": 37.55,
+      "log_name": "20261116-164745-seo-v5-browser-final.log",
+      "log_sha256": "fdb109d015d245d9c98e46d44baeb083393e7aeec6420f67c8b358c510d0dff7"
+    },
+    {
+      "check": "nginx-local-final",
+      "status": "passed",
+      "exit_code": 0,
+      "elapsed_seconds": 1.52,
+      "log_name": "20261116-163507-seo-v5-nginx-local-final.log",
+      "log_sha256": "cf788f2afd55d66b114e85181612c593ea27792ff5d09dedf4e5f93cc764187e"
+    },
+    {
+      "check": "public-text-scan",
+      "status": "passed",
+      "exit_code": 0,
+      "elapsed_seconds": 3.02,
+      "log_name": "20261116-164833-seo-v5-public-text-scan.log",
+      "log_sha256": "b2370c8a706afbb75dd82013362438dd1aff22b60ccc45aecfde8413e1d2d2d0"
+    },
+    {
+      "check": "format-final",
+      "status": "passed",
+      "exit_code": 0,
+      "elapsed_seconds": 4.53,
+      "log_name": "20261116-163930-seo-v5-format-final.log",
+      "log_sha256": "966182cd5c7ccaa7a5ed2980922eff18bb90e9d3d8cd24e4f822c8f46a456a3d"
+    },
+    {
+      "check": "final-copy-tests",
+      "status": "passed",
+      "exit_code": 0,
+      "elapsed_seconds": 1.77,
+      "log_name": "20261116-163816-seo-v5-final-copy-tests.log",
+      "log_sha256": "88ed62340c588a6d723997204b5e801dfcb50bad0d21e104a3bdb009c5ecac5b"
+    },
+    {
+      "check": "review-user-tests",
+      "status": "passed",
+      "exit_code": 0,
+      "elapsed_seconds": 10.09,
+      "log_name": "20261116-170233-seo-v5-review-user-tests-direct.log",
+      "log_sha256": "6c1967b82ceeb2fae22783b17f01888389e01e0e34afd0324f3c200c9d68cfdb"
+    },
+    {
+      "check": "review-user-build",
+      "status": "passed",
+      "exit_code": 0,
+      "elapsed_seconds": 28.54,
+      "log_name": "20261116-170632-seo-v5-review-notice-build.log",
+      "log_sha256": "0463f0727ace2a8e01cbc41c1e7020a5faee9db31bc9d196c4e3c858aad8c916"
+    },
+    {
+      "check": "review-backend-build",
+      "status": "passed",
+      "exit_code": 0,
+      "elapsed_seconds": 7.04,
+      "log_name": "20261116-170255-seo-v5-review-backend-build.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "check": "review-backend-tests",
+      "status": "passed",
+      "exit_code": 0,
+      "elapsed_seconds": 7.55,
+      "log_name": "20261116-170236-seo-v5-review-go-json.log",
+      "log_sha256": "ee6142de67076943b98dfcd5dfe98c16b1ba46e3df185f18e678efc8ffd37c36"
+    },
+    {
+      "check": "review-browser",
+      "status": "passed",
+      "exit_code": 0,
+      "elapsed_seconds": 56.07,
+      "log_name": "20261116-170721-seo-v5-review-browser-final.log",
+      "log_sha256": "cbf969c4361efe336aade1526a431250c461cc4884ce941ef8f73a1c19419a3c"
+    },
+    {
+      "check": "review-richtext",
+      "status": "passed",
+      "exit_code": 0,
+      "elapsed_seconds": 4.54,
+      "log_name": "20261116-170537-seo-v5-review-richtext.log",
+      "log_sha256": "111ac7f5778d6e5ec59be4b0f4897dee166417535d5990a7311d981b8fcfb1de"
+    },
+    {
+      "check": "review-http",
+      "status": "passed",
+      "exit_code": 0,
+      "elapsed_seconds": 2.02,
+      "log_name": "20261116-170448-seo-v5-review-http.log",
+      "log_sha256": "2492023e49914a7bff6e44b5d41ad4aa678045553cf6bc364e670b0d4f2eb968"
+    },
+    {
+      "check": "review-format",
+      "status": "passed",
+      "exit_code": 0,
+      "elapsed_seconds": 5.03,
+      "log_name": "20261116-170534-seo-v5-review-format.log",
+      "log_sha256": "966182cd5c7ccaa7a5ed2980922eff18bb90e9d3d8cd24e4f822c8f46a456a3d"
+    },
+    {
+      "check": "review-public-scan",
+      "status": "passed",
+      "exit_code": 0,
+      "elapsed_seconds": 3.03,
+      "log_name": "20261116-171019-seo-v5-final-public-scan.log",
+      "log_sha256": "b2370c8a706afbb75dd82013362438dd1aff22b60ccc45aecfde8413e1d2d2d0"
+    },
+    {
+      "check": "review-scope",
+      "status": "passed",
+      "exit_code": 0,
+      "elapsed_seconds": 4.03,
+      "log_name": "20261116-170821-seo-v5-push-scope-final.log",
+      "log_sha256": "44ebdb5914e546d07163d65c4e4c23c90a7c9f0f1f9af4e4c16da0e7a3445ff5"
+    },
+    {
+      "check": "review-copy-tests",
+      "status": "passed",
+      "exit_code": 0,
+      "elapsed_seconds": 1.72,
+      "log_name": "20261116-171221-seo-v5-copy-final-tests.log",
+      "log_sha256": "a3e1c13e64a3b6376f391644c14934b9102b001169c44e59db2ae61db45a7393"
+    },
+    {
+      "check": "review-copy-line-endings",
+      "status": "passed",
+      "exit_code": 0,
+      "elapsed_seconds": 2.03,
+      "log_name": "20261116-171217-seo-v5-copy-line-endings.log",
+      "log_sha256": "f32bd257724087e6b16ad1eafe1aa9ba02bcc22ffed3dad39590c25ab8923067"
+    }
+  ]
+}

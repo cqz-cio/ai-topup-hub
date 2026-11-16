@@ -2,7 +2,9 @@ package container
 
 import (
 	"context"
+	"time"
 
+	"github.com/dujiao-next/internal/constants"
 	adproxyapp "github.com/dujiao-next/internal/modules/adproxy/application"
 	adproxygateway "github.com/dujiao-next/internal/modules/adproxy/infrastructure/adgateway"
 	categoryapp "github.com/dujiao-next/internal/modules/catalog/category/application"
@@ -30,6 +32,7 @@ import (
 	sitemapcatalog "github.com/dujiao-next/internal/modules/sitemap/infrastructure/catalogreader"
 	walletapp "github.com/dujiao-next/internal/modules/wallet/application"
 	"github.com/dujiao-next/internal/platform/database/gormdb"
+	"github.com/dujiao-next/internal/platform/publiccontent"
 	giftcardredeemgormuow "github.com/dujiao-next/internal/workflows/giftcardredeem/infrastructure/gormuow"
 )
 
@@ -60,6 +63,7 @@ func (c *Container) initApplicationServices() {
 			for _, post := range posts {
 				result = append(result, sitemapcontract.PublishedPost{
 					Slug:        post.Slug,
+					Type:        post.Type,
 					CreatedAt:   post.CreatedAt,
 					PublishedAt: post.PublishedAt,
 				})
@@ -67,6 +71,14 @@ func (c *Container) initApplicationServices() {
 			return result, nil
 		}),
 		sitemapcache.New(),
+		func(ctx context.Context) (map[string]time.Time, error) {
+			config, err := c.SettingService.GetByKey(constants.SettingKeySiteConfig)
+			if err != nil {
+				return nil, err
+			}
+			// About settings have no editorial timestamp in the current schema.
+			return publiccontent.LegalModifiedDates(config["legal"]), nil
+		},
 	)
 	if err != nil {
 		logger.Errorw("provider_init_sitemap_failed", "error", err)

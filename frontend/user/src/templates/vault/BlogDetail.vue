@@ -19,7 +19,7 @@
 
       <Card class="p-[30px]">
         <div v-if="post.thumbnail" class="mb-7 h-80 overflow-hidden rounded-md">
-          <img :src="getImageUrl(post.thumbnail)" :alt="getLocalizedText(post.title)" loading="lazy" class="h-full w-full object-cover" />
+          <img :src="getImageUrl(post.thumbnail)" v-bind="imageDimensions(getImageUrl(post.thumbnail))" :alt="getLocalizedText(post.title)" class="h-full w-full object-cover" />
         </div>
 
         <header class="mb-6 border-b pb-6">
@@ -33,7 +33,7 @@
 
         <div
           class="prose max-w-none dark:prose-invert prose-a:text-primary prose-img:rounded-md"
-          v-html="processHtmlForDisplay(readingContent)"
+          v-html="processPublicHtmlForDisplay(readingContent)"
         ></div>
 
         <!-- 相关商品 -->
@@ -49,7 +49,7 @@
               class="flex items-center gap-3.5 rounded-md border bg-secondary p-3 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow)]"
             >
               <div v-if="rp.image" class="h-14 w-14 flex-none overflow-hidden rounded-sm">
-                <img :src="getImageUrl(rp.image)" :alt="getLocalizedText(rp.title)" loading="lazy" class="h-full w-full object-cover" />
+                <img :src="getImageUrl(rp.image)" v-bind="imageDimensions(getImageUrl(rp.image))" :alt="getLocalizedText(rp.title)" loading="lazy" class="h-full w-full object-cover" />
               </div>
               <div class="min-w-0">
                 <div class="truncate font-bold">{{ getLocalizedText(rp.title) }}</div>
@@ -79,13 +79,14 @@
 </template>
 
 <script setup lang="ts">
+import { imageDimensions } from '../../utils/imageDimensions'
 import { useI18n } from 'vue-i18n'
 import { ArrowLeft, AlertCircle, ChevronRight } from 'lucide-vue-next'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { getImageUrl } from '../../utils/image'
-import { processHtmlForDisplay } from '../../utils/content'
+import { processPublicHtmlForDisplay } from '../../utils/content'
 import { useBlogDetail } from '../../composables/useBlogDetail'
 
 const { t } = useI18n()

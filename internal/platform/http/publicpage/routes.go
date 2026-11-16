@@ -12,6 +12,9 @@ import (
 
 // Register preserves real product images and normalizes only public documents.
 func (h *Handler) Register(routes gin.IRoutes, assets fs.FS) {
+	if h.assets == nil {
+		h.assets = assets
+	}
 	register := func(path string, handler gin.HandlerFunc) {
 		routes.GET(path, handler)
 		routes.HEAD(path, handler)

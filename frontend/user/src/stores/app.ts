@@ -81,6 +81,11 @@ export const useAppStore = defineStore('app', () => {
             const requestTime = Date.now()
             const response = await configAPI.get()
             config.value = response.data.data
+            const publicFooter = document.getElementById('public-footer-categories')
+            if (publicFooter) {
+                try { config.value.public_footer_categories = JSON.parse(publicFooter.textContent || '[]') }
+                finally { publicFooter.remove() }
+            }
             const publicLinks = document.getElementById('public-catalog-links')
             if (publicLinks) {
                 try {

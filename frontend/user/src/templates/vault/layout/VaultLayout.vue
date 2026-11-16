@@ -4,7 +4,7 @@
     <header class="sticky top-0 z-50 border-b bg-[color:var(--bg)]">
       <div class="mx-auto flex h-[70px] w-full max-w-[1180px] items-center gap-3 px-4 sm:gap-5 sm:px-6">
         <RouterLink class="inline-flex min-w-0 items-center gap-2.5 text-[19px] font-extrabold tracking-[-0.02em] text-foreground" to="/" :title="brandName">
-          <img v-if="brandLogo" :src="brandLogo" :alt="brandName" class="h-8 max-w-[120px] object-contain sm:max-w-[160px]" />
+          <img v-if="brandLogo" :src="brandLogo" v-bind="imageDimensions(brandLogo)" :alt="brandName" class="h-8 max-w-[120px] object-contain sm:max-w-[160px]" />
           <span v-else class="truncate">{{ brandName }}</span>
         </RouterLink>
 
@@ -91,7 +91,7 @@
       <div class="mx-auto grid w-full max-w-[1180px] grid-cols-1 gap-[30px] px-6 pb-9 pt-[52px] sm:grid-cols-2 lg:grid-cols-[1.7fr_repeat(3,1fr)]">
         <div>
           <RouterLink class="inline-flex items-center gap-2.5 text-[19px] font-extrabold tracking-[-0.02em] text-foreground" to="/">
-            <img v-if="brandLogo" :src="brandLogo" :alt="brandName" class="h-8 max-w-[160px] object-contain" />
+            <img v-if="brandLogo" :src="brandLogo" v-bind="imageDimensions(brandLogo)" :alt="brandName" class="h-8 max-w-[160px] object-contain" />
             <span v-else>{{ brandName }}</span>
           </RouterLink>
           <p class="mt-3 max-w-[36ch] text-[14.5px] text-muted-foreground">{{ brandDescription || t('vault.footer.tagline') }}</p>
@@ -99,6 +99,7 @@
         <div>
           <h4 class="mb-3 text-sm font-bold">{{ t('vault.footer.shop') }}</h4>
           <RouterLink v-if="!isListMode" to="/products" class="flex items-center gap-[7px] py-[5px] text-[14.5px] text-muted-foreground hover:text-primary">{{ t('products.allCategories') }}</RouterLink>
+          <RouterLink v-for="category in categoryLinks" :key="category.path" :to="category.path" class="flex items-center gap-[7px] py-[5px] text-[14.5px] text-muted-foreground hover:text-primary">{{ category.title }}</RouterLink>
           <RouterLink v-if="noticeEnabled" to="/notice" class="flex items-center gap-[7px] py-[5px] text-[14.5px] text-muted-foreground hover:text-primary">{{ t('nav.notice') }}</RouterLink>
           <RouterLink v-if="blogEnabled" to="/blog" class="flex items-center gap-[7px] py-[5px] text-[14.5px] text-muted-foreground hover:text-primary">{{ t('nav.blog') }}</RouterLink>
           <RouterLink to="/me" class="flex items-center gap-[7px] py-[5px] text-[14.5px] text-muted-foreground hover:text-primary">{{ t('navbar.personalCenter') }}</RouterLink>
@@ -132,6 +133,8 @@
 </template>
 
 <script setup lang="ts">
+import { imageDimensions } from '../../../utils/imageDimensions'
+import { useFooterCategories } from '../../../composables/useFooterCategories'
 import SupportContacts from '../../../components/SupportContacts.vue'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -159,6 +162,7 @@ import '../styles/vault.css'
 
 const { t } = useI18n()
 const appStore = useAppStore()
+const categoryLinks = useFooterCategories()
 const cartStore = useCartStore()
 const userAuthStore = useUserAuthStore()
 

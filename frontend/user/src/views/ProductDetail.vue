@@ -69,7 +69,7 @@
               <div class="product-purchase-summary">
                 <div v-if="categoryName || product.tags?.length" class="product-meta">
                 <div v-if="categoryName" class="text-xs uppercase tracking-wider text-muted-foreground">
-                  {{ t('productDetail.categoryLabel') }} · {{ categoryName }}
+                  {{ t('productDetail.categoryLabel') }} · <RouterLink v-if="product.category?.slug" :to="`/categories/${encodeURIComponent(product.category.slug)}`" class="underline">{{ categoryName }}</RouterLink><span v-else>{{ categoryName }}</span>
                 </div>
 
                 <div v-if="product.tags && product.tags.length > 0" class="mb-4 flex flex-wrap gap-2">

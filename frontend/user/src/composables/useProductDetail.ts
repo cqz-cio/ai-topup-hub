@@ -7,6 +7,7 @@ import { seoPlainText, seoText } from '../utils/seo'
 import { defaultShareImage, productSchemaImages } from '../utils/shareSeo'
 import { appendRechargeLinks } from '../utils/gptRecharge'
 import { appendDeliveryPolicy, offerMerchantIdentity } from '../utils/deliveryPolicy'
+import { faqSchema } from '../utils/publicSemantics'
 import { useAppStore } from '../stores/app'
 import { productAPI } from '../api'
 import { getImageUrl } from '../utils/image'
@@ -613,7 +614,7 @@ export function useProductDetail(options: { onLoaded?: () => void } = {}) {
   const productSeoDescription = computed(() => {
     if (!product.value) return ''
     return seoPlainText(seoText(product.value.seo_meta?.description, appStore.locale)
-      || getLocalizedText(product.value.description)) || getLocalizedText(product.value.title)
+      || getLocalizedText(product.value.description) || getLocalizedText(product.value.content)).slice(0,160)
   })
 
   usePageSeo({
@@ -628,6 +629,7 @@ export function useProductDetail(options: { onLoaded?: () => void } = {}) {
     imageHeight: () => Number(product.value?.seo_meta?.og_image_height) || 0,
     imageAlt: () => product.value ? getLocalizedText(product.value.title) : '',
     type: () => 'product',
+    breadcrumbParents: () => product.value?.category?.slug ? [{title:categoryName.value,path:'/categories/'+encodeURIComponent(product.value.category.slug)}] : [],
   })
 
   useHead({
@@ -672,11 +674,12 @@ export function useProductDetail(options: { onLoaded?: () => void } = {}) {
         jsonLd.category = getLocalizedText(product.value.category.name)
       }
 
+      const faq = faqSchema(getLocalizedText(product.value.content), canonical)
       return [{
         key: 'product-schema',
         type: 'application/ld+json',
         innerHTML: JSON.stringify(jsonLd).replace(/</g, '\\u003c'),
-      }]
+      }, ...(faq ? [{key:'product-faq',type:'application/ld+json',innerHTML:JSON.stringify(faq).replace(/</g,'\\u003c')}] : [])]
     },
   })
 

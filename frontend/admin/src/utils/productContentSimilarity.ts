@@ -10,7 +10,7 @@ export function normalizeProductContent(content: string): string {
     })
     .replace(/&(nbsp|amp|lt|gt|quot|apos);/gi, ' ')
     .normalize('NFKC').toLowerCase()
-  return visible.replace(/\b(ultra|super|premium|plus|monthly|yearly|cny|rmb)\b|年付|月付|暂时缺货|缺货|有货|库存/gi, '')
+  return visible.replace(/\b(ultra|super|premium|plus|pro|go|monthly|yearly|cny|rmb|egp?|ph)\b|\b\d+\s*x\b|[一二三四六十二]+个?月|\d+\s*个月|半年|一年|三个月|六个月|十二个月|菲区|菲律宾|埃及|美金|年付|月付|暂时缺货|缺货|有货|库存/gi, '')
     .replace(/[\p{N}\p{P}\p{S}\s]/gu, '')
 }
 
