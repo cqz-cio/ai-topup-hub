@@ -1,0 +1,150 @@
+{
+  "recoveryDate": "2026-11-16",
+  "productionRelease": "20261115-235900",
+  "recordedOriginalCommit": "2c07968190a43d8b4067a17d38a97cc970b00b62",
+  "originalGitObjectRecovered": false,
+  "scope": "Exact production Node server sources and identified verification files. Missing React/Vue UI rebuilt from published artifacts; see wudi-ui-recovery-20261116.json. Original Git object and original UI source files remain unavailable.",
+  "serverFiles": {
+    "server/wudi.mjs": "ec04e222438adfed1dce5850cb857d42cf7c4d50c60f5dd6819d3de45206f249",
+    "server/service.mjs": "a9f9a095f4d0724242708ba3b358f43fdfd37e7e294ffc7d16ae160628a96cfb",
+    "server/main.mjs": "0d62c455184c88c00d54ba902d63c270ca0036c67167304c88cad65da24dd2fc",
+    "server/preflight-details.mjs": "b5057f7728ae61928e82bacf3724bf8a58cba2cbd58741d0020115ba1eb75386",
+    "server/partner.mjs": "e23ea097deaba04f6bd702018884f326233d8500710e86230eb62db11f23bbb8",
+    "server/abuse.mjs": "79035ddb95aa2a1fc60184da46e3d73cc67fd68a0cc77cc41d41bcabd07a3d54",
+    "server/store.mjs": "da6cf10a371ef09ad7a343abeb202d7a833b6abbbed1d894ae11c0a9978772e8",
+    "server/mock-wudi.mjs": "efa52c8241a0ae7da508bade92891cc6f438b1d600f1deae04f4ec4df50e84cb",
+    "server/partner-orders.mjs": "bc4689b5f461364f2ca7dc00c1742efb4bd4e832f58bf88301ee1555faa8bd6b",
+    "server/management.mjs": "7a673291d22b1cfc8590f1f914f397b61c290bd3176c267d45a4dbb561b9a682",
+    "server/mock-wudi-v2.mjs": "e0d3887a0f3b3737f288aa52dd9cdf1b04c0854447527ed9d471fd863ddb7dd4",
+    "server/security.mjs": "604d6673ac64490c25f62763a76845e83c37b016778f049b1abf4ef0c547f26b",
+    "server/http.mjs": "19e7fa8340d3d027712a68e225850e630183fd5ceeb72637b720679a681219a8",
+    "server/mock.mjs": "9b9ae0aa09c8e678d4b2fef8d018946c3cae6b33b69b3f8744a4ec100fc38709",
+    "server/wudi-v2.mjs": "704f858923c194b6b1e5548ab9a914af3ceb97f0bffb04efa44c742b96656797",
+    "server/partner-links.mjs": "b9266a4bc44278f257242d1857f362525e905cf576c2d137b973da0fddc2dcbc",
+    "server/delivery.mjs": "bf974fe3bac1cc6b88e02d733d3009661fa6974b0934d1a2e97e6a65a9e8462d"
+  },
+  "verificationFiles": [
+    {
+      "path": "redemption-center/scripts/backup.mjs",
+      "origin": "production-runtime-source",
+      "sha256": "c73a26b17422ab3c73503fb22086a72fdb5d727b7e6b84bbe6fbe2f9f69bd4ba",
+      "bytes": 588
+    },
+    {
+      "path": "redemption-center/package.json",
+      "origin": "verification-source",
+      "sha256": "db1c8ea27514e495d4989568b3aba63feb560653be78e6c0384af2bd14ba1a4d",
+      "bytes": 615
+    },
+    {
+      "path": "redemption-center/src/api.js",
+      "origin": "verification-source",
+      "sha256": "40857594e0d01c26220c30a79f80779d7d8ff734827a3143c69f28cd0be6f904",
+      "bytes": 3045
+    },
+    {
+      "path": "redemption-center/src/batch.js",
+      "origin": "verification-source",
+      "sha256": "86ddc1ec726577aa1dcf99754e7b98caf720466b7b7a15532482f7a6399480e2",
+      "bytes": 1059
+    },
+    {
+      "path": "redemption-center/src/link-flow.js",
+      "origin": "verification-source",
+      "sha256": "8bafe4894c63fae29c63ec54976f7387743fe6996eb9a9dfde8759a46e285fb6",
+      "bytes": 1869
+    },
+    {
+      "path": "redemption-center/.openai/hosting.json",
+      "origin": "verification-source",
+      "sha256": "d532abb65cf9ae20634b464d954cb4a08a0de9f3cd3cdf7f9c3ec8948826d947",
+      "bytes": 31
+    },
+    {
+      "path": "redemption-center/worker/index.js",
+      "origin": "verification-source",
+      "sha256": "2dd0615a445143933d88d4271f54f5d63ee951421fcd08c5a7617bb09c564389",
+      "bytes": 483
+    },
+    {
+      "path": "redemption-center/tests/startup.test.mjs",
+      "origin": "verification-source",
+      "sha256": "7f8c739f7ca5995a596b629e3ea09e729eb14adfb3fc99dc54fd6afacc5c2d70",
+      "bytes": 1899
+    },
+    {
+      "path": "redemption-center/tests/wudi-delivery.test.mjs",
+      "origin": "verification-source",
+      "sha256": "ebf1692a5a55e275058c4f00622b99e4680a18f015db0cf380cf46e65d437bee",
+      "bytes": 7547
+    },
+    {
+      "path": "redemption-center/tests/wudi.test.mjs",
+      "origin": "verification-source",
+      "sha256": "abf13c1ff66694117b8b4282d6500e3a71c528c37ace2f4d8f5854be5f689e47",
+      "bytes": 14309
+    },
+    {
+      "path": "redemption-center/tests/wudi-v2.test.mjs",
+      "origin": "verification-source",
+      "sha256": "4c9cc367de78a8d33ee57c974931a9849d5ee2152c75e4ed88ec360c9afd3ff2",
+      "bytes": 19637
+    },
+    {
+      "path": "redemption-center/tests/sites-worker.test.mjs",
+      "origin": "verification-source",
+      "sha256": "96af7b48906c6460c793356d7b6952f7d5026dbf5a502bec0d9297ff04201c26",
+      "bytes": 2219
+    },
+    {
+      "path": "redemption-center/tests/privacy.test.mjs",
+      "origin": "verification-source",
+      "sha256": "e43577a04119564b44e8ffe02b643baa04da998389434c2eb0d148946675adca",
+      "bytes": 10646
+    },
+    {
+      "path": "redemption-center/tests/management.test.mjs",
+      "origin": "verification-source",
+      "sha256": "913be0d48df59a0027f9c8f8eadf6d10cf145a8979ed50bbddfd0b03bdec7d1c",
+      "bytes": 11332
+    },
+    {
+      "path": "redemption-center/tests/management-wudi.test.mjs",
+      "origin": "verification-source",
+      "sha256": "4d454c49dcea16c0afc3b87704cd2fddc2ac6d60e56f5cf36589f10a0e8e2506",
+      "bytes": 16371
+    },
+    {
+      "path": "redemption-center/README.md",
+      "origin": "production-release-readme",
+      "sha256": "14ce9969a5cfcc019e9552d2b115c001d29f3c4e8c318984696eef058db3297e",
+      "bytes": 34109
+    }
+  ],
+  "excludedIsolatedFixture": {
+    "path": "redemption-center/tests/shop-fixture.mjs",
+    "reason": "Server verification records identify this as an isolated replacement. Preserve main fixture instead of treating it as original production source."
+  },
+  "preservedMainTests": [
+    {
+      "path": "redemption-center/tests/redemption.test.mjs",
+      "reason": "Keep existing tier, account-ownership and billing safety regressions omitted by the older server verification snapshot."
+    }
+  ],
+  "sourceHashMeaning": "serverFiles is the exact production byte manifest; verificationFiles records captured source inputs before recovery documentation annotations.",
+  "validation": {
+    "nodeVersion": "24.15.0",
+    "serverHashMatches": 17,
+    "nodeTestsPassed": 139,
+    "nodeTestsSkipped": 0,
+    "serialTestConcurrency": 1,
+    "retainedFrontendBuildPassed": true,
+    "productionFrontendBuildMatch": false,
+    "realTransactions": false,
+    "initialFailures": [
+      "Sites packaging test before local build existed",
+      "One Wudi delivery test file exited abnormally in parallel full suite; focused and serial full rechecks passed."
+    ]
+  },
+  "frontendReconstructionRecord": "wudi-ui-recovery-20261116.json"
+}

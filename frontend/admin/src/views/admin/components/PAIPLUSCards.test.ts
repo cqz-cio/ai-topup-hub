@@ -68,7 +68,7 @@ describe('PAIPLUS cards in shop administration', () => {
     mock.reveal.mockResolvedValue({ ...full, capabilities })
     mock.check.mockResolvedValue({ ...card, capabilities, upstream_checked_at: 1000, upstream: { status: 'no_record', used: null, can_resubmit: false, scope: 'partner_order', message: '未查到本代理的兑换记录；不能据此退款。' } })
     const host = await mount(); button(host, '查看双码与管理').click(); await flush()
-    expect(host.textContent).toContain('本站待兑换')
+    expect(host.textContent).toContain('查询范围限于本代理的兑换记录；未查到记录时使用状态待核验。')
     expect(button(host, '检查并销毁本站卡密')).toBeUndefined()
     expect(host.querySelector('#paiplus-revoke-reason')).toBeNull()
     button(host, '查询上游记录').click(); await flush()
@@ -89,5 +89,48 @@ describe('PAIPLUS cards in shop administration', () => {
     button(host, '核验上游状态').click(); await flush(); button(host, '关闭并隐藏卡密').click()
     resolve({ ...card, upstream: { status: 'no_record' } }); await flush()
     expect(host.textContent).not.toContain(full.code); expect(host.textContent).not.toContain('未查到本代理兑换记录')
+  })
+
+  it('offers an unknown-state filter without treating unverified cards as unused', async () => {
+    mock.list.mockResolvedValue({ cards: [{ ...card, status: 'unknown' }], total: 1, counts: { unknown: 1, unused: 0 } })
+    const host = await mount()
+    const select = host.querySelector<HTMLSelectElement>('select[aria-label="卡密状态"]')!
+    expect([...select.options].find(option => option.value === 'unknown')?.text).toBe('待核验')
+    expect(host.querySelector('tbody')?.textContent).toContain('待核验')
+    expect(host.querySelector('tbody')?.textContent).not.toContain('未使用')
+    select.value = 'unknown'; select.dispatchEvent(new Event('change')); await flush()
+    expect(mock.list).toHaveBeenLastCalledWith({ query: '', status: 'unknown', page: 1, page_size: 20 })
+    const counter = [...host.querySelectorAll<HTMLButtonElement>('button[aria-pressed]')].find(el => el.textContent?.includes('待核验'))!
+    expect(counter.getAttribute('aria-pressed')).toBe('true')
+    counter.click(); await flush()
+    expect(mock.list).toHaveBeenLastCalledWith({ query: '', status: '', page: 1, page_size: 20 })
+  })
+
+  it.each([
+    ['used', '已使用'], ['unused', '未使用（本次查询结果）'], ['processing', '兑换进行中'],
+    ['review', '等待上游人工核对'], ['disabled', '上游已停用'], ['new_upstream_state', '待核验'],
+  ])('shows the Wudi main-site %s status without inferring refund eligibility', async (status, label) => {
+    const capabilities = { status_scope: 'card', can_revoke: false, revoke_message: '请人工核对。' }
+    mock.reveal.mockResolvedValue({ ...full, capabilities, upstream: { status, source: 'wudi_main', used: null, can_resubmit: false } })
+    const host = await mount(); button(host, '查看双码与管理').click(); await flush()
+    expect(host.textContent).toContain(`上游状态：${label}`)
+    expect(host.textContent).not.toContain('未使用，可兑换')
+    expect(button(host, '检查并销毁本站卡密')).toBeUndefined()
+    expect(host.textContent).not.toContain('兑换结果：')
+  })
+
+  it('shows Wudi redemption result and time independently of main-site status', async () => {
+    const updated = '2026-11-15T15:59:00.000Z'
+    mock.reveal.mockResolvedValue({ ...full, upstream: { status: 'used', source: 'wudi_main', used: true, can_resubmit: false, redemption_status: 'succeeded', redemption_updated_at: updated } })
+    const host = await mount(); button(host, '查看双码与管理').click(); await flush()
+    expect(host.textContent).toContain('上游状态：已使用')
+    expect(host.textContent).toContain('兑换结果：兑换成功')
+    expect(host.textContent).toContain(new Date(updated).toLocaleString('zh-CN', { hour12: false }))
+    mock.check.mockResolvedValue({ ...card, upstream: { status: 'review', source: 'wudi_main', used: null, can_resubmit: false, redemption_status: 'unrecognized' } })
+    button(host, '核验上游状态').click(); await flush()
+    expect(host.textContent).toContain('等待上游人工核对')
+    expect(host.textContent).toContain('兑换结果：待核验')
+    expect(host.textContent).not.toContain(new Date(updated).toLocaleString('zh-CN', { hour12: false }))
+    expect(host.textContent).toContain(full.code); expect(host.textContent).toContain(full.source_code)
   })
 })

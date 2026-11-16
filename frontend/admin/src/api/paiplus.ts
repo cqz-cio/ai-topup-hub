@@ -21,7 +21,7 @@ export interface PAIPLUSCard {
   updated_at: number
   revoked_at: number
   upstream_checked_at: number
-  upstream: { status: string; used: boolean | null; can_resubmit: boolean; plan?: string; used_at?: string | number; scope?: 'partner_order'; message?: string } | null
+  upstream: { status: string; used: boolean | null; can_resubmit: boolean; plan?: string; used_at?: string | number; scope?: 'card' | 'partner_order'; source?: 'wudi_main'; redemption_status?: string | null; redemption_updated_at?: string | null; message?: string } | null
   capabilities?: PAIPLUSCapabilities
   submitted: boolean
   attempt_state: string | null

@@ -1,0 +1,2 @@
+# Recovered production Node sources are verified by their exact SHA256.
+redemption-center/server/*.mjs text eol=lf

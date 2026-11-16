@@ -1,0 +1,34 @@
+name: Wudi redemption recovery
+
+on:
+  pull_request:
+    paths:
+      - 'redemption-center/**'
+      - 'docs/history/wudi-source-recovery-20261116.json'
+      - '.github/workflows/wudi-source-recovery.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  redemption:
+    name: Verify recovered redemption service and UI
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.15.0'
+          cache: npm
+          cache-dependency-path: redemption-center/package-lock.json
+      - name: Install locked dependencies
+        working-directory: redemption-center
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Build reconstructed frontend
+        working-directory: redemption-center
+        run: npm run build
+      - name: Run recovered and existing safety regressions
+        working-directory: redemption-center
+        run: node --test --test-concurrency=1 --test-timeout=60000 tests/*.test.mjs
