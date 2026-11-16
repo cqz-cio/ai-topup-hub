@@ -28,7 +28,7 @@ test('legacy encrypted database upgrades without changing its card pairs or prio
   t.after(()=>rmSync(folder,{recursive:true,force:true}));
   const old=new Store(path);
   old.db.exec('DROP TABLE card_operations');
-  for(const column of ['order_id','order_no','product_id','sku_id','upstream_snapshot_enc','upstream_checked_at','revoked_at'])old.db.exec(`ALTER TABLE cards DROP COLUMN ${column}`);
+  for(const column of ['order_id','order_no','product_id','sku_id','upstream_snapshot_enc','upstream_checked_at','upstream_card_status','revoked_at'])old.db.exec(`ALTER TABLE cards DROP COLUMN ${column}`);
   old.db.exec('ALTER TABLE audit DROP COLUMN actor');
   old.run('INSERT INTO cards(id,fingerprint,code_enc,source_hash,source_enc,reference,label,status,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?)',f.card.id,f.card.fingerprint,f.card.code_enc,f.card.source_hash,f.card.source_enc,f.card.reference,'旧卡','ready',1,1);
   old.run("INSERT INTO audit(action,subject,at) VALUES('issue',?,1)",f.card.id);old.close();
@@ -36,6 +36,7 @@ test('legacy encrypted database upgrades without changing its card pairs or prio
   try {
     const card=upgraded.get('SELECT * FROM cards');assert.equal(f.crypt.decrypt(card.code_enc),f.code);assert.equal(f.crypt.decrypt(card.source_enc),f.source);
     assert.equal(card.revoked_at,0);assert.equal(card.status,'ready');assert.equal(upgraded.get('SELECT * FROM audit').actor,'system');
+    assert.equal(card.upstream_card_status,'');
     assert.equal(upgraded.get('SELECT count(*) n FROM card_operations').n,0);
   } finally {upgraded.close();}
 });

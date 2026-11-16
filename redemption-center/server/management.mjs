@@ -7,7 +7,7 @@ const messages={
   CARD_BUSY:'销毁失败：卡密正在核验，请稍后重试。',
   CHECK_UNAVAILABLE:'销毁失败：暂时无法确认上游卡密是否有效，请稍后重试，不要据此退款。',
 };
-const statusGroup=c=>c.revoked_at?'revoked':({ready:'unused',disabled:'unused',completed:'used',processing:'processing',revoking:'revoking',invalid:'invalid',failed:'invalid'}[c.status]||'unknown');
+const statusGroup=(c,links)=>c.revoked_at?'revoked':links&&['ready','disabled'].includes(c.status)?(c.upstream_card_status==='unused'?'unused':'unknown'):({ready:'unused',disabled:'unused',completed:'used',processing:'processing',revoking:'revoking',invalid:'invalid',failed:'invalid'}[c.status]||'unknown');
 const short=(v,n=120)=>typeof v==='string'?v.slice(0,n):'';
 const fail=code=>new Problem(code,messages[code]||'卡密操作未完成。',409);
 
@@ -17,13 +17,19 @@ export class CardManagement {
   constructor(service) { this.service=service; this.store=service.store; this.vault=service.vault; this.jobs=new Map(); }
   card(cardID) { const c=this.store.get('SELECT * FROM cards WHERE id=?',String(cardID||'')); if(!c)throw new Problem('NOT_FOUND','卡密不存在。',404); return c; }
   snapshot(c) { return c.upstream_snapshot_enc?JSON.parse(this.vault.decrypt(c.upstream_snapshot_enc)):null; }
+  capabilities() {
+    const main=typeof this.service.links?.partner.cardStatus==='function';
+    return {status_scope:this.service.links&&!main?'partner_order':'card',can_revoke:!this.service.links,
+      revoke_message:this.service.links?(main?'当前可查询上游卡密状态，包含主站手动兑换；上游未提供退款销毁接口，退款前仍需人工核对。':'当前上游仅提供本代理的兑换记录，未提供卡密未使用证明及退款销毁接口。请人工核对，不能仅凭未查到记录退款。'):null};
+  }
   row(c) {
     const a=c.attempt_id?this.store.get('SELECT state,submitted_at FROM attempts WHERE id=?',c.attempt_id):null;
+    const link=this.service.links?.latest(c.id);
     const reference=/^shop:(\d+):order:(\d+):(\d+)$/.exec(c.reference);
     return {id:c.id,code:maskedCard(this.vault.decrypt(c.code_enc)),source_code:'••••••'+this.vault.decrypt(c.source_enc).slice(-4),
       reference:c.reference,order_id:c.order_id||Number(reference?.[2]||0),order_no:c.order_no,product_id:c.product_id,sku_id:c.sku_id,label:c.label,
-      status:statusGroup(c),local_status:c.status,created_at:c.created_at,updated_at:c.updated_at,revoked_at:c.revoked_at,
-      upstream_checked_at:c.upstream_checked_at,upstream:this.snapshot(c),attempt_state:a?.state||null,submitted:!!a?.submitted_at};
+      status:statusGroup(c,this.service.links),local_status:c.status,created_at:c.created_at,updated_at:c.updated_at,revoked_at:c.revoked_at,
+      upstream_checked_at:c.upstream_checked_at,upstream:this.snapshot(c),attempt_state:link?.state||a?.state||null,submitted:!!a?.submitted_at,external_link_created:!!link,capabilities:this.capabilities()};
   }
   list(input={}) {
     const page=Math.max(1,Math.min(100000,Number.isSafeInteger(input.page)?input.page:1));
@@ -37,13 +43,19 @@ export class CardManagement {
     }
     for(const k of ['order_id','product_id'])if(Number.isSafeInteger(input[k])&&input[k]>0){clauses.push(`${k}=?`);args.push(input[k]);}
     const statuses={unused:['ready','disabled'],used:['completed'],processing:['processing'],revoking:['revoking'],revoked:['revoked'],invalid:['invalid','failed']};
-    if(input.status) {if(!statuses[input.status])throw new Problem('FILTER_INVALID','请选择有效卡密状态。');clauses.push(`status IN (${statuses[input.status].map(()=>'?').join(',')})`);args.push(...statuses[input.status]);}
+    if(input.status==='unknown') {
+      clauses.push(this.service.links?"status IN ('ready','disabled') AND upstream_card_status!='unused' AND revoked_at=0":"status NOT IN ('ready','disabled','completed','processing','revoking','revoked','invalid','failed') AND revoked_at=0");
+    } else if(input.status) {
+      if(!statuses[input.status])throw new Problem('FILTER_INVALID','请选择有效卡密状态。');
+      clauses.push(`status IN (${statuses[input.status].map(()=>'?').join(',')})`);args.push(...statuses[input.status]);
+      if(input.status==='unused'&&this.service.links)clauses.push("upstream_card_status='unused' AND revoked_at=0");
+    }
     const where=clauses.length?' WHERE '+clauses.join(' AND '):'';
     const total=this.store.get('SELECT count(*) n FROM cards'+where,...args).n;
     const cards=this.store.all('SELECT * FROM cards'+where+' ORDER BY created_at DESC,id LIMIT ? OFFSET ?',...args,size,(page-1)*size).map(c=>this.row(c));
     const counts={unused:0,used:0,processing:0,revoking:0,revoked:0,invalid:0,unknown:0};
-    for(const c of this.store.all('SELECT status,revoked_at,count(*) n FROM cards GROUP BY status,revoked_at'))counts[statusGroup(c)]+=c.n;
-    return {cards,total,page,page_size:size,counts};
+    for(const c of this.store.all('SELECT status,revoked_at,upstream_card_status,count(*) n FROM cards GROUP BY status,revoked_at,upstream_card_status'))counts[statusGroup(c,this.service.links)]+=c.n;
+    return {cards,total,page,page_size:size,counts,capabilities:this.capabilities()};
   }
   detail(cardID,actor) {
     const c=this.card(cardID);this.store.audit('reveal_card_pair',c.id,actor);
@@ -53,6 +65,22 @@ export class CardManagement {
   }
   async readSource(c,attemptID=c.attempt_id) {
     const a=attemptID?this.store.get('SELECT * FROM attempts WHERE id=?',attemptID):null;
+    const links=this.service.links;
+    // Submitted legacy attempts retain their original provider. Management
+    // queries must never create a preview/link or retry a pending creation.
+    if(links && !a?.submitted_at) {
+      if(typeof links.partner.cardStatus==='function')return links.partner.cardStatus(this.vault.decrypt(c.source_enc));
+      const row=links.latest(c.id),data=row?links.data(row):null;
+      if(row && row.key_hash!==links.keyHash)throw new Error('Partner credential changed');
+      let result;
+      if(data?.id)result=await links.partner.status(data.id);
+      else if(links.partner.protocol===2) {
+        try {result=(await links.partner.lookup(this.vault.decrypt(c.source_enc))).order;}
+        catch(error) {if(error?.code!=='INTENT_NOT_FOUND')throw error;}
+        if(!result)return {status:'no_record',used:null,can_resubmit:false,scope:'partner_order',message:'未查到本代理的兑换记录；这不代表上游卡密未使用或可以退款。'};
+      } else return {status:'unverified',used:null,can_resubmit:false,scope:'partner_order',message:'尚未建立可查询的兑换记录，当前接口不能直接核验卡密是否未使用。'};
+      return {status:short(result.status,40),used:result.status==='succeeded'?true:null,can_resubmit:false,scope:'partner_order',message:'已查询本代理兑换记录；记录状态不等同于卡密未使用证明。'};
+    }
     const device=a?this.service.device(a):'management-'+this.vault.hash('management-device',c.id).slice(0,48);
     const source=this.vault.decrypt(c.source_enc);
     const data=await this.service.partner.call('lookup',{code:source},device,{timeout:15000});
@@ -61,7 +89,8 @@ export class CardManagement {
     return {status:short(data.status,40),used:data.used,can_resubmit:data.can_resubmit,plan:short(data.plan,80),used_at:typeof data.used_at==='number'?data.used_at:short(data.used_at,80)};
   }
   saveSnapshot(c,snapshot) {
-    this.store.run('UPDATE cards SET upstream_snapshot_enc=?,upstream_checked_at=? WHERE id=?',this.vault.encrypt(JSON.stringify(snapshot)),Date.now(),c.id);
+    const cardStatus=snapshot.scope==='card'&&snapshot.source==='wudi_main'?snapshot.status:'';
+    this.store.run('UPDATE cards SET upstream_snapshot_enc=?,upstream_checked_at=?,upstream_card_status=? WHERE id=?',this.vault.encrypt(JSON.stringify(snapshot)),Date.now(),cardStatus,c.id);
   }
   async refresh(cardID,actor='system') {
     const c=this.card(cardID);
@@ -73,16 +102,22 @@ export class CardManagement {
       if(!now.revoked_at && now.status!=='revoking' && !a?.submitted_at) {
         let status=now.status;
         if(snapshot.used || ['used','completed'].includes(snapshot.status))status='completed';
-        else if(['queued','processing','submitting','uncertain'].includes(snapshot.status))status='processing';
-        else if(['unknown','invalid','expired','disabled','revoked'].includes(snapshot.status))status='invalid';
+        else if(snapshot.scope==='partner_order') {
+          // An expired/failed redemption is not an invalid card. Do not let a
+          // record-only lookup undo completion, disabling or permanent holds.
+          if(['ready','processing'].includes(status) && ['awaiting_customer','queued','running','captcha_required','manual_review','uncertain','retryable_no_task'].includes(snapshot.status))status='processing';
+        }
+        else if(['queued','processing','review','submitting','uncertain'].includes(snapshot.status)&&['ready','processing'].includes(status))status='processing';
+        else if(['unknown','invalid','expired','disabled','revoked'].includes(snapshot.status)&&['ready','processing'].includes(status))status='invalid';
         // Never automatically re-enable invalid/used/disabled cards.
-        this.store.run('UPDATE cards SET status=?,updated_at=? WHERE id=?',status,Date.now(),c.id);
+        if(status!==now.status)this.store.run('UPDATE cards SET status=?,updated_at=? WHERE id=?',status,Date.now(),c.id);
       }
       this.store.audit('check_card_status',c.id,actor);
     });
     return this.row(this.card(c.id));
   }
   async revoke(input,actor) {
+    if(this.service.links)throw new Problem('CHECK_UNAVAILABLE','当前兑换协议不提供卡密未使用核验或撤销链接，不能自动销毁确认退款，请人工核对。',409);
     const {card_id:cardID,request_id:requestID,confirmed}=input,reason=short(input.reason,500).trim();
     if(confirmed!==true || !reason || !/^[A-Za-z0-9_-]{16,80}$/.test(requestID||''))throw new Problem('CONFIRM_REQUIRED','请填写销毁原因，并确认永久停用这张本站卡密。');
     let job=this.store.transaction(()=>{

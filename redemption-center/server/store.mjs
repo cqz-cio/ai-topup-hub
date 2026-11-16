@@ -34,9 +34,17 @@ export class Store {
         finished_at INTEGER
       );
       CREATE UNIQUE INDEX IF NOT EXISTS card_operation_pending ON card_operations(card_id) WHERE state='pending';
+      CREATE TABLE IF NOT EXISTS partner_redemptions (
+        id TEXT PRIMARY KEY, card_id TEXT NOT NULL REFERENCES cards(id), sequence INTEGER NOT NULL,
+        device_hash TEXT NOT NULL, request_id TEXT NOT NULL UNIQUE, key_hash TEXT NOT NULL,
+        state TEXT NOT NULL, data_enc TEXT NOT NULL DEFAULT '', exposed_at INTEGER,
+        next_poll INTEGER NOT NULL DEFAULT 0, created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL,
+        UNIQUE(card_id,sequence)
+      );
+      CREATE INDEX IF NOT EXISTS partner_redemptions_poll ON partner_redemptions(state,next_poll);
     `);
     const columns=new Set(this.all('PRAGMA table_info(cards)').map(c=>c.name));
-    for(const [name,type] of Object.entries({order_id:'INTEGER NOT NULL DEFAULT 0',order_no:"TEXT NOT NULL DEFAULT ''",product_id:'INTEGER NOT NULL DEFAULT 0',sku_id:'INTEGER NOT NULL DEFAULT 0',upstream_snapshot_enc:"TEXT NOT NULL DEFAULT ''",upstream_checked_at:'INTEGER NOT NULL DEFAULT 0',revoked_at:'INTEGER NOT NULL DEFAULT 0'})) {
+    for(const [name,type] of Object.entries({order_id:'INTEGER NOT NULL DEFAULT 0',order_no:"TEXT NOT NULL DEFAULT ''",product_id:'INTEGER NOT NULL DEFAULT 0',sku_id:'INTEGER NOT NULL DEFAULT 0',upstream_snapshot_enc:"TEXT NOT NULL DEFAULT ''",upstream_checked_at:'INTEGER NOT NULL DEFAULT 0',upstream_card_status:"TEXT NOT NULL DEFAULT ''",revoked_at:'INTEGER NOT NULL DEFAULT 0'})) {
       if(!columns.has(name))this.db.exec(`ALTER TABLE cards ADD COLUMN ${name} ${type}`);
     }
     if(!this.all('PRAGMA table_info(audit)').some(c=>c.name==='actor'))this.db.exec("ALTER TABLE audit ADD COLUMN actor TEXT NOT NULL DEFAULT 'system'");

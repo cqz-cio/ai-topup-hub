@@ -7,6 +7,8 @@ import { Partner } from './partner.mjs';
 import { MockPartner } from './mock.mjs';
 import { RedemptionService } from './service.mjs';
 import { makeServer } from './http.mjs';
+import { WudiV2 } from './wudi-v2.mjs';
+import { MockWudiV2 } from './mock-wudi-v2.mjs';
 
 export function start(env=process.env) {
   const mode=env.REDEMPTION_MODE;
@@ -20,8 +22,12 @@ export function start(env=process.env) {
   if(env.REDEMPTION_ADMIN_TOKEN===env.REDEMPTION_INTEGRATION_TOKEN)throw new Error('Use separate admin and integration credentials');
   if(env.REDEMPTION_MANAGEMENT_TOKEN && (env.REDEMPTION_MANAGEMENT_TOKEN.length<32 || [env.REDEMPTION_ADMIN_TOKEN,env.REDEMPTION_INTEGRATION_TOKEN].includes(env.REDEMPTION_MANAGEMENT_TOKEN)))throw new Error('Use a separate management credential with at least 32 characters');
   const store=new Store(env.REDEMPTION_DB||resolve('runtime/redemption.db'));
-  const partner=mode==='mock'?new MockPartner(store):new Partner({password:env.CDK_PARTNER_PASSWORD});
-  const service=new RedemptionService({store,vault:vault(env.REDEMPTION_MASTER_KEY),partner,publicOrigin,mock:mode==='mock'});
+  const provider=env.REDEMPTION_PROVIDER||'legacy';
+  if(!['legacy','wudi'].includes(provider))throw new Error('Invalid REDEMPTION_PROVIDER');
+  const partner=mode==='mock'?new MockPartner(store):env.CDK_PARTNER_PASSWORD?new Partner({password:env.CDK_PARTNER_PASSWORD}):{call:async()=>{throw new Error('Legacy provider unavailable');}};
+  if(mode==='live'&&provider==='legacy'&&!env.CDK_PARTNER_PASSWORD)throw new Error('CDK_PARTNER_PASSWORD is required in legacy mode');
+  const linkPartner=provider==='wudi'?(mode==='mock'?new MockWudiV2(store):new WudiV2({key:env.WUDI_PARTNER_KEY})):null;
+  const service=new RedemptionService({store,vault:vault(env.REDEMPTION_MASTER_KEY),partner,linkPartner,publicOrigin,mock:mode==='mock'});
   const config={mode,publicOrigin,trustProxy:env.REDEMPTION_TRUST_PROXY==='loopback',adminToken:env.REDEMPTION_ADMIN_TOKEN,integrationToken:env.REDEMPTION_INTEGRATION_TOKEN,managementToken:env.REDEMPTION_MANAGEMENT_TOKEN,examples:[]};
   const examples=group=>{
     const result=[];
@@ -44,7 +50,7 @@ export function start(env=process.env) {
   const cardSync=setInterval(()=>service.management.reconcile().catch(()=>{}),30000);cardSync.unref();
   server.listen(port,host,()=>console.log(`PAIPLUS ${mode} API listening on ${host}:${port}`));
   let stopped=false;
-  const stop=()=>{if(stopped)return;stopped=true;clearInterval(cleanup);clearInterval(reconcile);clearInterval(cardSync);server.close(async()=>{try{await Promise.allSettled([service.reconciling,service.management.reconciling,...service.management.jobs.values()]);}finally{store.close();}});};
+  const stop=()=>{if(stopped)return;stopped=true;clearInterval(cleanup);clearInterval(reconcile);clearInterval(cardSync);server.close(async()=>{try{await Promise.allSettled([service.reconciling,service.links?.reconciling,...(service.links?.jobs.values()||[]),service.management.reconciling,...service.management.jobs.values()]);}finally{store.close();}});};
   process.once('SIGTERM',stop);process.once('SIGINT',stop);
   return {server,service,config,stop};
 }

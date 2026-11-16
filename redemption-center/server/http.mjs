@@ -55,7 +55,7 @@ export function makeServer({service,config,staticDir}) {
       if(!/^device-[A-Za-z0-9_-]{32}$/.test(device||'')){device='device-'+id();res.setHeader('Set-Cookie',cookie('pai_device',device,31536000));}
       const deviceKey=service.vault.hash('device',device);
       if(req.method==='GET' && path==='/api/session') {
-        send(200,{ok:true,data:{mode:config.mode,brand:'π星卡社',prefix:'PAIPLUS',admin:adminValid(jar.pai_admin),recent:service.recent(device),examples:config.mode==='mock'?config.examples:[]}});return;
+        send(200,{ok:true,data:{mode:config.mode,provider:service.links?'wudi':'legacy',partner_protocol:service.links?.partner.protocol||1,brand:'π星卡社',prefix:'PAIPLUS',admin:adminValid(jar.pai_admin),recent:service.recent(device),examples:config.mode==='mock'?config.examples:[]}});return;
       }
       if(req.method!=='POST')throw new Problem('METHOD','Method not allowed',405);
       if(path==='/api/integration/deliver') {
@@ -102,18 +102,28 @@ export function makeServer({service,config,staticDir}) {
       }
       limit(`device:${deviceKey}`,400);
       network=ip;
-      const action=path.slice(5),weights={'lookup':200,'lookup-batch':200,preview:150,preflight:150,redeem:150,billing:20,'result-by-code':180,results:6000,result:300};
+      const action=path.slice(5),weights={'lookup':200,'lookup-batch':200,preview:150,preflight:150,redeem:150,billing:20,'result-by-code':180,results:6000,result:300,'partner-link':150,'partner-retry':20,'partner-check':4,'partner-check-status':35,'partner-confirm':9,'partner-orders':30,'subscription-query':10,'subscription-status':35};
       if(!Object.hasOwn(weights,action))throw new Problem('NOT_FOUND','接口不存在。',404);
       const rows=Array.isArray(input.codes)?Math.max(1,input.codes.length):1;
       const reserveAction = name => {
-        if(['preview','lookup','lookup-batch','billing','result-by-code'].includes(name))abuse.discovery(ip);
+        if(['preview','lookup','lookup-batch','billing','result-by-code','partner-link','partner-retry'].includes(name))abuse.discovery(ip);
         limit(`action:${ip}:${name==='lookup-batch'?'lookup':name}`,weights[name],['lookup-batch','results'].includes(name)?rows:1);
         if(name==='billing')limit(`billing:${deviceKey}`,10);
       };
       reserveAction(action);
       release=abuse.acquire(ip);
       let data;
-      if(path==='/api/preview') {limit(`preview:${deviceKey}`,120);data=await service.preview(input.code,device);}
+      const v2Actions={'partner-check':'check','partner-check-status':'checkStatus','partner-confirm':'confirm','partner-orders':'orders','subscription-query':'querySubscription','subscription-status':'subscriptionStatus'};
+      if(Object.hasOwn(v2Actions,action)) {
+        if(service.links?.partner.protocol!==2)throw new Problem('NOT_FOUND','接口未启用。',404);
+        data=await service.links[v2Actions[action]](input,device);
+      }
+      else if(path==='/api/partner-link'||path==='/api/partner-retry') {
+        if(!service.links)throw new Problem('NOT_FOUND','接口未启用。',404);
+        if(path==='/api/partner-retry'&&input.confirmed!==true)throw new Problem('CONFIRM_REQUIRED','请确认需要重新生成链接。',409);
+        data=await service.links.prepare(input.code,device,{retry:path==='/api/partner-retry'});
+      }
+      else if(path==='/api/preview') {limit(`preview:${deviceKey}`,120);data=await service.preview(input.code,device);}
       else if(path==='/api/preflight') {
         limit(`preflight:${deviceKey}`,120);
         const legacy=input.include_billing===undefined;

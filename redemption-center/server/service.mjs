@@ -1,6 +1,8 @@
 import { Problem, id, newCard, normalizeCard, maskedCard, maskedEmail, credential, terminal, safeURL } from './security.mjs';
 import { parseDelivery, customerDelivery } from './delivery.mjs';
 import { CardManagement } from './management.mjs';
+import { PartnerLinks } from './partner-links.mjs';
+import { PartnerOrders } from './partner-orders.mjs';
 import { preflightDetails, preflightRestriction, legacyBlockedSummary } from './preflight-details.mjs';
 
 const active = s => ['submitting','queued','processing','uncertain'].includes(s);
@@ -30,7 +32,7 @@ function verifiedPlanMismatch(card,details) {
 }
 
 export class RedemptionService {
-  constructor({store,vault,partner,publicOrigin,mock=false}) {
+  constructor({store,vault,partner,publicOrigin,mock=false,linkPartner=null}) {
     this.store=store; this.vault=vault; this.partner=partner; this.publicOrigin=publicOrigin; this.mock=mock; this.polls=new Map();
     const fingerprint=vault.hash('key','paiplus-key-check'), saved=store.get("SELECT value FROM meta WHERE key='key_fingerprint'");
     if(saved && saved.value!==fingerprint)throw new Error('Master key does not match this database');
@@ -51,8 +53,10 @@ export class RedemptionService {
       }
     });
     this.management=new CardManagement(this);
+    this.links=linkPartner?(linkPartner.protocol===2?new PartnerOrders(this,linkPartner):new PartnerLinks(this,linkPartner)):null;
   }
   expire() {
+    this.links?.expire?.();
     this.store.run("UPDATE attempts SET session_enc='',preflight_enc='',confirmation_hash='',state='preview' WHERE state='checked' AND checked_at<?",Date.now()-15*60000);
   }
   data(a) { return a?.data_enc?JSON.parse(this.vault.decrypt(a.data_enc)):{}; }
@@ -120,6 +124,7 @@ export class RedemptionService {
     });
   }
   async preview(value,device) {
+    if(this.links)return this.links.prepare(value,device);
     this.expire();
     const c=this.card(value);
     this.assertUsable(c);
@@ -172,6 +177,7 @@ export class RedemptionService {
       {preflight_enc:'',session_enc:'',confirmation_hash:'',checked_at:null});
   }
   async preflight(attemptID,session,device,reserveBilling,legacy=false,readOnlyOnError=false) {
+    if(this.links)throw new Problem('EXTERNAL_CONFIRMATION','请打开专属兑换链接，在兑换站核对账号并确认。',409);
     this.expire(); session=credential(session);
     let a=this.attempt(attemptID,device);
     if(!['preview','checked','blocked'].includes(a.state))throw new Problem('WRONG_STEP','请先验证卡密，处理中不能更换账号。',409);
@@ -231,6 +237,7 @@ export class RedemptionService {
     }
   }
   async redeem(attemptID,confirmation,confirmed,device) {
+    if(this.links)throw new Problem('EXTERNAL_CONFIRMATION','请在专属兑换链接中确认，本站仅查询原记录。',409);
     this.expire(); let a=this.attempt(attemptID,device);
     if(active(a.state)||terminal(a.state))return this.view(a);
     if(confirmed!==true || !confirmation || a.state!=='checked' || !a.confirmation_hash || a.confirmation_hash!==this.vault.hash('confirmation',confirmation))throw new Problem('CONFIRM_REQUIRED','请重新核验并确认本次账号与套餐。',409);
@@ -292,10 +299,14 @@ export class RedemptionService {
     })();
     this.polls.set(a.id,promise); return promise;
   }
-  async result(attemptID,device) { return this.view(await this.pollRecord(this.attempt(attemptID,device))); }
+  async result(attemptID,device) {
+    if(this.links && this.store.get('SELECT id FROM partner_redemptions WHERE id=?',String(attemptID||'')))return this.links.result(attemptID,device);
+    return this.view(await this.pollRecord(this.attempt(attemptID,device)));
+  }
   // The server also reconciles after the buyer closes the page. It only queries;
   // it never replays a submitted charge or creates another request ID.
   async reconcile() {
+    if(this.links)await this.links.reconcile();
     if(this.reconciling)return this.reconciling;
     this.reconciling=(async()=>{
       const now=Date.now();
@@ -313,21 +324,35 @@ export class RedemptionService {
     return values.map(code=>{
       const c=this.card(code),a=c.attempt_id?this.store.get('SELECT * FROM attempts WHERE id=?',c.attempt_id):null;
       this.assertUsable(c);
+      const link=this.links?.latest(c.id);if(link)return this.links.view(link);
       const owned=a?.device_hash===this.vault.hash('device',device);
       if(!a || (!owned && !a.submitted_at))return this.unsubmittedSummary(c);
       return this.view(a,owned);
     });
   }
   async recover(value,device) {
+    if(this.links){const result=await this.links.recover(value);if(result)return result;}
     const c=this.card(value), a=c.attempt_id?this.store.get('SELECT * FROM attempts WHERE id=?',c.attempt_id):null;
     this.assertUsable(c);
     const owned=a?.device_hash===this.vault.hash('device',device);
     if(!a || (!owned && !a.submitted_at))return this.unsubmittedSummary(c);
     return this.view(await this.pollRecord(a),owned);
   }
-  recent(device) { return this.store.all('SELECT * FROM attempts WHERE device_hash=? ORDER BY created_at DESC LIMIT 30',this.vault.hash('device',device)).map(a=>({...this.view(a),confirmation:null})); }
+  recent(device) { return [...(this.links?.recent(device)||[]),...this.store.all('SELECT * FROM attempts WHERE device_hash=? ORDER BY created_at DESC LIMIT 30',this.vault.hash('device',device)).map(a=>({...this.view(a),confirmation:null}))].sort((a,b)=>b.created_at-a.created_at).slice(0,30); }
   async lookup(values,device) {
     if(!Array.isArray(values) || !values.length || values.length>100)throw new Problem('LOOKUP_LIMIT','每次查询 1–100 张卡密。');
+    if(this.links) {
+      const result=[];
+      for(const [i,value] of values.entries()) {
+        try {
+          const c=this.card(value);this.assertUsable(c);const row=this.links.latest(c.id);
+          const old=!row&&c.attempt_id?this.store.get('SELECT * FROM attempts WHERE id=?',c.attempt_id):null;
+          const current=row?this.links.view(await this.links.sync(row)):old?.submitted_at?this.view(await this.pollRecord(old),false):null;
+          result.push({row:i+1,code:normalizeCard(value),status:current?.state||(c.status==='completed'?'used':'unverified'),used:['succeeded','completed'].includes(current?.state)||c.status==='completed'?true:null,can_resubmit:false,message:current?.message||'尚未建立新协议兑换记录，不能据此确认上游卡密未使用。',query_error:current?.query_error||null});
+        } catch(error) {result.push({row:i+1,code:'••••••',status:({CARD_REVOKED:'revoked',CARD_REVOKING:'revoking',CARD_INVALID:'invalid',CARD_DISABLED:'disabled'})[error.code]||'unknown',used:null,can_resubmit:false});}
+      }
+      return result;
+    }
     const results=[], groups=new Map();
     for(let i=0;i<values.length;i++) {
       try {
@@ -353,6 +378,7 @@ export class RedemptionService {
     return results;
   }
   async billing({code,session},device) {
+    if(this.links)throw new Problem('BILLING_UNAVAILABLE','当前兑换服务未提供账单接口，请在账号官方订阅页面查看账单。',409);
     if(!!code===!!session)throw new Problem('BILLING_INPUT','请选择卡密或账号凭证中的一种查询方式。');
     let body,d=device;
     if(code) {
@@ -379,6 +405,7 @@ export class RedemptionService {
       const c=this.store.get('SELECT * FROM cards WHERE id=?',cardID);
       if(!c)throw new Problem('NOT_FOUND','卡密不存在。',404);
       const a=c.attempt_id?this.store.get('SELECT * FROM attempts WHERE id=?',c.attempt_id):null;
+      if(this.links?.latest(c.id))throw new Problem('EXTERNAL_LINK_ACTIVE','已创建外部兑换链接，不能在此停用或重置，请联系客服核对。',409);
       if(a?.submitted_at || !['ready','disabled'].includes(c.status))throw new Problem('CARD_IN_USE','已提交或已使用卡密不能在此停用或重新启用，请核对原兑换。',409);
       this.store.run('UPDATE cards SET status=?,updated_at=? WHERE id=?',disabled?'disabled':'ready',Date.now(),c.id); this.store.audit(disabled?'disable':'enable',c.id); return {ok:true};
     });
@@ -387,6 +414,7 @@ export class RedemptionService {
     return this.store.transaction(()=>{
       const c=this.store.get('SELECT * FROM cards WHERE id=?',cardID);
       if(!c)throw new Problem('NOT_FOUND','卡密不存在。',404);
+      if(this.links?.latest(c.id))throw new Problem('EXTERNAL_LINK_ACTIVE','外部兑换记录不能解除绑定，请继续查询原记录。',409);
       if(!['ready','disabled'].includes(c.status))throw new Problem('CARD_IN_USE','已销毁、失效或处理中卡密不能解除核验。',409);
       const a=c.attempt_id?this.store.get('SELECT * FROM attempts WHERE id=?',c.attempt_id):null;
       if(!a)return {ok:true};

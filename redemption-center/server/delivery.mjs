@@ -10,7 +10,8 @@ export function parseDelivery(payload, quantity) {
   const records=[];
   for(const line of payload.split(/\r?\n/).map(v=>v.trim()).filter(Boolean)) {
     if(/^(?:兑换地址|充值地址|兑换链接|充值链接)[：:]\s*https?:\/\/\S+$/.test(line))continue;
-    const code=line.replace(/^(?:兑换)?卡密[：:]\s*/,'');
+    if(/^兑换站[：:]\s*(?:https:\/\/)?wudi\.cdk\.bar\/?$/i.test(line))continue;
+    const code=line.replace(/^(?:兑换)?卡密(?:cdk)?[：:]\s*/i,'');
     if(sourcePattern.test(code)) { records.push({source:code});continue; }
     const account=line.match(accountPattern);
     if(!account)throw invalid();
