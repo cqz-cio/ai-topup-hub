@@ -9,7 +9,7 @@
       class="relative grid h-14 w-14 flex-none place-items-center overflow-hidden rounded-[11px] sm:h-16 sm:w-16"
       :class="coverClass"
     >
-      <img v-if="coverImage" :src="coverImage" :alt="title" loading="lazy" class="absolute inset-0 h-full w-full object-cover" @error="imageErrored = true" />
+      <img v-if="coverImage" :src="coverImage" v-bind="imageDimensions(coverImage)" :alt="title" loading="lazy" class="absolute inset-0 h-full w-full object-cover" @error="imageErrored = true" />
       <Package v-else class="relative z-[1] h-6 w-6 text-white" />
       <span v-if="soldOut" class="absolute inset-0 grid place-items-center bg-black/55 text-[10px] font-bold text-white">{{ t('products.stockStatus.outOfStock') }}</span>
     </span>
@@ -51,6 +51,7 @@
 </template>
 
 <script setup lang="ts">
+import { imageDimensions } from '../../../utils/imageDimensions'
 import { computed, ref, type Component } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { AlarmClock, ChevronRight, Package, ShoppingCart, XCircle, Zap } from 'lucide-vue-next'

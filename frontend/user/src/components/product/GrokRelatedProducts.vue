@@ -4,19 +4,19 @@ import {RouterLink} from 'vue-router'
 import {api} from '../../api/client'
 import {useAppStore} from '../../stores/app'
 import {useLocalized} from '../../composables/useProduct'
-import {isGrokProduct, otherGrokProducts} from '../../utils/grokRelatedProducts'
+import {relatedProductCluster, otherRelatedProducts} from '../../utils/grokRelatedProducts'
 const props=defineProps<{product: any}>()
 const app=useAppStore()
 const {getLocalizedText,formatPrice,siteCurrency}=useLocalized()
 const rows=ref<any[]>([])
 const headings: Record<string,string>={'en-US':'Other Grok plans','zh-TW':'其他 Grok 檔位'}
-const heading=computed(()=>headings[app.locale] || '其他 Grok 档位')
+const heading=computed(()=>relatedProductCluster(props.product)?.key === 'grok' ? headings[app.locale] || '其他 Grok 档位' : relatedProductCluster(props.product)?.title || '')
 watch(()=>[props.product?.id,props.product?.category?.id,app.isResellerTenant],async(_,__,onCleanup)=>{
   let stale=false;onCleanup(()=>{stale=true});rows.value=[]
-  if(app.isResellerTenant || !isGrokProduct(props.product))return
+  if(app.isResellerTenant || !relatedProductCluster(props.product))return
   try{
     const response=await api.get('/public/products',{params:{category_id:props.product.category.id,page:1,page_size:100}})
-    if(!stale)rows.value=otherGrokProducts(props.product,response.data.data || [])
+    if(!stale)rows.value=otherRelatedProducts(props.product,response.data.data || [])
   }catch{ /* The product remains usable; no invented or stale recommendation links. */ }
 },{immediate:true})
 </script>

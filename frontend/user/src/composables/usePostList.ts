@@ -7,6 +7,7 @@ import { usePageSeo } from './usePageSeo'
 import { useHead } from '@unhead/vue'
 import { postListState, postListPath } from '../utils/postListUrl'
 import { schemaJSON } from '../utils/siteIdentity'
+import { pageDescription, blogDescription } from '../utils/publicDescriptions'
 
 /**
  * 文章/公告列表共享逻辑（Blog/Notice，classic + vault 双模板共用）。
@@ -34,7 +35,7 @@ export function usePostList(
 
   usePageSeo({
     title: seo.title,
-    description: () => type === 'blog' ? '最新文章和动态' : '购买、交付与售后服务公告',
+    description: () => type === 'blog' ? blogDescription(posts.value.map(post=>getLocalizedText(post.title))) : pageDescription('notice'),
     canonicalPath: () => postListPath(seo.canonicalPath, searchKeyword.value.trim() ? 1 : currentPage.value),
     noindex: () => !!searchKeyword.value.trim(),
     followWhenNoindex: true,
@@ -116,7 +117,7 @@ export function usePostList(
     if (loading.value) return { script: [] }
     const origin = String(appStore.config?.brand?.site_url || window.location.origin).replace(/\/+$/, '')
     const schema = {
-      '@context': 'https://schema.org', '@type': 'CollectionPage', name: seo.title(), description: type === 'blog' ? '最新文章和动态' : '购买、交付与售后服务公告',
+      '@context': 'https://schema.org', '@type': 'CollectionPage', name: seo.title(), description: type === 'blog' ? blogDescription(posts.value.map(post=>getLocalizedText(post.title))) : pageDescription('notice'),
       url: origin + postListPath(seo.canonicalPath, searchKeyword.value.trim() ? 1 : currentPage.value),
       inLanguage: appStore.locale, isPartOf: { '@id': origin + '/#website' }, about: { '@id': origin + '/#organization' },
       mainEntity: { '@type': 'ItemList', itemListElement: posts.value.map((post, i) => ({

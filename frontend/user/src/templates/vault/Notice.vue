@@ -17,14 +17,14 @@
           v-for="notice in notices"
           :key="notice.id"
           type="button"
-          class="group flex w-full items-center gap-[18px] rounded-lg border bg-card px-[22px] py-[18px] text-left transition hover:-translate-x-0.5 hover:border-hairline-strong hover:shadow-[var(--shadow)]"
+          class="group flex min-w-0 w-full items-center gap-[18px] rounded-lg border bg-card px-[22px] py-[18px] text-left transition hover:-translate-x-0.5 hover:border-hairline-strong hover:shadow-[var(--shadow)]"
           @click="goToNotice(notice.slug)"
         >
           <div
             class="relative grid h-14 w-14 flex-none place-items-center overflow-hidden rounded-md bg-secondary max-[640px]:hidden"
             :class="notice.thumbnail ? '' : 'bg-[color:var(--teal)]'"
           >
-            <img v-if="notice.thumbnail" :src="getImageUrl(notice.thumbnail)" :alt="getLocalizedText(notice.title)" loading="lazy" class="absolute inset-0 h-full w-full object-cover" />
+            <img v-if="notice.thumbnail" :src="getImageUrl(notice.thumbnail)" v-bind="imageDimensions(getImageUrl(notice.thumbnail))" :alt="getLocalizedText(notice.title)" loading="lazy" class="absolute inset-0 h-full w-full object-cover" />
             <Bell v-else class="h-6 w-6 text-white/90" />
           </div>
           <div class="min-w-0 flex-1">
@@ -55,6 +55,7 @@
 </template>
 
 <script setup lang="ts">
+import { imageDimensions } from '../../utils/imageDimensions'
 import { useI18n } from 'vue-i18n'
 import { Bell, ChevronLeft, ChevronRight } from 'lucide-vue-next'
 import { Badge } from '@/components/ui/badge'

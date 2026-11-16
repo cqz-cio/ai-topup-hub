@@ -121,6 +121,7 @@ import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { ArrowUpRight, ArrowRight, ChevronDown, Check, Copy, Info, PackageOpen, Search, ShoppingBag, ClipboardList } from 'lucide-vue-next'
 import { useI18n } from 'vue-i18n'
 import { categoryAPI, productAPI } from '../api/product'
+import { pageDescription, catalogDescription, needsDescription } from '../utils/publicDescriptions'
 import { useAppStore } from '../stores/app'
 import { useUserAuthStore } from '../stores/userAuth'
 import { usePageSeo } from '../composables/usePageSeo'
@@ -395,9 +396,17 @@ const copyWechat = async () => {
     copyMessage.value = ''
   }, 3000)
 }
+const catalogSeoDescription = computed(() => {
+  if (isRechargePage.value) return gptRecharge.value.summary
+  if (!catalogOnly) return undefined
+  if (!currentCategory.value) return pageDescription('products')
+  const saved = seoText(currentCategory.value.seo_meta?.description, appStore.locale)
+  const name = categoryHeading.value || ''
+  return needsDescription(saved, name) ? catalogDescription(name, orderedProducts.value.map(productTitle)) : saved
+})
 usePageSeo({
   title: () => isRechargePage.value ? gptRecharge.value.seoTitle : catalogOnly ? (seoText(currentCategory.value?.seo_meta?.title, appStore.locale) || categoryHeading.value || t('shopUi.productsTitle')) : undefined,
-  description: () => isRechargePage.value ? gptRecharge.value.summary : catalogOnly ? (seoText(currentCategory.value?.seo_meta?.description, appStore.locale) || t('shopUi.catalogHint')) : undefined,
+  description: () => catalogSeoDescription.value,
   image: () => seoText(currentCategory.value?.seo_meta?.og_image, appStore.locale) || currentCategory.value?.icon || '',
   imageWidth: () => Number(currentCategory.value?.seo_meta?.og_image_width) || 0,
   imageHeight: () => Number(currentCategory.value?.seo_meta?.og_image_height) || 0,
@@ -418,7 +427,7 @@ useHead(() => {
   const items = orderedProducts.value
   const schema = {
     '@context': 'https://schema.org', '@type': 'CollectionPage', name: isRechargePage.value ? gptRecharge.value.title : (seoText(currentCategory.value?.seo_meta?.title, appStore.locale) || categoryHeading.value || t('shopUi.productsTitle')),
-    description: isRechargePage.value ? gptRecharge.value.summary : t('shopUi.catalogHint'), url: origin + route.path,
+    description: catalogSeoDescription.value, url: origin + route.path,
     mainEntity: { '@type': 'ItemList', itemListElement: items.map((product, index) => ({
       '@type': 'ListItem', position: index + 1, name: productTitle(product), url: `${origin}/products/${encodeURIComponent(product.slug)}`,
     })) },

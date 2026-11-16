@@ -43,7 +43,7 @@
               <div v-for="group in listProductGroups" :key="group.categoryId ?? 'uncategorized'">
                 <div class="mb-2.5 flex items-center gap-2 px-0.5">
                   <span class="h-4 w-1 flex-none rounded-full bg-primary"></span>
-                  <img v-if="group.categoryIcon" :src="getImageUrl(group.categoryIcon)" :alt="group.categoryName" loading="lazy" class="h-5 w-5 flex-none rounded object-cover" />
+                  <img v-if="group.categoryIcon" :src="getImageUrl(group.categoryIcon)" v-bind="imageDimensions(getImageUrl(group.categoryIcon))" :alt="group.categoryName" loading="lazy" class="h-5 w-5 flex-none rounded object-cover" />
                   <span class="min-w-0 truncate text-sm font-bold text-foreground">{{ group.categoryName }}</span>
                   <span class="flex-none text-xs text-muted-foreground">({{ group.products.length }})</span>
                 </div>
@@ -100,7 +100,7 @@
             :to="`/categories/${cat.slug}`"
           >
             <span class="grid h-10 w-10 place-items-center rounded-xl bg-white/20">
-              <img v-if="cat.icon" :src="getImageUrl(cat.icon)" :alt="catName(cat)" loading="lazy" class="h-6 w-6 object-contain" />
+              <img v-if="cat.icon" :src="getImageUrl(cat.icon)" v-bind="imageDimensions(getImageUrl(cat.icon))" :alt="catName(cat)" loading="lazy" class="h-6 w-6 object-contain" />
               <Tag v-else class="h-[22px] w-[22px]" />
             </span>
             <div class="min-w-0"><div class="line-clamp-2 break-words font-bold">{{ catName(cat) }}</div></div>
@@ -174,6 +174,7 @@
 </template>
 
 <script setup lang="ts">
+import { imageDimensions } from '../../utils/imageDimensions'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import CodexCreditsSection from '../../components/commerce/CodexCreditsSection.vue'
 import { splitCodexCredits } from '../../utils/codexCredits'

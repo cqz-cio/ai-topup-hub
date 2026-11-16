@@ -1,4 +1,5 @@
 import { getImageUrl } from './image'
+import { imageDimensions } from './imageDimensions'
 
 /**
  * 将 HTML 内容中的图片路径转换为显示用的绝对路径
@@ -12,6 +13,21 @@ export function processHtmlForDisplay(html: string): string {
     return html.replace(/src=["'](\/uploads\/.*?)["']/g, (_, path) => {
         return `src="${getImageUrl(path)}"`
     })
+}
+
+/** Preserve public rich text while adding measured intrinsic image dimensions. */
+export function processPublicHtmlForDisplay(html: string): string {
+    const displayed = processHtmlForDisplay(html)
+    if (!displayed || !/<img\b/i.test(displayed)) return displayed
+    const doc = new DOMParser().parseFromString(displayed, 'text/html')
+    for (const image of doc.images) {
+        const size = imageDimensions(image.getAttribute('src'))
+        if (size.width && size.height) {
+            image.width = size.width
+            image.height = size.height
+        }
+    }
+    return doc.body.innerHTML
 }
 
 /**

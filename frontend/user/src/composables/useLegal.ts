@@ -4,6 +4,7 @@ import { useAppStore } from '../stores/app'
 import { usePageSeo } from './usePageSeo'
 import { useHead } from '@unhead/vue'
 import { schemaJSON } from '../utils/siteIdentity'
+import { pageDescription } from '../utils/publicDescriptions'
 
 /**
  * 条款/隐私页共享逻辑（classic + vault 双模板共用）。
@@ -16,7 +17,7 @@ export function useLegal(type: () => 'terms' | 'privacy') {
 
   usePageSeo({
     title: () => type() === 'terms' ? t('footer.terms') : t('footer.privacy'),
-    description: () => type() === 'terms' ? t('footer.terms') : t('footer.privacy'),
+    description: () => appStore.isResellerTenant ? '' : pageDescription(type()),
     canonicalPath: () => type() === 'terms' ? '/terms' : '/privacy',
   })
 
@@ -46,7 +47,7 @@ export function useLegal(type: () => 'terms' | 'privacy') {
     if (!appStore.config || !content.value) return { script: [] }
     const origin = String(appStore.config.brand?.site_url || window.location.origin).replace(/\/+$/, '')
     return { script: [{ key: 'legal-page', type: 'application/ld+json', innerHTML: schemaJSON({
-      '@context': 'https://schema.org', '@type': 'WebPage', name: title.value, description: title.value,
+      '@context': 'https://schema.org', '@type': 'WebPage', name: title.value, description: appStore.isResellerTenant ? '' : pageDescription(type()),
       url: origin + (type() === 'terms' ? '/terms' : '/privacy'), inLanguage: appStore.locale,
       isPartOf: { '@id': origin + '/#website' }, about: { '@id': origin + '/#organization' },
     }) }] }

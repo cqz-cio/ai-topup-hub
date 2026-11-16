@@ -26,7 +26,7 @@
           :to="`/blog/${post.slug}`"
         >
           <div v-if="post.thumbnail" class="-mx-[22px] -mt-[22px] mb-4 h-[168px] overflow-hidden rounded-t-xl">
-            <img :src="getImageUrl(post.thumbnail)" :alt="getLocalizedText(post.title)" loading="lazy" class="h-full w-full object-cover" />
+            <img :src="getImageUrl(post.thumbnail)" v-bind="imageDimensions(getImageUrl(post.thumbnail))" :alt="getLocalizedText(post.title)" loading="lazy" class="h-full w-full object-cover" />
           </div>
           <div class="mb-1 flex items-center gap-2.5">
             <Badge :variant="post.type === 'blog' ? 'info' : 'warning'" size="sm" class="rounded-full">{{ post.type === 'blog' ? t('shopUi.blogTitle') : t('nav.notice') }}</Badge>
@@ -56,6 +56,7 @@
 </template>
 
 <script setup lang="ts">
+import { imageDimensions } from '../../utils/imageDimensions'
 import { useI18n } from 'vue-i18n'
 import { ArrowRight, BookOpen, ChevronLeft, ChevronRight, Search } from 'lucide-vue-next'
 import { Badge } from '@/components/ui/badge'

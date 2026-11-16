@@ -9,6 +9,7 @@
         <img
           v-if="!bannerLoading && heroImage"
           :src="heroImage"
+          v-bind="imageDimensions(heroImage)"
           :key="heroImage"
           :alt="heroTitle"
           class="absolute inset-0 h-full w-full object-cover"
@@ -80,6 +81,7 @@
 </template>
 
 <script setup lang="ts">
+import { imageDimensions } from '../../../utils/imageDimensions'
 import { onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ArrowRight, ChevronLeft, ChevronRight, Zap } from 'lucide-vue-next'

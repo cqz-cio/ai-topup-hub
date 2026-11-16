@@ -12,7 +12,7 @@
         class="absolute inset-0 z-10 transition-colors duration-300"
         :class="soldOut ? 'bg-black/15' : 'bg-black/15 group-hover:bg-black/5'"
       ></div>
-      <img v-if="displayImageSrc && !imageErrored" :src="displayImageSrc"
+      <img v-if="displayImageSrc && !imageErrored" :src="displayImageSrc" v-bind="imageDimensions(displayImageSrc)"
         :alt="getLocalizedText(product.title)" loading="lazy" decoding="async"
         class="w-full h-full object-cover transform transition-transform duration-700 ease-out"
         :class="[
@@ -169,6 +169,7 @@ import { useI18n } from 'vue-i18n'
 import { computed, ref, watch } from 'vue'
 import { ArrowRight, ChevronRight, Image as ImageIcon, Lock, Pencil, ShoppingCart, UserPlus, Zap } from 'lucide-vue-next'
 import { getFirstImageUrl, getImageUrl } from '../utils/image'
+import { imageDimensions } from '../utils/imageDimensions'
 import { useLocalized, useProductLabels } from '../composables/useProduct'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'

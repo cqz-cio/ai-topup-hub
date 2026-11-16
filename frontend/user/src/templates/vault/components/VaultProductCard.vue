@@ -5,7 +5,7 @@
         class="relative grid h-[152px] w-full flex-none place-items-center overflow-hidden rounded-[13px] will-change-transform after:absolute after:inset-0 after:bg-[radial-gradient(130%_80%_at_78%_14%,rgba(255,255,255,0.26),transparent_56%)]"
         :class="coverClass"
       >
-        <img v-if="coverImage" :src="coverImage" :alt="title" loading="lazy" class="absolute inset-0 h-full w-full object-cover" @error="imageErrored = true" />
+        <img v-if="coverImage" :src="coverImage" v-bind="imageDimensions(coverImage)" :alt="title" loading="lazy" class="absolute inset-0 h-full w-full object-cover" @error="imageErrored = true" />
         <Package v-else class="relative z-[1] h-[58px] w-[58px] text-white" />
         <!-- 商家标签浮层 -->
         <div v-if="!soldOut && product.tags && product.tags.length" class="absolute right-1.5 top-1.5 z-[3] flex max-w-[80%] flex-wrap justify-end gap-1">
@@ -62,6 +62,7 @@
 </template>
 
 <script setup lang="ts">
+import { imageDimensions } from '../../../utils/imageDimensions'
 import ProductContactButton from '../../../components/product/ProductContactButton.vue'
 import { isContactFirstProduct } from '../../../utils/contactFirstProducts'
 import { computed, ref, type Component } from 'vue'

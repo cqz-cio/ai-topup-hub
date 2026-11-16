@@ -3,7 +3,7 @@
     <div class="relative group"
       @touchstart="onImageTouchStart"
       @touchend="onImageTouchEnd">
-      <img v-if="currentImage" :src="displayImage(currentImage)" :alt="productTitle"
+      <img v-if="currentImage" :src="displayImage(currentImage)" v-bind="imageDimensions(displayImage(currentImage))" :alt="productTitle"
         :class="{ 'is-glass-cover': !!glassCover(currentImage) }" @error="handleImageError(currentImage)"
         class="block w-full aspect-[5/3] object-contain object-center bg-muted rounded-xl border relative z-10" />
       <div v-else
@@ -17,7 +17,7 @@
       <div v-for="(image, index) in images" :key="index" @click="$emit('update:currentImage', image)"
         class="cursor-pointer rounded-lg overflow-hidden border-2 transition-all duration-300 shrink-0 w-16 h-16 md:w-auto md:h-auto md:aspect-square snap-start"
         :class="currentImage === image ? 'border-primary ring-1 ring-primary/40 opacity-100' : 'border-transparent opacity-60 hover:opacity-100 hover:scale-105'">
-        <img :src="displayImage(image)" :alt="`Image ${index + 1}`" loading="lazy"
+        <img :src="displayImage(image)" v-bind="imageDimensions(displayImage(image))" :alt="`${productTitle} ${index + 1}`" loading="lazy"
           :class="{ 'is-glass-cover': !!glassCover(image) }" @error="handleImageError(image)"
           class="block w-full h-full object-contain object-center bg-muted" />
       </div>
@@ -30,6 +30,7 @@ import { ref, watch } from 'vue'
 import { Image as ImageIcon } from 'lucide-vue-next'
 import { useAppStore } from '../../stores/app'
 import { getCatalogGlassCover } from '../../utils/catalogGlass'
+import { imageDimensions } from '../../utils/imageDimensions'
 
 const props = defineProps<{
   images: string[]

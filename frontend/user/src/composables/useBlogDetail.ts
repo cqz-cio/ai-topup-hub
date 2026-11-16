@@ -50,6 +50,7 @@ export function useBlogDetail() {
     image: () => post.value?.thumbnail || '',
     canonicalPath: () => `/blog/${(route.params.slug as string) || ''}`,
     type: () => 'article',
+    breadcrumbParents: () => post.value?.type === 'notice' ? [{title:'公告',path:'/notice'}] : [{title:'博客',path:'/blog'}],
   })
 
   // Keep article structured data after Vue replaces the initial public HTML.

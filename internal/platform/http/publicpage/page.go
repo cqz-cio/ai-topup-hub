@@ -9,6 +9,7 @@ import (
 	"errors"
 	"html"
 	"html/template"
+	"io/fs"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -16,6 +17,7 @@ import (
 	"time"
 
 	"github.com/dujiao-next/internal/platform/http/siteurl"
+	"github.com/dujiao-next/internal/platform/publiccontent"
 	"github.com/gin-gonic/gin"
 	"github.com/microcosm-cc/bluemonday"
 )
@@ -30,6 +32,7 @@ func (r Redirect) Error() string { return "canonical public URL: " + r.Path }
 type Site struct {
 	Name, URL, Currency, Logo, Icon, DefaultImage, Description, ReturnPolicyPath string
 	CatalogLinks                                                                 map[string]string
+	FooterCategories                                                             []Link
 }
 type Link struct{ Title, Path string }
 type Fact struct{ Name, Value string }
@@ -42,6 +45,7 @@ type Page struct {
 	Kind, Path, Title, Summary, Content string
 	SEOTitle, SEODescription            string
 	Price, Category, Availability       string
+	CategoryPath                        string
 	Images                              []string
 	ShareImage                          string
 	ShareImageWidth, ShareImageHeight   int
@@ -77,6 +81,7 @@ type SitePages interface {
 type Handler struct {
 	source Source
 	policy *bluemonday.Policy
+	assets fs.FS
 }
 
 func New(source Source) *Handler {
@@ -136,12 +141,20 @@ func (h *Handler) serve(c *gin.Context, load func(context.Context, string) (Page
 	}
 	data := document{
 		Page: page, Site: site, Canonical: canonical, Images: images,
-		Body:        template.HTML(h.policy.Sanitize(page.Content)), // Only sanitized UGC is trusted.
+		Body:        template.HTML(contentImageDimensions(h.policy.Sanitize(page.Content))), // Only sanitized UGC is trusted.
 		Summary:     template.HTML(h.policy.Sanitize(page.Summary)),
-		Description: plainText(page.Summary),
+		Description: descriptionFor(page),
 	}
 	catalogLinks, _ := json.Marshal(site.CatalogLinks)
 	data.CatalogLinks = template.JS(catalogLinks) // JSON encoding escapes HTML delimiters.
+	footers, _ := json.Marshal(site.FooterCategories)
+	data.FooterCategories = template.JS(footers)
+	for i, raw := range page.Images {
+		if resolved := absoluteImage(origin, raw); resolved != "" {
+			size := publiccontent.PublicImageSize(raw)
+			data.Covers = append(data.Covers, cover{resolved, size.Width, size.Height, i > 0})
+		}
+	}
 	data.Icon = absoluteImage(origin, site.Icon)
 	shareImages := append([]string{page.ShareImage}, page.Images...)
 	sharing := shareImage(origin, shareImages, site.DefaultImage, page.Title)
@@ -153,12 +166,8 @@ func (h *Handler) serve(c *gin.Context, load func(context.Context, string) (Page
 	}
 	data.ShareImage, data.TwitterCard, data.ShareImageAlt = sharing.Image, sharing.Card, sharing.Alt
 	data.ShareImageWidth, data.ShareImageHeight = sharing.Width, sharing.Height
-	if description := plainText(page.SEODescription); description != "" {
-		data.Description = description
-	}
-	if data.Description == "" {
-		data.Description = page.Title
-	}
+	data.Semantics = documentSemantics(page, string(data.Body), origin)
+	data.Styles = h.stylesheets()
 	data.MetadataTitle = strings.TrimSpace(page.SEOTitle)
 	if data.MetadataTitle == "" {
 		data.MetadataTitle = page.Title

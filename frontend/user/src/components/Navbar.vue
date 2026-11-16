@@ -7,7 +7,7 @@
       <!-- Logo -->
       <router-link to="/" class="brand-wordmark group relative" :title="brandSiteName">
         <span v-if="brandLogo" class="brand-logo-tile">
-          <img :src="brandLogo" :alt="brandSiteName" class="brand-logo-image" fetchpriority="high" decoding="async" />
+          <img :src="brandLogo" v-bind="imageDimensions(brandLogo)" :alt="brandSiteName" class="brand-logo-image" fetchpriority="high" decoding="async" />
         </span>
         <div class="brand-wordmark-copy">
           <span class="theme-wordmark-text">{{ brandSiteName }}</span>
@@ -204,6 +204,7 @@ import { useAppStore } from '../stores/app'
 import { useCartStore } from '../stores/cart'
 import { useUserAuthStore } from '../stores/userAuth'
 import { getImageUrl } from '../utils/image'
+import { imageDimensions } from '../utils/imageDimensions'
 import { useNavConfig } from '../composables/useNavConfig'
 import {
   ShoppingCart, ClipboardList, LogIn, User, LogOut, Languages,

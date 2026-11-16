@@ -192,3 +192,37 @@ func TestSitemapMatchesPublicRootCategoryExpansion(t *testing.T) {
 		t.Fatal(xml, err)
 	}
 }
+
+func TestV5StaticLastmodUsesContentDatesAndOmitsUnknown(t *testing.T) {
+	date := func(day int) time.Time { return time.Date(2026, 10, day, 0, 0, 0, 0, time.UTC) }
+	catalog := &catalogStub{products: []contract.Product{{Slug: "one", UpdatedAt: date(9)}, {Slug: "two", UpdatedAt: date(11)}}}
+	posts := contract.PublishedPostReaderFunc(func(context.Context, int) ([]contract.PublishedPost, error) {
+		blog, notice := date(12), date(13)
+		return []contract.PublishedPost{{Slug: "blog", Type: "blog", PublishedAt: &blog}, {Slug: "notice", Type: "notice", PublishedAt: &notice}}, nil
+	})
+	s, _ := NewService(catalog, posts, &cacheStub{}, func(context.Context) (map[string]time.Time, error) {
+		return map[string]time.Time{"/terms": date(14), "/privacy": date(15), "/about": date(16)}, nil
+	})
+	entries, err := s.collectURLs(context.Background(), "https://example.test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	wanted := map[string]string{"/": "2026-10-11", "/products": "2026-10-11", "/blog": "2026-10-12", "/notice": "2026-10-13", "/terms": "2026-10-14", "/privacy": "2026-10-15", "/about": "2026-10-16"}
+	for _, entry := range entries {
+		for path, want := range wanted {
+			if entry.Location == "https://example.test"+path && entry.LastModified != want {
+				t.Fatal(entry, want)
+			}
+		}
+	}
+	empty, _ := NewService(&catalogStub{}, &postStub{}, &cacheStub{})
+	entries, err = empty.collectURLs(context.Background(), "https://example.test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, entry := range entries {
+		if entry.LastModified != "" {
+			t.Fatal("invented current date", entry)
+		}
+	}
+}

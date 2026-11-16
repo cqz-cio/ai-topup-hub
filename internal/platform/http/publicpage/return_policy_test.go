@@ -30,7 +30,11 @@ func TestProductReferencesTheVisibleMerchantPolicyAndCurrentOffer(t *testing.T) 
 							product = value
 						}
 						if graph, ok := value["@graph"].([]any); ok {
-							organization = graph[0].(map[string]any)
+							for _, node := range graph {
+								if item, ok := node.(map[string]any); ok && item["@type"] == "Organization" {
+									organization = item
+								}
+							}
 						}
 					}
 				}

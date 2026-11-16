@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"net/url"
+	"os"
 	"sort"
 	"strconv"
 	"strings"
@@ -49,7 +50,11 @@ type source struct {
 }
 
 func New(c *container.Container, products *producthttp.PublicHandler, posts *contenthttp.PublicHandler) *publicpage.Handler {
-	return publicpage.New(&source{products: products, categories: c.CategoryService, catalog: products, posts: posts, settings: c.SettingService, overlay: c.ResellerSiteConfigService, catalogLinks: c.ProductRepo.PublicCatalogLinks})
+	handler := publicpage.New(&source{products: products, categories: c.CategoryService, catalog: products, posts: posts, settings: c.SettingService, overlay: c.ResellerSiteConfigService, catalogLinks: c.ProductRepo.PublicCatalogLinks})
+	if path := strings.TrimSpace(os.Getenv("PUBLIC_STOREFRONT_DIR")); path != "" {
+		handler.WithAssets(os.DirFS(path))
+	}
+	return handler
 }
 
 func (s *source) PrepareContext(ctx context.Context) (context.Context, error) {
@@ -93,6 +98,10 @@ func (s *source) Site(ctx context.Context) (publicpage.Site, error) {
 			site.DefaultImage = assets.ShareImage
 		}
 	}
+	site.FooterCategories, err = s.footerCategories(ctx)
+	if err != nil {
+		return publicpage.Site{}, err
+	}
 	return site, nil
 }
 
@@ -112,16 +121,19 @@ func (s *source) Product(ctx context.Context, slug string) (publicpage.Page, err
 		price = *p.EffectivePriceAmount
 	}
 	page := publicpage.Page{Kind: "product", Path: "/products/" + url.PathEscape(p.Slug), Title: localized(p.Title), Summary: localized(p.Description), Content: localized(p.Content), Price: price.String(), Category: localized(p.Category.Name), Images: p.Images, Availability: "https://schema.org/InStock"}
+	if p.Category.Slug != "" {
+		page.CategoryPath = "/categories/" + url.PathEscape(p.Category.Slug)
+	}
 	if isMainSite(ctx) {
 		guide := publiccontent.GPTRecharge().Resolve(publiccontent.CatalogLinks(ctx))
 		page.Content = guide.AppendRelated(guide.RewriteLinks(page.Content, publiccontent.CatalogLinks(ctx)), page.Kind, p.Slug, p.Category.Slug)
 		page.Content = publiccontent.DeliveryAndReturns().AppendLink(page.Content)
-		if publiccontent.IsGrokProduct(p.Slug, p.SlugAliases) {
+		if cluster := publiccontent.RelatedProductCluster(p.Slug, p.SlugAliases); cluster.Key != "" {
 			page.RelatedProducts, err = s.grokAlternatives(ctx, p)
 			if err != nil {
 				return publicpage.Page{}, err
 			}
-			page.RelatedProductsTitle = "其他 Grok 档位"
+			page.RelatedProductsTitle = cluster.Title
 		}
 	}
 	page.SEOTitle = metadataText(p.SeoMeta["title"])
@@ -162,6 +174,7 @@ func (s *source) Product(ctx context.Context, slug string) (publicpage.Page, err
 }
 
 func (s *source) grokAlternatives(ctx context.Context, current productpresenter.Product) ([]publicpage.Item, error) {
+	cluster := publiccontent.RelatedProductCluster(current.Slug, current.SlugAliases)
 	// This small category is read once through the anonymous batch projection.
 	rows, _, err := s.catalogProducts(ctx, strconv.Itoa(int(current.Category.ID)), 1, 100)
 	if err != nil {
@@ -169,7 +182,7 @@ func (s *source) grokAlternatives(ctx context.Context, current productpresenter.
 	}
 	var items []publicpage.Item
 	for _, item := range rows {
-		if item.ID == current.ID || item.Slug == current.Slug || !publiccontent.IsGrokProduct(item.Slug, item.SlugAliases) {
+		if item.ID == current.ID || item.Slug == current.Slug || !cluster.Contains(item.Slug, item.SlugAliases) {
 			continue
 		}
 		price := item.PriceAmount
@@ -270,6 +283,13 @@ func (s *source) Category(ctx context.Context, slug string) (publicpage.Page, er
 	guide := publiccontent.GPTRecharge().Resolve(publiccontent.CatalogLinks(ctx))
 	if slug == guide.CategorySlug && isMainSite(ctx) {
 		page.Title, page.SEOTitle, page.Summary, page.Content = guide.Title, guide.SEOTitle, guide.Summary, guide.HTML()
+		page.SEODescription = guide.Summary
+	} else if publiccontent.NeedsDescription(page.SEODescription, page.Title) {
+		names := make([]string, 0, len(page.Items))
+		for _, item := range page.Items {
+			names = append(names, item.Title)
+		}
+		page.SEODescription = publiccontent.CatalogDescription(localized(category.NameJSON), names)
 	}
 	return page, nil
 }

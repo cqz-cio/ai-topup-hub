@@ -27,7 +27,7 @@
                 : 'bg-secondary text-muted-foreground hover:text-foreground lg:bg-transparent lg:hover:bg-secondary'"
               @click="$emit('select', grp.id)"
             >
-              <img v-if="grp.icon" :src="getImageUrl(grp.icon)" :alt="catName(grp)" loading="lazy" class="h-5 w-5 flex-none rounded-md object-cover" />
+              <img v-if="grp.icon" :src="getImageUrl(grp.icon)" v-bind="imageDimensions(getImageUrl(grp.icon))" :alt="catName(grp)" loading="lazy" class="h-5 w-5 flex-none rounded-md object-cover" />
               <span class="min-w-0 truncate">{{ catName(grp) }}</span>
             </button>
             <button
@@ -61,6 +61,7 @@
 </template>
 
 <script setup lang="ts">
+import { imageDimensions } from '../../../utils/imageDimensions'
 import { useI18n } from 'vue-i18n'
 import { ChevronDown } from 'lucide-vue-next'
 import { getImageUrl } from '../../../utils/image'

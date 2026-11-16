@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { processHtmlForDisplay } from '../../utils/content'
+import { processPublicHtmlForDisplay } from '../../utils/content'
 
 const props = defineProps<{ html: string; readingSurface?: boolean }>()
 const sections = computed(() => {
-  const doc = new DOMParser().parseFromString(processHtmlForDisplay(props.html), 'text/html')
+  const doc = new DOMParser().parseFromString(processPublicHtmlForDisplay(props.html), 'text/html')
   const groups: string[][] = []
   for (const node of Array.from(doc.body.childNodes)) {
     if (node.nodeType === Node.COMMENT_NODE) continue

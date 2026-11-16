@@ -39,7 +39,7 @@
             >
             <!-- Thumbnail -->
             <div v-if="post.thumbnail" class="h-48 overflow-hidden relative">
-              <img :src="getImageUrl(post.thumbnail)" :alt="getLocalizedText(post.title)"
+              <img :src="getImageUrl(post.thumbnail)" v-bind="imageDimensions(getImageUrl(post.thumbnail))" :alt="getLocalizedText(post.title)"
                 loading="lazy" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
               <div class="absolute inset-0 bg-black/35"></div>
             </div>
@@ -95,6 +95,7 @@
 import { useI18n } from 'vue-i18n'
 import { RouterLink } from 'vue-router'
 import { ArrowRight, BookOpen, Search } from 'lucide-vue-next'
+import { imageDimensions } from '../utils/imageDimensions'
 import { getImageUrl } from '../utils/image'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'

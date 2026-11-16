@@ -3,7 +3,7 @@
   <aside ref="widget" class="support-widget" :style="{ ...widgetStyle, '--pet-scale': petScale }" :data-resting="resting" :data-open="open" :data-moved="!!widgetStyle" :data-dragging="dragging" :data-panel-overlap="panelOverlap" @keydown.esc.stop.prevent="escape">
     <section v-if="open" id="pi-support-window" ref="panel" class="support-window" :style="panelStyle" role="dialog" :aria-labelledby="'pi-support-title'" :aria-busy="busy">
       <header class="support-header">
-        <img :src="avatar" alt="" class="support-avatar" />
+        <img :src="avatar" width="133" height="160" alt="" class="support-avatar" />
         <div class="support-identity"><h2 id="pi-support-title">{{ copy.name }}</h2><span>{{ copy.subtitle }}</span></div>
         <button ref="closeButton" class="support-icon" type="button" :aria-label="copy.close" @click="close"><Minus :size="17" /></button>
       </header>

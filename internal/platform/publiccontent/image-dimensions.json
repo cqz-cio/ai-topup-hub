@@ -1,0 +1,894 @@
+{
+  "/uploads/86gamestore/c779fc65589ae19c7ff2.jpg": {
+    "width": 420,
+    "height": 420
+  },
+  "/uploads/86gamestore/f0bb72279d34b2b14d08.jpg": {
+    "width": 1024,
+    "height": 1024
+  },
+  "/uploads/catalog/grok-20261023/grok-plus-monthly.svg": {
+    "width": 960,
+    "height": 540
+  },
+  "/uploads/catalog/grok-20261023/grok-plus-yearly.svg": {
+    "width": 960,
+    "height": 540
+  },
+  "/uploads/catalog/grok-20261023/grok-premium-monthly.svg": {
+    "width": 960,
+    "height": 540
+  },
+  "/uploads/catalog/grok-20261023/grok-premium-yearly.svg": {
+    "width": 960,
+    "height": 540
+  },
+  "/uploads/catalog/grok-20261023/grok-super-monthly.svg": {
+    "width": 960,
+    "height": 540
+  },
+  "/uploads/catalog/grok-20261023/grok-super-yearly.svg": {
+    "width": 960,
+    "height": 540
+  },
+  "/uploads/catalog/grok-20261023/grok-ultra-monthly.svg": {
+    "width": 960,
+    "height": 540
+  },
+  "/uploads/catalog/grok-20261023/grok-ultra-yearly.svg": {
+    "width": 960,
+    "height": 540
+  },
+  "/brand/bikini-bottom-detail-20261022.png": {
+    "width": 1672,
+    "height": 941
+  },
+  "/brand/jellyfishing/clean-plate.png": {
+    "width": 1672,
+    "height": 941
+  },
+  "/brand/jellyfishing/foreground.png": {
+    "width": 1672,
+    "height": 941
+  },
+  "/brand/jellyfishing-background.png": {
+    "width": 1672,
+    "height": 941
+  },
+  "/brand/ocean-buttons/add-cart-20261022.png": {
+    "width": 2172,
+    "height": 724
+  },
+  "/brand/ocean-buttons/buy-now-20261022.png": {
+    "width": 2172,
+    "height": 724
+  },
+  "/brand/patrick-logo.png": {
+    "width": 1254,
+    "height": 1254
+  },
+  "/brand/scenes/bubbles-20261023/detail-bubbles.png": {
+    "width": 768,
+    "height": 768
+  },
+  "/brand/scenes/bubbles-20261023/detail-clean.png": {
+    "width": 1672,
+    "height": 941
+  },
+  "/brand/scenes/bubbles-20261023/garden-bubbles.png": {
+    "width": 768,
+    "height": 384
+  },
+  "/brand/scenes/bubbles-20261023/garden-clean.png": {
+    "width": 1672,
+    "height": 941
+  },
+  "/brand/scenes/bubbles-20261023/home-bubbles.png": {
+    "width": 768,
+    "height": 384
+  },
+  "/brand/scenes/bubbles-20261023/home-clean.png": {
+    "width": 1672,
+    "height": 941
+  },
+  "/brand/scenes/bubbles-20261023/street-bubbles.png": {
+    "width": 768,
+    "height": 384
+  },
+  "/brand/scenes/bubbles-20261023/street-clean.png": {
+    "width": 1672,
+    "height": 941
+  },
+  "/brand/scenes/coral-garden-20261022.png": {
+    "width": 1672,
+    "height": 941
+  },
+  "/brand/scenes/krusty-street-20261022.png": {
+    "width": 1672,
+    "height": 941
+  },
+  "/brand/scenes/pineapple-home-20261022.png": {
+    "width": 1672,
+    "height": 941
+  },
+  "/brand-icon-v2.svg": {
+    "width": 64,
+    "height": 64
+  },
+  "/brand-icon.png": {
+    "width": 32,
+    "height": 32
+  },
+  "/catalog-products/097b405cdd903e0750a19c6d848b4c.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/catalog-products/274c9483478cf511bbd14bc65a3926.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/catalog-products/294d28a8dc515316e378f8e150fa6d.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/catalog-products/51b9fa3a993e4df58dc55ee3af246b.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/catalog-products/68ab65a1551230b14e21bf165a14f1.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/catalog-products/9c416262bd799c295d0beca233a53f.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/catalog-products/ad164ca5e1678795061ce64705be4c.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/catalog-products/b729782a65596b0cf751320e932aca.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/catalog-products/glass-20261019/codex-1000-ph-20261016.svg": {
+    "width": 960,
+    "height": 540
+  },
+  "/catalog-products/glass-20261019/codex-250-ph-20261016.svg": {
+    "width": 960,
+    "height": 540
+  },
+  "/catalog-products/glass-20261019/codex-2500-ph-20261016.svg": {
+    "width": 960,
+    "height": 540
+  },
+  "/catalog-products/glass-20261019/codex-25000-ph-20261016.svg": {
+    "width": 960,
+    "height": 540
+  },
+  "/catalog-products/glass-20261019/codex-500-ph-20261016.svg": {
+    "width": 960,
+    "height": 540
+  },
+  "/catalog-products/glass-20261019/codex-5000-ph-20261016.svg": {
+    "width": 960,
+    "height": 540
+  },
+  "/catalog-products/glass-20261019/go-20261001.svg": {
+    "width": 900,
+    "height": 540
+  },
+  "/catalog-products/glass-20261019/plus-20261001.svg": {
+    "width": 900,
+    "height": 540
+  },
+  "/catalog-products/glass-20261019/pro10x-direct-ph-20261016.svg": {
+    "width": 900,
+    "height": 540
+  },
+  "/catalog-products/glass-20261019/pro10x-renew-ph-20261016.svg": {
+    "width": 900,
+    "height": 540
+  },
+  "/catalog-products/glass-20261019/pro20x-ios-20261007.svg": {
+    "width": 900,
+    "height": 540
+  },
+  "/catalog-products/glass-20261019/pro25x-cl-20261016.svg": {
+    "width": 900,
+    "height": 540
+  },
+  "/catalog-products/glass-20261019/pro25x-ph-20261016.svg": {
+    "width": 900,
+    "height": 540
+  },
+  "/catalog-products/glass-20261019/pro5x-cl-20261016.svg": {
+    "width": 900,
+    "height": 540
+  },
+  "/catalog-products/glass-20261019/pro5x-ios-20261007.svg": {
+    "width": 900,
+    "height": 540
+  },
+  "/catalog-products/glass-20261019/pro5x-ph-20261016.svg": {
+    "width": 900,
+    "height": 540
+  },
+  "/catalog-products/gmail-random-account.png": {
+    "width": 1536,
+    "height": 1024
+  },
+  "/catalog-products/pro-usd-20261111/pro-100-eg.svg": {
+    "width": 900,
+    "height": 540
+  },
+  "/catalog-products/pro-usd-20261111/pro-100-ph.svg": {
+    "width": 900,
+    "height": 540
+  },
+  "/catalog-products/pro-usd-20261111/pro-200-ph.svg": {
+    "width": 900,
+    "height": 540
+  },
+  "/catalog-products/pro-usd-20261111/pro-200-renew-ph.svg": {
+    "width": 900,
+    "height": 540
+  },
+  "/catalog-products/pro-usd-20261111/pro-500-eg.svg": {
+    "width": 900,
+    "height": 540
+  },
+  "/catalog-products/pro-usd-20261111/pro-500-ph.svg": {
+    "width": 900,
+    "height": 540
+  },
+  "/catalog-products/qzweb/aa16fb0f3bb8f6933985a4c8df660946.jpg": {
+    "width": 175,
+    "height": 178
+  },
+  "/catalog-products/qzweb/categories/10-7b19d7bf095bddd5574df0d27301dda5.png": {
+    "width": 128,
+    "height": 128
+  },
+  "/catalog-products/qzweb/categories/4-7b19d7bf095bddd5574df0d27301dda5.png": {
+    "width": 128,
+    "height": 128
+  },
+  "/catalog-products/qzweb/categories/6-5c682572551325f8affb793950af57ca.jpg": {
+    "width": 150,
+    "height": 150
+  },
+  "/catalog-products/qzweb/categories/7-aa16fb0f3bb8f6933985a4c8df660946.jpg": {
+    "width": 175,
+    "height": 178
+  },
+  "/catalog-products/qzweb/categories/9-7b19d7bf095bddd5574df0d27301dda5.png": {
+    "width": 128,
+    "height": 128
+  },
+  "/catalog-products/qzweb/codex-1000-ph-20261015.svg": {
+    "width": 960,
+    "height": 540
+  },
+  "/catalog-products/qzweb/codex-1000-ph-20261016.svg": {
+    "width": 960,
+    "height": 540
+  },
+  "/catalog-products/qzweb/codex-250-ph-20261015.svg": {
+    "width": 960,
+    "height": 540
+  },
+  "/catalog-products/qzweb/codex-250-ph-20261016.svg": {
+    "width": 960,
+    "height": 540
+  },
+  "/catalog-products/qzweb/codex-2500-ph-20261015.svg": {
+    "width": 960,
+    "height": 540
+  },
+  "/catalog-products/qzweb/codex-2500-ph-20261016.svg": {
+    "width": 960,
+    "height": 540
+  },
+  "/catalog-products/qzweb/codex-25000-ph-20261015.svg": {
+    "width": 960,
+    "height": 540
+  },
+  "/catalog-products/qzweb/codex-25000-ph-20261016.svg": {
+    "width": 960,
+    "height": 540
+  },
+  "/catalog-products/qzweb/codex-500-ph-20261015.svg": {
+    "width": 960,
+    "height": 540
+  },
+  "/catalog-products/qzweb/codex-500-ph-20261016.svg": {
+    "width": 960,
+    "height": 540
+  },
+  "/catalog-products/qzweb/codex-5000-ph-20261015.svg": {
+    "width": 960,
+    "height": 540
+  },
+  "/catalog-products/qzweb/codex-5000-ph-20261016.svg": {
+    "width": 960,
+    "height": 540
+  },
+  "/catalog-products/qzweb/d9b577cb478d98f95d021b7e6f3bb54c.jpg": {
+    "width": 715,
+    "height": 712
+  },
+  "/catalog-products/qzweb/go-20261001.svg": {
+    "width": 900,
+    "height": 540
+  },
+  "/catalog-products/qzweb/plus-20261001.svg": {
+    "width": 900,
+    "height": 540
+  },
+  "/catalog-products/qzweb/pro10x-direct-ph-20261016.svg": {
+    "width": 900,
+    "height": 540
+  },
+  "/catalog-products/qzweb/pro10x-renew-ph-20261016.svg": {
+    "width": 900,
+    "height": 540
+  },
+  "/catalog-products/qzweb/pro20x-direct-20261001.svg": {
+    "width": 900,
+    "height": 540
+  },
+  "/catalog-products/qzweb/pro20x-ios-20261007.svg": {
+    "width": 900,
+    "height": 540
+  },
+  "/catalog-products/qzweb/pro20x-renew-20261001.svg": {
+    "width": 900,
+    "height": 540
+  },
+  "/catalog-products/qzweb/pro25x-cl-20261016.svg": {
+    "width": 900,
+    "height": 540
+  },
+  "/catalog-products/qzweb/pro25x-ph-20261016.svg": {
+    "width": 900,
+    "height": 540
+  },
+  "/catalog-products/qzweb/pro50x-cl-20261001.svg": {
+    "width": 900,
+    "height": 540
+  },
+  "/catalog-products/qzweb/pro50x-ph-20261001.svg": {
+    "width": 900,
+    "height": 540
+  },
+  "/catalog-products/qzweb/pro5x-cl-20261001.svg": {
+    "width": 900,
+    "height": 540
+  },
+  "/catalog-products/qzweb/pro5x-cl-20261016.svg": {
+    "width": 900,
+    "height": 540
+  },
+  "/catalog-products/qzweb/pro5x-ios-20261007.svg": {
+    "width": 900,
+    "height": 540
+  },
+  "/catalog-products/qzweb/pro5x-ph-20261001.svg": {
+    "width": 900,
+    "height": 540
+  },
+  "/catalog-products/qzweb/pro5x-ph-20261016.svg": {
+    "width": 900,
+    "height": 540
+  },
+  "/catalog-products/transparent-icons-20261020/gemini.png": {
+    "width": 1243,
+    "height": 1265
+  },
+  "/catalog-products/transparent-icons-20261020/gpt.png": {
+    "width": 1254,
+    "height": 1254
+  },
+  "/catalog-products/transparent-icons-20261020/telegram.svg": {
+    "width": 420,
+    "height": 420
+  },
+  "/dj.svg": {
+    "width": 1600,
+    "height": 1600
+  },
+  "/media/ocean-20261023/add-cart-20261022.webp": {
+    "width": 2172,
+    "height": 724
+  },
+  "/media/ocean-20261023/bikini-bottom-detail-20261022.webp": {
+    "width": 1672,
+    "height": 941
+  },
+  "/media/ocean-20261023/buy-now-20261022.webp": {
+    "width": 2172,
+    "height": 724
+  },
+  "/media/ocean-20261023/coral-garden-20261022.webp": {
+    "width": 1672,
+    "height": 941
+  },
+  "/media/ocean-20261023/detail-bubbles.webp": {
+    "width": 768,
+    "height": 768
+  },
+  "/media/ocean-20261023/detail-clean.webp": {
+    "width": 1672,
+    "height": 941
+  },
+  "/media/ocean-20261023/garden-bubbles.webp": {
+    "width": 768,
+    "height": 384
+  },
+  "/media/ocean-20261023/garden-clean.webp": {
+    "width": 1672,
+    "height": 941
+  },
+  "/media/ocean-20261023/home-bubbles.webp": {
+    "width": 768,
+    "height": 384
+  },
+  "/media/ocean-20261023/home-clean.webp": {
+    "width": 1672,
+    "height": 941
+  },
+  "/media/ocean-20261023/krusty-street-20261022.webp": {
+    "width": 1672,
+    "height": 941
+  },
+  "/media/ocean-20261023/pineapple-home-20261022.webp": {
+    "width": 1672,
+    "height": 941
+  },
+  "/media/ocean-20261023/street-bubbles.webp": {
+    "width": 768,
+    "height": 384
+  },
+  "/media/ocean-20261023/street-clean.webp": {
+    "width": 1672,
+    "height": 941
+  },
+  "/media/seo-share/catalog-01e70cd4e27690b7c8dc-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-0218ddf1715224810452-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-194f484f506cf96c1da4-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-1f546c40c339d980edcb-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-2095502b726926280c8f-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-28f09f2eef60e354de74-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-2a654f55ed5b424f4653-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-2be5f17b926e651c440e-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-2cd7bdbe124ebc12839b-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-2f93471c605f90c09cca-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-35bc965469a013d72bed-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-373ff895b01d56af0da0-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-3db89c1d58a14b23a274-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-3dc654682ec8feeb8f5e-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-498c2f331bc2bcf53784-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-4a2d82666b1ba1310bbd-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-520cdb13113f4bc324c1-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-540f8b70e53bc986b2a2-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-56255742f238e429ae29-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-5b8c5678a958c95d76a0-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-604e9a593821c9786b97-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-6589210be62709745657-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-67577fb336970362091e-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-6930638547c7115b56ec-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-6af7cb5c8762d0c3255a-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-6d209723d1296bea4dc7-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-6f667902ab005edd8bda-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-7077f1b9d2a56e2262d7-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-70f17c8782d51ff65f87-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-765c1dfc4bccb30b21af-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-8b0b69939180c86b056d-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-957e4ece2e4fe733d4e0-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-9bfe7d652511f998e107-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-a265846e94494cef7883-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-a962f51756255a5211d4-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-ae9ae4c3fa932f480654-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-b2a85c3169fc048fc179-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-b437272f892facb5f251-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-bad5f49be94f3ba291de-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-c779fc65589ae19c7ff2-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-c7bd626eceb6e6c61c7b-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-d7d4c32af9652177616a-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-db694793c10628125d51-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-efe05831890e78c61343-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-f0b095dddcaf1b8973f0-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-f0bb72279d34b2b14d08-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-f4a88133edc358338b8d-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-f7909964d711ba179f40-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-f912ad18cfe536e0451e-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-fa654f26a8573e7b3dbc-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-fd6da8e9e2e72dba8b8a-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/catalog-ff4045697ab44cc33528-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/seo-share/qzweb-og-1200x630.jpg": {
+    "width": 1200,
+    "height": 630
+  },
+  "/media/storefront-20261020/clean-plate.webp": {
+    "width": 1672,
+    "height": 941
+  },
+  "/media/storefront-20261020/foreground.webp": {
+    "width": 1672,
+    "height": 941
+  },
+  "/media/storefront-20261020/gemini.webp": {
+    "width": 1243,
+    "height": 1265
+  },
+  "/media/storefront-20261020/gpt.webp": {
+    "width": 1254,
+    "height": 1254
+  },
+  "/media/storefront-20261020/jellyfishing.webp": {
+    "width": 1672,
+    "height": 941
+  },
+  "/media/storefront-20261020/patrick-icon.png": {
+    "width": 48,
+    "height": 48
+  },
+  "/media/storefront-20261020/patrick-logo.webp": {
+    "width": 1254,
+    "height": 1254
+  },
+  "/media/storefront-20261114/clean-plate.webp": {
+    "width": 1672,
+    "height": 941
+  },
+  "/media/storefront-20261114/foreground.webp": {
+    "width": 1672,
+    "height": 941
+  },
+  "/media/storefront-20261114/jellyfishing-1280.avif": {
+    "width": 1280,
+    "height": 720
+  },
+  "/media/storefront-20261114/jellyfishing-1280.webp": {
+    "width": 1280,
+    "height": 720
+  },
+  "/media/storefront-20261114/jellyfishing-1672.avif": {
+    "width": 1672,
+    "height": 941
+  },
+  "/media/storefront-20261114/jellyfishing-1672.webp": {
+    "width": 1672,
+    "height": 941
+  },
+  "/products/097b405cdd903e0750a19c6d848b4c.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/products/11ef8ab4679b1d2582ff01fae8f53c.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/products/20bfa550fa0abc04e9b99aef2f6bef.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/products/221055ad7e6f864518dd13222fed5f.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/products/22c2140d7e93d9bbb00eb72104e672.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/products/274c9483478cf511bbd14bc65a3926.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/products/27b62d0e78b4f6b556ce24ba613dba.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/products/294d28a8dc515316e378f8e150fa6d.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/products/3302dfaa81adacbb93cfbd6b28d262.jpg": {
+    "width": 2150,
+    "height": 816
+  },
+  "/products/349eb8d1a3e549f452786b82e92cb0.jpg": {
+    "width": 642,
+    "height": 922
+  },
+  "/products/48e7757018eda0f3fc80c2554e2c13.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/products/491aa91ff81cb776d4c7888875d001.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/products/4a9652bf31107f8e8f319f8a1c159d.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/products/51b9fa3a993e4df58dc55ee3af246b.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/products/5a40902c8b9cf615bbbe6cfe1bf6d8.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/products/5b27a95a0a4bd01035ddc2b2c9d657.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/products/5b92cbef8745dbbcdb9a38245d3bce.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/products/61bbbf59ee6f7ffd2f4a3c31a010ba.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/products/68ab65a1551230b14e21bf165a14f1.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/products/6ceb74b9acc1b6668eabe8755bd5ab.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/products/804b8625bf9f00e453b62a07bd77da.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/products/88f65c9be6574ee687432c3f589c30.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/products/9c416262bd799c295d0beca233a53f.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/products/aa7e319fc2bfe23e7ae0461caca9ef.jpg": {
+    "width": 2816,
+    "height": 1504
+  },
+  "/products/ad164ca5e1678795061ce64705be4c.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/products/ae5a600121f20e8b58dd92616342d6.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/products/afbdbc23a34fe12809921d5e4e4136.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/products/b1db89e735aaed3b517c9766a6edbe.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/products/b2d880fdf437165c1d8a20cae77ab0.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/products/b729782a65596b0cf751320e932aca.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/products/c8ef387adb68ccf7126cb0a94d8a35.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/products/chatgpt-plus-icon-v1.png": {
+    "width": 1254,
+    "height": 1254
+  },
+  "/products/chatgpt-pro-icon-v1.png": {
+    "width": 1254,
+    "height": 1254
+  },
+  "/products/claude-pro-icon-v1.png": {
+    "width": 1254,
+    "height": 1254
+  },
+  "/products/d23aa015e183fa1eb4226c38a636d6.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/products/d397dc541abcd331867d63ad6fcd24.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/products/d61f1303bf6c9c1bfbb8cbda98613e.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/products/d88ef20d8a2993de76d027df34a84e.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/products/deb9447ca3065a44bfbb7ba5c7b8e1.jpg": {
+    "width": 619,
+    "height": 754
+  },
+  "/products/e65a56f4be56b24b4847fc120543e4.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/products/fbdfe8cca1d3eb9aee42810486408f.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/products/fec0935a8aab54ff9553d721ee3b6d.jpg": {
+    "width": 2048,
+    "height": 2048
+  },
+  "/products/ff64063be557beb8c6810a6e3fb616.jpg": {
+    "width": 2048,
+    "height": 2048
+  }
+}
