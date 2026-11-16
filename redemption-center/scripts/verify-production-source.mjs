@@ -16,5 +16,5 @@ for (const [relative, sha256] of Object.entries(expected)) {
   const hash = createHash('sha256').update(await readFile(path.join(root, relative))).digest('hex');
   if (hash !== sha256) failures.push(relative);
 }
-console.log(JSON.stringify({release: manifest.productionRelease, files: actual.length, failures, originalGitObjectRecovered: false, completeFrontendSourceRecovered: false}, null, 2));
+console.log(JSON.stringify({release: manifest.productionRelease, files: actual.length, failures, originalGitObjectRecovered: false, originalFrontendFilesRecovered: false, frontendReconstructionRecord: manifest.frontendReconstructionRecord || null}, null, 2));
 if (failures.length) process.exitCode = 1;

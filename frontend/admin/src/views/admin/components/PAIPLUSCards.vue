@@ -20,13 +20,14 @@ const reason = ref(''), confirmed = ref(false)
 let active = true, listVersion = 0, detailVersion = 0, timer: ReturnType<typeof setInterval> | undefined
 const recordQueries = computed(() => (detail.value?.capabilities || data.value?.capabilities)?.status_scope === 'partner_order')
 const canRevoke = computed(() => detail.value?.capabilities?.can_revoke === true)
-const labels = computed<Record<string, string>>(() => ({ unused: recordQueries.value ? '本站待兑换' : '未使用', used: '已使用', processing: '兑换进行中', revoking: '销毁核验中', revoked: '已销毁', invalid: '已失效' }))
+const labels = computed<Record<string, string>>(() => ({ unknown: '待核验', unused: recordQueries.value ? '待核验' : '未使用', used: '已使用', processing: '兑换进行中', revoking: '销毁核验中', revoked: '已销毁', invalid: '已失效' }))
 const statusName = (value: string) => labels.value[value] || '待核验'
 const recordLabels: Record<string, string> = { no_record: '未查到本代理兑换记录', unverified: '暂未建立可查询记录', awaiting_customer: '等待客户确认', queued: '兑换排队中', running: '兑换处理中', captcha_required: '等待客户验证', succeeded: '兑换成功', failed: '本次兑换失败', cancelled: '本次兑换已取消', manual_review: '等待人工核对', uncertain: '兑换结果待确认', expired: '本次兑换授权已过期', card_unavailable: '本次兑换卡密不可用', retryable_no_task: '原兑换任务待核对' }
 function upstreamName(card: PAIPLUSCard) {
   const snapshot = card.upstream
   if (!snapshot) return '尚未查询'
   if (snapshot.scope === 'partner_order') return recordLabels[snapshot.status] || '兑换结果待确认'
+  if (snapshot.source === 'wudi_main') return ({ used: '已使用', unused: '未使用（本次查询结果）', processing: '兑换进行中', review: '等待上游人工核对', disabled: '上游已停用' } as Record<string, string>)[snapshot.status] || '待核验'
   return snapshot.used === true ? '已使用' : snapshot.status === 'unused' && snapshot.used === false && snapshot.can_resubmit ? '未使用，可兑换' : '需核对，不能直接退款'
 }
 const date = (value: number | null | undefined) => value ? new Date(value).toLocaleString('zh-CN', { hour12: false }) : '尚未核验'
@@ -107,9 +108,9 @@ onUnmounted(() => { active = false; ++listVersion; close(); clearInterval(timer)
   <section class="space-y-4" aria-label="PAIPLUS 交付卡密">
     <div class="rounded-xl border border-border bg-card p-4">
       <h2 class="font-semibold">已交付卡密与上游对应关系</h2>
-      <p class="mt-1 text-sm text-muted-foreground">付款发货后自动记录到这里。{{ recordQueries ? '“本站待兑换”是本站记录，不代表上游已确认未使用；查询范围限于本代理的兑换记录。' : '“未使用”表示客户尚未兑换，不代表尚未发货。' }}查看双码和查询均记录操作人。</p>
-      <div class="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-6">
-        <button v-for="key in ['unused', 'used', 'processing', 'revoking', 'revoked', 'invalid']" :key="key" type="button" class="rounded-lg border px-3 py-2 text-left" :class="status === key ? 'border-primary ring-1 ring-primary' : 'border-border'" :aria-pressed="status === key" @click="status = status === key ? '' : key; search()">
+      <p class="mt-1 text-sm text-muted-foreground">付款发货后自动记录到这里。{{ recordQueries ? '查询范围限于本代理的兑换记录；未查到记录时使用状态待核验。' : '状态以最近一次上游查询为准；尚未确认使用情况的卡显示“待核验”。' }}查看双码和查询均记录操作人。</p>
+      <div class="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-7">
+        <button v-for="key in ['unknown', 'unused', 'used', 'processing', 'revoking', 'revoked', 'invalid']" :key="key" type="button" class="rounded-lg border px-3 py-2 text-left" :class="status === key ? 'border-primary ring-1 ring-primary' : 'border-border'" :aria-pressed="status === key" @click="status = status === key ? '' : key; search()">
           <span class="block text-xs text-muted-foreground">{{ statusName(key) }}</span><strong class="mt-1 block text-xl">{{ data?.counts[key] ?? '—' }}</strong>
         </button>
       </div>
@@ -117,7 +118,7 @@ onUnmounted(() => { active = false; ++listVersion; close(); clearInterval(timer)
     <form class="flex flex-col gap-2 sm:flex-row" @submit.prevent="search">
       <Input v-model="query" aria-label="搜索卡密或订单" placeholder="搜索订单编号、商品名称或完整卡密" autocomplete="off" class="flex-1" />
       <select v-model="status" aria-label="卡密状态" class="h-10 rounded-md border border-input bg-background px-3 text-sm" @change="search">
-        <option value="">全部状态</option><option v-for="(label, key) in labels" :key="key" :value="key" v-show="key !== 'unknown'">{{ label }}</option>
+        <option value="">全部状态</option><option v-for="(label, key) in labels" :key="key" :value="key">{{ label }}</option>
       </select>
       <Button type="submit" :disabled="loading">查询</Button>
       <Button type="button" variant="outline" :disabled="loading" @click="load()">刷新列表</Button>
@@ -153,7 +154,7 @@ onUnmounted(() => { active = false; ++listVersion; close(); clearInterval(timer)
             <div v-for="item in [{ name: '本站 PAIPLUS 卡密', value: detail.code }, { name: '对应上游卡密', value: detail.source_code }]" :key="item.name"><div class="mb-1 flex items-center justify-between gap-2"><label class="text-xs text-muted-foreground">{{ item.name }}</label><Button type="button" size="sm" variant="ghost" @click="copy(item.value)">复制</Button></div><code class="block select-all break-all rounded-md border border-border p-3 text-sm">{{ item.value }}</code></div>
             <p class="break-all text-xs text-muted-foreground">绑定编号：{{ detail.reference }}</p>
           </div>
-          <div class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border p-4"><div class="text-sm"><p>{{ recordQueries ? '上游兑换记录' : '上游状态' }}：{{ upstreamName(detail) }}</p><p class="mt-1 text-xs text-muted-foreground">最近查询：{{ date(detail.upstream_checked_at) }}</p><p v-if="detail.upstream?.message" class="mt-2 max-w-lg text-xs text-muted-foreground">{{ detail.upstream.message }}</p></div><Button v-if="permission('check')" type="button" variant="outline" :disabled="working" @click="check">{{ recordQueries ? '查询上游记录' : '核验上游状态' }}</Button></div>
+          <div class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border p-4"><div class="text-sm"><p>{{ recordQueries ? '上游兑换记录' : '上游状态' }}：{{ upstreamName(detail) }}</p><p v-if="detail.upstream?.source === 'wudi_main' && detail.upstream.redemption_status" class="mt-1 text-xs">兑换结果：{{ recordLabels[detail.upstream.redemption_status] || '待核验' }}<span v-if="detail.upstream.redemption_updated_at"> · {{ new Date(detail.upstream.redemption_updated_at).toLocaleString('zh-CN', { hour12: false }) }}</span></p><p class="mt-1 text-xs text-muted-foreground">最近查询：{{ date(detail.upstream_checked_at) }}</p><p v-if="detail.upstream?.message" class="mt-2 max-w-lg text-xs text-muted-foreground">{{ detail.upstream.message }}</p></div><Button v-if="permission('check')" type="button" variant="outline" :disabled="working" @click="check">{{ recordQueries ? '查询上游记录' : '核验上游状态' }}</Button></div>
           <div v-if="detail.status === 'revoked'" class="rounded-xl border border-border p-4 text-sm"><strong>本站卡密已永久销毁</strong><p class="mt-1">销毁时间：{{ date(detail.revoked_at) }}。原对应关系保留用于核账和向上游申请退款，不能重新启用。</p></div>
           <div v-else-if="permission('revoke') && !canRevoke" class="space-y-2 rounded-xl border border-border p-4 text-sm"><h3 class="font-semibold">退款前人工核对</h3><p class="text-muted-foreground">{{ detail.capabilities?.revoke_message || '当前未确认自动销毁能力，请人工核对后处理退款。' }}</p></div>
           <form v-else-if="permission('revoke') && canRevoke" class="space-y-3 rounded-xl border border-destructive/30 p-4" @submit.prevent="destroy">

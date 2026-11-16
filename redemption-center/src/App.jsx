@@ -1,14 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ArrowRight, ArrowUpRight, ArrowLeft, Check, CheckCircle2, FileSpreadsheet, Headphones, Info, Layers3, Menu, Pause, Play, Search, ShieldCheck, Ticket, UserRound, WalletCards, X, Download, RotateCcw, Copy, LockKeyhole, AlertCircle } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, ArrowLeft, Check, CheckCircle2, FileSpreadsheet, Headphones, Info, Layers3, Menu, Moon, Sun, Pause, Play, Search, ShieldCheck, Ticket, UserRound, WalletCards, X, Download, RotateCcw, Copy, LockKeyhole, AlertCircle } from 'lucide-react';
 import { SceneMotion } from './SceneMotion.jsx';
 import { api, active, terminal, statusLabel, productLabel, extractCard, formatDate } from './api.js';
 import { parseRows } from './batch.js';
+import { WudiV2Flow } from './WudiV2Flow.jsx';
+import { LinkRecharge, LinkBatch, LinkBilling } from './WudiLinkFlow.jsx';
+import './wudi-flow.css';
 import './design.css';
 import './functional.css';
 import SessionGuide from './SessionGuide.jsx';
 import ConfirmationPanel from './ConfirmationPanel.jsx';
 
 const tools=[{id:'recharge',name:'充值兑换',desc:'验证卡密，核对账号后充值',icon:Ticket},{id:'batch',name:'批量兑换',desc:'导入表格，逐行核对与提交',icon:Layers3},{id:'lookup',name:'卡密查询',desc:'查看使用状态和充值记录',icon:Search},{id:'billing',name:'账单查询',desc:'查看订阅状态及可用账单',icon:WalletCards}];
+const wudiTools=[{id:'recharge',name:'兑换套餐',icon:Ticket},{id:'promo',name:'半价兑换',icon:Ticket},{id:'lookup',name:'查询结果',icon:Search},{id:'orders',name:'我的订单',icon:FileSpreadsheet},{id:'billing',name:'订阅查询',icon:WalletCards},{id:'batch',name:'批量兑换',icon:Layers3}];
 const steps=['验证卡密','核对账号','确认充值','查看结果'];
 function Message({children}){return children?<p role="alert" className="error"><AlertCircle size={16}/>{children}</p>:null;}
 function Status({state}){return <span className={'status status-'+state}>{statusLabel(state)}</span>;}
@@ -111,21 +115,137 @@ function Admin({config,onChange}) {
 }
 
 export function App() {
-  const [config,setConfig]=useState(null),[bootError,setBootError]=useState(''),[tool,setTool]=useState(location.pathname==='/admin'?'admin':'recharge'),[dialog,setDialog]=useState(''),[menu,setMenu]=useState(false);
-  const [motionEnabled,setMotionEnabled]=useState(()=>!window.matchMedia('(prefers-reduced-motion: reduce)').matches),[motionStatus,setMotionStatus]=useState('loading');
-  const bootVersion=useRef(0);
-  async function boot(){
-    const version=++bootVersion.current;
-    try{const data=await api('session');if(version===bootVersion.current){setConfig(data);setBootError('');}}
-    catch(e){if(version===bootVersion.current)setBootError(e.message);}
+  const [config, setConfig] = useState(null);
+  const [bootError, setBootError] = useState('');
+  const [tool, setTool] = useState(location.pathname === '/admin' ? 'admin' : 'recharge');
+  const [dark, setDark] = useState(false);
+  const [dialog, setDialog] = useState('');
+  const [menu, setMenu] = useState(false);
+  const [motionEnabled, setMotionEnabled] = useState(() => !window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const [motionStatus, setMotionStatus] = useState('loading');
+  const bootVersion = useRef(0);
+
+  async function boot() {
+    const version = ++bootVersion.current;
+    try {
+      const data = await api('session');
+      if (version === bootVersion.current) { setConfig(data); setBootError(''); }
+    } catch (error) {
+      if (version === bootVersion.current) setBootError(error.message);
+    }
   }
-  useEffect(()=>{boot();const preference=window.matchMedia('(prefers-reduced-motion: reduce)'),update=()=>setMotionEnabled(!preference.matches);preference.addEventListener('change',update);return()=>preference.removeEventListener('change',update);},[]);
-  const select=id=>{setTool(id);setMenu(false);};
-  return <div className="app layout-sidebar"><div className="scene" aria-hidden="true">{motionEnabled&&<SceneMotion onStatus={setMotionStatus}/>}</div><div className="wash" aria-hidden="true"/>
-  <header className="site-header"><div className="header-inner"><a className="brand" href="/"><span className="logo"><img src="/assets/brand-logo.png" alt="派大星"/></span><span><b>π星卡社</b><small>卡密兑换 · 自助服务</small></span></a><nav className={'site-nav '+(menu?'open':'')} aria-label="主导航"><button className="active" onClick={()=>select('recharge')}><Ticket size={16}/>兑换中心</button><button onClick={()=>{setMenu(false);setDialog('guide');}}><Info size={16}/>帮助</button></nav><div className="header-right"><button className="mobile-menu icon-button" aria-label={menu?'收起导航':'展开导航'} aria-expanded={menu} onClick={()=>setMenu(!menu)}><Menu size={20}/></button></div></div></header>
-  <main className="page"><div className="page-heading"><div><div className="eyebrow">π星卡社 / 自助服务</div><h1>{tool==='admin'?'站点管理':'兑换中心'}</h1><p>从一张卡密开始，轻松完成充值。</p></div><button className="preview-badge motion-toggle" aria-label={motionEnabled?'暂停背景动画':'开启背景动画'} aria-pressed={motionEnabled&&motionStatus==='playing'} disabled={motionStatus==='unavailable'} onClick={()=>setMotionEnabled(!motionEnabled)}>{motionEnabled&&motionStatus!=='unavailable'?<Pause size={14}/>:<Play size={14}/>}<span>{motionStatus==='unavailable'?'静态背景':!motionEnabled?'动态已暂停':motionStatus==='playing'?'动态已开启':'背景加载中'}</span></button></div>
-  {config?.mode==='mock'&&<div className="environment-note"><Info size={16}/><span>本地联调：卡密由本机数据库生成，充值走模拟源头，不产生真实充值。请使用测试账号凭证。</span></div>}
-  {!config?<section className="form-panel glass"><h2>{bootError?'服务暂未连接':'正在连接兑换服务…'}</h2><Message>{bootError}</Message>{bootError&&<button className="primary" onClick={boot}>重新连接</button>}</section>:<div className={'workspace '+(tool==='admin'?'admin-workspace':'')}><nav className="tool-nav" aria-label="兑换工具" role="tablist"><p className="sidebar-caption">自助服务</p>{tools.map(({id,name,icon:Icon})=><button role="tab" aria-selected={tool===id} className={'tool-tab '+(tool===id?'selected':'')} key={id} onClick={()=>select(id)}><Icon size={19}/><span>{name}</span></button>)}<button className="sidebar-help" onClick={()=>setDialog('support')}><Headphones size={18}/>需要帮助？</button></nav><div className="tool-content" role="tabpanel" aria-label={tools.find(t=>t.id===tool)?.name||'站点管理'}>{tool==='admin'?<Admin config={config} onChange={boot}/>:<div className="functional-work-grid"><div className="main-flow" key={tool}>{tool==='recharge'?<Recharge config={config} onChange={boot}/>:tool==='batch'?<Batch config={config} onChange={boot}/>:tool==='lookup'?<Lookup/>:<Billing/>}</div><aside className="help-area"><ShieldCheck size={25}/><h3>{tool==='batch'?'每一行，都准确配对':tool==='billing'?'订阅信息，一目了然':'兑换前的小提醒'}</h3><p>{tool==='batch'?'请核对每一行的邮箱和商品。结果待确认的行只会查询原记录。':tool==='billing'?'账单和发票以实际查询结果为准，缺失信息会显示为暂未提供。':'卡密决定充值商品和套餐。请在下一步核对账号，确认后再提交。'}</p><div className="help-links"><button onClick={()=>setDialog('guide')}><Info size={17}/>查看兑换说明<ArrowUpRight size={15}/></button></div><div className="help-bottom">遇到问题？<button onClick={()=>setDialog('support')}>联系客服</button></div></aside></div>}</div></div>}
-  <footer className="page-footer"><span><ShieldCheck size={15}/>先核对，再提交，每一步都清楚。</span><div className="footer-links"><button className="text-button" onClick={()=>setDialog('support')}><Headphones size={16}/>联系客服</button><a href="/admin" className="text-button">站点管理</a></div></footer></main>
-  {dialog&&<div className="modal-backdrop" onClick={()=>setDialog('')}><section className="modal glass" role="dialog" aria-modal="true" aria-labelledby="dialog-title" onClick={e=>e.stopPropagation()}><button className="close icon-button" aria-label="关闭" onClick={()=>setDialog('')}><X size={21}/></button><h2 id="dialog-title">{dialog==='support'?'联系客服':'兑换使用说明'}</h2>{dialog==='support'?<><p>请联系向你提供卡密的客服，并提供兑换时间、问题截图或本站兑换记录，以便核对处理。</p><p>不要在公开聊天中发送账号凭证或完整卡密。</p></>:<><p>1. 输入你收到的 PAIPLUS 卡密，核对商品与套餐。</p><p>2. 按对应产品提示填写账号凭证，核验邮箱。</p><p>3. 确认账号无误后提交充值。</p><p>4. 等待状态变为“已完成”。处理中或结果待确认时查询原记录，勿重复兑换。</p><p>批量表格在本地读取，每行的卡密与 Session 始终按原行号配对。</p></>}</section></div>}</div>;
+
+  useEffect(() => {
+    boot();
+    const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const update = () => setMotionEnabled(!preference.matches);
+    preference.addEventListener('change', update);
+    return () => preference.removeEventListener('change', update);
+  }, []);
+
+  const select = id => { setTool(id); setMenu(false); };
+  const currentTools = config?.partner_protocol === 2 ? wudiTools : tools;
+
+  function renderFlow() {
+    if (config.partner_protocol === 2) return <WudiV2Flow tool={tool} config={config} onChange={boot}/>;
+    if (tool === 'recharge') return config.provider === 'wudi' ? <LinkRecharge config={config} onChange={boot}/> : <Recharge config={config} onChange={boot}/>;
+    if (tool === 'batch') return config.provider === 'wudi' ? <LinkBatch config={config} onChange={boot}/> : <Batch config={config} onChange={boot}/>;
+    if (tool === 'lookup') return <Lookup/>;
+    return config.provider === 'wudi' ? <LinkBilling/> : <Billing/>;
+  }
+
+  const helpText = config?.partner_protocol === 2
+    ? '先验证卡密，再粘贴完整 Session 预检。核对账号、套餐和订阅详情，由你确认后才提交兑换。处理中请继续查询原订单。'
+    : config?.provider === 'wudi'
+      ? '获取链接后，在兑换站核对账号与套餐并确认。回到这里可查看结果；处理中请继续查询原记录。'
+      : tool === 'batch'
+        ? '请核对每一行的邮箱和商品。结果待确认的行只会查询原记录。'
+        : tool === 'billing'
+          ? '账单和发票以实际查询结果为准，缺失信息会显示为暂未提供。'
+          : '卡密决定充值商品和套餐。请在下一步核对账号，确认后再提交。';
+
+  return <div className={'app layout-sidebar' + (dark ? ' dark' : '')}>
+    <div className="scene" aria-hidden="true">{motionEnabled && <SceneMotion onStatus={setMotionStatus}/>}</div>
+    <div className="wash" aria-hidden="true"/>
+    <header className="site-header">
+      <div className="header-inner">
+        <a className="brand" href="/">
+          <span className="logo"><img src="/assets/brand-logo.png" alt="派大星"/></span>
+          <span><b>π星卡社</b><small>卡密兑换 · 自助服务</small></span>
+        </a>
+        <nav className={'site-nav ' + (menu ? 'open' : '')} aria-label="主导航">
+          <button className="active" onClick={() => select('recharge')}><Ticket size={16}/>兑换中心</button>
+          <button onClick={() => { setMenu(false); setDialog('guide'); }}><Info size={16}/>帮助</button>
+        </nav>
+        <div className="header-right">
+          <button className="icon-button" aria-label={dark ? '切换浅色模式' : '切换深色模式'} onClick={() => setDark(!dark)}>{dark ? <Sun size={19}/> : <Moon size={19}/>}</button>
+          <button className="mobile-menu icon-button" aria-label={menu ? '收起导航' : '展开导航'} aria-expanded={menu} onClick={() => setMenu(!menu)}><Menu size={20}/></button>
+        </div>
+      </div>
+    </header>
+    <main className="page">
+      <div className="page-heading">
+        <div><div className="eyebrow">π星卡社 / 自助服务</div><h1>{tool === 'admin' ? '站点管理' : '兑换中心'}</h1><p>从一张卡密开始，轻松完成充值。</p></div>
+        <button className="preview-badge motion-toggle" aria-label={motionEnabled ? '暂停背景动画' : '开启背景动画'} aria-pressed={motionEnabled && motionStatus === 'playing'} disabled={motionStatus === 'unavailable'} onClick={() => setMotionEnabled(!motionEnabled)}>
+          {motionEnabled && motionStatus !== 'unavailable' ? <Pause size={14}/> : <Play size={14}/>}
+          <span>{motionStatus === 'unavailable' ? '静态背景' : !motionEnabled ? '动态已暂停' : motionStatus === 'playing' ? '动态已开启' : '背景加载中'}</span>
+        </button>
+      </div>
+      {config?.mode === 'mock' && <div className="environment-note"><Info size={16}/><span>本地联调：卡密由本机数据库生成，充值走模拟源头，不产生真实充值。请使用测试账号凭证。</span></div>}
+      {!config ? <section className="form-panel glass">
+        <h2>{bootError ? '服务暂未连接' : '正在连接兑换服务…'}</h2><Message>{bootError}</Message>
+        {bootError && <button className="primary" onClick={boot}>重新连接</button>}
+      </section> : <div className={'workspace ' + (tool === 'admin' ? 'admin-workspace' : '')}>
+        <nav className="tool-nav" aria-label="兑换工具" role="tablist">
+          <p className="sidebar-caption">自助服务</p>
+          {currentTools.map(({ id, name, icon: Icon }) => <button role="tab" aria-selected={tool === id} className={'tool-tab ' + (tool === id ? 'selected' : '')} key={id} onClick={() => select(id)}><Icon size={19}/><span>{name}</span></button>)}
+          <button className="sidebar-help" onClick={() => setDialog('support')}><Headphones size={18}/>需要帮助？</button>
+        </nav>
+        <div className="tool-content" role="tabpanel" aria-label={currentTools.find(item => item.id === tool)?.name || '站点管理'}>
+          {tool === 'admin' ? <Admin config={config} onChange={boot}/> : <div className="functional-work-grid">
+            <div className="main-flow" key={tool}>{renderFlow()}</div>
+            <aside className="help-area">
+              <ShieldCheck size={25}/>
+              <h3>{tool === 'batch' ? '每一行，都准确配对' : tool === 'billing' ? '订阅信息，一目了然' : '兑换前的小提醒'}</h3>
+              <p>{helpText}</p>
+              <div className="help-links"><button onClick={() => setDialog('guide')}><Info size={17}/>查看兑换说明<ArrowUpRight size={15}/></button></div>
+              <div className="help-bottom">遇到问题？<button onClick={() => setDialog('support')}>联系客服</button></div>
+            </aside>
+          </div>}
+        </div>
+      </div>}
+      <footer className="page-footer">
+        <span><ShieldCheck size={15}/>先核对，再提交，每一步都清楚。</span>
+        <div className="footer-links"><button className="text-button" onClick={() => setDialog('support')}><Headphones size={16}/>联系客服</button><a href="/admin" className="text-button">站点管理</a></div>
+      </footer>
+    </main>
+    {dialog && <div className="modal-backdrop" onClick={() => setDialog('')}>
+      <section className="modal glass" role="dialog" aria-modal="true" aria-labelledby="dialog-title" onClick={event => event.stopPropagation()}>
+        <button className="close icon-button" aria-label="关闭" onClick={() => setDialog('')}><X size={21}/></button>
+        <h2 id="dialog-title">{dialog === 'support' ? '联系客服' : '兑换使用说明'}</h2>
+        {dialog === 'support' ? <>
+          <p>请联系向你提供卡密的客服，并提供兑换时间、问题截图或本站兑换记录，以便核对处理。</p>
+          <p>不要在公开聊天中发送账号凭证或完整卡密。</p>
+        </> : config?.partner_protocol === 2 ? <>
+          <p>1. 使用订单中的 PAIPLUS 卡密验证套餐和地区。</p>
+          <p>2. 粘贴完整 Session，阅读并同意预检说明。已有相同网页订阅时，服务方可能关闭自动续费。</p>
+          <p>3. 预检通过后核对账号及订阅详情，在两分钟授权期限内勾选确认并提交兑换。</p>
+          <p>4. 排队、处理中或结果待核实时，继续查询原订单。只有明确成功才视为完成。</p>
+          <p>查询结果和我的订单可用原本站卡密找回；订阅查询无需卡密，不提交充值。批量卡密须逐张核对并确认。</p>
+        </> : config?.provider === 'wudi' ? <>
+          <p>1. 输入你收到的 PAIPLUS 卡密，获取专属兑换链接。</p>
+          <p>2. 复制页面私下显示的兑换卡密，打开专属链接，在兑换站粘贴。</p>
+          <p>3. 在兑换站核对账号与套餐，并由你确认充值。创建链接不会充值。</p>
+          <p>4. 返回本站查看结果。处理中或待核实时继续查询原记录，不能重复提交。</p>
+          <p>新协议无需在本站填写 Session；批量表格只填写一列卡密。当前服务未提供账单及未使用卡密核验。</p>
+        </> : <>
+          <p>1. 输入你收到的 PAIPLUS 卡密，核对商品与套餐。</p>
+          <p>2. 按对应产品提示填写账号凭证，核验邮箱。</p>
+          <p>3. 确认账号无误后提交充值。</p>
+          <p>4. 等待状态变为“已完成”。处理中或结果待确认时查询原记录，勿重复兑换。</p>
+          <p>批量表格在本地读取，每行的卡密与 Session 始终按原行号配对。</p>
+        </>}
+      </section>
+    </div>}
+  </div>;
 }

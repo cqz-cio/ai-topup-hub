@@ -4,9 +4,6 @@ import { App } from "./App.jsx";
 import { clearPendingRequests } from "./api.js";
 import "./styles.css";
 
-// Keep native controls bright even when the operating system is in dark mode.
-document.documentElement.style.colorScheme = "light";
-
 const root=createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>

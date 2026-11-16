@@ -3,7 +3,7 @@
   "productionRelease": "20261115-235900",
   "recordedOriginalCommit": "2c07968190a43d8b4067a17d38a97cc970b00b62",
   "originalGitObjectRecovered": false,
-  "scope": "Exact production Node server source plus identified verification files. Frontend and admin source are incomplete. Not deployable as a complete production snapshot.",
+  "scope": "Exact production Node server sources and identified verification files. Missing React/Vue UI rebuilt from published artifacts; see wudi-ui-recovery-20261116.json. Original Git object and original UI source files remain unavailable.",
   "serverFiles": {
     "server/wudi.mjs": "ec04e222438adfed1dce5850cb857d42cf7c4d50c60f5dd6819d3de45206f249",
     "server/service.mjs": "a9f9a095f4d0724242708ba3b358f43fdfd37e7e294ffc7d16ae160628a96cfb",
@@ -145,5 +145,6 @@
       "Sites packaging test before local build existed",
       "One Wudi delivery test file exited abnormally in parallel full suite; focused and serial full rechecks passed."
     ]
-  }
+  },
+  "frontendReconstructionRecord": "wudi-ui-recovery-20261116.json"
 }

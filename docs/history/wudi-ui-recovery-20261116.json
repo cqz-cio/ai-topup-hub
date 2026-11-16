@@ -1,0 +1,164 @@
+{
+  "date": "2026-11-16",
+  "productionRelease": "20261115-235900",
+  "originalGitObjectRecovered": false,
+  "originalFrontendFilesRecovered": false,
+  "frontendReconstructedFromPublishedArtifacts": true,
+  "deployed": false,
+  "sourceFiles": {
+    "redemption-center/src/App.jsx": "1ba121749ba5209a86b13547cf905067fe63214d2ff987ead36e9c38d1691e20",
+    "redemption-center/src/main.jsx": "d2fbc3ebd7f700f2baf49f3c2682d824c1808168b5c991aaf20950ad796c82d9",
+    "redemption-center/src/WudiV2Flow.jsx": "336cb41f220a8bc091e89d85565b83493ec456e0213f1a3983a72aec957de145",
+    "redemption-center/src/WudiLinkFlow.jsx": "c2fafc11ba5271d15e5f03233a9c79d194841ff7eea81e4a8ae1f9427539aeb4",
+    "redemption-center/src/wudi-flow.css": "9d256dbbbb4cdbdc457c9fd5d32adb94234bae3121ced5616461b3b164228955",
+    "redemption-center/tests/wudi-ui.test.mjs": "6cfdd15e5fe49afc7c274493a4fbe7f1dfd7ac2ebd14713712fe820b2065c825",
+    "frontend/admin/src/api/paiplus.ts": "85d359fa868c7939ea09b6c31723f17ff0b69b86a870597b7b989c9edc379223",
+    "frontend/admin/src/views/admin/components/PAIPLUSCards.vue": "50e3291bfa0286106d7cd0325dfdf98adc2a6a001f7658db41fc5fdff08b71a1",
+    "frontend/admin/src/views/admin/components/PAIPLUSCards.test.ts": "f0d0bbb740e13510007ad20cb279545629f2f67d50a0114015b19dabe742cb86"
+  },
+  "artifacts": {
+    "redemption": {
+      "bundle": "index-fmRdUZgO.js",
+      "sha256": "a5a243964836d961a368c4590f654e22259740c4ca6289b77ed62657a587d74e",
+      "v1ApplicationRange": [
+        219287,
+        228374
+      ],
+      "v2ApplicationRange": [
+        228374,
+        241727
+      ],
+      "rangeUnits": "JavaScript UTF-16 offsets, half-open; identified using Babel AST"
+    },
+    "admin": {
+      "productionSha256": "9161b2cbd9b24aa9c30e048f002cfd187424ceeb89459c6e42aecbfc49b51531",
+      "rebuiltSha256": "5e0f66f352fd535071e71e2b7f764fdfe44ad55571f3ec0b8908266ab93454e0",
+      "importHashNormalizedEqual": true,
+      "normalizedHashes": [
+        "195c68769350994271f3e98a298dc0a46fa0c0df4df557c87df510fcc797e405",
+        "195c68769350994271f3e98a298dc0a46fa0c0df4df557c87df510fcc797e405"
+      ]
+    }
+  },
+  "staticAnalysis": {
+    "reaParentEvidenceId": "ev_d0d94534e9a29d6f22b1d5f9b811a7b1ef9b799b145dc22630b2c38ca99e0889",
+    "coverage": "Partial static entry analysis; semantic-node limit. Not treated as proof of runtime equivalence."
+  },
+  "css": {
+    "legacyFunctionsUnchanged": true,
+    "jsxSyntaxPassed": true,
+    "recoveredCssRules": 31,
+    "productionCommonCssRules": 279,
+    "sharedCssRulesEquivalentIgnoringBuildVendorPrefixes": true,
+    "sharedCssCascadeOrderEqual": true,
+    "retainedExtraCss": [
+      "session-guide.css",
+      "confirmation.css"
+    ],
+    "mainPrivacyListenersRetained": true,
+    "productionThemeToggleRestored": true,
+    "originalAppSourceRecovered": false,
+    "productionBundleSha256": "a5a243964836d961a368c4590f654e22259740c4ca6289b77ed62657a587d74e",
+    "productionStylesheetSha256": "41da041c144b593b3cfd8523aa7b652aa176ae7d0889e8eec2c80da53c3e2ed0"
+  },
+  "validation": {
+    "redemptionTests": 152,
+    "newReactDOMTests": 13,
+    "adminTests": 83,
+    "skipped": 0,
+    "redemptionBuild": true,
+    "adminTypecheckAndBuild": true,
+    "browser": {
+      "simulatedCompleted": true,
+      "subscriptionReturned": true,
+      "sessionCleared": true,
+      "redemptionConsoleErrors": [],
+      "helpVisible": true,
+      "darkToggle": true,
+      "unknownFilter": true,
+      "unknownDetailVisible": true,
+      "fullCodesHidden": true,
+      "usedDetailAndTime": true,
+      "adminConsoleErrors": []
+    },
+    "responsive": [
+      {
+        "width": 1440,
+        "domEqual": true,
+        "elementBoundsEqual": true,
+        "elementCount": 28,
+        "production": {
+          "brokenImages": 0,
+          "height": 900,
+          "scrollWidth": 1425,
+          "width": 1440
+        },
+        "reconstructed": {
+          "brokenImages": 0,
+          "height": 900,
+          "scrollWidth": 1425,
+          "width": 1440
+        },
+        "fullComputedStyleEqual": false,
+        "differenceNote": "Only the animation button hover background differed; element bounds/fonts and shared CSS are equal."
+      },
+      {
+        "width": 390,
+        "domEqual": true,
+        "elementBoundsEqual": true,
+        "elementCount": 28,
+        "production": {
+          "brokenImages": 0,
+          "height": 900,
+          "scrollWidth": 375,
+          "width": 390
+        },
+        "reconstructed": {
+          "brokenImages": 0,
+          "height": 900,
+          "scrollWidth": 375,
+          "width": 390
+        },
+        "fullComputedStyleEqual": true,
+        "differenceNote": null
+      },
+      {
+        "width": 320,
+        "domEqual": true,
+        "elementBoundsEqual": true,
+        "elementCount": 28,
+        "production": {
+          "brokenImages": 0,
+          "height": 900,
+          "scrollWidth": 366,
+          "width": 320
+        },
+        "reconstructed": {
+          "brokenImages": 0,
+          "height": 900,
+          "scrollWidth": 366,
+          "width": 320
+        },
+        "fullComputedStyleEqual": true,
+        "differenceNote": null
+      }
+    ],
+    "mainLegacySourcePreserved": true,
+    "mainSEODuplicateWarningPreserved": true
+  },
+  "limitations": [
+    "Original commit and original frontend source files remain unavailable; this is a reviewed reconstruction.",
+    "Full bundles differ because main security improvements and admin SEO source are intentionally retained.",
+    "320px viewport retains the published horizontal overflow (about 366px document width); no layout redesign in this task.",
+    "No real transactions or production database writes; CI status must be checked at the PR current head."
+  ],
+  "failedAttemptsRetained": [
+    "SSH initial connection timeout, bounded retry succeeded.",
+    "DOM test bundler CommonJS mismatch, corrected external imports.",
+    "Sandbox EACCES for loopback tests, authorized local-network rerun succeeded.",
+    "Local admin preview CSP/i18n conflict, precompiled messages fixed without loosening CSP.",
+    "npm wrapper exited 3221226505 after output completion; direct Vite build and packaging succeeded.",
+    "Initial viewport changes targeted another tab; dimensions were explicitly checked before accepted responsive measurements.",
+    "Full-page screenshot timeouts and an asynchronous subscription wait timeout; bounded viewport captures and subsequent actual result checks succeeded."
+  ]
+}

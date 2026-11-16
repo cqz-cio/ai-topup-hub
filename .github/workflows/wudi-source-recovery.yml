@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   redemption:
-    name: Verify recovered redemption service
+    name: Verify recovered redemption service and UI
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -26,7 +26,7 @@ jobs:
       - name: Install locked dependencies
         working-directory: redemption-center
         run: npm ci --ignore-scripts --no-audit --no-fund
-      - name: Build retained frontend for packaging checks
+      - name: Build reconstructed frontend
         working-directory: redemption-center
         run: npm run build
       - name: Run recovered and existing safety regressions

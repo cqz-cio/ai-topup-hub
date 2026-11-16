@@ -1,0 +1,221 @@
+/* Reconstructed from the verified 20261115-235900 public stylesheet.
+ * Load before the shared theme, matching the production cascade. */
+.link-result {
+  margin-top: 24px;
+  border-top: 1px solid #8bada744;
+  padding-top: 20px;
+  line-height: 1.8;
+}
+
+.link-result-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.link-result-heading span {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.link-result p {
+  font-size: 13px;
+}
+
+.redemption-code {
+  display: block;
+  padding: 14px;
+  background: var(--input);
+  border: 1px solid #8bada744;
+  border-radius: 10px;
+  overflow-wrap: anywhere;
+  -webkit-user-select: all;
+  user-select: all;
+  font-size: 14px;
+}
+
+.link-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 18px;
+}
+
+.link-actions a {
+  text-decoration: none;
+}
+
+.link-actions .secondary,.file-pick {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid #769b8d66;
+  border-radius: 9px;
+  background: var(--input);
+  padding: 11px 15px;
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}
+
+.file-pick {
+  margin: 0 !important;
+  position: relative;
+}
+
+.file-pick input {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  opacity: 0;
+  width: 100%;
+  cursor: pointer;
+}
+
+.batch-link-row {
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid #8bada744;
+}
+
+.batch-link-row h3 {
+  font-size: 14px;
+}
+
+.batch-link-row .link-result {
+  margin-top: 0;
+  padding-top: 10px;
+  border: 0;
+}
+
+@media (max-width:720px) {
+  .link-actions {
+    gap: 10px;
+  }
+  .link-actions .primary,.link-actions .secondary {
+    font-size: 12px;
+    padding: 12px;
+  }
+  .redemption-code {
+    font-size: 12px;
+  }
+  .link-result-heading span {
+    font-size: 10px;
+  }
+  .link-result p {
+    font-size: 12px;
+  }
+}
+
+.wudi-flow input:not([type=checkbox]):not([type=file]),.wudi-flow textarea {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 8px 0 16px;
+  padding: 13px 15px;
+  border: 1px solid var(--line,#d0d7cf);
+  border-radius: 12px;
+  background: #ffffffb8;
+  color: inherit;
+  font: inherit;
+}
+
+.wudi-flow textarea {
+  min-height: 130px;
+  resize: vertical;
+  overflow-wrap: anywhere;
+}
+
+.wudi-flow form {
+  margin: 16px 0;
+}
+
+.wudi-flow .primary,.wudi-flow .secondary {
+  margin: 5px 8px 5px 0;
+}
+
+.wudi-result,.wudi-preflight,.wudi-account {
+  margin-top: 20px;
+  padding: 18px;
+  border: 1px solid rgba(92,112,91,.2);
+  border-radius: 14px;
+  overflow-wrap: anywhere;
+  background: #ffffff40;
+}
+
+.wudi-flow dl {
+  display: grid;
+  grid-template-columns: minmax(90px,1fr) minmax(0,2fr);
+  gap: 8px 12px;
+  margin: 12px 0;
+}
+
+.wudi-flow dt {
+  opacity: .75;
+}
+
+.wudi-flow dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.wudi-flow h3,.wudi-flow h4 {
+  margin: 10px 0;
+}
+
+.wudi-consent {
+  display: flex !important;
+  gap: 10px;
+  align-items: flex-start;
+  font-weight: 400 !important;
+  line-height: 1.7;
+  margin: 16px 0;
+}
+
+.wudi-consent input {
+  flex-shrink: 0;
+  width: 17px;
+  height: 17px;
+  margin-top: 6px;
+}
+
+.wudi-batch-rows {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.wudi-flow .stepper {
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.wudi-flow .stepper li {
+  flex: 1;
+  min-width: 100px;
+}
+
+.dark .wudi-flow input:not([type=checkbox]):not([type=file]),.dark .wudi-flow textarea {
+  background: #192822b3;
+}
+
+.dark .wudi-result,.dark .wudi-preflight,.dark .wudi-account {
+  background: #19282240;
+}
+
+@media (max-width:480px) {
+  .wudi-result,.wudi-preflight,.wudi-account {
+    padding: 13px;
+  }
+  .wudi-flow dl {
+    grid-template-columns: 95px minmax(0,1fr);
+  }
+  .wudi-flow .stepper li {
+    min-width: 40%;
+    font-size: 12px;
+  }
+}
