@@ -1,0 +1,159 @@
+{
+  "version": 1,
+  "purpose": "Replace internal review markers with customer-facing verification instructions.",
+  "products": [
+    {
+      "id": 60,
+      "slug": "telegram-premium-3m",
+      "replacements": [
+        {
+          "column": "content_json",
+          "path": [
+            "zh-CN"
+          ],
+          "before": "相关未说明事项需店主确认。",
+          "after": "页面未说明的功能、优惠或叠加条件，购买前请联系客服核实。"
+        }
+      ]
+    },
+    {
+      "id": 62,
+      "slug": "telegram-premium-12m",
+      "replacements": [
+        {
+          "column": "content_json",
+          "path": [
+            "zh-CN"
+          ],
+          "before": "单账号次数、转赠等未写明的适用情况需店主确认。",
+          "after": "如需确认同一账号的使用次数或能否转赠，购买前请联系客服核实。"
+        }
+      ]
+    },
+    {
+      "id": 45,
+      "slug": "chatgpt-pro-100-ph",
+      "replacements": [
+        {
+          "column": "content_json",
+          "path": [
+            "zh-CN"
+          ],
+          "before": "菲区与埃及的额外资格差异需店主确认。",
+          "after": "如需比较菲区与埃及商品的账号资格，购买前请联系客服核实，并以各商品的兑换预检结果为准。"
+        }
+      ]
+    },
+    {
+      "id": 31,
+      "slug": "chatgpt-pro-200-ph",
+      "replacements": [
+        {
+          "column": "content_json",
+          "path": [
+            "zh-CN"
+          ],
+          "before": "与 Pro 5x、25x 的官方功能和额度差别若页面没有写明，需店主确认，不能仅凭数字推断。",
+          "after": "如需了解与 Pro 5x、25x 的功能或额度差别，购买前请联系客服核实，不要仅凭数字推断。"
+        }
+      ]
+    },
+    {
+      "id": 33,
+      "slug": "chatgpt-pro-500-ph",
+      "replacements": [
+        {
+          "column": "content_json",
+          "path": [
+            "zh-CN"
+          ],
+          "before": "相关官方权益差别需店主确认。",
+          "after": "如需了解不同档位的具体权益，购买前请联系客服核实。"
+        }
+      ]
+    },
+    {
+      "id": 37,
+      "slug": "chatgpt-pro-100-egypt",
+      "replacements": [
+        {
+          "column": "content_json",
+          "path": [
+            "zh-CN"
+          ],
+          "before": "区域以外是否存在账号资格差异需店主确认。",
+          "after": "如需确认不同渠道的账号资格差异，购买前请联系客服核实，并以兑换预检结果为准。"
+        },
+        {
+          "column": "content_json",
+          "path": [
+            "zh-CN"
+          ],
+          "before": "未确定时需店主确认，并以兑换预检为准。",
+          "after": "如无法判断是否适用，购买前请联系客服核实，并以兑换预检为准。"
+        }
+      ]
+    },
+    {
+      "id": 29,
+      "slug": "chatgpt-go-code-egypt",
+      "replacements": [
+        {
+          "column": "content_json",
+          "path": [
+            "zh-CN"
+          ],
+          "before": "本页没有沿用 Pro 的“掉订阅至少十分钟”规则，因此不要把其他商品的等待时间当成 Go 的适用结论；这一点需店主确认。",
+          "after": "请勿直接套用 Pro 商品的“掉订阅至少十分钟”条件；如需确认 Go 的账号状态或等待要求，购买前请联系客服核实，并以兑换预检结果为准。"
+        },
+        {
+          "column": "content_json",
+          "path": [
+            "zh-CN"
+          ],
+          "before": "本页已有规则仅说明账号资格由兑换预检确认，未约定 Pro 的十分钟条件；是否适用需店主确认，不能自动推断。",
+          "after": "请勿将 Pro 商品的十分钟条件直接套用到 Go。购买前请联系客服核实 Go 的等待要求，账号是否适用以兑换预检结果为准。"
+        },
+        {
+          "column": "description_json",
+          "path": [
+            "zh-CN"
+          ],
+          "before": "Go 是否适用其他套餐的等待规则，需店主确认。",
+          "after": "Go 的账号状态和等待要求请在购买前联系客服核实，并以兑换预检结果为准。"
+        },
+        {
+          "column": "seo_meta_json",
+          "path": [
+            "description",
+            "zh-CN"
+          ],
+          "before": "Go 是否适用其他套餐的等待规则，需店主确认。",
+          "after": "Go 的账号状态和等待要求请在购买前联系客服核实，并以兑换预检结果为准。"
+        }
+      ]
+    },
+    {
+      "id": 59,
+      "slug": "chatgpt-go-manual",
+      "replacements": [
+        {
+          "column": "content_json",
+          "path": [
+            "zh-CN"
+          ],
+          "before": "未写明的账号差异需店主确认。",
+          "after": "如不确定自己的账号是否适用，购买前请联系客服核实。"
+        },
+        {
+          "column": "content_json",
+          "path": [
+            "zh-CN"
+          ],
+          "before": "其他未写明的渠道需店主确认。",
+          "after": "如需使用其他渠道，购买前请联系客服核实是否支持。"
+        }
+      ]
+    }
+  ]
+}
