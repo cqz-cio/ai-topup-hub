@@ -94,12 +94,17 @@
       "status": "passed",
       "elapsed_seconds": 2.02,
       "log_local": "work/codex-logs/20261117-161242-ph-publish-package-final.log"
+    },
+    "ph-publish-sitemap-test": {
+      "status": "passed",
+      "elapsed_seconds": 2.01,
+      "log_local": "work/codex-logs/20261117-162357-ph-publish-sitemap-test.log"
     }
   },
   "tests": {
     "transaction_safety": 8,
     "storefront": 278,
-    "related_go_packages": 3
+    "related_go_packages": 4
   },
   "browser": {
     "checked_at_utc": "2026-11-17T08:15:36.667581+00:00",
@@ -123,6 +128,21 @@
       "status": "corrected",
       "stage": "faq-parity",
       "detail": "新增 FAQ 含链接，渲染器在标签边界规范化空格；按去除空白后的完整问答逐项对比通过，内容没有改写。"
+    },
+    {
+      "status": "corrected",
+      "stage": "CI sitemap date assertion",
+      "detail": "PR #11 首轮 API 测试断言仍为指南旧日期 2026-11-10；本次新增指南入口的实际更新日期为 2026-11-17，已同步既有断言，sitemap 包本地回归通过。"
+    },
+    {
+      "status": "corrected",
+      "stage": "published SVG preservation",
+      "detail": "发布产物与线上 6 张旧 SVG 仅换行符不同；已核对规范化字节一致，并保留线上原始字节，未修改图片源码或内容。"
+    },
+    {
+      "status": "retained_failure",
+      "stage": "upload before package complete",
+      "detail": "打包保护检查阻止未确认的 SVG 差异；随后上传入口因包未生成而退出，未传输或切换生产。"
     }
   ],
   "files_sha256": {
