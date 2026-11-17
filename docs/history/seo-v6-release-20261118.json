@@ -1,0 +1,244 @@
+{
+  "status": "deployed_and_verified",
+  "recorded_at": "2026-11-17T16:21:18.531306+00:00",
+  "activated_at": "2026-11-17T16:18:18.666625+00:00",
+  "release": "20261118-000600",
+  "source_commit": "a39a7348dfa2d81db8141a99a4dbee40b451c2c6",
+  "reviewed_pr_head": "a5c30b63b803f23ddea5048c631dae5c32cd5982",
+  "pr": {
+    "number": 12,
+    "url": "https://github.com/cqz-cio/ai-topup-hub/pull/12",
+    "merged": true,
+    "linux_ci_run": 44114800099,
+    "ci_jobs_passed": 4
+  },
+  "binary_sha256": "decd021ba2e8617633ca4af8ac73d05495e6cf284c6d80e5d422fb402dae88ac",
+  "vcs_modified": false,
+  "embedded_files_reused": 733,
+  "backup": "/srv/zhixiang/backups/before-seo-v6-20261118-000600",
+  "frontend_release_unchanged": "/srv/zhixiang-front/releases/20261117-162000",
+  "content": {
+    "operations": 2,
+    "product_id": 30,
+    "product_tags_after": [],
+    "article_id": 10,
+    "article_sentence_only": true,
+    "product_updated_at_changed": true,
+    "post_published_at_preserved": true,
+    "other_languages_preserved": true,
+    "tables_audited": 75,
+    "non_target_fields_preserved": true
+  },
+  "validation": {
+    "content_unit_tests": 9,
+    "production_copy_tables": 75,
+    "copy_rollback_exact": true,
+    "repeat_rejected_without_changes": true,
+    "public_requests_before": 27,
+    "public_requests_after": 33,
+    "public_acceptance": [
+      {
+        "name": "1_cart_crawl_allowed",
+        "passed": true,
+        "details": {
+          "allowed": {
+            "/cart": true,
+            "/cart/": true,
+            "/cart?utm=test": true,
+            "/cart/?utm=test": true,
+            "/cart?next=/checkout": true
+          },
+          "canonical_robots_read": true,
+          "head_status": 200,
+          "cache_control": "public, max-age=3600"
+        }
+      },
+      {
+        "name": "2_sensitive_paths_still_blocked",
+        "passed": true,
+        "details": {
+          "/cart/checkout": false,
+          "/checkout": false,
+          "/pay": false,
+          "/orders/": false,
+          "/admin/": false,
+          "/auth/": false,
+          "/cart/api": false,
+          "/cartoon": false,
+          "/cart-old": false
+        }
+      },
+      {
+        "name": "3_cart_http_headers",
+        "passed": true,
+        "details": {
+          "GET_HEAD_requests": 10,
+          "status": 200,
+          "x_robots_tag": "noindex, nofollow",
+          "cache_control": "no-cache"
+        }
+      },
+      {
+        "name": "4_sitemap_scope_preserved",
+        "passed": true,
+        "details": {
+          "urls": 47,
+          "cart_in_sitemap": false,
+          "unpublished_account_page_status": 404
+        }
+      },
+      {
+        "name": "5_plus_tag_removed",
+        "passed": true,
+        "details": {
+          "product_id": 30,
+          "slug": "chatgpt-plus-code",
+          "detail_tags": [],
+          "catalog_tags": []
+        }
+      },
+      {
+        "name": "6_four_pro_tags_preserved",
+        "passed": true,
+        "details": [
+          {
+            "id": 45,
+            "slug": "chatgpt-pro-100-ph",
+            "status": 200,
+            "tags": [
+              "ChatGpt 菲区"
+            ],
+            "preserved": true
+          },
+          {
+            "id": 31,
+            "slug": "chatgpt-pro-200-ph",
+            "status": 200,
+            "tags": [
+              "ChatGpt 菲区"
+            ],
+            "preserved": true
+          },
+          {
+            "id": 33,
+            "slug": "chatgpt-pro-500-ph",
+            "status": 200,
+            "tags": [
+              "ChatGpt 菲区"
+            ],
+            "preserved": true
+          },
+          {
+            "id": 32,
+            "slug": "chatgpt-pro-200-renew-ph",
+            "status": 200,
+            "tags": [
+              "ChatGpt 菲区"
+            ],
+            "preserved": true
+          }
+        ]
+      },
+      {
+        "name": "7_article_sentence_and_six_faq",
+        "passed": true,
+        "details": {
+          "old_sentence_present": false,
+          "new_sentence_count": 1,
+          "faq_count": 6,
+          "faq_unchanged": true,
+          "questions_visible": true,
+          "canonical": [
+            "https://www.qzweb.cloud/blog/chatgpt-ph-recharge-guide"
+          ]
+        }
+      },
+      {
+        "name": "8_prices_unchanged",
+        "passed": true,
+        "details": {
+          "products_checked": 25,
+          "changed_product_ids": []
+        }
+      }
+    ],
+    "all_product_price_rows_preserved": 97,
+    "all_sku_price_rows_preserved": 97
+  },
+  "preservation": {
+    "frontend_release": true,
+    "frontend_files": true,
+    "nginx_files": true,
+    "uploads_files": true,
+    "config_hashes": true,
+    "systemd_hashes": true,
+    "scripts": true,
+    "mode": "storefront",
+    "procurement_boundary": {
+      "UPSTREAM_PURCHASE_ENABLED": "true",
+      "UPSTREAM_PURCHASE_ORDER_ID_FLOOR": "44",
+      "UPSTREAM_PURCHASE_PAID_AFTER": "2026-10-16T13:31:15.812954Z"
+    },
+    "public_storefront_dir": true,
+    "frontend_file_count": 15733,
+    "nginx_file_count": 26,
+    "media_file_count": 35,
+    "other_services": {
+      "nginx.service": {
+        "active": true,
+        "pid_preserved": true
+      },
+      "zhixiang-redis.service": {
+        "active": true,
+        "pid_preserved": true
+      },
+      "paiplus.service": {
+        "active": true,
+        "pid_preserved": true
+      },
+      "zhixiang-support.service": {
+        "active": true,
+        "pid_preserved": true
+      }
+    },
+    "stock": {
+      "ellaix": {
+        "timer_active": true,
+        "service_result": "success",
+        "exit_status": "0",
+        "report": "merchant1039-catalog-sync.json",
+        "report_at": "2026-11-17T16:20:35.195986+00:00",
+        "purchase_endpoint_called": false
+      },
+      "86gamestore": {
+        "timer_active": true,
+        "service_result": "success",
+        "exit_status": "0",
+        "report": "merchant26113-stock-sync.json",
+        "report_at": "2026-11-17T16:20:53.177204+00:00",
+        "purchase_endpoint_called": false
+      }
+    }
+  },
+  "sitemap_cache_keys_deleted": 0,
+  "rollback": {
+    "backend": "/srv/zhixiang/releases/20261117-162000",
+    "action": "Only switch /srv/zhixiang/current and restart zhixiang-shop.service; keep frontend link unchanged",
+    "content": "Compare current target fields to content-receipt.json, then restore only product 30 tags and its recorded updated_at plus post 10 exact content_json; refuse later edits",
+    "whole_database_restore_forbidden": true
+  },
+  "unpublished": [
+    "ready-account page",
+    "homepage popup change",
+    "category comparison table",
+    "S1-S5 screenshots"
+  ],
+  "real_orders_payments_purchases_gsc_actions": false,
+  "process_notes": [
+    "Read-only preflight initially used presentation names instead of DB column names; corrected without writes.",
+    "Archive source matched Git contents, but shared index stat data reported dirty; independent build index verified clean before building.",
+    "Existing program and 733 embedded assets were downloaded and verified. Only a 317468-byte binary delta was uploaded, reconstructed and fully hashed."
+  ],
+  "private_evidence": "work/v6-live/",
+  "records_do_not_trigger_redeployment": true
+}
