@@ -1,0 +1,18 @@
+{
+  "source": "production 20261116-154000 retained local build source",
+  "production_binary_sha256": "bb9e797fb51cd7eeb25afb371cd3aa2d363c351530c24c3fecad3e27b925e6c8",
+  "base": "5af32b3005fd33854768025a15de58a91238f3c7",
+  "files": {
+    "internal/authz/bootstrap.go": "48ea88c03bc530774298a7b858937c9b0dcd3eee48a56f624011809d26a36f1e",
+    "internal/authz/paiplus_access_test.go": "994e927e2b2699cabdce2b8f165bc27f476cc33cc3195b429b1fbd976f469daa",
+    "internal/modules/cardsecret/contract/management.go": "bd114a07403ecd1e77ae98a4c49947d52c6a8cb0f46ae58ae860274ad20db116",
+    "internal/modules/cardsecret/infrastructure/managementclient/client.go": "22af67e0d2813cd7a22c477d80345a3df56bfe957f021d95b4236c352cbdb2d9",
+    "internal/modules/cardsecret/infrastructure/managementclient/client_test.go": "2e38b9bd720e91b3974948ce400e7f6f72fe44085bb689778f6ffc5bc0301b7f",
+    "internal/modules/cardsecret/transport/http/management_handler.go": "526b6b6a126262d98e5d62cf277d2dd9ef4c4c378d0f47488cb9583970dc9b2e",
+    "internal/modules/cardsecret/transport/http/routes.go": "bb35207ec841fcd42c9cc4b972de44aaa409dc56a6782e0ff8948e639ec3047d",
+    "internal/modules/cardsecret/transport/http/manual_status_test.go": "6605f3c3c6c74133db9f7f91e83b05fddecb73b2412c9febd3fa0af7e54feb78"
+  },
+  "scope": "Preserve already deployed manual card-status backend during SEO v5 release; no new card-state changes",
+  "admin_and_redemption": "Keep current production artifacts unchanged; this archival patch only preserves Go routes/contracts/authorization and tests.",
+  "test_layout_adjustment": "manual_status_test.go moved to the existing integrationtest directory and uses the exported constructor; production code stays byte-identical. This keeps directory file budgets intact."
+}

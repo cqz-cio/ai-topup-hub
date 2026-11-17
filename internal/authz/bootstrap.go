@@ -81,6 +81,7 @@ func BuiltinRoleSeeds() []RoleSeed {
 				{Object: "/admin/card-secrets/paiplus/reveal", Action: "POST"},
 				{Object: "/admin/card-secrets/paiplus/check", Action: "POST"},
 				{Object: "/admin/card-secrets/paiplus/revoke", Action: "POST"},
+				{Object: "/admin/card-secrets/paiplus/manual-status", Action: "POST"},
 				{Object: "/admin/gift-cards", Action: "*"},
 				{Object: "/admin/gift-cards/:id", Action: "*"},
 				{Object: "/admin/gift-cards/generate", Action: "POST"},

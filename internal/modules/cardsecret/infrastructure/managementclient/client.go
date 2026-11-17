@@ -41,20 +41,23 @@ func FromEnvironment() (contract.Management, error) {
 }
 
 var messages = map[string]string{
-	"CARD_INVALID":       "卡密无效，销毁失败：该卡密已使用或上游已失效。",
-	"CARD_REVOKED":       "卡密无效，销毁失败：这张本站卡密已销毁。",
-	"CARD_IN_USE":        "销毁失败：卡密正在充值或已有提交记录，请先核对充值结果，不要据此退款。",
-	"CARD_BUSY":          "销毁失败：卡密正在核验，请稍后重试。",
-	"CHECK_UNAVAILABLE":  "暂时无法确认上游状态，操作未确认成功。请刷新卡密状态，不要据此退款。",
-	"CONFIRM_REQUIRED":   "请填写销毁原因，并确认永久停用这张本站卡密。",
-	"OPERATION_CONFLICT": "操作状态已变化，请刷新卡密详情核对。",
-	"NOT_FOUND":          "卡密不存在。",
-	"FILTER_INVALID":     "请选择有效卡密状态。",
-	"RATE_LIMITED":       "操作较频繁，请稍后重试。",
+	"CARD_INVALID":            "卡密无效，销毁失败：该卡密已使用或上游已失效。",
+	"CARD_REVOKED":            "卡密无效，销毁失败：这张本站卡密已销毁。",
+	"CARD_IN_USE":             "销毁失败：卡密正在充值或已有提交记录，请先核对充值结果，不要据此退款。",
+	"CARD_BUSY":               "销毁失败：卡密正在核验，请稍后重试。",
+	"CHECK_UNAVAILABLE":       "暂时无法确认上游状态，操作未确认成功。请刷新卡密状态，不要据此退款。",
+	"CONFIRM_REQUIRED":        "请填写销毁原因，并确认永久停用这张本站卡密。",
+	"OPERATION_CONFLICT":      "操作状态已变化，请刷新卡密详情核对。",
+	"NOT_FOUND":               "卡密不存在。",
+	"FILTER_INVALID":          "请选择有效卡密状态。",
+	"RATE_LIMITED":            "操作较频繁，请稍后重试。",
+	"MANUAL_CONFIRM_REQUIRED": "请选择状态、填写核验说明并明确确认修改。",
+	"MANUAL_STATE_CHANGED":    "卡密状态已变化，请刷新详情后重新核对。",
+	"MANUAL_STATUS_BLOCKED":   "当前卡密存在使用、兑换或锁定记录，不能直接修改为所选状态。",
 }
 
 func (c *Client) Call(ctx context.Context, operation string, input contract.ManagementInput, adminID uint) (json.RawMessage, error) {
-	if adminID == 0 || (operation != "cards" && operation != "detail" && operation != "check" && operation != "revoke") {
+	if adminID == 0 || (operation != "cards" && operation != "detail" && operation != "check" && operation != "revoke" && operation != "manual-status") {
 		return nil, errors.New("invalid card management operation")
 	}
 	payload := struct {

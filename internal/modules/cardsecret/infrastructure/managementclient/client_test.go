@@ -82,3 +82,20 @@ func TestManagementConfigurationAndActionsFailClosed(t *testing.T) {
 		t.Fatal("unknown operation accepted")
 	}
 }
+
+func TestManualStatusCarriesExpectedStateAndTrustedActor(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var body map[string]interface{}
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		if r.URL.Path != "/api/management/manual-status" || body["actor"] != "shop-admin:42" || body["status"] != "used" || body["expected_state"] != strings.Repeat("e", 64) || body["confirmed"] != true {
+			t.Error("manual status lost actor, target or state guard")
+		}
+		_, _ = w.Write([]byte(`{"ok":true,"data":{"card":{"status":"used"}}}`))
+	}))
+	defer server.Close()
+	client, _ := New(server.URL, strings.Repeat("m", 32))
+	_, err := client.Call(context.Background(), "manual-status", contract.ManagementInput{CardID: "card-identity-123456", Status: "used", Reason: "人工核验", Confirmed: true, RequestID: "request-identity-123456", ExpectedState: strings.Repeat("e", 64)}, 42)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
