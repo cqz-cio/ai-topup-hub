@@ -1,5 +1,5 @@
 {
-  "status": "approved_for_publication",
+  "status": "published",
   "base_commit": "7276bac1c0f350dd605062e1ba0dd15ece7786a8",
   "branch": "codex/blog-ph-chatgpt-20261117",
   "facts_checked_on": "2026-11-17",
@@ -24,18 +24,19 @@
       },
       "review_file": "chatgpt-ph-recharge-guide.md",
       "preview_file": "preview.html",
-      "is_published": false,
-      "published_at": null,
+      "is_published": true,
+      "published_at": "2026-11-17T08:37:09.958244+00:00",
       "thumbnail": "",
       "canonical_after_publication": "https://www.qzweb.cloud/blog/chatgpt-ph-recharge-guide",
       "default_share_image": "/media/seo-share/qzweb-og-1200x630.jpg",
       "default_share_image_width": 1200,
-      "default_share_image_height": 630
+      "default_share_image_height": 630,
+      "id": 10
     }
   ],
   "publication_approved": true,
-  "production_writes": false,
-  "gsc_submission": false,
+  "production_writes": true,
+  "gsc_submission": true,
   "approved_related_products": [
     {
       "id_observed": 45,
@@ -87,5 +88,7 @@
       "anchor": "菲区 ChatGPT 充值怎么选、怎么兑",
       "path": "/blog/chatgpt-ph-recharge-guide"
     }
-  ]
+  ],
+  "publication_record": "publication-result.json",
+  "gsc_record": "gsc-result.json"
 }

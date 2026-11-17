@@ -1,0 +1,275 @@
+{
+  "status": "published",
+  "time": "2026-11-17T08:37:10.780525+00:00",
+  "release": "20261117-162000",
+  "source_commit": "113b5e7867718dafa05907d212be0efe77d6f21c",
+  "merge_commit": "3781e9852f97ff97ce30512a60d1c5e9d453dbda",
+  "binary_sha256": "b846ceebd5db78d7466a1cbf2f700aa9b839f5682d641d0a9141bafa477ea154",
+  "backup": "/srv/zhixiang/backups/before-ph-blog-20261117-162000",
+  "content": {
+    "status": "applied",
+    "article_id": 10,
+    "published_at": "2026-11-17T08:37:09.958244+00:00",
+    "articles_created": 1,
+    "relations_created": 4,
+    "backlinks_updated": 2,
+    "tables_checked": 75,
+    "all_other_values_preserved": true
+  },
+  "nginx_unchanged": true,
+  "private_configuration_unchanged": true,
+  "prices_products_skus_orders_payments_settings_preserved": true,
+  "unchanged_services": [
+    "nginx",
+    "zhixiang-redis",
+    "paiplus",
+    "zhixiang-support"
+  ],
+  "sitemap_cache_keys_deleted": 0,
+  "real_order_payment_redemption_refund": false,
+  "recorded_at_utc": "2026-11-17T08:47:32.831386+00:00",
+  "pull_request": {
+    "headRefOid": "113b5e7867718dafa05907d212be0efe77d6f21c",
+    "mergeCommit": {
+      "oid": "3781e9852f97ff97ce30512a60d1c5e9d453dbda"
+    },
+    "mergedAt": "2026-11-17T08:30:32Z",
+    "number": 11,
+    "state": "MERGED",
+    "url": "https://github.com/cqz-cio/ai-topup-hub/pull/11"
+  },
+  "ci": [
+    {
+      "name": "Verify installer",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/cqz-cio/ai-topup-hub/actions/runs/44046704112/job/133914060897"
+    },
+    {
+      "name": "Verify API",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/cqz-cio/ai-topup-hub/actions/runs/44046704112/job/133914060536"
+    },
+    {
+      "name": "Verify release config",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/cqz-cio/ai-topup-hub/actions/runs/44046704112/job/133914061001"
+    },
+    {
+      "name": "Verify fullstack build",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/cqz-cio/ai-topup-hub/actions/runs/44046704112/job/133914061184"
+    }
+  ],
+  "staging": {
+    "status": "staged",
+    "production_switched": false,
+    "production_content_written": false,
+    "backup": "/srv/zhixiang/backups/before-ph-blog-20261117-162000",
+    "rehearsal_tables": 75,
+    "rehearsal_rollback_passed": true,
+    "user_files": 497,
+    "delta_files": 196,
+    "preserved_user_files": 13562,
+    "preserved_admin_files": 1962,
+    "nginx_unchanged": true
+  },
+  "public_verification": {
+    "status": "passed",
+    "checked_at_utc": "2026-11-17T08:38:40.718664+00:00",
+    "url": "https://www.qzweb.cloud/blog/chatgpt-ph-recharge-guide",
+    "http_status": 200,
+    "self_canonical": true,
+    "blogposting_author": "π星卡社",
+    "published_at": "2026-11-17T08:37:09Z",
+    "visible_faq_count": 6,
+    "faqpage_questions": 6,
+    "faq_parity": true,
+    "related_product_ids": [
+      45,
+      31,
+      33,
+      32
+    ],
+    "product_backlinks_verified": 4,
+    "blog_listing_contains_article": true,
+    "category_guide_contains_article": true,
+    "sitemap_lastmod": "2026-11-17",
+    "blog_sitemap_lastmod": "2026-11-17",
+    "old_article_backlinks": [
+      {
+        "url": "https://www.qzweb.cloud/blog/chatgpt-code-region-check",
+        "status": 200,
+        "anchor": "菲区 ChatGPT 充值怎么选、怎么兑"
+      },
+      {
+        "url": "https://www.qzweb.cloud/blog/chatgpt-payment-methods",
+        "status": 200,
+        "anchor": "菲区 ChatGPT 充值怎么选、怎么兑"
+      }
+    ],
+    "crawler_checks": [
+      {
+        "ua": "Googlebot",
+        "status": 200,
+        "same_public_body": true
+      },
+      {
+        "ua": "OAI-SearchBot",
+        "status": 200,
+        "same_public_body": true
+      },
+      {
+        "ua": "Bingbot",
+        "status": 200,
+        "same_public_body": true
+      }
+    ],
+    "internal_links_http_200": 15,
+    "public_products_prices_stock_preserved": 25,
+    "no_internal_markers": true,
+    "not_a_google_indexing_confirmation": true
+  },
+  "server_verification": {
+    "status": "passed",
+    "checked_at_utc": "2026-11-17T08:42:37.742718+00:00",
+    "release": "20261117-162000",
+    "backend_binary_sha256": "b846ceebd5db78d7466a1cbf2f700aa9b839f5682d641d0a9141bafa477ea154",
+    "current_user_files_verified": 497,
+    "old_user_files_preserved": 13562,
+    "admin_files_unchanged": 1962,
+    "nginx_files_unchanged": 26,
+    "private_files_unchanged": 14,
+    "redemption_release_unchanged": true,
+    "services": {
+      "zhixiang-shop": {
+        "active": true,
+        "process_preserved": false
+      },
+      "nginx": {
+        "active": true,
+        "process_preserved": true
+      },
+      "zhixiang-redis": {
+        "active": true,
+        "process_preserved": true
+      },
+      "paiplus": {
+        "active": true,
+        "process_preserved": true
+      },
+      "zhixiang-support": {
+        "active": true,
+        "process_preserved": true
+      }
+    },
+    "stock_services": {
+      "zhixiang-stock-sync.service": {
+        "timer_active": true,
+        "Result": "success",
+        "ExecMainExitTimestamp": "",
+        "ExecMainStatus": "0"
+      },
+      "zhixiang-86gamestore-stock-sync.service": {
+        "timer_active": true,
+        "Result": "success",
+        "ExecMainExitTimestamp": "Tue 2026-11-17 16:41:42 CST",
+        "ExecMainStatus": "0"
+      }
+    }
+  },
+  "google_search_console": {
+    "checked_at_utc": "2026-11-17T08:43:02.932Z",
+    "url": "https://www.qzweb.cloud/blog/chatgpt-ph-recharge-guide",
+    "property": "sc-domain:qzweb.cloud",
+    "previous_state": "网址尚未收录到 Google：Google 无法识别此网址",
+    "request_status": "requested",
+    "visible_confirmation": "已请求编入索引",
+    "queue_confirmation": "已将网址添加到优先抓取队列中",
+    "indexing_confirmed": false,
+    "quota_exhausted": false,
+    "scheduled_for_tomorrow": false
+  },
+  "execution_results": {
+    "ph-publish-stage": {
+      "status": "passed",
+      "exit_code": 0,
+      "elapsed_seconds": 36.55
+    },
+    "ph-publish-cutover": {
+      "status": "passed",
+      "exit_code": 0,
+      "elapsed_seconds": 33.54
+    },
+    "ph-publish-public-verification": {
+      "status": "passed",
+      "exit_code": 0,
+      "elapsed_seconds": 23.54
+    },
+    "ph-publish-post-server": {
+      "status": "passed",
+      "exit_code": 0,
+      "elapsed_seconds": 6.02
+    },
+    "ph-publish-upload-persistent": {
+      "status": "passed",
+      "exit_code": 0,
+      "elapsed_seconds": 35.04
+    }
+  },
+  "browser": {
+    "desktop": {
+      "viewport_width": 1920,
+      "document_width": 1910,
+      "broken_images": 0,
+      "console_errors": 0,
+      "faq_six_visible": true,
+      "four_related_products_visible": true,
+      "old_article_backlinks_clicked": 2,
+      "screenshot": "publication-desktop.jpg"
+    },
+    "mobile_visual_acceptance": false,
+    "mobile_note": "视口覆盖在截图调用时未稳定保留，未计作手机截图验收；页面布局未改。"
+  },
+  "limits": [
+    "Google 申请成功不代表已经收录、获得排名或 AI 推荐。",
+    "未执行真实订单、付款、采购、充值或退款。"
+  ],
+  "execution_notes": [
+    {
+      "stage": "CI first run",
+      "status": "corrected",
+      "detail": "旧 sitemap 日期断言导致 API 检查失败；更新既有断言后四项 CI 全部成功。"
+    },
+    {
+      "stage": "SVG integrity",
+      "status": "preserved",
+      "detail": "6 张旧 SVG 仅换行符差异，验证后使用线上原字节，未改变图片内容。"
+    },
+    {
+      "stage": "upload attempts",
+      "status": "recovered",
+      "detail": "首次分块超时、第二次新建 SSH 连接超时；改为复用单一连接，仅补传缺块。26/26 分块及整个压缩包 SHA256 通过后才暂存和发布。"
+    },
+    {
+      "stage": "server guard representation",
+      "status": "corrected_before_execution",
+      "detail": "正式执行前将受保护数据摘要转换为字段值元组，避免 sqlite.Row 对象地址影响摘要。"
+    },
+    {
+      "stage": "browser backlink wait",
+      "status": "passed_after_navigation",
+      "detail": "首次点击后的标题读取等待过短；随后核对实际新文 URL 和完整正文，两篇回链均成功。"
+    },
+    {
+      "stage": "archive whitespace check",
+      "status": "corrected",
+      "detail": "Windows 默认 CRLF 导致 Git 空白检查失败，已将本次归档 JSON 统一保存为 LF，不改内容或重复部署。"
+    },
+    {
+      "stage": "archive file scope guard",
+      "status": "corrected_before_commit",
+      "detail": "本地 Git 状态解析误删首行前导空格，文件范围保护检查因此停止；保留状态列空格后重新检查，没有提交额外文件。"
+    }
+  ],
+  "production_redeployed_for_records": false
+}

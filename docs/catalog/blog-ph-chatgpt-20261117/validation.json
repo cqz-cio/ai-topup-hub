@@ -145,7 +145,7 @@
       "detail": "打包保护检查阻止未确认的 SVG 差异；随后上传入口因包未生成而退出，未传输或切换生产。"
     }
   ],
-  "files_sha256": {
+  "files_sha256_at_local_validation": {
     "backlinks.json": "21d8fd7c058cdcbc84e8fa7dca489e115dc35504e026d6804458a27083c3213e",
     "catalog.json": "1a3227817182d5aaa75851d191293ee854aa03bf4f3234e6cfa55a4e92e99a3b",
     "chatgpt-ph-recharge-guide.html": "160a38f6db30e5a01ae43601f576990a94726ed7826f26d95a7c1159a9955788",
@@ -155,6 +155,25 @@
     "preview.html": "f8ede4476dd3efedcc6202ea24037efc18817894d4dd497988f28edd03e6abb7",
     "publication-preflight.json": "3bcdc769a65d50664acdabd4dd1714cc0fd5e73aea4c5d8c2cfe7a9abded51a1",
     "README.md": "d7084035a2b92eee586ed6f6738218cb628a6b5d6529a1c82c6a5d6f21b18eb6",
+    "review-fact-checks.json": "6a57621556985253c1138ad692134a7757c6b731219e015b58e023a0c7145c9d",
+    "sources.json": "cb2cb92f37306dad42c80c99d6781849bedd424fd76271052d72c1aec0313dcb"
+  },
+  "publication_record": "publication-result.json",
+  "record_updated_at_utc": "2026-11-17T08:47:32.831386+00:00",
+  "files_sha256": {
+    "backlinks.json": "21d8fd7c058cdcbc84e8fa7dca489e115dc35504e026d6804458a27083c3213e",
+    "catalog.json": "ed1f0d15e09b2e76c17559b748a47d5fdcb8d3e42031f05e7f4c165341fe5d89",
+    "chatgpt-ph-recharge-guide.html": "160a38f6db30e5a01ae43601f576990a94726ed7826f26d95a7c1159a9955788",
+    "chatgpt-ph-recharge-guide.md": "7026176004c5d3d59761170838fb002cf22ff888fb199012ad496d2e11eb6f6c",
+    "gsc-result.json": "50b6a92453e07fa2d84e14982885a90d19a2821ee26ee1fad6d5338a21da9dd7",
+    "link-checks.json": "dc076769ba0dd5f62ce1937b21fa3636074ec61d67bc28d1b8b88f33a76af35f",
+    "preview-desktop.jpg": "7360d453b3fa353389ab275e3cdfa8ffc085febfcba68cb7a8546394ff11bc44",
+    "preview.html": "f8ede4476dd3efedcc6202ea24037efc18817894d4dd497988f28edd03e6abb7",
+    "public-verification.json": "dc88277a7b1c02393ae2ee1c3204b9fd0aaa2daa947fd0fdf4af01b5305e9042",
+    "publication-desktop.jpg": "bf8e2fcc241175dbcae2efe73c40d78008250acadfe6e534a988e95eaa61bff3",
+    "publication-preflight.json": "3bcdc769a65d50664acdabd4dd1714cc0fd5e73aea4c5d8c2cfe7a9abded51a1",
+    "publication-result.json": "2e0b647aff410b650a7980812b18a02406a63067ca88130420036bac10d45d5a",
+    "README.md": "3c127e438d562f1a641d95ab084a4f99ae2b2904bc9fe248038c6ccee42e7cd9",
     "review-fact-checks.json": "6a57621556985253c1138ad692134a7757c6b731219e015b58e023a0c7145c9d",
     "sources.json": "cb2cb92f37306dad42c80c99d6781849bedd424fd76271052d72c1aec0313dcb"
   }

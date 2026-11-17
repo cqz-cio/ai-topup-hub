@@ -1,0 +1,56 @@
+{
+  "status": "passed",
+  "checked_at_utc": "2026-11-17T08:38:40.718664+00:00",
+  "url": "https://www.qzweb.cloud/blog/chatgpt-ph-recharge-guide",
+  "http_status": 200,
+  "self_canonical": true,
+  "blogposting_author": "π星卡社",
+  "published_at": "2026-11-17T08:37:09Z",
+  "visible_faq_count": 6,
+  "faqpage_questions": 6,
+  "faq_parity": true,
+  "related_product_ids": [
+    45,
+    31,
+    33,
+    32
+  ],
+  "product_backlinks_verified": 4,
+  "blog_listing_contains_article": true,
+  "category_guide_contains_article": true,
+  "sitemap_lastmod": "2026-11-17",
+  "blog_sitemap_lastmod": "2026-11-17",
+  "old_article_backlinks": [
+    {
+      "url": "https://www.qzweb.cloud/blog/chatgpt-code-region-check",
+      "status": 200,
+      "anchor": "菲区 ChatGPT 充值怎么选、怎么兑"
+    },
+    {
+      "url": "https://www.qzweb.cloud/blog/chatgpt-payment-methods",
+      "status": 200,
+      "anchor": "菲区 ChatGPT 充值怎么选、怎么兑"
+    }
+  ],
+  "crawler_checks": [
+    {
+      "ua": "Googlebot",
+      "status": 200,
+      "same_public_body": true
+    },
+    {
+      "ua": "OAI-SearchBot",
+      "status": 200,
+      "same_public_body": true
+    },
+    {
+      "ua": "Bingbot",
+      "status": 200,
+      "same_public_body": true
+    }
+  ],
+  "internal_links_http_200": 15,
+  "public_products_prices_stock_preserved": 25,
+  "no_internal_markers": true,
+  "not_a_google_indexing_confirmation": true
+}
