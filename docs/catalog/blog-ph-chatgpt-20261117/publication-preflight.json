@@ -1,0 +1,40 @@
+{
+  "checked_at_utc": "2026-11-17T08:07:56.626312+00:00",
+  "status": "passed",
+  "products": [
+    {
+      "id": 45,
+      "slug": "chatgpt-pro-100-ph",
+      "title": "ChatGPT Pro 100美金 兑换码｜菲区｜自动发码"
+    },
+    {
+      "id": 31,
+      "slug": "chatgpt-pro-200-ph",
+      "title": "ChatGPT Pro 200美金 兑换码｜菲区｜自动发码"
+    },
+    {
+      "id": 33,
+      "slug": "chatgpt-pro-500-ph",
+      "title": "ChatGPT Pro 500美金 兑换码｜菲区｜自动发码"
+    },
+    {
+      "id": 32,
+      "slug": "chatgpt-pro-200-renew-ph",
+      "title": "ChatGPT Pro 200美金 续费绑卡｜菲区｜自动发码"
+    }
+  ],
+  "new_slug_unused": true,
+  "backlink_posts": [
+    {
+      "id": 9,
+      "slug": "chatgpt-code-region-check",
+      "content_sha256": "ee39c259ef377fe1cc8cf9cf9922ff67f4f1f1fbb721751f4eb7e2c43057fc63"
+    },
+    {
+      "id": 4,
+      "slug": "chatgpt-payment-methods",
+      "content_sha256": "e186f5df465fea4ceadbd12942543808a86b41fafa43455740aa6f2218a77155"
+    }
+  ],
+  "production_mutation": false
+}

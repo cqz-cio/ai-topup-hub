@@ -1,0 +1,163 @@
+{
+  "review_document": "https://drive.google.com/file/d/1XQpZOtSGpH9rJclSMOFIOY6g5LAnqKJb/view",
+  "review_document_sha256_local_text": "103f7ac80e0381dcaa2cb1dadb7f5f4fb8a112da182cff11fc8f1a2da878c3cc",
+  "status": "passed",
+  "method": "Anonymous read-only HTTPS GET; product content taken from current public API, not inferred from related-product cards",
+  "checks": {
+    "egypt_100_and_500_listed": true,
+    "egypt_200_not_in_observed_public_category": true,
+    "egypt_200_html_http_status": 404,
+    "egypt_200_api_business_status": 404,
+    "channel_claim_attributed_to_ph_100_and_egypt_500_pages": true,
+    "ph_200_and_ph_500_content_have_no_channel_name_sentence": true,
+    "no_claim_that_only_two_pages_have_channel_name_wording": true,
+    "no_one_to_one_tier_mapping_or_shared_eligibility_inferred": true,
+    "blog_remains_publicly_unavailable": true
+  },
+  "products": [
+    {
+      "slug": "chatgpt-pro-100-ph",
+      "source_url": "https://www.qzweb.cloud/products/chatgpt-pro-100-ph",
+      "api_url": "https://www.qzweb.cloud/api/v1/public/products/chatgpt-pro-100-ph",
+      "checked_at_utc": "2026-11-17T07:45:26.947491+00:00",
+      "http_status": 200,
+      "response_sha256": "c415fbdf11d980f6e55684ef95d0f8845bb0599d6cad6fd22e0593e7a0055d83",
+      "title": "ChatGPT Pro 100美金 兑换码｜菲区｜自动发码",
+      "channel_name_paragraphs": [
+        "如果当前套餐尚未到期，不要把自动发码理解为支持覆盖；本站人工可覆盖商品有另一套条件。同倍数的埃及方案区别在渠道名称，如需比较菲区与埃及商品的账号资格，购买前请联系客服核实，并以各商品的兑换预检结果为准。5x 也不代表本站新增某一固定额度或功能承诺。"
+      ]
+    },
+    {
+      "slug": "chatgpt-pro-200-ph",
+      "source_url": "https://www.qzweb.cloud/products/chatgpt-pro-200-ph",
+      "api_url": "https://www.qzweb.cloud/api/v1/public/products/chatgpt-pro-200-ph",
+      "checked_at_utc": "2026-11-17T07:45:26.654540+00:00",
+      "http_status": 200,
+      "response_sha256": "3e8610bd3048a681fb39d8d741df7d6170dd369484bbfe7c8112a6f1b5b969f8",
+      "title": "ChatGPT Pro 200美金 兑换码｜菲区｜自动发码",
+      "channel_name_paragraphs": []
+    },
+    {
+      "slug": "chatgpt-pro-500-ph",
+      "source_url": "https://www.qzweb.cloud/products/chatgpt-pro-500-ph",
+      "api_url": "https://www.qzweb.cloud/api/v1/public/products/chatgpt-pro-500-ph",
+      "checked_at_utc": "2026-11-17T07:45:27.842820+00:00",
+      "http_status": 200,
+      "response_sha256": "6b566acfff333df577dadaa8e8d84f745577f8443dd5fcc5b7d926661bc9ccec",
+      "title": "ChatGPT Pro 500美金 兑换码｜菲区｜自动发码",
+      "channel_name_paragraphs": []
+    },
+    {
+      "slug": "chatgpt-pro-100-egypt",
+      "source_url": "https://www.qzweb.cloud/products/chatgpt-pro-100-egypt",
+      "api_url": "https://www.qzweb.cloud/api/v1/public/products/chatgpt-pro-100-egypt",
+      "checked_at_utc": "2026-11-17T07:45:30.297172+00:00",
+      "http_status": 200,
+      "response_sha256": "130ff0d80ca998bda29b1d4e43797f350e687e4bf5826752a0eaacef6f6aeca9",
+      "title": "ChatGPT Pro 100美金 兑换码｜埃及｜自动发码",
+      "channel_name_paragraphs": [
+        "埃及 5x 和菲区 5x 可以只凭相同倍数随意替换吗？ 已确认的区别是渠道名称不同。除此之外的资格差异没有在这里作出承诺，如无法判断是否适用，购买前请联系客服核实，并以兑换预检为准。"
+      ]
+    },
+    {
+      "slug": "chatgpt-pro-500-egypt",
+      "source_url": "https://www.qzweb.cloud/products/chatgpt-pro-500-egypt",
+      "api_url": "https://www.qzweb.cloud/api/v1/public/products/chatgpt-pro-500-egypt",
+      "checked_at_utc": "2026-11-17T07:45:29.688093+00:00",
+      "http_status": 200,
+      "response_sha256": "39f34aeb444501a470b826c6399b195e4594f205c69883c5bf0b078b092bfb17",
+      "title": "ChatGPT Pro 500美金 兑换码｜埃及｜自动发码",
+      "channel_name_paragraphs": [
+        "选择这款 ChatGPT Pro 500美金（Pro 25x）时，应同时核对埃及 EG／EGP 渠道和自己的目标账号。它与埃及 Pro 5x 的档位标识不同，与菲区 Pro 25x 的渠道名称不同；具体官方权益或跨地区资格不能从名称自行推导。"
+      ]
+    }
+  ],
+  "observed_category_product_paths": [
+    "/products/chatgpt-go-code-egypt",
+    "/products/chatgpt-plus-code",
+    "/products/chatgpt-plus-manual",
+    "/products/chatgpt-pro-100-egypt",
+    "/products/chatgpt-pro-100-ph",
+    "/products/chatgpt-pro-200-ph",
+    "/products/chatgpt-pro-200-renew-ph",
+    "/products/chatgpt-pro-500-egypt",
+    "/products/chatgpt-pro-500-ph"
+  ],
+  "public_response_evidence": [
+    {
+      "path": "/api/v1/public/products/chatgpt-pro-100-ph",
+      "url": "https://www.qzweb.cloud/api/v1/public/products/chatgpt-pro-100-ph",
+      "http_status": 200,
+      "checked_at_utc": "2026-11-17T07:45:26.947491+00:00",
+      "response_sha256": "c415fbdf11d980f6e55684ef95d0f8845bb0599d6cad6fd22e0593e7a0055d83"
+    },
+    {
+      "path": "/api/v1/public/products/chatgpt-pro-200-ph",
+      "url": "https://www.qzweb.cloud/api/v1/public/products/chatgpt-pro-200-ph",
+      "http_status": 200,
+      "checked_at_utc": "2026-11-17T07:45:26.654540+00:00",
+      "response_sha256": "3e8610bd3048a681fb39d8d741df7d6170dd369484bbfe7c8112a6f1b5b969f8"
+    },
+    {
+      "path": "/api/v1/public/products/chatgpt-pro-500-ph",
+      "url": "https://www.qzweb.cloud/api/v1/public/products/chatgpt-pro-500-ph",
+      "http_status": 200,
+      "checked_at_utc": "2026-11-17T07:45:27.842820+00:00",
+      "response_sha256": "6b566acfff333df577dadaa8e8d84f745577f8443dd5fcc5b7d926661bc9ccec"
+    },
+    {
+      "path": "/api/v1/public/products/chatgpt-pro-100-egypt",
+      "url": "https://www.qzweb.cloud/api/v1/public/products/chatgpt-pro-100-egypt",
+      "http_status": 200,
+      "checked_at_utc": "2026-11-17T07:45:30.297172+00:00",
+      "response_sha256": "130ff0d80ca998bda29b1d4e43797f350e687e4bf5826752a0eaacef6f6aeca9"
+    },
+    {
+      "path": "/api/v1/public/products/chatgpt-pro-500-egypt",
+      "url": "https://www.qzweb.cloud/api/v1/public/products/chatgpt-pro-500-egypt",
+      "http_status": 200,
+      "checked_at_utc": "2026-11-17T07:45:29.688093+00:00",
+      "response_sha256": "39f34aeb444501a470b826c6399b195e4594f205c69883c5bf0b078b092bfb17"
+    },
+    {
+      "path": "/api/v1/public/products/chatgpt-pro-200-egypt",
+      "url": "https://www.qzweb.cloud/api/v1/public/products/chatgpt-pro-200-egypt",
+      "http_status": 200,
+      "checked_at_utc": "2026-11-17T07:45:28.749792+00:00",
+      "response_sha256": "21edc3451a9a82c66ee735ee4d70331bd768db74b4d76e7f90a694619de026da"
+    },
+    {
+      "path": "/products/chatgpt-pro-200-egypt",
+      "url": "https://www.qzweb.cloud/products/chatgpt-pro-200-egypt",
+      "http_status": 404,
+      "checked_at_utc": "2026-11-17T07:45:29.300576+00:00",
+      "response_sha256": "8f5bd271e73ef363511a29de5e7c25240b6012dc35c7e06bb037a3fcd93ea5c0"
+    },
+    {
+      "path": "/categories/gpt-recharge",
+      "url": "https://www.qzweb.cloud/categories/gpt-recharge",
+      "http_status": 200,
+      "checked_at_utc": "2026-11-17T07:45:31.470342+00:00",
+      "response_sha256": "060b3fbdd8a096419f94492ea839729e60004215ff43ca59b2da60f5bffbb3f2"
+    },
+    {
+      "path": "/blog/chatgpt-ph-recharge-guide",
+      "url": "https://www.qzweb.cloud/blog/chatgpt-ph-recharge-guide",
+      "http_status": 404,
+      "checked_at_utc": "2026-11-17T07:45:31.240156+00:00",
+      "response_sha256": "8f5bd271e73ef363511a29de5e7c25240b6012dc35c7e06bb037a3fcd93ea5c0"
+    },
+    {
+      "path": "/api/v1/public/posts/chatgpt-ph-recharge-guide",
+      "url": "https://www.qzweb.cloud/api/v1/public/posts/chatgpt-ph-recharge-guide",
+      "http_status": 200,
+      "checked_at_utc": "2026-11-17T07:45:32.944236+00:00",
+      "response_sha256": "946e2449d1fed462a3df898d5d1bc9a2e6dcafe27fda0e8ad131dee0d3abdf32"
+    }
+  ],
+  "limits": [
+    "公开目录的未见记录只对应本次核验时间，不表示未来或后台永远不存在该商品。",
+    "埃及 Pro 100 页也出现渠道名称用语；正文只归属自己引用的两处来源，不声称全站只有两页写过。",
+    "FAQ 使用不能仅凭名称判断能否互换，不添加全部不能兑换或全部可通用的新结论。"
+  ]
+}

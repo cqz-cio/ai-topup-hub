@@ -1,0 +1,161 @@
+{
+  "status": "passed",
+  "record_type": "approved_publication_local_validation",
+  "checked_at_utc": "2026-11-17T08:12:44.566453+00:00",
+  "revision_base": "3bd8a265a695cdb15e80051c75950c0dcad6551b",
+  "body_cjk_characters": 2232,
+  "body_nonwhitespace_characters": 2797,
+  "h2_sections": 7,
+  "visible_faq_count": 6,
+  "generated_faq_count": 6,
+  "html_markdown_preview_parity": true,
+  "prior_accepted_body_preserved": true,
+  "owner_approval_answers": 4,
+  "internal_links_unique": 15,
+  "preview_noindex": true,
+  "production_mutation_at_validation": false,
+  "earlier_validation_commit": "3bd8a265a695cdb15e80051c75950c0dcad6551b",
+  "earlier_execution_notes": [
+    {
+      "status": "failed",
+      "stage": "Initial sandbox Go rendering",
+      "detail": "No output timeout; termination command hit sandbox restrictions. Original failure retained; later inspection found no surviving target or descendants.",
+      "log_local": "work/codex-logs/20261117-145912-blog-ph-render-draft.log"
+    },
+    {
+      "status": "passed",
+      "stage": "Diagnostic Go rendering with build progress",
+      "elapsed_seconds": 6.52,
+      "log_local": "work/codex-logs/20261117-150310-blog-ph-render-diagnostic.log"
+    },
+    {
+      "status": "passed",
+      "stage": "Draft content and schema checks",
+      "log_local": "work/codex-logs/20261117-150326-blog-ph-package-check.log"
+    },
+    {
+      "status": "passed",
+      "stage": "Public internal-link GET checks",
+      "log_local": "work/codex-logs/20261117-150435-blog-ph-internal-links.log"
+    },
+    {
+      "status": "failed_then_corrected",
+      "stage": "Initial staged whitespace check",
+      "detail": "The link-check JSON used Windows CRLF; normalized only line endings to LF, with JSON values unchanged.",
+      "log_local": "work/codex-logs/20261117-152849-blog-ph-staged-check.log"
+    },
+    {
+      "stage": "blog-ph-review-facts",
+      "status": "passed",
+      "elapsed_seconds": 8.52,
+      "log_local": "work/codex-logs/20261117-154524-blog-ph-review-facts.log"
+    },
+    {
+      "stage": "blog-ph-review-render",
+      "status": "passed",
+      "elapsed_seconds": 1.51,
+      "log_local": "work/codex-logs/20261117-154636-blog-ph-review-render.log"
+    },
+    {
+      "stage": "blog-ph-review-package",
+      "status": "passed",
+      "elapsed_seconds": 1.03,
+      "log_local": "work/codex-logs/20261117-154740-blog-ph-review-package.log"
+    },
+    {
+      "stage": "blog-ph-review-links",
+      "status": "passed",
+      "elapsed_seconds": 6.52,
+      "log_local": "work/codex-logs/20261117-154819-blog-ph-review-links.log"
+    }
+  ],
+  "test_results": {
+    "ph-publish-transaction-tests": {
+      "status": "passed",
+      "elapsed_seconds": 1.02,
+      "log_local": "work/codex-logs/20261117-161019-ph-publish-transaction-tests.log"
+    },
+    "ph-publish-go-final-tests": {
+      "status": "passed",
+      "elapsed_seconds": 4.52,
+      "log_local": "work/codex-logs/20261117-161245-ph-publish-go-final-tests.log"
+    },
+    "ph-publish-front-final-tests": {
+      "status": "passed",
+      "elapsed_seconds": 8.04,
+      "log_local": "work/codex-logs/20261117-161253-ph-publish-front-final-tests.log"
+    },
+    "ph-publish-internal-links": {
+      "status": "passed",
+      "elapsed_seconds": 7.02,
+      "log_local": "work/codex-logs/20261117-161503-ph-publish-internal-links.log"
+    },
+    "ph-publish-package-final": {
+      "status": "passed",
+      "elapsed_seconds": 2.02,
+      "log_local": "work/codex-logs/20261117-161242-ph-publish-package-final.log"
+    },
+    "ph-publish-sitemap-test": {
+      "status": "passed",
+      "elapsed_seconds": 2.01,
+      "log_local": "work/codex-logs/20261117-162357-ph-publish-sitemap-test.log"
+    }
+  },
+  "tests": {
+    "transaction_safety": 8,
+    "storefront": 278,
+    "related_go_packages": 4
+  },
+  "browser": {
+    "checked_at_utc": "2026-11-17T08:15:36.667581+00:00",
+    "viewport_width": 1920,
+    "document_width": 1905,
+    "sixth_faq_visible": true,
+    "screenshot": "preview-desktop.jpg"
+  },
+  "execution_notes": [
+    {
+      "status": "corrected",
+      "stage": "front-test-entry",
+      "detail": "最初误用项目未安装的 Vitest 入口；改用 package.json 中的 Node 单次测试入口。"
+    },
+    {
+      "status": "corrected",
+      "stage": "guide-visible-link",
+      "detail": "既有测试发现 blogSlugs 新增项缺少分类页可见链接，已补入原指南列表并复验 278 项通过。"
+    },
+    {
+      "status": "corrected",
+      "stage": "faq-parity",
+      "detail": "新增 FAQ 含链接，渲染器在标签边界规范化空格；按去除空白后的完整问答逐项对比通过，内容没有改写。"
+    },
+    {
+      "status": "corrected",
+      "stage": "CI sitemap date assertion",
+      "detail": "PR #11 首轮 API 测试断言仍为指南旧日期 2026-11-10；本次新增指南入口的实际更新日期为 2026-11-17，已同步既有断言，sitemap 包本地回归通过。"
+    },
+    {
+      "status": "corrected",
+      "stage": "published SVG preservation",
+      "detail": "发布产物与线上 6 张旧 SVG 仅换行符不同；已核对规范化字节一致，并保留线上原始字节，未修改图片源码或内容。"
+    },
+    {
+      "status": "retained_failure",
+      "stage": "upload before package complete",
+      "detail": "打包保护检查阻止未确认的 SVG 差异；随后上传入口因包未生成而退出，未传输或切换生产。"
+    }
+  ],
+  "files_sha256": {
+    "backlinks.json": "21d8fd7c058cdcbc84e8fa7dca489e115dc35504e026d6804458a27083c3213e",
+    "catalog.json": "1a3227817182d5aaa75851d191293ee854aa03bf4f3234e6cfa55a4e92e99a3b",
+    "chatgpt-ph-recharge-guide.html": "160a38f6db30e5a01ae43601f576990a94726ed7826f26d95a7c1159a9955788",
+    "chatgpt-ph-recharge-guide.md": "7026176004c5d3d59761170838fb002cf22ff888fb199012ad496d2e11eb6f6c",
+    "link-checks.json": "dc076769ba0dd5f62ce1937b21fa3636074ec61d67bc28d1b8b88f33a76af35f",
+    "preview-desktop.jpg": "7360d453b3fa353389ab275e3cdfa8ffc085febfcba68cb7a8546394ff11bc44",
+    "preview.html": "f8ede4476dd3efedcc6202ea24037efc18817894d4dd497988f28edd03e6abb7",
+    "publication-preflight.json": "3bcdc769a65d50664acdabd4dd1714cc0fd5e73aea4c5d8c2cfe7a9abded51a1",
+    "README.md": "d7084035a2b92eee586ed6f6738218cb628a6b5d6529a1c82c6a5d6f21b18eb6",
+    "review-fact-checks.json": "6a57621556985253c1138ad692134a7757c6b731219e015b58e023a0c7145c9d",
+    "sources.json": "cb2cb92f37306dad42c80c99d6781849bedd424fd76271052d72c1aec0313dcb"
+  }
+}

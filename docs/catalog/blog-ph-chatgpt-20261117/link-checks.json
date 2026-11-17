@@ -1,0 +1,128 @@
+{
+  "checked_at_utc": "2026-11-17T08:15:09.829428+00:00",
+  "method": "Anonymous HTTPS GET for unique in-body internal links",
+  "total": 15,
+  "passed": 15,
+  "results": [
+    {
+      "url": "https://www.qzweb.cloud/about",
+      "http_status": 200,
+      "final_url": "https://www.qzweb.cloud/about",
+      "response_sha256": "5c01489b5295be202a6690bfc051b79dd7471340eab516b619e8b71ec1cdc989",
+      "canonical": "https://www.qzweb.cloud/about",
+      "passed": true
+    },
+    {
+      "url": "https://www.qzweb.cloud/blog/chatgpt-code-region-check",
+      "http_status": 200,
+      "final_url": "https://www.qzweb.cloud/blog/chatgpt-code-region-check",
+      "response_sha256": "1584619c845b043bc87d4732ccc30604a917c64c70f032817821e241bc297a73",
+      "canonical": "https://www.qzweb.cloud/blog/chatgpt-code-region-check",
+      "passed": true
+    },
+    {
+      "url": "https://www.qzweb.cloud/blog/chatgpt-membership-not-active",
+      "http_status": 200,
+      "final_url": "https://www.qzweb.cloud/blog/chatgpt-membership-not-active",
+      "response_sha256": "f82200f75954bbc468822282622432b07f558b05d04c2a66ab68689c45b0d7bd",
+      "canonical": "https://www.qzweb.cloud/blog/chatgpt-membership-not-active",
+      "passed": true
+    },
+    {
+      "url": "https://www.qzweb.cloud/blog/chatgpt-payment-methods",
+      "http_status": 200,
+      "final_url": "https://www.qzweb.cloud/blog/chatgpt-payment-methods",
+      "response_sha256": "a7a248941aebcd6b146fa57e9114fc6a3398160589f005e94f3f80cd366e6621",
+      "canonical": "https://www.qzweb.cloud/blog/chatgpt-payment-methods",
+      "passed": true
+    },
+    {
+      "url": "https://www.qzweb.cloud/blog/chatgpt-plus-code-guide",
+      "http_status": 200,
+      "final_url": "https://www.qzweb.cloud/blog/chatgpt-plus-code-guide",
+      "response_sha256": "cc17c390511f30a67379643aed05612790c92d174563962f0d96fa3ff0145cee",
+      "canonical": "https://www.qzweb.cloud/blog/chatgpt-plus-code-guide",
+      "passed": true
+    },
+    {
+      "url": "https://www.qzweb.cloud/blog/chatgpt-plus-renewal-rules",
+      "http_status": 200,
+      "final_url": "https://www.qzweb.cloud/blog/chatgpt-plus-renewal-rules",
+      "response_sha256": "14e54c3680a6cd0ac9ec86bbb8879c3add35490ff020412a7cb583fcbe14b6a3",
+      "canonical": "https://www.qzweb.cloud/blog/chatgpt-plus-renewal-rules",
+      "passed": true
+    },
+    {
+      "url": "https://www.qzweb.cloud/blog/purchase-and-agent-guide",
+      "http_status": 200,
+      "final_url": "https://www.qzweb.cloud/blog/purchase-and-agent-guide",
+      "response_sha256": "31a9549c4da21f962be2d8274228a402febe32664b7c9bbb783a59435c0cb60e",
+      "canonical": "https://www.qzweb.cloud/blog/purchase-and-agent-guide",
+      "passed": true
+    },
+    {
+      "url": "https://www.qzweb.cloud/categories/gpt-recharge",
+      "http_status": 200,
+      "final_url": "https://www.qzweb.cloud/categories/gpt-recharge",
+      "response_sha256": "060b3fbdd8a096419f94492ea839729e60004215ff43ca59b2da60f5bffbb3f2",
+      "canonical": "https://www.qzweb.cloud/categories/gpt-recharge",
+      "passed": true
+    },
+    {
+      "url": "https://www.qzweb.cloud/products/chatgpt-plus-code",
+      "http_status": 200,
+      "final_url": "https://www.qzweb.cloud/products/chatgpt-plus-code",
+      "response_sha256": "2539b9a94366dee3acb5a0695997559986d51ac7b4815d7e9e82854f8f432c70",
+      "canonical": "https://www.qzweb.cloud/products/chatgpt-plus-code",
+      "passed": true
+    },
+    {
+      "url": "https://www.qzweb.cloud/products/chatgpt-pro-100-egypt",
+      "http_status": 200,
+      "final_url": "https://www.qzweb.cloud/products/chatgpt-pro-100-egypt",
+      "response_sha256": "9e5fee13441a049e9009e34187cc593870b2673ea27f6ee8656771e55ee3a8de",
+      "canonical": "https://www.qzweb.cloud/products/chatgpt-pro-100-egypt",
+      "passed": true
+    },
+    {
+      "url": "https://www.qzweb.cloud/products/chatgpt-pro-100-ph",
+      "http_status": 200,
+      "final_url": "https://www.qzweb.cloud/products/chatgpt-pro-100-ph",
+      "response_sha256": "f45c0c3a0254edc5d6722141ce8725d9a8ac9eadd5cf34412732f39029d21c94",
+      "canonical": "https://www.qzweb.cloud/products/chatgpt-pro-100-ph",
+      "passed": true
+    },
+    {
+      "url": "https://www.qzweb.cloud/products/chatgpt-pro-200-ph",
+      "http_status": 200,
+      "final_url": "https://www.qzweb.cloud/products/chatgpt-pro-200-ph",
+      "response_sha256": "f21baa42e6dbf67c7bc94f4207e77216ae88475f0e85ff5776f1bac26b003314",
+      "canonical": "https://www.qzweb.cloud/products/chatgpt-pro-200-ph",
+      "passed": true
+    },
+    {
+      "url": "https://www.qzweb.cloud/products/chatgpt-pro-200-renew-ph",
+      "http_status": 200,
+      "final_url": "https://www.qzweb.cloud/products/chatgpt-pro-200-renew-ph",
+      "response_sha256": "e2766c1e362f266f6e5db547f2897712ace10362bdd40f6d00c55d4a03932b57",
+      "canonical": "https://www.qzweb.cloud/products/chatgpt-pro-200-renew-ph",
+      "passed": true
+    },
+    {
+      "url": "https://www.qzweb.cloud/products/chatgpt-pro-500-egypt",
+      "http_status": 200,
+      "final_url": "https://www.qzweb.cloud/products/chatgpt-pro-500-egypt",
+      "response_sha256": "20b0e0ef9d08b1e621ecb84b464928d1df6f0bc6fc3f7adc1e76ca4a8bdef478",
+      "canonical": "https://www.qzweb.cloud/products/chatgpt-pro-500-egypt",
+      "passed": true
+    },
+    {
+      "url": "https://www.qzweb.cloud/products/chatgpt-pro-500-ph",
+      "http_status": 200,
+      "final_url": "https://www.qzweb.cloud/products/chatgpt-pro-500-ph",
+      "response_sha256": "9f0778a7d7fbb9a15d9b1708beff08195690f1555f58ae6dc949c9881b903c63",
+      "canonical": "https://www.qzweb.cloud/products/chatgpt-pro-500-ph",
+      "passed": true
+    }
+  ]
+}

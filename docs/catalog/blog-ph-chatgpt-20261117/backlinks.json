@@ -1,0 +1,16 @@
+[
+  {
+    "id": 9,
+    "slug": "chatgpt-code-region-check",
+    "before_sha256": "ee39c259ef377fe1cc8cf9cf9922ff67f4f1f1fbb721751f4eb7e2c43057fc63",
+    "append_html": "<p>延伸阅读：<a href=\"/blog/chatgpt-ph-recharge-guide\">菲区 ChatGPT 充值怎么选、怎么兑</a>。</p>",
+    "preserve_original_published_at": "2026-11-10T05:40:08.836080+00:00"
+  },
+  {
+    "id": 4,
+    "slug": "chatgpt-payment-methods",
+    "before_sha256": "e186f5df465fea4ceadbd12942543808a86b41fafa43455740aa6f2218a77155",
+    "append_html": "<p>延伸阅读：<a href=\"/blog/chatgpt-ph-recharge-guide\">菲区 ChatGPT 充值怎么选、怎么兑</a>。</p>",
+    "preserve_original_published_at": "2026-11-09T08:33:59.269458+00:00"
+  }
+]
