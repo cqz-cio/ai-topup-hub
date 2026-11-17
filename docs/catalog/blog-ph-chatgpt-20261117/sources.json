@@ -1,0 +1,160 @@
+{
+  "fetched_at_utc": "2026-11-17T06:50:33.453503+00:00",
+  "method": "Read-only anonymous HTTPS GET; no account, database or write API used",
+  "engineering_document": {
+    "url": "https://drive.google.com/file/d/1fufVkk7FzU6qbMeMYZoZTrQ5y2Z_Gb6-/view",
+    "name": "qzweb-blog-ph-chatgpt-engineering-doc.md",
+    "precedence": "The owner's explicit instruction to omit the account-sale keyword overrides the optional FAQ in the document."
+  },
+  "products": [
+    {
+      "slug": "chatgpt-pro-100-ph",
+      "id_observed": 45,
+      "title_observed": "ChatGPT Pro 100美金 兑换码｜菲区｜自动发码",
+      "source": "https://www.qzweb.cloud/products/chatgpt-pro-100-ph"
+    },
+    {
+      "slug": "chatgpt-pro-200-ph",
+      "id_observed": 31,
+      "title_observed": "ChatGPT Pro 200美金 兑换码｜菲区｜自动发码",
+      "source": "https://www.qzweb.cloud/products/chatgpt-pro-200-ph"
+    },
+    {
+      "slug": "chatgpt-pro-500-ph",
+      "id_observed": 33,
+      "title_observed": "ChatGPT Pro 500美金 兑换码｜菲区｜自动发码",
+      "source": "https://www.qzweb.cloud/products/chatgpt-pro-500-ph"
+    },
+    {
+      "slug": "chatgpt-pro-200-renew-ph",
+      "id_observed": 32,
+      "title_observed": "ChatGPT Pro 200美金 续费绑卡｜菲区｜自动发码",
+      "source": "https://www.qzweb.cloud/products/chatgpt-pro-200-renew-ph"
+    }
+  ],
+  "claim_sources": [
+    {
+      "claim": "普通开通的账号条件、至少 10 分钟、一个月期限、档位和 PAIPLUS 交付",
+      "urls": [
+        "https://www.qzweb.cloud/products/chatgpt-pro-100-ph",
+        "https://www.qzweb.cloud/products/chatgpt-pro-200-ph",
+        "https://www.qzweb.cloud/products/chatgpt-pro-500-ph"
+      ]
+    },
+    {
+      "claim": "续费绑卡仅针对当前仍为 Pro 10x 的账号，绑卡后联系客服确认",
+      "urls": [
+        "https://www.qzweb.cloud/products/chatgpt-pro-200-renew-ph"
+      ]
+    },
+    {
+      "claim": "Plus 商品未标为菲区，单独引用 Plus 使用说明",
+      "urls": [
+        "https://www.qzweb.cloud/products/chatgpt-plus-code",
+        "https://www.qzweb.cloud/blog/chatgpt-plus-code-guide"
+      ]
+    },
+    {
+      "claim": "地区与预检、故障排查、交付售后和站点身份",
+      "urls": [
+        "https://www.qzweb.cloud/blog/chatgpt-code-region-check",
+        "https://www.qzweb.cloud/blog/chatgpt-membership-not-active",
+        "https://www.qzweb.cloud/blog/purchase-and-agent-guide",
+        "https://www.qzweb.cloud/about"
+      ]
+    },
+    {
+      "claim": "官方服务支持地区由 OpenAI 当前帮助中心列表决定",
+      "urls": [
+        "https://help.openai.com/en/articles/7947663-chatgpt-supported-countries"
+      ]
+    }
+  ],
+  "public_response_evidence": [
+    {
+      "url": "https://www.qzweb.cloud/api/v1/public/products/chatgpt-pro-100-ph",
+      "http_status": 200,
+      "response_sha256": "58bc2bbf0621655ba484d35e964f5376354fb4412a6c8265c917c51433444291"
+    },
+    {
+      "url": "https://www.qzweb.cloud/api/v1/public/products/chatgpt-pro-200-ph",
+      "http_status": 200,
+      "response_sha256": "61692eb07a8125f3646d4ad7db459a24c1480d7faf74834327d337a940094b5f"
+    },
+    {
+      "url": "https://www.qzweb.cloud/api/v1/public/products/chatgpt-pro-500-ph",
+      "http_status": 200,
+      "response_sha256": "6b566acfff333df577dadaa8e8d84f745577f8443dd5fcc5b7d926661bc9ccec"
+    },
+    {
+      "url": "https://www.qzweb.cloud/api/v1/public/products/chatgpt-pro-200-renew-ph",
+      "http_status": 200,
+      "response_sha256": "0bcdf699563353b0f6c674e732d5897728ba93565ea1ff672fe8911c50177600"
+    },
+    {
+      "url": "https://www.qzweb.cloud/api/v1/public/products/chatgpt-plus-code",
+      "http_status": 200,
+      "response_sha256": "1ccce0db82bf383f57a9b7390384ae2ea0512f501a46991d67238e267edbc54b"
+    },
+    {
+      "url": "https://www.qzweb.cloud/api/v1/public/posts/chatgpt-code-region-check",
+      "http_status": 200,
+      "response_sha256": "8b0674b93eb279f83c0b9fd0dc09ab8a319cf222785ede0d440a29903626e393"
+    },
+    {
+      "url": "https://www.qzweb.cloud/api/v1/public/posts/chatgpt-plus-code-guide",
+      "http_status": 200,
+      "response_sha256": "4af77db9e9f786d694bc7c71c31b0511d2c89164d2e688b968db1edf49dfd5f1"
+    },
+    {
+      "url": "https://www.qzweb.cloud/api/v1/public/posts/chatgpt-plus-renewal-rules",
+      "http_status": 200,
+      "response_sha256": "dd225d33608e406a028e04d031f31c0fe246db17eabd0cfb993d3a5175ec26b8"
+    },
+    {
+      "url": "https://www.qzweb.cloud/api/v1/public/posts/chatgpt-membership-not-active",
+      "http_status": 200,
+      "response_sha256": "10e1589062950360c86e718db4ab1f656edcb3e554a4878e2c8fac5486e01ecc"
+    },
+    {
+      "url": "https://www.qzweb.cloud/api/v1/public/posts/purchase-and-agent-guide",
+      "http_status": 200,
+      "response_sha256": "e947c857ec5de68ca2902b9318814d056d03f55a006436e9b0415d13c84a333d"
+    },
+    {
+      "url": "https://www.qzweb.cloud/api/v1/public/posts/chatgpt-payment-methods",
+      "http_status": 200,
+      "response_sha256": "5a5a25018cf3144dfdf77e83c7e71df754a3a02c367c11e4f91cf87f751e848a"
+    },
+    {
+      "url": "https://www.qzweb.cloud/categories/gpt-recharge",
+      "http_status": 200,
+      "response_sha256": "060b3fbdd8a096419f94492ea839729e60004215ff43ca59b2da60f5bffbb3f2"
+    },
+    {
+      "url": "https://www.qzweb.cloud/about",
+      "http_status": 200,
+      "response_sha256": "5c01489b5295be202a6690bfc051b79dd7471340eab516b619e8b71ec1cdc989"
+    },
+    {
+      "url": "https://www.qzweb.cloud/blog/chatgpt-code-region-check",
+      "http_status": 200,
+      "response_sha256": "1584619c845b043bc87d4732ccc30604a917c64c70f032817821e241bc297a73"
+    },
+    {
+      "url": "https://www.qzweb.cloud/blog/chatgpt-ph-recharge-guide",
+      "http_status": 404,
+      "response_sha256": "8f5bd271e73ef363511a29de5e7c25240b6012dc35c7e06bb037a3fcd93ea5c0"
+    },
+    {
+      "url": "https://www.qzweb.cloud/api/v1/public/posts/chatgpt-ph-recharge-guide",
+      "http_status": 200,
+      "response_sha256": "aae4b8d317be67c17a6c56f8d0466a34c9c3b5bcbcc9cc2c61872243cd9d3722"
+    }
+  ],
+  "limits": [
+    "商品价格和库存为动态数据，正文不写固定人民币售价或库存承诺。",
+    "公开 URL 不存在不能排除后台已有同名未发布记录；发布审批后须再次核对 slug 唯一性。",
+    "此次只核对公开事实与本地草稿，不代表 Google 收录、排名或 AI 引用。"
+  ]
+}

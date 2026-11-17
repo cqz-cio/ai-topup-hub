@@ -1,0 +1,45 @@
+{
+  "status": "draft_review_only",
+  "base_commit": "7276bac1c0f350dd605062e1ba0dd15ece7786a8",
+  "branch": "codex/blog-ph-chatgpt-20261117",
+  "facts_checked_on": "2026-11-17",
+  "posts": [
+    {
+      "type": "blog",
+      "slug": "chatgpt-ph-recharge-guide",
+      "title": {
+        "zh-CN": "菲区 ChatGPT 充值怎么选、怎么兑",
+        "zh-TW": "",
+        "en-US": ""
+      },
+      "summary": {
+        "zh-CN": "菲区 ChatGPT 充值应先核对套餐档位和账号当前订阅状态。本文对照本站四款菲区 Pro 商品，区分普通开通与续费绑卡，说明付款后领取 PAIPLUS 卡密、预检、兑换及核对结果的步骤，并整理地区资格和售后边界；具体以商品页当前说明为准。",
+        "zh-TW": "",
+        "en-US": ""
+      },
+      "content_files": {
+        "zh-CN": "chatgpt-ph-recharge-guide.html",
+        "zh-TW": "",
+        "en-US": ""
+      },
+      "review_file": "chatgpt-ph-recharge-guide.md",
+      "preview_file": "preview.html",
+      "is_published": false,
+      "published_at": null,
+      "thumbnail": "",
+      "canonical_after_publication": "https://www.qzweb.cloud/blog/chatgpt-ph-recharge-guide",
+      "default_share_image": "/media/seo-share/qzweb-og-1200x630.jpg",
+      "default_share_image_width": 1200,
+      "default_share_image_height": 630
+    }
+  ],
+  "proposed_related_products_for_review_only": [
+    { "id_observed": 45, "slug": "chatgpt-pro-100-ph" },
+    { "id_observed": 31, "slug": "chatgpt-pro-200-ph" },
+    { "id_observed": 33, "slug": "chatgpt-pro-500-ph" },
+    { "id_observed": 32, "slug": "chatgpt-pro-200-renew-ph" }
+  ],
+  "publication_approved": false,
+  "production_writes": false,
+  "gsc_submission": false
+}

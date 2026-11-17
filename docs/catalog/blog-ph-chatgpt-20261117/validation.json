@@ -1,0 +1,119 @@
+{
+  "checked_at_utc": "2026-11-17T07:03:27.782109+00:00",
+  "status": "passed",
+  "scope": "Draft body, metadata, Markdown parity and actual repository SSR; no production mutation",
+  "base_commit": "7276bac1c0f350dd605062e1ba0dd15ece7786a8",
+  "body_cjk_characters": 2011,
+  "body_nonwhitespace_characters": 2474,
+  "summary_cjk_characters": 89,
+  "h2_sections": 7,
+  "visible_faq_count": 5,
+  "generated_faq_count": 5,
+  "schema_types": [
+    "BlogPosting",
+    "Organization",
+    "WebSite",
+    "BreadcrumbList",
+    "FAQPage"
+  ],
+  "markdown_visible_text_matches_html": true,
+  "markdown_links_match_html": true,
+  "internal_links_unique": 12,
+  "all_required_internal_links_present": true,
+  "draft_is_noindex": true,
+  "publication_date_deliberately_unset": true,
+  "production_new_page_http_status_observed": 404,
+  "production_new_post_api_http_status_observed": 200,
+  "production_new_post_api_business_status_observed": 404,
+  "future_release_checks": [
+    "确认正文获批",
+    "生产 slug 唯一性",
+    "真实 PublishedAt",
+    "blogSlugs 与作者信息",
+    "已批准的商品关联和回链",
+    "真实页面、sitemap 和 Google 索引申请"
+  ],
+  "files_sha256": {
+    "catalog.json": "4e506433ae205220a63a5259cbf9b44fe52b5289ec75d4c6db8e38fb0b9ff581",
+    "chatgpt-ph-recharge-guide.html": "2da623d65564172732dd3102e65a2fa5c9160f15989442249b0431efce831cd1",
+    "chatgpt-ph-recharge-guide.md": "402b157c5a896bacd31e9c72d3f95b085b3cfb7190dcb55f238e8a4a9925e655",
+    "preview.html": "5f4f883b97d66a98098ab2dec1fad462b0547e9f1939a3fb56563bf0b52c949a",
+    "sources.json": "5053330e614d7e3f105796ca06edf8bbf7f1ea6b6b82dd7b143800c8594aec71",
+    "README.md": "b206f91652f7c573a91ee8817304b166452ef8d621cbfeb7f40d6d794027a361",
+    "link-checks.json": "1d5aa444b79673eaa4cee5954db52bc8bf29dfb2d4e30ecef28619dde7f6d7b0",
+    "preview-desktop.jpg": "c4937545f6ee6fe8856ce31d5fb4ec4909852d659c33e0401d7263ba288d188d"
+  },
+  "git_branch": "codex/blog-ph-chatgpt-20261117",
+  "git_head": "7276bac1c0f350dd605062e1ba0dd15ece7786a8",
+  "origin_main_at_review": "7276bac1c0f350dd605062e1ba0dd15ece7786a8",
+  "tracked_application_changes": [],
+  "new_files": [
+    "docs/catalog/blog-ph-chatgpt-20261117/README.md",
+    "docs/catalog/blog-ph-chatgpt-20261117/catalog.json",
+    "docs/catalog/blog-ph-chatgpt-20261117/chatgpt-ph-recharge-guide.html",
+    "docs/catalog/blog-ph-chatgpt-20261117/chatgpt-ph-recharge-guide.md",
+    "docs/catalog/blog-ph-chatgpt-20261117/link-checks.json",
+    "docs/catalog/blog-ph-chatgpt-20261117/preview.html",
+    "docs/catalog/blog-ph-chatgpt-20261117/sources.json",
+    "docs/catalog/blog-ph-chatgpt-20261117/validation.json"
+  ],
+  "commit_created": false,
+  "pushed": false,
+  "deployed": false,
+  "production_database_written": false,
+  "internal_links_http_200_and_self_canonical": 12,
+  "browser_review": {
+    "viewport": {
+      "height": 855,
+      "width": 1920
+    },
+    "document_width": 1905,
+    "table_rows": 4,
+    "h2_sections": 7,
+    "console_warnings_or_errors_observed": 0,
+    "screenshot_local": "work/blog-ph-chatgpt-20261117/preview-desktop.jpg",
+    "screenshot_file": "preview-desktop.jpg"
+  },
+  "execution_notes": [
+    {
+      "status": "failed",
+      "stage": "Initial sandbox Go rendering",
+      "detail": "No output timeout; termination command hit sandbox restrictions. Original failure retained; later inspection found no surviving target or descendants.",
+      "log_local": "work/codex-logs/20261117-145912-blog-ph-render-draft.log"
+    },
+    {
+      "status": "passed",
+      "stage": "Diagnostic Go rendering with build progress",
+      "elapsed_seconds": 6.52,
+      "log_local": "work/codex-logs/20261117-150310-blog-ph-render-diagnostic.log"
+    },
+    {
+      "status": "passed",
+      "stage": "Draft content and schema checks",
+      "log_local": "work/codex-logs/20261117-150326-blog-ph-package-check.log"
+    },
+    {
+      "status": "passed",
+      "stage": "Public internal-link GET checks",
+      "log_local": "work/codex-logs/20261117-150435-blog-ph-internal-links.log"
+    },
+    {
+      "status": "failed_then_corrected",
+      "stage": "Initial staged whitespace check",
+      "detail": "The link-check JSON used Windows CRLF; normalized only line endings to LF, with JSON values unchanged.",
+      "log_local": "work/codex-logs/20261117-152849-blog-ph-staged-check.log"
+    }
+  ],
+  "record_type": "local_draft_validation_snapshot_before_git_submission",
+  "git_status_note": "Git 状态字段为完成本地验证时的快照。后续仅获授权提交推送，当前分支提交信息以 Git 历史为准；不合并、不上线。",
+  "submission_preparation": {
+    "prepared_at_utc": "2026-11-17T07:28:13.957417+00:00",
+    "authorization": "仅将草稿与验证记录提交推送到独立分支，供 Grok 审核；不合并、不上线。",
+    "article_content_changed": false,
+    "preview_screenshot_archived": true,
+    "file_count": 9,
+    "format_only_changes": [
+      "link-checks.json: CRLF converted to LF; JSON values unchanged"
+    ]
+  }
+}
