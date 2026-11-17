@@ -1,0 +1,37 @@
+{
+  "recorded_at": "2026-11-17T15:21:03Z",
+  "source": "本对话店主回复",
+  "owner_message": "按商品信息来   去掉吧   成品号plus 一个月订阅  质保订阅一个月 115一个        第4个不知道你帮我做一下吧",
+  "scope": "更新 v6 审阅稿与待发布字段清单；未执行生产变更",
+  "plus": {
+    "product_id": 30,
+    "slug": "chatgpt-plus-code",
+    "remove_tag": "ChatGpt 菲区",
+    "preserve": "原商品标题、正文资格、预检要求、售价、库存与 URL",
+    "region_inference": "不据此声明全球通用、无地区限制或判定供货地区"
+  },
+  "ready_account": {
+    "name": "ChatGPT Plus 成品号",
+    "subscription_duration": "一个月",
+    "subscription_warranty": "一个月",
+    "owner_quoted_price_cny": "115.00",
+    "price_unit": "个",
+    "publication": "说明页草稿；不创建 SKU、不改现有商品售价",
+    "still_unspecified": [
+      "具体交付物与交付时间",
+      "账号归属与换绑、安全操作",
+      "订阅质保处理方式、退款或补号规则"
+    ]
+  },
+  "fourth_item": {
+    "clarification": "已询问具体所指，暂未收到澄清；先按上一条复核的第4项截图素材推进",
+    "completed": "真实匿名查单入口 S0、截图取材说明；不把 S0 计作 S1–S5",
+    "remaining": "真实且获准公开的交付、预检、提交与结果界面尚无可用记录；未创建订单或执行兑换取材"
+  },
+  "release": {
+    "merge_main": false,
+    "deploy": false,
+    "production_write": false,
+    "cart_separate_release": false
+  }
+}

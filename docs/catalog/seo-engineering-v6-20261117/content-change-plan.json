@@ -1,0 +1,58 @@
+{
+  "status": "reviewed_content_direction_not_deployed",
+  "approval_source": "owner-confirmation.json",
+  "operations": [
+    {
+      "kind": "remove_product_tag",
+      "product": {
+        "id": 30,
+        "slug": "chatgpt-plus-code",
+        "category_id": 9,
+        "title_zh_CN": "ChatGPT Plus 兑换码｜自动发码"
+      },
+      "field": "tags",
+      "before": [
+        "ChatGpt 菲区"
+      ],
+      "after": [],
+      "other_products_unchanged": [
+        45,
+        31,
+        33,
+        32
+      ],
+      "preserve_other_product_fields": true
+    },
+    {
+      "kind": "replace_post_sentence",
+      "post": {
+        "id": 10,
+        "slug": "chatgpt-ph-recharge-guide"
+      },
+      "field": "content.zh-CN",
+      "before": "本站 Plus 兑换码没有标注菲区，不应混入这四款菲区 Pro 的选品表，也不能用 Pro 档位替代 Plus 套餐。",
+      "after": "Plus 与本节四款菲区 Pro 是不同套餐，请分别按各自商品说明选择，不能用 Pro 档位或资格规则替代 Plus。",
+      "preserve_other_languages_and_fields": true
+    }
+  ],
+  "guards": {
+    "default": "plan_only",
+    "require_identity_match": true,
+    "unexpected_tag_or_copy_change": "refuse_whole_batch",
+    "already_at_target": "no_op_without_updating_timestamp",
+    "allowed_updated_at": "only_rows_with_actual_content_change",
+    "preserve": [
+      "prices",
+      "inventory",
+      "order_items",
+      "orders",
+      "payment",
+      "card_secrets",
+      "supplier_mappings",
+      "canonical_urls",
+      "published_media"
+    ],
+    "production_execution": "仅在另行明确发布后准备并验证定向事务/备份/回退脚本"
+  },
+  "ready_account_action": "仅更新说明稿；不把115元写入任何现存SKU或商品"
+}

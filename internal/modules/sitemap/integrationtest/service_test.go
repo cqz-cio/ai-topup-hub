@@ -227,10 +227,11 @@ func TestSitemapServiceIncludesActiveContent(t *testing.T) {
 	}
 
 	mustNotContain := []string{
-		"hidden",             // 停用分类
-		"draft-product",      // 下架商品
-		"in-hidden-category", // 分类停用下的商品
-		"/blog/draft",        // 未发布文章
+		"https://example.com/cart", // public shell must remain excluded, even when crawlable
+		"hidden",                   // 停用分类
+		"draft-product",            // 下架商品
+		"in-hidden-category",       // 分类停用下的商品
+		"/blog/draft",              // 未发布文章
 	}
 	for _, s := range mustNotContain {
 		if strings.Contains(xmlStr, s) {
@@ -266,5 +267,69 @@ func TestSitemapServiceGenerateRejectsEmptyBaseURL(t *testing.T) {
 	svc, _ := newSitemapServiceForTest(t, nil)
 	if _, err := svc.Generate(context.Background(), ""); err == nil {
 		t.Fatalf("expected error for empty base url")
+	}
+}
+
+func TestRobotsAllowsOnlyPublicCartEntrypoints(t *testing.T) {
+	svc, _ := newSitemapServiceForTest(t, nil)
+	body := svc.GenerateRobots("https://example.com")
+	// Evaluate actual crawl decisions rather than just searching for Allow text.
+	// These rules use only literal prefixes and Google's end-of-URL '$' marker;
+	// '?' is part of the URL, not a wildcard. Longest match wins, Allow wins ties.
+	canCrawl := func(target string) bool {
+		allowed, longest := true, -1
+		for _, line := range strings.Split(body, "\n") {
+			kind, pattern, ok := strings.Cut(line, ": ")
+			if !ok || (kind != "Allow" && kind != "Disallow") {
+				continue
+			}
+			prefix := strings.TrimSuffix(pattern, "$")
+			matches := strings.HasPrefix(target, prefix)
+			if strings.HasSuffix(pattern, "$") {
+				matches = target == prefix
+			}
+			if matches && (len(prefix) > longest || len(prefix) == longest && kind == "Allow") {
+				longest, allowed = len(prefix), kind == "Allow"
+			}
+		}
+		return allowed
+	}
+	for _, path := range []string{
+		"/cart", "/cart/", "/cart?", "/cart/?", "/cart?utm=test", "/cart/?utm=test",
+		"/cart?next=/checkout", "/cart/?next=%2Fcart%2Fapi", "/cart?x=/cart/checkout&y=1",
+		"/", "/products", "/blog", "/sitemap.xml", "/robots.txt",
+	} {
+		t.Run("allow"+path, func(t *testing.T) {
+			if !canCrawl(path) {
+				t.Errorf("public entry blocked: %s", path)
+			}
+		})
+	}
+	for _, path := range []string{
+		"/cart/checkout", "/cart/api", "/cart/extra", "/cart/checkout?utm=test", "/cart//", "/cart//?x=1",
+		"/cartoon", "/cart-old", "/carts", "/cart%2Fcheckout",
+		"/checkout", "/checkout/", "/checkout?next=/cart", "/pay", "/pay?order=1", "/payment-guide",
+		"/orders/", "/orders/1", "/recharge-orders/1", "/admin/", "/admin/products", "/auth/", "/auth/login",
+		"/me/", "/me/profile", "/guest/", "/guest/orders", "/api/private", "/api/v1/admin/products",
+		"/api/v1/public/products-secret", "/api/v1/public/config-secret",
+	} {
+		t.Run("block"+path, func(t *testing.T) {
+			if canCrawl(path) {
+				t.Errorf("protected prefix opened: %s", path)
+			}
+		})
+	}
+	for _, resource := range []string{"config", "products", "categories", "posts", "post-categories", "banners", "member-levels"} {
+		for _, suffix := range []string{"", "?page=1"} {
+			path := "/api/v1/public/" + resource + suffix
+			if !canCrawl(path) {
+				t.Errorf("existing render endpoint blocked: %s", path)
+			}
+		}
+	}
+	for _, path := range []string{"/api/v1/public/products/chatgpt-plus-code", "/api/v1/public/posts/chatgpt-ph-recharge-guide"} {
+		if !canCrawl(path) {
+			t.Errorf("existing detail endpoint blocked: %s", path)
+		}
 	}
 }

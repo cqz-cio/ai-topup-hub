@@ -1,0 +1,30 @@
+{
+  "status": "stage_one_review_only",
+  "base_sha": "781fcd1062bbccfa4a25fe5d0f7dad051a5b8885",
+  "branch": "codex/seo-engineering-v6-20261117",
+  "cart_commit": "5e6587f8997fb52b4966ca7e9bf0e64303e087b5",
+  "task_report": {
+    "lines": 428,
+    "truncated": false,
+    "name": "qzweb-seo-engineering-report-v6.md",
+    "content_sha256": "a3712b95549299b4045aeb1623ba93ecd782dbbe5cf634958ce478277888aec9"
+  },
+  "content_approval": "owner_directed_tag_removal_and_account_facts_recorded; release_not_executed",
+  "owner_confirmation": "owner-confirmation.json",
+  "content_change_plan": "content-change-plan.json",
+  "owner_followup_evidence": "evidence/owner-followup.json",
+  "merged": false,
+  "deployed": false,
+  "production_database_writes": false,
+  "gsc_actions": false,
+  "runtime_changed_files": [
+    "internal/modules/sitemap/application/service.go"
+  ],
+  "original_workspace": {
+    "preserved": true,
+    "branch": "codex/glass-header-footer",
+    "status_entries": 87,
+    "head": "09dae2114edad1879deb87401fd45817fdbe6d43"
+  },
+  "evidence_uses_anonymous_public_data_only": true
+}

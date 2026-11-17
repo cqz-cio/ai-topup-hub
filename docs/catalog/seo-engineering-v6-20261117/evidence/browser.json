@@ -1,0 +1,149 @@
+{
+  "date": "2026-11-17",
+  "tool": "Orca CLI embedded browser",
+  "mode": "anonymous public browser and local review preview",
+  "home_url": "https://www.qzweb.cloud/",
+  "initial_preferences": {
+    "announcement_dismiss": null,
+    "announcement_closed": null
+  },
+  "announcement_version": "63bd14ea",
+  "cases": [
+    {
+      "case": "first desktop",
+      "viewport": [
+        1289,
+        931
+      ],
+      "dialog": [
+        640,
+        819.265625
+      ],
+      "visible": true,
+      "screenshot": "home-desktop.png"
+    },
+    {
+      "case": "first mobile",
+      "viewport": [
+        390,
+        844
+      ],
+      "dialog": [
+        366,
+        759.59375
+      ],
+      "visible": true,
+      "scrollWidth": 390,
+      "screenshot": "home-390.png"
+    },
+    {
+      "case": "first narrow mobile",
+      "viewport": [
+        320,
+        740
+      ],
+      "dialog": [
+        296,
+        666
+      ],
+      "visible": true,
+      "scrollWidth": 320,
+      "screenshot": "home-320.png"
+    },
+    {
+      "case": "click close",
+      "visible": false,
+      "sessionStorage": {
+        "announcement_closed": "63bd14ea"
+      }
+    },
+    {
+      "case": "reload after close",
+      "loaded": true,
+      "visible": false
+    },
+    {
+      "case": "clear closed session and reload",
+      "visible": true
+    },
+    {
+      "case": "dismiss today then reload",
+      "loaded": true,
+      "visible": false,
+      "localStorage": {
+        "announcement_dismiss": {
+          "version": "63bd14ea",
+          "mode": "today",
+          "date": "2026-11-17"
+        }
+      }
+    },
+    {
+      "case": "dismiss forever then reload",
+      "loaded": true,
+      "visible": false,
+      "localStorage": {
+        "announcement_dismiss": {
+          "version": "63bd14ea",
+          "mode": "forever"
+        }
+      }
+    },
+    {
+      "case": "malformed dismissal record then reload",
+      "loaded": true,
+      "visible": true
+    },
+    {
+      "case": "old version forever record then reload",
+      "loaded": true,
+      "visible": true
+    }
+  ],
+  "plus": {
+    "url": "https://www.qzweb.cloud/products/chatgpt-plus-code",
+    "h1": "ChatGPT Plus 兑换码｜自动发码",
+    "product_meta_text": "分类 · GPT（卡冲）\nChatGpt 菲区",
+    "selfCanonical": true,
+    "productSchemaImage": "https://www.qzweb.cloud/media/seo-share/qzweb-og-1200x630.jpg",
+    "faqCount": 3,
+    "priceAtObservation": "130.00",
+    "availability": "InStock",
+    "screenshot": "plus-tag-desktop.png"
+  },
+  "preview": {
+    "url": "http://127.0.0.1:5186/preview.html",
+    "viewports": [
+      [
+        1289,
+        931
+      ],
+      [
+        390,
+        844
+      ],
+      [
+        320,
+        740
+      ]
+    ],
+    "mobileScrollWidths": [
+      390,
+      320
+    ],
+    "robots": "noindex, nofollow",
+    "detailsInitiallyOpen": false,
+    "detailsClickedOpen": true,
+    "modal": false,
+    "consoleEntries": []
+  },
+  "limitations": [
+    "Orca resets the viewport on navigation; mobile dimensions were explicitly checked after setting each viewport.",
+    "Storage unavailable and next-day rollover were not browser-tested; source catches storage errors.",
+    "No transactions, no production content/config changes."
+  ],
+  "final_preferences": {
+    "announcement_dismiss": null,
+    "announcement_closed": null
+  }
+}

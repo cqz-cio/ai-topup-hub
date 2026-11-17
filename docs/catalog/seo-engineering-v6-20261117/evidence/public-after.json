@@ -1,0 +1,2916 @@
+{
+  "timestamp_utc": "2026-11-17T14:51:51.189636+00:00",
+  "base": "https://www.qzweb.cloud",
+  "mode": "anonymous-read-only",
+  "expected_cart_crawl": "blocked",
+  "requests": [
+    {
+      "path": "/robots.txt",
+      "method": "GET",
+      "status": 200,
+      "headers": {
+        "content-type": "text/plain; charset=utf-8",
+        "cache-control": "public, max-age=3600"
+      },
+      "bytes": 767,
+      "sha256": "22b5fb846feaeeaa8710fe1f14ce984ff8542a22afd5c2fe938fa0be4888cec7"
+    },
+    {
+      "path": "/cart",
+      "method": "GET",
+      "status": 200,
+      "headers": {
+        "content-type": "text/html",
+        "cache-control": "no-cache",
+        "x-robots-tag": "noindex, nofollow"
+      },
+      "bytes": 1763,
+      "sha256": "450ef14c0aee8ab5318b9f52547ebeb2fe2c63d464e1aad615740b0f3df01215"
+    },
+    {
+      "path": "/cart",
+      "method": "HEAD",
+      "status": 200,
+      "headers": {
+        "content-type": "text/html",
+        "cache-control": "no-cache",
+        "x-robots-tag": "noindex, nofollow"
+      },
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/cart/",
+      "method": "GET",
+      "status": 200,
+      "headers": {
+        "content-type": "text/html",
+        "cache-control": "no-cache",
+        "x-robots-tag": "noindex, nofollow"
+      },
+      "bytes": 1763,
+      "sha256": "450ef14c0aee8ab5318b9f52547ebeb2fe2c63d464e1aad615740b0f3df01215"
+    },
+    {
+      "path": "/cart/",
+      "method": "HEAD",
+      "status": 200,
+      "headers": {
+        "content-type": "text/html",
+        "cache-control": "no-cache",
+        "x-robots-tag": "noindex, nofollow"
+      },
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/cart?utm=test",
+      "method": "GET",
+      "status": 200,
+      "headers": {
+        "content-type": "text/html",
+        "cache-control": "no-cache",
+        "x-robots-tag": "noindex, nofollow"
+      },
+      "bytes": 1763,
+      "sha256": "450ef14c0aee8ab5318b9f52547ebeb2fe2c63d464e1aad615740b0f3df01215"
+    },
+    {
+      "path": "/cart?utm=test",
+      "method": "HEAD",
+      "status": 200,
+      "headers": {
+        "content-type": "text/html",
+        "cache-control": "no-cache",
+        "x-robots-tag": "noindex, nofollow"
+      },
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/cart/?utm=test",
+      "method": "GET",
+      "status": 200,
+      "headers": {
+        "content-type": "text/html",
+        "cache-control": "no-cache",
+        "x-robots-tag": "noindex, nofollow"
+      },
+      "bytes": 1763,
+      "sha256": "450ef14c0aee8ab5318b9f52547ebeb2fe2c63d464e1aad615740b0f3df01215"
+    },
+    {
+      "path": "/cart/?utm=test",
+      "method": "HEAD",
+      "status": 200,
+      "headers": {
+        "content-type": "text/html",
+        "cache-control": "no-cache",
+        "x-robots-tag": "noindex, nofollow"
+      },
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/cart?next=/checkout",
+      "method": "GET",
+      "status": 200,
+      "headers": {
+        "content-type": "text/html",
+        "cache-control": "no-cache",
+        "x-robots-tag": "noindex, nofollow"
+      },
+      "bytes": 1763,
+      "sha256": "450ef14c0aee8ab5318b9f52547ebeb2fe2c63d464e1aad615740b0f3df01215"
+    },
+    {
+      "path": "/cart?next=/checkout",
+      "method": "HEAD",
+      "status": 200,
+      "headers": {
+        "content-type": "text/html",
+        "cache-control": "no-cache",
+        "x-robots-tag": "noindex, nofollow"
+      },
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/cart/checkout",
+      "method": "GET",
+      "status": 404,
+      "headers": {
+        "content-type": "text/html",
+        "x-robots-tag": "noindex",
+        "cache-control": "no-store"
+      },
+      "bytes": 208,
+      "sha256": "60823f0f3af406ec77811c5766cb0d217b3cab2a046279ae973b4d2c1069d6de"
+    },
+    {
+      "path": "/cart/api",
+      "method": "GET",
+      "status": 404,
+      "headers": {
+        "content-type": "text/html",
+        "x-robots-tag": "noindex",
+        "cache-control": "no-store"
+      },
+      "bytes": 208,
+      "sha256": "60823f0f3af406ec77811c5766cb0d217b3cab2a046279ae973b4d2c1069d6de"
+    },
+    {
+      "path": "/cart/extra",
+      "method": "GET",
+      "status": 404,
+      "headers": {
+        "content-type": "text/html",
+        "x-robots-tag": "noindex",
+        "cache-control": "no-store"
+      },
+      "bytes": 208,
+      "sha256": "60823f0f3af406ec77811c5766cb0d217b3cab2a046279ae973b4d2c1069d6de"
+    },
+    {
+      "path": "/",
+      "method": "GET",
+      "status": 200,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "public, max-age=60, s-maxage=120, stale-while-revalidate=300",
+        "vary": "Cookie, Authorization"
+      },
+      "bytes": 18705,
+      "sha256": "8fbaec46000018195e4796e74b54fc4c7f131d07a45ec824125e9cedb9da71d8"
+    },
+    {
+      "path": "/products",
+      "method": "GET",
+      "status": 200,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "public, max-age=60, s-maxage=120, stale-while-revalidate=300",
+        "vary": "Cookie, Authorization"
+      },
+      "bytes": 21092,
+      "sha256": "5397cd1b67f5bbb6aa965cdcce322f2d1b696576278235812f76cce0468d6b22"
+    },
+    {
+      "path": "/blog",
+      "method": "GET",
+      "status": 200,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "public, max-age=60, s-maxage=120, stale-while-revalidate=300",
+        "vary": "Cookie, Authorization"
+      },
+      "bytes": 12211,
+      "sha256": "c229bb67f1ae5b2f9715ce87340a046b3f77e093e275a52056113c3b97c1427b"
+    },
+    {
+      "path": "/products/chatgpt-plus-code",
+      "method": "GET",
+      "status": 200,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "public, max-age=60, s-maxage=120, stale-while-revalidate=300",
+        "vary": "Cookie, Authorization"
+      },
+      "bytes": 14709,
+      "sha256": "2539b9a94366dee3acb5a0695997559986d51ac7b4815d7e9e82854f8f432c70"
+    },
+    {
+      "path": "/categories/gpt-recharge",
+      "method": "GET",
+      "status": 200,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "public, max-age=60, s-maxage=120, stale-while-revalidate=300",
+        "vary": "Cookie, Authorization"
+      },
+      "bytes": 16308,
+      "sha256": "f609ad2dfa685c12cf92cd0597b1adb431b4f221287a71b048fba1628d15c2d3"
+    },
+    {
+      "path": "/blog/chatgpt-ph-recharge-guide",
+      "method": "GET",
+      "status": 200,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "public, max-age=60, s-maxage=120, stale-while-revalidate=300",
+        "vary": "Cookie, Authorization"
+      },
+      "bytes": 20607,
+      "sha256": "cc800bcaf0a89da9c9b07084c920f55f9ddffe8c42ff0b616eb11873dbbeffa2"
+    },
+    {
+      "path": "/blog/chatgpt-plus-code-guide",
+      "method": "GET",
+      "status": 200,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "public, max-age=60, s-maxage=120, stale-while-revalidate=300",
+        "vary": "Cookie, Authorization"
+      },
+      "bytes": 12893,
+      "sha256": "cc17c390511f30a67379643aed05612790c92d174563962f0d96fa3ff0145cee"
+    },
+    {
+      "path": "/blog/chatgpt-code-region-check",
+      "method": "GET",
+      "status": 200,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "public, max-age=60, s-maxage=120, stale-while-revalidate=300",
+        "vary": "Cookie, Authorization"
+      },
+      "bytes": 11660,
+      "sha256": "72c134977840681c990673a54c91b47b7cb9922befd0d0e376de86d4336bf850"
+    },
+    {
+      "path": "/blog/chatgpt-payment-methods",
+      "method": "GET",
+      "status": 200,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "public, max-age=60, s-maxage=120, stale-while-revalidate=300",
+        "vary": "Cookie, Authorization"
+      },
+      "bytes": 13787,
+      "sha256": "a2170287cb8eb5689974a121dc33a5e030e9e790d5dd1a590bcc6f63dd75393b"
+    },
+    {
+      "path": "/sitemap.xml",
+      "method": "GET",
+      "status": 200,
+      "headers": {
+        "content-type": "application/xml; charset=utf-8",
+        "cache-control": "public, max-age=300"
+      },
+      "bytes": 8613,
+      "sha256": "39d7757fa10273a2df525bfb71eca44413c00e37e2aeb71e7ff3cadb0c217442"
+    },
+    {
+      "path": "/robots.txt",
+      "method": "GET",
+      "status": 200,
+      "headers": {
+        "content-type": "text/plain; charset=utf-8",
+        "cache-control": "public, max-age=3600"
+      },
+      "bytes": 767,
+      "sha256": "22b5fb846feaeeaa8710fe1f14ce984ff8542a22afd5c2fe938fa0be4888cec7"
+    },
+    {
+      "path": "/api/v1/public/products?page=1&page_size=100",
+      "method": "GET",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "private, no-store",
+        "vary": "Authorization"
+      },
+      "bytes": 157406,
+      "sha256": "df538ae171ea0ea7ddca49105dba14be954eb1f149af265cae18914b1b548028"
+    },
+    {
+      "path": "/api/v1/public/products/chatgpt-plus-code",
+      "method": "GET",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "private, no-store",
+        "vary": "Authorization"
+      },
+      "bytes": 7115,
+      "sha256": "5441b09aa85c62e2a60a71627aa3fee8fb9bfd1c9cd1f1d2a7cdf36f376c55f7"
+    }
+  ],
+  "pages": {
+    "/": {
+      "canonical": [
+        "https://www.qzweb.cloud/"
+      ],
+      "meta": {
+        "viewport": "width=device-width, initial-scale=1",
+        "description": "π星卡社提供 AI 数字商品与第三方订阅服务。查看 ChatGPT Plus 自助兑换码、人工充值的适用条件、使用教程和售后说明，按商品与订单指引领取交付内容。",
+        "og:title": "π星卡社｜AI 数字商品与订阅服务指南",
+        "og:description": "π星卡社提供 AI 数字商品与第三方订阅服务。查看 ChatGPT Plus 自助兑换码、人工充值的适用条件、使用教程和售后说明，按商品与订单指引领取交付内容。",
+        "og:url": "https://www.qzweb.cloud/",
+        "og:site_name": "π星卡社",
+        "og:type": "website",
+        "og:image": "https://www.qzweb.cloud/media/seo-share/qzweb-og-1200x630.jpg",
+        "og:image:width": "1200",
+        "og:image:height": "630",
+        "og:image:alt": "ChatGPT、Grok、Gemini 等 AI 订阅与充值，轻松选购",
+        "twitter:card": "summary_large_image",
+        "twitter:title": "π星卡社｜AI 数字商品与订阅服务指南",
+        "twitter:description": "π星卡社提供 AI 数字商品与第三方订阅服务。查看 ChatGPT Plus 自助兑换码、人工充值的适用条件、使用教程和售后说明，按商品与订单指引领取交付内容。",
+        "twitter:image": "https://www.qzweb.cloud/media/seo-share/qzweb-og-1200x630.jpg",
+        "twitter:image:alt": "ChatGPT、Grok、Gemini 等 AI 订阅与充值，轻松选购"
+      },
+      "jsonld": [
+        {
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "about": {
+            "@id": "https://www.qzweb.cloud/#organization"
+          },
+          "description": "π星卡社提供 AI 数字商品与第三方订阅服务。查看 ChatGPT Plus 自助兑换码、人工充值的适用条件、使用教程和售后说明，按商品与订单指引领取交付内容。",
+          "inLanguage": "zh-CN",
+          "isPartOf": {
+            "@id": "https://www.qzweb.cloud/#website"
+          },
+          "name": "ChatGPT、Grok、Gemini 等 AI 订阅与充值，轻松选购",
+          "url": "https://www.qzweb.cloud/"
+        },
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://www.qzweb.cloud/#organization",
+              "@type": "Organization",
+              "contactPoint": {
+                "@type": "ContactPoint",
+                "contactType": "customer support",
+                "url": "https://www.qzweb.cloud/about"
+              },
+              "description": "π星卡社提供 AI 数字商品与第三方订阅服务。查看 ChatGPT Plus 自助兑换码、人工充值的适用条件、使用教程和售后说明，按商品与订单指引领取交付内容。",
+              "hasMerchantReturnPolicy": {
+                "@id": "https://www.qzweb.cloud/blog/purchase-and-agent-guide#merchant-return-policy",
+                "@type": "MerchantReturnPolicy",
+                "merchantReturnLink": "https://www.qzweb.cloud/blog/purchase-and-agent-guide"
+              },
+              "logo": "https://www.qzweb.cloud/media/storefront-20261020/patrick-logo.webp",
+              "name": "π星卡社",
+              "url": "https://www.qzweb.cloud/"
+            },
+            {
+              "@id": "https://www.qzweb.cloud/#website",
+              "@type": "WebSite",
+              "name": "π星卡社",
+              "publisher": {
+                "@id": "https://www.qzweb.cloud/#organization"
+              },
+              "url": "https://www.qzweb.cloud/"
+            }
+          ]
+        }
+      ],
+      "text": "π星卡社｜AI 数字商品与订阅服务指南\nπ星卡社\n·\n商品中心\n·\n文章\n·\n关于我们\nChatGPT、Grok、Gemini 等 AI 订阅与充值，轻松选购\n选择适合你的服务与规格，在线完成付款。到账确认后，在本站查看并领取账号或卡密。\n商品与当前售价\nChatGPT Go 兑换码｜埃及｜自动发码\n· 39.99 CNY · 有货 · GPT（卡冲）\n这款埃及兑换码充值的是 ChatGPT Go，付款后自动发放本站 PAIPLUS 卡密，面向客户自己的账号。本页说明 Go 与 Pro 商品的区分、预检资格及到账结果核验；Go 的账号状态和等待要求请在购买前联系客服核实，并以兑换预检结果为准。\nChatGPT Plus 兑换码｜自动发码\n· 130.00 CNY · 有货 · GPT（卡冲）\nChatGPT Plus 自助充值至自己的账号，付款成功后自动发放本站 PAIPLUS 卡密。适用账号须通过预检，领取后按订单指引完成兑换。\nChatGPT Pro 100美金 兑换码｜菲区｜自动发码\n· 700.00 CNY · 有货 · GPT（卡冲）\n这款菲区 ChatGPT Pro 100美金商品对应 Pro 5x 自动发码，充值到您自己的账号。本页先核对新账号或到期条件，再说明订单取码、预检和结果确认；收到 PAIPLUS 卡密仍需兑换，未到期覆盖请另看人工方案。\nChatGPT Pro 200美金 兑换码｜菲区｜自动发码\n· 1200.00 CNY · 有货 · GPT（卡冲）\n菲区 ChatGPT Pro 200美金自动发码页对应 Pro 10x 开通方案，与仍持有 Pro 10x 的续费绑卡商品分别适用。购买前检查订阅状态，领取订单卡密后按入口预检；本页同时保留订阅质保和剩余时长退款说明。\nChatGPT Pro 200美金 续费绑卡｜菲区｜自动发码\n· 1200.00 CNY · 有货 · GPT（卡冲）\nChatGPT Pro 200美金续费绑卡方案面向当前仍为 Pro 10x 的自有账号。付款后自动发放本站卡密，请依订单指引绑卡并联系客服确认；本页重点说明续费资格与确认步骤，不将它写成新账号开通或到期充值方案。\nChatGPT Pro 500美金 兑换码｜菲区｜自动发码\n· 3380.00 CNY · 有货 · GPT（卡冲）\n查看菲区 ChatGPT Pro 500美金、即 Pro 25x 兑换码的购买核对步骤。本站自动交付 PAIPLUS 卡密，目标为用户自有账号；先确认套餐标识与预检资格，再查看开通结果，订阅保障不包含账号封禁或免费补开承诺。\nChatGPT Pro 500美金 兑换码｜埃及｜自动发码\n· 3250.00 CNY · 有货 · GPT（卡冲）\n埃及 ChatGPT Pro 500美金商品对应 Pro 25x 自动发码，使用 EG／EGP 渠道。本页区分档位、地区和自有账号三项核对信息，说明预检、异常取证与订阅售后；卡密到账不等于开通，具体使用结果请按订单入口查询。\nChatGPT Pro 100美金 兑换码｜埃及｜自动发码\n· 680.00 CNY · 有货 · GPT（卡冲）\n埃及 EG／EGP 渠道的 ChatGPT Pro 100美金兑换码对应 Pro 5x，自有账号通过预检后使用。阅读本页可核对地区标识、自动发码与兑换步骤，以及未用卡密的退款条件；渠道名称不代表成功率或到账速度保证。\n预售｜Gemini Pro 18 个月｜直充自有账号｜一个月质保\n· 28.00 CNY · 暂时缺货 · Gemini\nGemini Pro 18 个月订阅，兑换至客户自己的账号。正常使用一个月内掉订阅全额退款。人工发货。通常在付款当天内发货。 账号须注册满 7 天，使用免费且未领学生优惠、免费试用等优惠的账号激活。\n预售｜Gemini Pro 18 个月｜直充自有账号｜无持续订阅质保\n· 21.00 CNY · 暂时缺货 · Gemini\nGemini Pro 18 个月订阅，兑换至客户自己的账号。保证激活成功且激活时订阅时长为 18 个月，不保证后续订阅持续保留。人工发货。通常在付款当天内发货。 账号须注册满 7 天，使用免费且未领学生优惠、免费试用等优惠的账号激活。\nGrok Ultra 年付兑换码\n· 15348.00 CNY · 有货 · Grok\n准备选择 Ultra 年付时，请在购买前完成档位、周期与账号三项确认。本页解释与 Super 年付和 Ultra 月付如何区分，集中回答长期周期选择、交付内容及兑换完成后的记录问题。\nGrok Ultra 月付兑换码\n· 1668.00 CNY · 有货 · Grok\nUltra 月付的选购依据是明确的档位与周期，不是由更高售价推断未列出的权益。本文说明它与 Super 月付、Ultra 年付的关系，并列出购买前应向兑换页确认的问题。\nGrok Super 年付兑换码\n· 7288.00 CNY · 有货 · Grok\nSuper 年付适合在核实账号条件后，明确选择该档年付标识的购买安排。本文将购买前的信息准备与兑换后的结果检查分开，说明与 Premium、Ultra 年付以及 Super 月付的选择差异。\nGrok Super 月付兑换码\n· 748.00 CNY · 有货 · Grok\n已确认要兑换 Super 月付时，本页帮助你在提交前逐项检查套餐名称、周期和目标账号。Premium、Ultra 月付属于不同档位，Super 年付则是另一周期，不能只按名称相近来选码。\nGrok Premium 年付兑换码\n· 2348.00 CNY · 有货 · Grok\nPremium 年付需要同时匹配 Premium 档位和年付周期。这里围绕长期使用计划整理购买核对表，区分 Plus、Super 年付及本档月付，并说明待核实账号条件时应如何处理。\nGrok Premium 月付兑换码\n· 288.00 CNY · 有货 · Grok\nPremium 月付面向已确认兑换目标为该档月付套餐的购买者。选购重点是不要将它与 Plus 或 Super 的月付码混用，也不要误选 Premium 年付；本文逐步说明核验顺序。\nGrok Plus 年付兑换码\n· 658.00 CNY · 有货 · Grok\n选择 Plus 年付时，先把较长周期的安排与账号适用条件核实清楚。本页说明年付标签如何核对、与月付及 Premium 年付如何区分，以及兑换后应保存哪些记录。\nGrok Plus 月付兑换码\n· 88.00 CNY · 暂时缺货 · Grok\n已核对需要 Plus 月付的用户，可先确认目标账号能否兑换，再按本页库存选择。这里区分 Plus 年付与 Premium 月付，说明订单领码和套餐核对，不提供成品账号。\nChatGPT Pro 200美金｜代充｜人工发货\n· 1478.00 CNY · 有货 · GPT可覆盖充值（ios谷歌支付）\nChatGPT Pro 200美金人工代充对应 Pro 10x，渠道为 iOS／Google，充值到客户自己的账号。可覆盖充值会从本次成功起重新计时，原有剩余时长不保留；本页说明覆盖选择、人工交付及订阅质保的具体边界。\nChatGPT Pro 100美金｜代充｜人工发货\n· 680.00 CNY · 有货 · GPT可覆盖充值（ios谷歌支付）\nPro 100美金人工代充为 ChatGPT Pro 5x 方案，现有充值渠道为 iOS／Google。购买前可核对跨套餐覆盖、手机号验证和未发货退款条件；人工交付不保证即时开通，订阅期与退款按实际开通和掉订阅时间核算。\nChatGPT Plus｜代充｜人工发货\n· 145.00 CNY · 有货 · GPT可覆盖充值（ios谷歌支付）\nChatGPT Plus 充值至自己的账号，付款后人工发放卡密。支持未到期及跨套餐覆盖；原剩余时间不保留，充值成功起重新计算一个月。\nChatGPT Go｜代充｜人工发货\n· 39.99 CNY · 有货 · GPT可覆盖充值（ios谷歌支付）\n本页为 ChatGPT Go 人工代充，现有说明的渠道是 iOS，目标为客户自有账号。阅读购买前的覆盖规则与验证要求，确认原剩余时间不会保留；人工发货通常在付款当天内完成，实际开通和售后结果以核实记录为准。\nTelegram Premium 3 个月｜礼品激活链接｜人工发货\n· 115.00 CNY · 有货 · Telegram会员链接\nTelegram Premium 三个月商品交付礼品激活链接，建议使用当前未开通会员的账号。订单由人工发货，仅保证链接正常激活，激活后不提供质保；已有会员能否叠加需购买前咨询客服，本页说明账号核对与未激活时的处理条件。\nTelegram Premium 6 个月｜礼品激活链接｜人工发货\n· 158.00 CNY · 有货 · Telegram会员链接\nTelegram Premium 六个月商品交付的是礼品链接，由人工在订单中发放。本页重点说明已有会员能否叠加、私密保存链接及激活前核验的方法；请勿转发给群聊或他人，激活后的会员时长不等于售后质保期。\nTelegram Premium 12 个月｜礼品激活链接｜人工发货\n· 278.00 CNY · 有货 · Telegram会员链接\n十二个月 Telegram Premium 礼品链接适用于需要该会员时长并已核对账号条件的用户。本页提供 Telegram 内打开链接的办法、人工发货与实际激活的区别，以及未发货和未激活退款的核实流程，不承诺当天开通。\n智享日常，从这里开始\n从选购到领取，清楚每一步。\n选择商品：确认规格与使用期限\n确认订单：保存邮箱和查询密码\n完成付款：按订单指引完成付款\n领取卡密：到账后在订单中领取\n不必来回找入口，在本站完成整个购买流程。\n交付内容在订单内领取。游客请保存下单邮箱与查询密码。\n使用期限与质保期不同，购买前请分别确认。\n购买前需要帮助？\n不确定规格、使用方式或售后范围，可以联系在线客服。\n购买之后，在这里领取。\n会员登录查看订单；游客使用下单邮箱和查询密码即可找回。\n我的订单\n·\n游客查单\n相关内容\nGPT 充值方案与购买须知\n商品中心\n·\n博客\n·\n公告\n·\n关于我们\n·\nGPT（卡冲）\n·\nGemini\n·\nGrok\n·\nTelegram会员链接\n·\nGPT可覆盖充值（ios谷歌支付）\n·\n服务条款\n·\n隐私政策"
+    },
+    "/products": {
+      "canonical": [
+        "https://www.qzweb.cloud/products"
+      ],
+      "meta": {
+        "viewport": "width=device-width, initial-scale=1",
+        "description": "浏览 ChatGPT、Grok、Gemini、Telegram Premium 等在售商品，按分类比较套餐与交付方式。售价及库存以商品页实时显示为准，使用期限与质保期不同；购买前请核对适用账号、兑换步骤及退款条件。",
+        "og:title": "AI 订阅与充值商品 - π星卡社",
+        "og:description": "浏览 ChatGPT、Grok、Gemini、Telegram Premium 等在售商品，按分类比较套餐与交付方式。售价及库存以商品页实时显示为准，使用期限与质保期不同；购买前请核对适用账号、兑换步骤及退款条件。",
+        "og:url": "https://www.qzweb.cloud/products",
+        "og:site_name": "π星卡社",
+        "og:type": "website",
+        "og:image": "https://www.qzweb.cloud/media/seo-share/qzweb-og-1200x630.jpg",
+        "og:image:width": "1200",
+        "og:image:height": "630",
+        "og:image:alt": "AI 订阅与充值商品",
+        "twitter:card": "summary_large_image",
+        "twitter:title": "AI 订阅与充值商品 - π星卡社",
+        "twitter:description": "浏览 ChatGPT、Grok、Gemini、Telegram Premium 等在售商品，按分类比较套餐与交付方式。售价及库存以商品页实时显示为准，使用期限与质保期不同；购买前请核对适用账号、兑换步骤及退款条件。",
+        "twitter:image": "https://www.qzweb.cloud/media/seo-share/qzweb-og-1200x630.jpg",
+        "twitter:image:alt": "AI 订阅与充值商品"
+      },
+      "jsonld": [
+        {
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          "description": "浏览 ChatGPT、Grok、Gemini、Telegram Premium 等在售商品，按分类比较套餐与交付方式。售价及库存以商品页实时显示为准，使用期限与质保期不同；购买前请核对适用账号、兑换步骤及退款条件。",
+          "mainEntity": {
+            "@type": "ItemList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "name": "ChatGPT Go 兑换码｜埃及｜自动发码",
+                "position": 1,
+                "url": "https://www.qzweb.cloud/products/chatgpt-go-code-egypt"
+              },
+              {
+                "@type": "ListItem",
+                "name": "ChatGPT Plus 兑换码｜自动发码",
+                "position": 2,
+                "url": "https://www.qzweb.cloud/products/chatgpt-plus-code"
+              },
+              {
+                "@type": "ListItem",
+                "name": "ChatGPT Pro 100美金 兑换码｜菲区｜自动发码",
+                "position": 3,
+                "url": "https://www.qzweb.cloud/products/chatgpt-pro-100-ph"
+              },
+              {
+                "@type": "ListItem",
+                "name": "ChatGPT Pro 200美金 兑换码｜菲区｜自动发码",
+                "position": 4,
+                "url": "https://www.qzweb.cloud/products/chatgpt-pro-200-ph"
+              },
+              {
+                "@type": "ListItem",
+                "name": "ChatGPT Pro 200美金 续费绑卡｜菲区｜自动发码",
+                "position": 5,
+                "url": "https://www.qzweb.cloud/products/chatgpt-pro-200-renew-ph"
+              },
+              {
+                "@type": "ListItem",
+                "name": "ChatGPT Pro 500美金 兑换码｜菲区｜自动发码",
+                "position": 6,
+                "url": "https://www.qzweb.cloud/products/chatgpt-pro-500-ph"
+              },
+              {
+                "@type": "ListItem",
+                "name": "ChatGPT Pro 500美金 兑换码｜埃及｜自动发码",
+                "position": 7,
+                "url": "https://www.qzweb.cloud/products/chatgpt-pro-500-egypt"
+              },
+              {
+                "@type": "ListItem",
+                "name": "ChatGPT Pro 100美金 兑换码｜埃及｜自动发码",
+                "position": 8,
+                "url": "https://www.qzweb.cloud/products/chatgpt-pro-100-egypt"
+              },
+              {
+                "@type": "ListItem",
+                "name": "预售｜Gemini Pro 18 个月｜直充自有账号｜一个月质保",
+                "position": 9,
+                "url": "https://www.qzweb.cloud/products/gemini-pro-18m-warranty"
+              },
+              {
+                "@type": "ListItem",
+                "name": "预售｜Gemini Pro 18 个月｜直充自有账号｜无持续订阅质保",
+                "position": 10,
+                "url": "https://www.qzweb.cloud/products/gemini-pro-18m-no-warranty"
+              },
+              {
+                "@type": "ListItem",
+                "name": "Grok Ultra 年付兑换码",
+                "position": 11,
+                "url": "https://www.qzweb.cloud/products/ellaix-grok-ultra-yearly"
+              },
+              {
+                "@type": "ListItem",
+                "name": "Grok Ultra 月付兑换码",
+                "position": 12,
+                "url": "https://www.qzweb.cloud/products/ellaix-grok-ultra-monthly"
+              },
+              {
+                "@type": "ListItem",
+                "name": "Grok Super 年付兑换码",
+                "position": 13,
+                "url": "https://www.qzweb.cloud/products/ellaix-grok-super-yearly"
+              },
+              {
+                "@type": "ListItem",
+                "name": "Grok Super 月付兑换码",
+                "position": 14,
+                "url": "https://www.qzweb.cloud/products/ellaix-grok-super-monthly"
+              },
+              {
+                "@type": "ListItem",
+                "name": "Grok Premium 年付兑换码",
+                "position": 15,
+                "url": "https://www.qzweb.cloud/products/ellaix-grok-premium-yearly"
+              },
+              {
+                "@type": "ListItem",
+                "name": "Grok Premium 月付兑换码",
+                "position": 16,
+                "url": "https://www.qzweb.cloud/products/ellaix-grok-premium-monthly"
+              },
+              {
+                "@type": "ListItem",
+                "name": "Grok Plus 年付兑换码",
+                "position": 17,
+                "url": "https://www.qzweb.cloud/products/ellaix-grok-plus-yearly"
+              },
+              {
+                "@type": "ListItem",
+                "name": "Grok Plus 月付兑换码",
+                "position": 18,
+                "url": "https://www.qzweb.cloud/products/ellaix-grok-plus-monthly"
+              },
+              {
+                "@type": "ListItem",
+                "name": "ChatGPT Pro 200美金｜代充｜人工发货",
+                "position": 19,
+                "url": "https://www.qzweb.cloud/products/chatgpt-pro-200-manual"
+              },
+              {
+                "@type": "ListItem",
+                "name": "ChatGPT Pro 100美金｜代充｜人工发货",
+                "position": 20,
+                "url": "https://www.qzweb.cloud/products/chatgpt-pro-100-manual"
+              },
+              {
+                "@type": "ListItem",
+                "name": "ChatGPT Plus｜代充｜人工发货",
+                "position": 21,
+                "url": "https://www.qzweb.cloud/products/chatgpt-plus-manual"
+              },
+              {
+                "@type": "ListItem",
+                "name": "ChatGPT Go｜代充｜人工发货",
+                "position": 22,
+                "url": "https://www.qzweb.cloud/products/chatgpt-go-manual"
+              },
+              {
+                "@type": "ListItem",
+                "name": "Telegram Premium 3 个月｜礼品激活链接｜人工发货",
+                "position": 23,
+                "url": "https://www.qzweb.cloud/products/telegram-premium-3m"
+              },
+              {
+                "@type": "ListItem",
+                "name": "Telegram Premium 6 个月｜礼品激活链接｜人工发货",
+                "position": 24,
+                "url": "https://www.qzweb.cloud/products/telegram-premium-6m"
+              },
+              {
+                "@type": "ListItem",
+                "name": "Telegram Premium 12 个月｜礼品激活链接｜人工发货",
+                "position": 25,
+                "url": "https://www.qzweb.cloud/products/telegram-premium-12m"
+              }
+            ]
+          },
+          "name": "AI 订阅与充值商品",
+          "url": "https://www.qzweb.cloud/products"
+        },
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://www.qzweb.cloud/#organization",
+              "@type": "Organization",
+              "contactPoint": {
+                "@type": "ContactPoint",
+                "contactType": "customer support",
+                "url": "https://www.qzweb.cloud/about"
+              },
+              "description": "π星卡社提供 AI 数字商品与第三方订阅服务。查看 ChatGPT Plus 自助兑换码、人工充值的适用条件、使用教程和售后说明，按商品与订单指引领取交付内容。",
+              "hasMerchantReturnPolicy": {
+                "@id": "https://www.qzweb.cloud/blog/purchase-and-agent-guide#merchant-return-policy",
+                "@type": "MerchantReturnPolicy",
+                "merchantReturnLink": "https://www.qzweb.cloud/blog/purchase-and-agent-guide"
+              },
+              "logo": "https://www.qzweb.cloud/media/storefront-20261020/patrick-logo.webp",
+              "name": "π星卡社",
+              "url": "https://www.qzweb.cloud/"
+            },
+            {
+              "@id": "https://www.qzweb.cloud/#website",
+              "@type": "WebSite",
+              "name": "π星卡社",
+              "publisher": {
+                "@id": "https://www.qzweb.cloud/#organization"
+              },
+              "url": "https://www.qzweb.cloud/"
+            }
+          ]
+        },
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "item": "https://www.qzweb.cloud/",
+                  "name": "首页",
+                  "position": 1
+                },
+                {
+                  "@type": "ListItem",
+                  "item": "https://www.qzweb.cloud/products",
+                  "name": "AI 订阅与充值商品",
+                  "position": 2
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "text": "AI 订阅与充值商品 - π星卡社\nπ星卡社\n·\n商品中心\n·\n文章\n·\n关于我们\nAI 订阅与充值商品\n使用期限与质保期不同，购买前请分别确认。\n商品与当前售价\nChatGPT Go 兑换码｜埃及｜自动发码\n· 39.99 CNY · 有货 · GPT（卡冲）\n这款埃及兑换码充值的是 ChatGPT Go，付款后自动发放本站 PAIPLUS 卡密，面向客户自己的账号。本页说明 Go 与 Pro 商品的区分、预检资格及到账结果核验；Go 的账号状态和等待要求请在购买前联系客服核实，并以兑换预检结果为准。\nChatGPT Plus 兑换码｜自动发码\n· 130.00 CNY · 有货 · GPT（卡冲）\nChatGPT Plus 自助充值至自己的账号，付款成功后自动发放本站 PAIPLUS 卡密。适用账号须通过预检，领取后按订单指引完成兑换。\nChatGPT Pro 100美金 兑换码｜菲区｜自动发码\n· 700.00 CNY · 有货 · GPT（卡冲）\n这款菲区 ChatGPT Pro 100美金商品对应 Pro 5x 自动发码，充值到您自己的账号。本页先核对新账号或到期条件，再说明订单取码、预检和结果确认；收到 PAIPLUS 卡密仍需兑换，未到期覆盖请另看人工方案。\nChatGPT Pro 200美金 兑换码｜菲区｜自动发码\n· 1200.00 CNY · 有货 · GPT（卡冲）\n菲区 ChatGPT Pro 200美金自动发码页对应 Pro 10x 开通方案，与仍持有 Pro 10x 的续费绑卡商品分别适用。购买前检查订阅状态，领取订单卡密后按入口预检；本页同时保留订阅质保和剩余时长退款说明。\nChatGPT Pro 200美金 续费绑卡｜菲区｜自动发码\n· 1200.00 CNY · 有货 · GPT（卡冲）\nChatGPT Pro 200美金续费绑卡方案面向当前仍为 Pro 10x 的自有账号。付款后自动发放本站卡密，请依订单指引绑卡并联系客服确认；本页重点说明续费资格与确认步骤，不将它写成新账号开通或到期充值方案。\nChatGPT Pro 500美金 兑换码｜菲区｜自动发码\n· 3380.00 CNY · 有货 · GPT（卡冲）\n查看菲区 ChatGPT Pro 500美金、即 Pro 25x 兑换码的购买核对步骤。本站自动交付 PAIPLUS 卡密，目标为用户自有账号；先确认套餐标识与预检资格，再查看开通结果，订阅保障不包含账号封禁或免费补开承诺。\nChatGPT Pro 500美金 兑换码｜埃及｜自动发码\n· 3250.00 CNY · 有货 · GPT（卡冲）\n埃及 ChatGPT Pro 500美金商品对应 Pro 25x 自动发码，使用 EG／EGP 渠道。本页区分档位、地区和自有账号三项核对信息，说明预检、异常取证与订阅售后；卡密到账不等于开通，具体使用结果请按订单入口查询。\nChatGPT Pro 100美金 兑换码｜埃及｜自动发码\n· 680.00 CNY · 有货 · GPT（卡冲）\n埃及 EG／EGP 渠道的 ChatGPT Pro 100美金兑换码对应 Pro 5x，自有账号通过预检后使用。阅读本页可核对地区标识、自动发码与兑换步骤，以及未用卡密的退款条件；渠道名称不代表成功率或到账速度保证。\n预售｜Gemini Pro 18 个月｜直充自有账号｜一个月质保\n· 28.00 CNY · 暂时缺货 · Gemini\nGemini Pro 18 个月订阅，兑换至客户自己的账号。正常使用一个月内掉订阅全额退款。人工发货。通常在付款当天内发货。 账号须注册满 7 天，使用免费且未领学生优惠、免费试用等优惠的账号激活。\n预售｜Gemini Pro 18 个月｜直充自有账号｜无持续订阅质保\n· 21.00 CNY · 暂时缺货 · Gemini\nGemini Pro 18 个月订阅，兑换至客户自己的账号。保证激活成功且激活时订阅时长为 18 个月，不保证后续订阅持续保留。人工发货。通常在付款当天内发货。 账号须注册满 7 天，使用免费且未领学生优惠、免费试用等优惠的账号激活。\nGrok Ultra 年付兑换码\n· 15348.00 CNY · 有货 · Grok\n准备选择 Ultra 年付时，请在购买前完成档位、周期与账号三项确认。本页解释与 Super 年付和 Ultra 月付如何区分，集中回答长期周期选择、交付内容及兑换完成后的记录问题。\nGrok Ultra 月付兑换码\n· 1668.00 CNY · 有货 · Grok\nUltra 月付的选购依据是明确的档位与周期，不是由更高售价推断未列出的权益。本文说明它与 Super 月付、Ultra 年付的关系，并列出购买前应向兑换页确认的问题。\nGrok Super 年付兑换码\n· 7288.00 CNY · 有货 · Grok\nSuper 年付适合在核实账号条件后，明确选择该档年付标识的购买安排。本文将购买前的信息准备与兑换后的结果检查分开，说明与 Premium、Ultra 年付以及 Super 月付的选择差异。\nGrok Super 月付兑换码\n· 748.00 CNY · 有货 · Grok\n已确认要兑换 Super 月付时，本页帮助你在提交前逐项检查套餐名称、周期和目标账号。Premium、Ultra 月付属于不同档位，Super 年付则是另一周期，不能只按名称相近来选码。\nGrok Premium 年付兑换码\n· 2348.00 CNY · 有货 · Grok\nPremium 年付需要同时匹配 Premium 档位和年付周期。这里围绕长期使用计划整理购买核对表，区分 Plus、Super 年付及本档月付，并说明待核实账号条件时应如何处理。\nGrok Premium 月付兑换码\n· 288.00 CNY · 有货 · Grok\nPremium 月付面向已确认兑换目标为该档月付套餐的购买者。选购重点是不要将它与 Plus 或 Super 的月付码混用，也不要误选 Premium 年付；本文逐步说明核验顺序。\nGrok Plus 年付兑换码\n· 658.00 CNY · 有货 · Grok\n选择 Plus 年付时，先把较长周期的安排与账号适用条件核实清楚。本页说明年付标签如何核对、与月付及 Premium 年付如何区分，以及兑换后应保存哪些记录。\nGrok Plus 月付兑换码\n· 88.00 CNY · 暂时缺货 · Grok\n已核对需要 Plus 月付的用户，可先确认目标账号能否兑换，再按本页库存选择。这里区分 Plus 年付与 Premium 月付，说明订单领码和套餐核对，不提供成品账号。\nChatGPT Pro 200美金｜代充｜人工发货\n· 1478.00 CNY · 有货 · GPT可覆盖充值（ios谷歌支付）\nChatGPT Pro 200美金人工代充对应 Pro 10x，渠道为 iOS／Google，充值到客户自己的账号。可覆盖充值会从本次成功起重新计时，原有剩余时长不保留；本页说明覆盖选择、人工交付及订阅质保的具体边界。\nChatGPT Pro 100美金｜代充｜人工发货\n· 680.00 CNY · 有货 · GPT可覆盖充值（ios谷歌支付）\nPro 100美金人工代充为 ChatGPT Pro 5x 方案，现有充值渠道为 iOS／Google。购买前可核对跨套餐覆盖、手机号验证和未发货退款条件；人工交付不保证即时开通，订阅期与退款按实际开通和掉订阅时间核算。\nChatGPT Plus｜代充｜人工发货\n· 145.00 CNY · 有货 · GPT可覆盖充值（ios谷歌支付）\nChatGPT Plus 充值至自己的账号，付款后人工发放卡密。支持未到期及跨套餐覆盖；原剩余时间不保留，充值成功起重新计算一个月。\nChatGPT Go｜代充｜人工发货\n· 39.99 CNY · 有货 · GPT可覆盖充值（ios谷歌支付）\n本页为 ChatGPT Go 人工代充，现有说明的渠道是 iOS，目标为客户自有账号。阅读购买前的覆盖规则与验证要求，确认原剩余时间不会保留；人工发货通常在付款当天内完成，实际开通和售后结果以核实记录为准。\nTelegram Premium 3 个月｜礼品激活链接｜人工发货\n· 115.00 CNY · 有货 · Telegram会员链接\nTelegram Premium 三个月商品交付礼品激活链接，建议使用当前未开通会员的账号。订单由人工发货，仅保证链接正常激活，激活后不提供质保；已有会员能否叠加需购买前咨询客服，本页说明账号核对与未激活时的处理条件。\nTelegram Premium 6 个月｜礼品激活链接｜人工发货\n· 158.00 CNY · 有货 · Telegram会员链接\nTelegram Premium 六个月商品交付的是礼品链接，由人工在订单中发放。本页重点说明已有会员能否叠加、私密保存链接及激活前核验的方法；请勿转发给群聊或他人，激活后的会员时长不等于售后质保期。\nTelegram Premium 12 个月｜礼品激活链接｜人工发货\n· 278.00 CNY · 有货 · Telegram会员链接\n十二个月 Telegram Premium 礼品链接适用于需要该会员时长并已核对账号条件的用户。本页提供 Telegram 内打开链接的办法、人工发货与实际激活的区别，以及未发货和未激活退款的核实流程，不承诺当天开通。\n商品中心\n·\n博客\n·\n公告\n·\n关于我们\n·\nGPT（卡冲）\n·\nGemini\n·\nGrok\n·\nTelegram会员链接\n·\nGPT可覆盖充值（ios谷歌支付）\n·\n服务条款\n·\n隐私政策"
+    },
+    "/blog": {
+      "canonical": [
+        "https://www.qzweb.cloud/blog"
+      ],
+      "meta": {
+        "viewport": "width=device-width, initial-scale=1",
+        "description": "浏览本站文章列表，阅读「菲区 ChatGPT 充值怎么选、怎么兑」等已发布内容。可通过文章了解商品选购、使用与订单相关说明，具体内容以各篇正文为准。下单前请同时核对商品页面的适用条件、交付方式和售后范围。",
+        "og:title": "使用教程与购买指南 - π星卡社",
+        "og:description": "浏览本站文章列表，阅读「菲区 ChatGPT 充值怎么选、怎么兑」等已发布内容。可通过文章了解商品选购、使用与订单相关说明，具体内容以各篇正文为准。下单前请同时核对商品页面的适用条件、交付方式和售后范围。",
+        "og:url": "https://www.qzweb.cloud/blog",
+        "og:site_name": "π星卡社",
+        "og:type": "website",
+        "og:image": "https://www.qzweb.cloud/media/seo-share/qzweb-og-1200x630.jpg",
+        "og:image:width": "1200",
+        "og:image:height": "630",
+        "og:image:alt": "使用教程与购买指南",
+        "twitter:card": "summary_large_image",
+        "twitter:title": "使用教程与购买指南 - π星卡社",
+        "twitter:description": "浏览本站文章列表，阅读「菲区 ChatGPT 充值怎么选、怎么兑」等已发布内容。可通过文章了解商品选购、使用与订单相关说明，具体内容以各篇正文为准。下单前请同时核对商品页面的适用条件、交付方式和售后范围。",
+        "twitter:image": "https://www.qzweb.cloud/media/seo-share/qzweb-og-1200x630.jpg",
+        "twitter:image:alt": "使用教程与购买指南"
+      },
+      "jsonld": [
+        {
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          "about": {
+            "@id": "https://www.qzweb.cloud/#organization"
+          },
+          "description": "浏览本站文章列表，阅读「菲区 ChatGPT 充值怎么选、怎么兑」等已发布内容。可通过文章了解商品选购、使用与订单相关说明，具体内容以各篇正文为准。下单前请同时核对商品页面的适用条件、交付方式和售后范围。",
+          "inLanguage": "zh-CN",
+          "isPartOf": {
+            "@id": "https://www.qzweb.cloud/#website"
+          },
+          "mainEntity": {
+            "@type": "ItemList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "name": "菲区 ChatGPT 充值怎么选、怎么兑",
+                "position": 1,
+                "url": "https://www.qzweb.cloud/blog/chatgpt-ph-recharge-guide"
+              },
+              {
+                "@type": "ListItem",
+                "name": "ChatGPT 充值后没有显示会员，应该怎么排查？",
+                "position": 2,
+                "url": "https://www.qzweb.cloud/blog/chatgpt-membership-not-active"
+              },
+              {
+                "@type": "ListItem",
+                "name": "ChatGPT Plus 订阅和 API 余额有什么区别？",
+                "position": 3,
+                "url": "https://www.qzweb.cloud/blog/chatgpt-plus-vs-api-balance"
+              },
+              {
+                "@type": "ListItem",
+                "name": "不同地区的 GPT 兑换码能通用吗？购买前如何核对？",
+                "position": 4,
+                "url": "https://www.qzweb.cloud/blog/chatgpt-code-region-check"
+              },
+              {
+                "@type": "ListItem",
+                "name": "ChatGPT 充值方式有哪些？订阅渠道、账号条件与注意事项",
+                "position": 5,
+                "url": "https://www.qzweb.cloud/blog/chatgpt-payment-methods"
+              },
+              {
+                "@type": "ListItem",
+                "name": "ChatGPT Plus 兑换码怎么用？从领取到核对开通结果",
+                "position": 6,
+                "url": "https://www.qzweb.cloud/blog/chatgpt-plus-code-guide"
+              },
+              {
+                "@type": "ListItem",
+                "name": "ChatGPT Plus 没到期能充值吗？到期续费与覆盖充值的区别",
+                "position": 7,
+                "url": "https://www.qzweb.cloud/blog/chatgpt-plus-renewal-rules"
+              },
+              {
+                "@type": "ListItem",
+                "name": "币安 Binance 下载与 USDT 付款教程",
+                "position": 8,
+                "url": "https://www.qzweb.cloud/blog/binance-usdt-payment-guide"
+              },
+              {
+                "@type": "ListItem",
+                "name": "欧易 OKX 下载与 USDT 付款教程",
+                "position": 9,
+                "url": "https://www.qzweb.cloud/blog/okx-usdt-payment-guide"
+              }
+            ]
+          },
+          "name": "使用教程与购买指南",
+          "url": "https://www.qzweb.cloud/blog"
+        },
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://www.qzweb.cloud/#organization",
+              "@type": "Organization",
+              "contactPoint": {
+                "@type": "ContactPoint",
+                "contactType": "customer support",
+                "url": "https://www.qzweb.cloud/about"
+              },
+              "description": "π星卡社提供 AI 数字商品与第三方订阅服务。查看 ChatGPT Plus 自助兑换码、人工充值的适用条件、使用教程和售后说明，按商品与订单指引领取交付内容。",
+              "hasMerchantReturnPolicy": {
+                "@id": "https://www.qzweb.cloud/blog/purchase-and-agent-guide#merchant-return-policy",
+                "@type": "MerchantReturnPolicy",
+                "merchantReturnLink": "https://www.qzweb.cloud/blog/purchase-and-agent-guide"
+              },
+              "logo": "https://www.qzweb.cloud/media/storefront-20261020/patrick-logo.webp",
+              "name": "π星卡社",
+              "url": "https://www.qzweb.cloud/"
+            },
+            {
+              "@id": "https://www.qzweb.cloud/#website",
+              "@type": "WebSite",
+              "name": "π星卡社",
+              "publisher": {
+                "@id": "https://www.qzweb.cloud/#organization"
+              },
+              "url": "https://www.qzweb.cloud/"
+            }
+          ]
+        },
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "item": "https://www.qzweb.cloud/",
+                  "name": "首页",
+                  "position": 1
+                },
+                {
+                  "@type": "ListItem",
+                  "item": "https://www.qzweb.cloud/blog",
+                  "name": "使用教程与购买指南",
+                  "position": 2
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "text": "使用教程与购买指南 - π星卡社\nπ星卡社\n·\n商品中心\n·\n文章\n·\n关于我们\n使用教程与购买指南\n最新文章和动态\n菲区 ChatGPT 充值怎么选、怎么兑\n2026-11-17\n菲区 ChatGPT 充值应先核对套餐档位和账号当前订阅状态。本文对照本站四款菲区 Pro 商品，区分普通开通与续费绑卡，说明付款后领取 PAIPLUS 卡密、预检、兑换及核对结果的步骤，并整理地区资格和售后边界；具体以商品页当前说明为准。\nChatGPT 充值后没有显示会员，应该怎么排查？\n2026-11-10\n区分付款、交付和开通状态，按商品类型、目标账号与购买渠道排查会员未显示，并整理售后需要的信息。\nChatGPT Plus 订阅和 API 余额有什么区别？\n2026-11-10\n分清 ChatGPT 会员与 API 账单，结合使用场景、商品说明和结果核对位置，避免把订阅充值当成 API 余额。\n不同地区的 GPT 兑换码能通用吗？购买前如何核对？\n2026-11-10\n地区、套餐与原订阅条件需要分别核对。通过购买清单、预检失败处理和售后边界，减少买错兑换码的情况。\nChatGPT 充值方式有哪些？订阅渠道、账号条件与注意事项\n2026-11-09\n了解官方订阅与本站第三方充值的区别，对比 Plus 自助兑换码和人工覆盖充值，购买前核对账号条件、交付方式与售后规则。\nChatGPT Plus 兑换码怎么用？从领取到核对开通结果\n2026-11-09\n按本站订单领取 PAIPLUS 卡密、确认账号资格、完成兑换并核对订阅状态，说明发码与开通的区别及常见异常处理。\nChatGPT Plus 没到期能充值吗？到期续费与覆盖充值的区别\n2026-11-09\n比较本站 Plus 自助兑换码与人工覆盖充值的适用条件，讲清未到期充值、原剩余时间、重复扣费检查和订阅售后规则。\n币安 Binance 下载与 USDT 付款教程\n2026-10-15\n从官方下载、注册认证和买 U，到选择网络、核对到账金额与查询订单，按步骤完成本站 USDT 付款。\n欧易 OKX 下载与 USDT 付款教程\n2026-10-15\n了解欧易官方安装、认证与买 U，按本站付款页选择链上网络、核对手续费和到账数量，并查询交付结果。\n商品中心\n·\n博客\n·\n公告\n·\n关于我们\n·\nGPT（卡冲）\n·\nGemini\n·\nGrok\n·\nTelegram会员链接\n·\nGPT可覆盖充值（ios谷歌支付）\n·\n服务条款\n·\n隐私政策"
+    },
+    "/products/chatgpt-plus-code": {
+      "canonical": [
+        "https://www.qzweb.cloud/products/chatgpt-plus-code"
+      ],
+      "meta": {
+        "viewport": "width=device-width, initial-scale=1",
+        "description": "ChatGPT Plus 自助充值服务，付款后自动交付本站 PAIPLUS 卡密。查看适用账号、兑换步骤与订阅售后条件；收到卡密后仍需完成激活。π星卡社为独立第三方服务平台。",
+        "og:title": "ChatGPT Plus 充值兑换码｜自助激活与购买须知 - π星卡社",
+        "og:description": "ChatGPT Plus 自助充值服务，付款后自动交付本站 PAIPLUS 卡密。查看适用账号、兑换步骤与订阅售后条件；收到卡密后仍需完成激活。π星卡社为独立第三方服务平台。",
+        "og:url": "https://www.qzweb.cloud/products/chatgpt-plus-code",
+        "og:site_name": "π星卡社",
+        "og:type": "product",
+        "og:image": "https://www.qzweb.cloud/media/seo-share/qzweb-og-1200x630.jpg",
+        "og:image:width": "1200",
+        "og:image:height": "630",
+        "og:image:alt": "ChatGPT Plus 兑换码｜自动发码",
+        "twitter:card": "summary_large_image",
+        "twitter:title": "ChatGPT Plus 充值兑换码｜自助激活与购买须知 - π星卡社",
+        "twitter:description": "ChatGPT Plus 自助充值服务，付款后自动交付本站 PAIPLUS 卡密。查看适用账号、兑换步骤与订阅售后条件；收到卡密后仍需完成激活。π星卡社为独立第三方服务平台。",
+        "twitter:image": "https://www.qzweb.cloud/media/seo-share/qzweb-og-1200x630.jpg",
+        "twitter:image:alt": "ChatGPT Plus 兑换码｜自动发码"
+      },
+      "jsonld": [
+        {
+          "@context": "https://schema.org",
+          "@id": "https://www.qzweb.cloud/products/chatgpt-plus-code#product",
+          "@type": "Product",
+          "category": "GPT（卡冲）",
+          "description": "ChatGPT Plus 自助充值服务，付款后自动交付本站 PAIPLUS 卡密。查看适用账号、兑换步骤与订阅售后条件；收到卡密后仍需完成激活。π星卡社为独立第三方服务平台。",
+          "image": [
+            "https://www.qzweb.cloud/media/seo-share/qzweb-og-1200x630.jpg"
+          ],
+          "name": "ChatGPT Plus 兑换码｜自动发码",
+          "offers": {
+            "@id": "https://www.qzweb.cloud/products/chatgpt-plus-code#offer",
+            "@type": "Offer",
+            "availability": "https://schema.org/InStock",
+            "hasMerchantReturnPolicy": {
+              "@id": "https://www.qzweb.cloud/blog/purchase-and-agent-guide#merchant-return-policy"
+            },
+            "price": "130.00",
+            "priceCurrency": "CNY",
+            "seller": {
+              "@id": "https://www.qzweb.cloud/#organization"
+            },
+            "url": "https://www.qzweb.cloud/products/chatgpt-plus-code"
+          },
+          "url": "https://www.qzweb.cloud/products/chatgpt-plus-code"
+        },
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://www.qzweb.cloud/#organization",
+              "@type": "Organization",
+              "contactPoint": {
+                "@type": "ContactPoint",
+                "contactType": "customer support",
+                "url": "https://www.qzweb.cloud/about"
+              },
+              "description": "π星卡社提供 AI 数字商品与第三方订阅服务。查看 ChatGPT Plus 自助兑换码、人工充值的适用条件、使用教程和售后说明，按商品与订单指引领取交付内容。",
+              "hasMerchantReturnPolicy": {
+                "@id": "https://www.qzweb.cloud/blog/purchase-and-agent-guide#merchant-return-policy",
+                "@type": "MerchantReturnPolicy",
+                "merchantReturnLink": "https://www.qzweb.cloud/blog/purchase-and-agent-guide"
+              },
+              "logo": "https://www.qzweb.cloud/media/storefront-20261020/patrick-logo.webp",
+              "name": "π星卡社",
+              "url": "https://www.qzweb.cloud/"
+            },
+            {
+              "@id": "https://www.qzweb.cloud/#website",
+              "@type": "WebSite",
+              "name": "π星卡社",
+              "publisher": {
+                "@id": "https://www.qzweb.cloud/#organization"
+              },
+              "url": "https://www.qzweb.cloud/"
+            }
+          ]
+        },
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "item": "https://www.qzweb.cloud/",
+                  "name": "首页",
+                  "position": 1
+                },
+                {
+                  "@type": "ListItem",
+                  "item": "https://www.qzweb.cloud/categories/gpt-recharge",
+                  "name": "GPT（卡冲）",
+                  "position": 2
+                },
+                {
+                  "@type": "ListItem",
+                  "item": "https://www.qzweb.cloud/products/chatgpt-plus-code",
+                  "name": "ChatGPT Plus 兑换码｜自动发码",
+                  "position": 3
+                }
+              ]
+            },
+            {
+              "@id": "https://www.qzweb.cloud/products/chatgpt-plus-code#faq",
+              "@type": "FAQPage",
+              "mainEntity": [
+                {
+                  "@type": "Question",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "本商品需满足上述适用账号条件，最终以兑换预检为准。未到期账号先阅读 到期续费与覆盖充值的区别 ，不要直接按可覆盖商品的规则购买。"
+                  },
+                  "name": "Plus 还没到期，可以用这款兑换码吗？"
+                },
+                {
+                  "@type": "Question",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "不是。领取本站 PAIPLUS 卡密后，还要按订单交付指引完成兑换并核对账号状态。详见 兑换码领取与使用教程 。"
+                  },
+                  "name": "自动发码就是自动开通了吗？"
+                },
+                {
+                  "@type": "Question",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "可先阅读 ChatGPT 充值方式与购买检查清单 ，再根据账号条件选择商品。"
+                  },
+                  "name": "不知道该选哪种方式？"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "text": "ChatGPT Plus 充值兑换码｜自助激活与购买须知 - π星卡社\nπ星卡社\n·\n商品中心\n·\n文章\n·\n关于我们\nChatGPT Plus 兑换码｜自动发码\nChatGPT Plus 自助充值至自己的账号，付款成功后自动发放本站 PAIPLUS 卡密。适用账号须通过预检，领取后按订单指引完成兑换。\n售价：130.00 CNY · 有货\n分类：\nGPT（卡冲）\n本商品由 π星卡社提供第三方服务，与 OpenAI 无隶属关系。ChatGPT、Plus 等名称用于说明服务适用对象，不表示官方授权或合作。\n商品与交付\nChatGPT Plus 兑换码，充值至客户自己的账号，不是成品号。付款成功后自动发码。\n适用账号\n适用于从未开通过会员的新账号，或原有订阅已到期、掉订阅至少 10 分钟的账号。最终是否符合条件以兑换预检结果为准。\n订阅期限\n订阅期限为一个月；具体起止时间以实际开通记录为准。\n兑换说明\n本商品发放本站 PAIPLUS 卡密，请在订单交付说明中打开本站兑换中心。请按兑换页面的步骤操作，核对目标账号及套餐后提交。\n收到卡密不代表订阅已经开通，请在兑换页面查询处理结果。\n订阅质保\n质保范围为本次订阅权益，不包含账号封禁。\n订阅有效期内发生掉订阅，可申请退还未使用部分。退款以本笔订单实际付款金额为基数，按实际订阅总时长和剩余时长计算。剩余时长从实际掉订阅时间起算，不从联系客服时间起算，也不固定按 30 天折算。\n应退金额＝本笔订单实付金额 × 实际掉订阅时的剩余订阅时长 ÷ 实际订阅总时长。\n也可选择补差价重新开通一个月：应补差价＝重新开通时的商品售价－本次应退的剩余金额。此方式需要客户补差价，并非免费补开。\n退款金额核算与材料\n退款按实际订阅起止时间与实际掉订阅时间核算，不按固定 30 天计算；最终金额四舍五入保留两位小数。请提供本站订单号和掉订阅截图，由客服核实时间、资格和金额。\n可按重新开通时售价减去应退剩余金额，补差价重新开通一个月；不是免费补开。特殊差额情况请联系客服核实。\n未使用卡密退款\n卡密已发出但尚未兑换，可以联系客服申请退款；须由客服核实卡密有效且未使用，销毁后再办理退款。\n账号核对\n请在提交前核对目标账号。客户自行填错 UID 或选错账号且充值成功后，不支持因此退款或转到其他账号，需自行承担责任；是否充值成功及责任归属由客服核实。本条不取消本商品适用的订阅质保。\n退款方式与处理时间\n应退金额按适用规则核算；不保证退款方式、渠道或原路退回，微信、支付宝等由客户与客服协商。没有固定退款完成或到账时效，以客服告知为准。\n异常处理与客服时间\n兑换失败、卡密无效或提示已使用，请提供本站订单号和报错截图。已付款但订单仍显示未付款，请提供订单号和支付成功截图。由人工客服核实处理，不承诺直接补发或退款。\n兑换仍在处理中或权益未到账时，请按兑换页面提示操作；出现异常请提供订单号和截图联系客服，没有统一等待或到账时限。\n人工客服在线时间：北京时间 07:00—24:00，不保证即时回复。请勿在客服 Agent 对话中发送密码、登录 token 或完整卡密。\n需要帮助\n请提供本站订单号并描述遇到的问题，勿向客服发送账号密码。\n微信：Cqz0924ttxk；QQ：1669268759；Telegram：@czq_piestar。\n购买前常见问题\nPlus 还没到期，可以用这款兑换码吗？\n本商品需满足上述适用账号条件，最终以兑换预检为准。未到期账号先阅读\n到期续费与覆盖充值的区别\n，不要直接按可覆盖商品的规则购买。\n自动发码就是自动开通了吗？\n不是。领取本站 PAIPLUS 卡密后，还要按订单交付指引完成兑换并核对账号状态。详见\n兑换码领取与使用教程\n。\n不知道该选哪种方式？\n可先阅读\nChatGPT 充值方式与购买检查清单\n，再根据账号条件选择商品。\n继续了解 GPT 充值\nGPT 充值方案与购买须知\n交付、退款申请与售后说明\n其他自动发码方案\nChatGPT Go 兑换码｜埃及｜自动发码\n· 39.99 CNY · 有货\nChatGPT Pro 100美金 兑换码｜菲区｜自动发码\n· 700.00 CNY · 有货\nChatGPT Pro 200美金 兑换码｜菲区｜自动发码\n· 1200.00 CNY · 有货\nChatGPT Pro 200美金 续费绑卡｜菲区｜自动发码\n· 1200.00 CNY · 有货\nChatGPT Pro 500美金 兑换码｜菲区｜自动发码\n· 3380.00 CNY · 有货\nChatGPT Pro 500美金 兑换码｜埃及｜自动发码\n· 3250.00 CNY · 有货\nChatGPT Pro 100美金 兑换码｜埃及｜自动发码\n· 680.00 CNY · 有货\n商品中心\n·\n博客\n·\n公告\n·\n关于我们\n·\nGPT（卡冲）\n·\nGemini\n·\nGrok\n·\nTelegram会员链接\n·\nGPT可覆盖充值（ios谷歌支付）\n·\n服务条款\n·\n隐私政策"
+    },
+    "/categories/gpt-recharge": {
+      "canonical": [
+        "https://www.qzweb.cloud/categories/gpt-recharge"
+      ],
+      "meta": {
+        "viewport": "width=device-width, initial-scale=1",
+        "description": "了解 ChatGPT Plus、Pro 的充值方式，先核对账号地区、当前订阅和开通条件，再选择兑换码或人工充值。下方为自助兑换商品，未到期或需要覆盖充值请查看对应人工商品。",
+        "og:title": "GPT充值｜ChatGPT Plus、Pro 方案与购买须知 - π星卡社",
+        "og:description": "了解 ChatGPT Plus、Pro 的充值方式，先核对账号地区、当前订阅和开通条件，再选择兑换码或人工充值。下方为自助兑换商品，未到期或需要覆盖充值请查看对应人工商品。",
+        "og:url": "https://www.qzweb.cloud/categories/gpt-recharge",
+        "og:site_name": "π星卡社",
+        "og:type": "website",
+        "og:image": "https://www.qzweb.cloud/media/seo-share/catalog-db694793c10628125d51-1200x630.jpg",
+        "og:image:width": "1200",
+        "og:image:height": "630",
+        "og:image:alt": "GPT 充值",
+        "twitter:card": "summary_large_image",
+        "twitter:title": "GPT充值｜ChatGPT Plus、Pro 方案与购买须知 - π星卡社",
+        "twitter:description": "了解 ChatGPT Plus、Pro 的充值方式，先核对账号地区、当前订阅和开通条件，再选择兑换码或人工充值。下方为自助兑换商品，未到期或需要覆盖充值请查看对应人工商品。",
+        "twitter:image": "https://www.qzweb.cloud/media/seo-share/catalog-db694793c10628125d51-1200x630.jpg",
+        "twitter:image:alt": "GPT 充值"
+      },
+      "jsonld": [
+        {
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          "description": "了解 ChatGPT Plus、Pro 的充值方式，先核对账号地区、当前订阅和开通条件，再选择兑换码或人工充值。下方为自助兑换商品，未到期或需要覆盖充值请查看对应人工商品。",
+          "image": [
+            "https://www.qzweb.cloud/catalog-products/qzweb/categories/4-7b19d7bf095bddd5574df0d27301dda5.png"
+          ],
+          "mainEntity": {
+            "@type": "ItemList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "name": "ChatGPT Go 兑换码｜埃及｜自动发码",
+                "position": 1,
+                "url": "https://www.qzweb.cloud/products/chatgpt-go-code-egypt"
+              },
+              {
+                "@type": "ListItem",
+                "name": "ChatGPT Plus 兑换码｜自动发码",
+                "position": 2,
+                "url": "https://www.qzweb.cloud/products/chatgpt-plus-code"
+              },
+              {
+                "@type": "ListItem",
+                "name": "ChatGPT Pro 100美金 兑换码｜埃及｜自动发码",
+                "position": 3,
+                "url": "https://www.qzweb.cloud/products/chatgpt-pro-100-egypt"
+              },
+              {
+                "@type": "ListItem",
+                "name": "ChatGPT Pro 100美金 兑换码｜菲区｜自动发码",
+                "position": 4,
+                "url": "https://www.qzweb.cloud/products/chatgpt-pro-100-ph"
+              },
+              {
+                "@type": "ListItem",
+                "name": "ChatGPT Pro 200美金 兑换码｜菲区｜自动发码",
+                "position": 5,
+                "url": "https://www.qzweb.cloud/products/chatgpt-pro-200-ph"
+              },
+              {
+                "@type": "ListItem",
+                "name": "ChatGPT Pro 200美金 续费绑卡｜菲区｜自动发码",
+                "position": 6,
+                "url": "https://www.qzweb.cloud/products/chatgpt-pro-200-renew-ph"
+              },
+              {
+                "@type": "ListItem",
+                "name": "ChatGPT Pro 500美金 兑换码｜埃及｜自动发码",
+                "position": 7,
+                "url": "https://www.qzweb.cloud/products/chatgpt-pro-500-egypt"
+              },
+              {
+                "@type": "ListItem",
+                "name": "ChatGPT Pro 500美金 兑换码｜菲区｜自动发码",
+                "position": 8,
+                "url": "https://www.qzweb.cloud/products/chatgpt-pro-500-ph"
+              }
+            ]
+          },
+          "name": "GPT 充值",
+          "url": "https://www.qzweb.cloud/categories/gpt-recharge"
+        },
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://www.qzweb.cloud/#organization",
+              "@type": "Organization",
+              "contactPoint": {
+                "@type": "ContactPoint",
+                "contactType": "customer support",
+                "url": "https://www.qzweb.cloud/about"
+              },
+              "description": "π星卡社提供 AI 数字商品与第三方订阅服务。查看 ChatGPT Plus 自助兑换码、人工充值的适用条件、使用教程和售后说明，按商品与订单指引领取交付内容。",
+              "hasMerchantReturnPolicy": {
+                "@id": "https://www.qzweb.cloud/blog/purchase-and-agent-guide#merchant-return-policy",
+                "@type": "MerchantReturnPolicy",
+                "merchantReturnLink": "https://www.qzweb.cloud/blog/purchase-and-agent-guide"
+              },
+              "logo": "https://www.qzweb.cloud/media/storefront-20261020/patrick-logo.webp",
+              "name": "π星卡社",
+              "url": "https://www.qzweb.cloud/"
+            },
+            {
+              "@id": "https://www.qzweb.cloud/#website",
+              "@type": "WebSite",
+              "name": "π星卡社",
+              "publisher": {
+                "@id": "https://www.qzweb.cloud/#organization"
+              },
+              "url": "https://www.qzweb.cloud/"
+            }
+          ]
+        },
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "item": "https://www.qzweb.cloud/",
+                  "name": "首页",
+                  "position": 1
+                },
+                {
+                  "@type": "ListItem",
+                  "item": "https://www.qzweb.cloud/categories/gpt-recharge",
+                  "name": "GPT 充值",
+                  "position": 2
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "text": "GPT充值｜ChatGPT Plus、Pro 方案与购买须知 - π星卡社\nπ星卡社\n·\n商品中心\n·\n文章\n·\n关于我们\nGPT 充值\n了解 ChatGPT Plus、Pro 的充值方式，先核对账号地区、当前订阅和开通条件，再选择兑换码或人工充值。下方为自助兑换商品，未到期或需要覆盖充值请查看对应人工商品。\n商品与当前售价\nChatGPT Go 兑换码｜埃及｜自动发码\n· 39.99 CNY · 有货 · GPT（卡冲）\n这款埃及兑换码充值的是 ChatGPT Go，付款后自动发放本站 PAIPLUS 卡密，面向客户自己的账号。本页说明 Go 与 Pro 商品的区分、预检资格及到账结果核验；Go 的账号状态和等待要求请在购买前联系客服核实，并以兑换预检结果为准。\nChatGPT Plus 兑换码｜自动发码\n· 130.00 CNY · 有货 · GPT（卡冲）\nChatGPT Plus 自助充值至自己的账号，付款成功后自动发放本站 PAIPLUS 卡密。适用账号须通过预检，领取后按订单指引完成兑换。\nChatGPT Pro 100美金 兑换码｜埃及｜自动发码\n· 680.00 CNY · 有货 · GPT（卡冲）\n埃及 EG／EGP 渠道的 ChatGPT Pro 100美金兑换码对应 Pro 5x，自有账号通过预检后使用。阅读本页可核对地区标识、自动发码与兑换步骤，以及未用卡密的退款条件；渠道名称不代表成功率或到账速度保证。\nChatGPT Pro 100美金 兑换码｜菲区｜自动发码\n· 700.00 CNY · 有货 · GPT（卡冲）\n这款菲区 ChatGPT Pro 100美金商品对应 Pro 5x 自动发码，充值到您自己的账号。本页先核对新账号或到期条件，再说明订单取码、预检和结果确认；收到 PAIPLUS 卡密仍需兑换，未到期覆盖请另看人工方案。\nChatGPT Pro 200美金 兑换码｜菲区｜自动发码\n· 1200.00 CNY · 有货 · GPT（卡冲）\n菲区 ChatGPT Pro 200美金自动发码页对应 Pro 10x 开通方案，与仍持有 Pro 10x 的续费绑卡商品分别适用。购买前检查订阅状态，领取订单卡密后按入口预检；本页同时保留订阅质保和剩余时长退款说明。\nChatGPT Pro 200美金 续费绑卡｜菲区｜自动发码\n· 1200.00 CNY · 有货 · GPT（卡冲）\nChatGPT Pro 200美金续费绑卡方案面向当前仍为 Pro 10x 的自有账号。付款后自动发放本站卡密，请依订单指引绑卡并联系客服确认；本页重点说明续费资格与确认步骤，不将它写成新账号开通或到期充值方案。\nChatGPT Pro 500美金 兑换码｜埃及｜自动发码\n· 3250.00 CNY · 有货 · GPT（卡冲）\n埃及 ChatGPT Pro 500美金商品对应 Pro 25x 自动发码，使用 EG／EGP 渠道。本页区分档位、地区和自有账号三项核对信息，说明预检、异常取证与订阅售后；卡密到账不等于开通，具体使用结果请按订单入口查询。\nChatGPT Pro 500美金 兑换码｜菲区｜自动发码\n· 3380.00 CNY · 有货 · GPT（卡冲）\n查看菲区 ChatGPT Pro 500美金、即 Pro 25x 兑换码的购买核对步骤。本站自动交付 PAIPLUS 卡密，目标为用户自有账号；先确认套餐标识与预检资格，再查看开通结果，订阅保障不包含账号封禁或免费补开承诺。\nPlus、Pro 充值怎么选？\n给自己的 ChatGPT 账号充值，请先区分自助兑换和人工充值。本站提供独立第三方服务，不是 OpenAI 官方网站，也不代表官方授权。\nChatGPT Plus 自助兑换码\n：付款后在订单内领取，按说明完成账号预检和兑换。\nChatGPT Plus 人工充值\n：适用条件、覆盖方式和交付时间请以该商品说明为准。\nChatGPT Pro：本页商品按地区、套餐档位与新开通／续费区分；如需人工处理，可查看\nGPT 人工及覆盖充值商品\n。\n这些商品用于 ChatGPT 订阅，不是 OpenAI API 余额，也不是给现有账号购买 Codex 点数。\n充值前需要确认什么？\n确认登录的是需要充值的账号，查看当前套餐、到期时间和原订阅渠道。\n核对商品要求的账号地区、支付方式及新开通或续费资格；不同地区、档位的兑换码不能默认通用。\n已有订阅时，先阅读\nPlus 到期续费与覆盖充值的区别\n。剩余时间是否保留、能否叠加，应按所选商品规则确认；Pro 不直接套用 Plus 规则。\n不确定账号是否适用时，先联系本站客服确认，再购买。\nGPT 充值多少钱，付款后收到什么？\n商品卡片显示当前售价和库存；具体规格、优惠、可用支付渠道及手续费，在商品详情和结算页核对。不要把不同地区或套餐档位的价格当成同一种服务比较。\n自动发码商品的交付内容在订单内领取，收到兑换码并不等于账号已经开通，需要继续按说明兑换。人工商品按详情要求提交必要资料并等待处理。游客请保存下单邮箱与查询密码，通过\n游客查单\n领取；会员可到\n我的订单\n查看。\n如何确认成功，失败了怎么办？\n充值完成后，回到自己的 ChatGPT 账号核对套餐状态与到期时间。不要只凭付款成功或收到卡密判断开通完成。\n遇到预检不通过、兑换报错或订阅未更新，先保存订单号、错误提示和操作时间，暂停重复购买或兑换，联系本站客服。不要在公开评论中发布卡密、密码或账号凭证。\n使用期限与质保期不同。是否支持退款、补差价重开及具体计算方式，以所购商品说明和实际处理结果为准；本站不作所有套餐通用的退款承诺。\n交付进度、退款申请与异常处理流程，请查看\n交付与售后说明\n；适用条件、质保范围和退款规则以所购商品约定为准，不同商品不能互相套用。\nGPT 充值与使用指南\nChatGPT 充值方式有哪些？订阅渠道、账号条件与注意事项\nChatGPT Plus 兑换码怎么用？从领取到核对开通结果\nChatGPT Plus 没到期能充值吗？到期续费与覆盖充值的区别\nChatGPT 充值后没有显示会员，应该怎么排查？\nChatGPT Plus 订阅和 API 余额有什么区别？\n不同地区的 GPT 兑换码能通用吗？购买前如何核对？\n菲区 ChatGPT 充值怎么选、怎么兑\n本文帮助你选择本站服务，产品名称仅用于说明服务对象。具体订阅功能与官方规则请以相应产品的官方说明为准。\n商品中心\n·\n博客\n·\n公告\n·\n关于我们\n·\nGPT（卡冲）\n·\nGemini\n·\nGrok\n·\nTelegram会员链接\n·\nGPT可覆盖充值（ios谷歌支付）\n·\n服务条款\n·\n隐私政策"
+    },
+    "/blog/chatgpt-ph-recharge-guide": {
+      "canonical": [
+        "https://www.qzweb.cloud/blog/chatgpt-ph-recharge-guide"
+      ],
+      "meta": {
+        "viewport": "width=device-width, initial-scale=1",
+        "description": "菲区 ChatGPT 充值应先核对套餐档位和账号当前订阅状态。本文对照本站四款菲区 Pro 商品，区分普通开通与续费绑卡，说明付款后领取 PAIPLUS 卡密、预检、兑换及核对结果的步骤，并整理地区资格和售后边界；具体以商品页当前说明为准。",
+        "og:title": "菲区 ChatGPT 充值怎么选、怎么兑 - π星卡社",
+        "og:description": "菲区 ChatGPT 充值应先核对套餐档位和账号当前订阅状态。本文对照本站四款菲区 Pro 商品，区分普通开通与续费绑卡，说明付款后领取 PAIPLUS 卡密、预检、兑换及核对结果的步骤，并整理地区资格和售后边界；具体以商品页当前说明为准。",
+        "og:url": "https://www.qzweb.cloud/blog/chatgpt-ph-recharge-guide",
+        "og:site_name": "π星卡社",
+        "og:type": "article",
+        "og:image": "https://www.qzweb.cloud/media/seo-share/qzweb-og-1200x630.jpg",
+        "og:image:width": "1200",
+        "og:image:height": "630",
+        "og:image:alt": "菲区 ChatGPT 充值怎么选、怎么兑",
+        "twitter:card": "summary_large_image",
+        "twitter:title": "菲区 ChatGPT 充值怎么选、怎么兑 - π星卡社",
+        "twitter:description": "菲区 ChatGPT 充值应先核对套餐档位和账号当前订阅状态。本文对照本站四款菲区 Pro 商品，区分普通开通与续费绑卡，说明付款后领取 PAIPLUS 卡密、预检、兑换及核对结果的步骤，并整理地区资格和售后边界；具体以商品页当前说明为准。",
+        "twitter:image": "https://www.qzweb.cloud/media/seo-share/qzweb-og-1200x630.jpg",
+        "twitter:image:alt": "菲区 ChatGPT 充值怎么选、怎么兑"
+      },
+      "jsonld": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BlogPosting",
+          "author": {
+            "@id": "https://www.qzweb.cloud/#organization",
+            "@type": "Organization",
+            "name": "π星卡社",
+            "url": "https://www.qzweb.cloud/about"
+          },
+          "datePublished": "2026-11-17T08:37:09Z",
+          "description": "菲区 ChatGPT 充值应先核对套餐档位和账号当前订阅状态。本文对照本站四款菲区 Pro 商品，区分普通开通与续费绑卡，说明付款后领取 PAIPLUS 卡密、预检、兑换及核对结果的步骤，并整理地区资格和售后边界；具体以商品页当前说明为准。",
+          "headline": "菲区 ChatGPT 充值怎么选、怎么兑",
+          "inLanguage": "zh-CN",
+          "mainEntityOfPage": "https://www.qzweb.cloud/blog/chatgpt-ph-recharge-guide",
+          "publisher": {
+            "@id": "https://www.qzweb.cloud/#organization"
+          },
+          "url": "https://www.qzweb.cloud/blog/chatgpt-ph-recharge-guide"
+        },
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://www.qzweb.cloud/#organization",
+              "@type": "Organization",
+              "contactPoint": {
+                "@type": "ContactPoint",
+                "contactType": "customer support",
+                "url": "https://www.qzweb.cloud/about"
+              },
+              "description": "π星卡社提供 AI 数字商品与第三方订阅服务。查看 ChatGPT Plus 自助兑换码、人工充值的适用条件、使用教程和售后说明，按商品与订单指引领取交付内容。",
+              "hasMerchantReturnPolicy": {
+                "@id": "https://www.qzweb.cloud/blog/purchase-and-agent-guide#merchant-return-policy",
+                "@type": "MerchantReturnPolicy",
+                "merchantReturnLink": "https://www.qzweb.cloud/blog/purchase-and-agent-guide"
+              },
+              "logo": "https://www.qzweb.cloud/media/storefront-20261020/patrick-logo.webp",
+              "name": "π星卡社",
+              "url": "https://www.qzweb.cloud/"
+            },
+            {
+              "@id": "https://www.qzweb.cloud/#website",
+              "@type": "WebSite",
+              "name": "π星卡社",
+              "publisher": {
+                "@id": "https://www.qzweb.cloud/#organization"
+              },
+              "url": "https://www.qzweb.cloud/"
+            }
+          ]
+        },
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "item": "https://www.qzweb.cloud/",
+                  "name": "首页",
+                  "position": 1
+                },
+                {
+                  "@type": "ListItem",
+                  "item": "https://www.qzweb.cloud/blog",
+                  "name": "博客",
+                  "position": 2
+                },
+                {
+                  "@type": "ListItem",
+                  "item": "https://www.qzweb.cloud/blog/chatgpt-ph-recharge-guide",
+                  "name": "菲区 ChatGPT 充值怎么选、怎么兑",
+                  "position": 3
+                }
+              ]
+            },
+            {
+              "@id": "https://www.qzweb.cloud/blog/chatgpt-ph-recharge-guide#faq",
+              "@type": "FAQPage",
+              "mainEntity": [
+                {
+                  "@type": "Question",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "不是。“菲区”是本站商品的渠道标注，本站提供独立第三方服务，商品名称不表示 OpenAI 官方授权。"
+                  },
+                  "name": "菲区 ChatGPT 兑换码是官方菲律宾礼品卡吗？"
+                },
+                {
+                  "@type": "Question",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "不能仅凭档位或渠道名称作此判断。本站目前有埃及渠道的 Pro 100美金、Pro 500美金自动发码，公开目录未见同为 Pro 200美金的埃及自动发码商品。文中引用的渠道说明分别来自菲区 Pro 100美金页和埃及 Pro 500美金页，不能概括所有档位，也不能据此推断账号资格相同。购买前请联系客服核实，并以各商品的兑换预检结果为准。"
+                  },
+                  "name": "菲区与埃及的 Pro 兑换码能直接互换吗？"
+                },
+                {
+                  "@type": "Question",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "三款普通开通页写明的是新账号或已到期、掉订阅至少 10 分钟的账号，不应当作覆盖方案。当前仍为 Pro 10x 的续费绑卡另有条件，购买时要分清。"
+                  },
+                  "name": "账号还没到期，可以买普通开通兑换码吗？"
+                },
+                {
+                  "@type": "Question",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "不是。还需按订单指引预检、兑换并查询处理结果，再核对目标账号的订阅状态；续费绑卡还须联系客服确认。"
+                  },
+                  "name": "收到 PAIPLUS 卡密就是开通成功了吗？"
+                },
+                {
+                  "@type": "Question",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "先停止，保留提示和订单号联系客服核对。不要伪造地区资料、重复尝试不同账号，或未经核实再购买另一地区的兑换码。"
+                  },
+                  "name": "预检提示地区或账号不适用，下一步怎么办？"
+                },
+                {
+                  "@type": "Question",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "卖。本站也提供 ChatGPT 成品号，具体规格和价格请通过 关于页面的客服入口 联系客服确认。公开商品目录目前没有单独的成品号商品页，本文不列出规格或售价。本文介绍的菲区兑换码是给客户自己的账号充值，与成品号不是同一类商品。"
+                  },
+                  "name": "你们卖 ChatGPT 成品号吗？"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "text": "菲区 ChatGPT 充值怎么选、怎么兑 - π星卡社\nπ星卡社\n·\n商品中心\n·\n文章\n·\n关于我们\n菲区 ChatGPT 充值怎么选、怎么兑\n2026-11-17\n菲区 ChatGPT 充值应先核对套餐档位和账号当前订阅状态。本文对照本站四款菲区 Pro 商品，区分普通开通与续费绑卡，说明付款后领取 PAIPLUS 卡密、预检、兑换及核对结果的步骤，并整理地区资格和售后边界；具体以商品页当前说明为准。\n菲区 ChatGPT 充值要先分清：是普通开通，还是续费绑卡。\n本站带“菲区”标注的四款 Pro 商品，账号要求并不完全一样。π星卡社为独立第三方，具体规则以各商品页当前说明为准。\n整理：\nπ星卡社\n｜资料核验日期：2026-11-17。\n本站说的“菲区”是什么\n“菲区”用于标明本站部分 ChatGPT Pro 兑换码及续费绑卡商品的地区与渠道。它不是 OpenAI 官方礼品卡名称，也不能据此理解为全球通用。“自动发码”说明的是付款后的交付方式，不代表任何账号都能兑换。\n选购时要分开核对三件事：官方服务支持地区、商品限定的渠道，以及自己的订阅状态。购买兑换码不会改变官方地区规则。请查阅\nOpenAI 当前支持国家和地区\n，不要把本文当作地区白名单。需要了解这些条件如何区分，可继续阅读\n不同地区兑换码的购买核对指南\n。\n和美国区或其他地区方案怎么理解\n本站商品页显示的是第三方商品售价，不是官方地区价目表的转载。本文不提供美国区或菲律宾区的官方价格比较，也不据渠道名称推算折扣。实际需要支付的金额与库存，请打开相应商品页核对；名称中的“100美金”“200美金”“500美金”不是本站人民币收款金额。\n目前本站另有埃及渠道的\nPro 100美金自动发码\n和\nPro 500美金自动发码\n，没有见到同为 Pro 200美金的埃及自动发码商品。\n菲区 Pro 100美金兑换码\n页写明，同倍数的埃及方案区别在渠道名称；\n埃及 Pro 500美金兑换码\n页写明，它与菲区 Pro 25x 的渠道名称不同。仅凭档位相近，不能推断账号资格相同，更不能把其中一款的说明套用到另一款，也不能按档位去一一配对。如需比较具体资格，购买前请联系客服核实，并以各商品的兑换预检结果为准。\n谁适合买普通开通，谁需要先停下来核对\n菲区 Pro 100、200、500 美金的普通开通页，共同写明适用于从未开通过会员的新账号，或原有订阅已到期、掉订阅至少 10 分钟的账号。满足文字描述后仍需预检，不能只根据自己估计的时间判定一定适用。这三款的订阅期限为一个月，具体起止以实际开通记录为准。\n如果当前套餐尚未到期，不要把普通自动发码理解成支持覆盖。应先看\n到期续费与未到期覆盖的区别\n，再到\nChatGPT 充值方案\n核对是否应改选人工商品；人工方案的规则不能移用到自动发码商品。\n另有一款 Pro 200 美金“续费绑卡”：对象是\n当前仍为 Pro 10x 的自有账号\n。它不能套用普通开通的“新账号或已到期”条件；交付后需按指引绑卡，并联系客服确认。其他档位、已到期或状态不清楚的账号，购买前先咨询。\n怎么选：四款菲区 Pro 与 Plus 的区别\n可先打开\nChatGPT 充值方案与购买须知\n，按目标套餐和当前账号状态筛选，再核对商品名称。四款菲区商品可按下面的用途区分：\n商品入口\n选择时看什么\n菲区 ChatGPT Pro 100美金兑换码\n对应 Pro 5x 普通开通，先核对新账号或到期条件。\n菲区 Pro 200美金开通兑换码\n对应 Pro 10x 普通开通，与续费绑卡分开选择。\n菲区 Pro 500美金兑换码\n对应 Pro 25x 普通开通，账号条件仍以本商品页为准。\n菲区 Pro 200美金续费绑卡\n针对当前仍为 Pro 10x 的账号；绑卡后联系客服确认。\n5x、10x、25x 是商品供货说明中的档位名称，不能仅凭数字推断官方功能或额度，也不能将 25x 换算成本站承诺的固定使用次数。需要了解具体权益差别，请在购买前联系客服核实。\n如果目标是 Plus，请另看\nChatGPT Plus 兑换码\n及\n兑换码使用说明\n。本站 Plus 兑换码没有标注菲区，不应混入这四款菲区 Pro 的选品表，也不能用 Pro 档位替代 Plus 套餐。\n菲区 Pro 兑换码怎么充值：从下单到核对结果\n核对商品与账号。\n打开选中的商品页，逐项确认“菲区”、档位、普通开通或续费绑卡标识，再检查自己的订阅状态。不要只看金额或“有货”就下单。\n按本站流程下单付款。\n售价、库存和可用付款方式以页面当时显示为准；对充值方式不熟悉，可先阅读\nChatGPT 充值方式说明\n。\n从订单领取交付内容。\n付款成功后，自动发码商品发放本站 PAIPLUS 卡密。请从订单交付说明进入本站兑换中心，按该订单提供的指引操作。\n先预检，再核对后提交。\n确认目标账号与套餐，按兑换页完成预检。遇到不适用提示先停止，不要反复拿同一张码尝试不同账号。收到卡密并不代表订阅已经开通。\n查询处理结果。\n在兑换页面查看状态，再到自己的 ChatGPT 账号核对订阅。权益未显示时，参考\n充值后会员未显示的排查说明\n，区分仍在处理中与已出现错误。\n续费绑卡另做确认。\n购买续费绑卡商品的用户，须按交付指引完成绑卡，再联系本站客服确认。领到码或完成绑卡，都不能直接作为订阅已经确认的结论。\n如果兑换失败、卡密提示无效或已使用，保存本站订单号与报错截图，通过\n关于页面的客服入口\n核实。截图先遮住敏感信息，不要发送密码、登录 token 或完整卡密；不要伪造地区资料，也不要另买不同地区的码继续试错。\n常见问题\n菲区 ChatGPT 兑换码是官方菲律宾礼品卡吗？\n不是。“菲区”是本站商品的渠道标注，本站提供独立第三方服务，商品名称不表示 OpenAI 官方授权。\n菲区与埃及的 Pro 兑换码能直接互换吗？\n不能仅凭档位或渠道名称作此判断。本站目前有埃及渠道的 Pro 100美金、Pro 500美金自动发码，公开目录未见同为 Pro 200美金的埃及自动发码商品。文中引用的渠道说明分别来自菲区 Pro 100美金页和埃及 Pro 500美金页，不能概括所有档位，也不能据此推断账号资格相同。购买前请联系客服核实，并以各商品的兑换预检结果为准。\n账号还没到期，可以买普通开通兑换码吗？\n三款普通开通页写明的是新账号或已到期、掉订阅至少 10 分钟的账号，不应当作覆盖方案。当前仍为 Pro 10x 的续费绑卡另有条件，购买时要分清。\n收到 PAIPLUS 卡密就是开通成功了吗？\n不是。还需按订单指引预检、兑换并查询处理结果，再核对目标账号的订阅状态；续费绑卡还须联系客服确认。\n预检提示地区或账号不适用，下一步怎么办？\n先停止，保留提示和订单号联系客服核对。不要伪造地区资料、重复尝试不同账号，或未经核实再购买另一地区的兑换码。\n你们卖 ChatGPT 成品号吗？\n卖。本站也提供 ChatGPT 成品号，具体规格和价格请通过\n关于页面的客服入口\n联系客服确认。公开商品目录目前没有单独的成品号商品页，本文不列出规格或售价。本文介绍的菲区兑换码是给客户自己的账号充值，与成品号不是同一类商品。\n风险与购买前注意事项\nπ星卡社与 OpenAI 无隶属关系，商品名称用于说明适用服务，不代表官方授权或合作。本文不保证开通结果、到账时效或账号不会受限，也不提供绕过官方地区规则的方法。\n使用期限与质保期要分别确认。这几款商品的质保针对本次订阅权益，不包含账号封禁；退款资格、剩余时长核算及填错账号后的责任，以相应商品页为准，不在本文另订统一规则。购买前请阅读\n交付与售后说明\n。遇到处理或退款问题，需由客服核实，不承诺即时答复或固定到账时间。\n相关内容\nChatGPT Pro 100美金 兑换码｜菲区｜自动发码\nChatGPT Pro 200美金 兑换码｜菲区｜自动发码\nChatGPT Pro 500美金 兑换码｜菲区｜自动发码\nChatGPT Pro 200美金 续费绑卡｜菲区｜自动发码\n商品中心\n·\n博客\n·\n公告\n·\n关于我们\n·\nGPT（卡冲）\n·\nGemini\n·\nGrok\n·\nTelegram会员链接\n·\nGPT可覆盖充值（ios谷歌支付）\n·\n服务条款\n·\n隐私政策"
+    },
+    "/blog/chatgpt-plus-code-guide": {
+      "canonical": [
+        "https://www.qzweb.cloud/blog/chatgpt-plus-code-guide"
+      ],
+      "meta": {
+        "viewport": "width=device-width, initial-scale=1",
+        "description": "按本站订单领取 PAIPLUS 卡密、确认账号资格、完成兑换并核对订阅状态，说明发码与开通的区别及常见异常处理。",
+        "og:title": "ChatGPT Plus 兑换码怎么用？从领取到核对开通结果 - π星卡社",
+        "og:description": "按本站订单领取 PAIPLUS 卡密、确认账号资格、完成兑换并核对订阅状态，说明发码与开通的区别及常见异常处理。",
+        "og:url": "https://www.qzweb.cloud/blog/chatgpt-plus-code-guide",
+        "og:site_name": "π星卡社",
+        "og:type": "article",
+        "og:image": "https://www.qzweb.cloud/media/seo-share/qzweb-og-1200x630.jpg",
+        "og:image:width": "1200",
+        "og:image:height": "630",
+        "og:image:alt": "ChatGPT Plus 兑换码怎么用？从领取到核对开通结果",
+        "twitter:card": "summary_large_image",
+        "twitter:title": "ChatGPT Plus 兑换码怎么用？从领取到核对开通结果 - π星卡社",
+        "twitter:description": "按本站订单领取 PAIPLUS 卡密、确认账号资格、完成兑换并核对订阅状态，说明发码与开通的区别及常见异常处理。",
+        "twitter:image": "https://www.qzweb.cloud/media/seo-share/qzweb-og-1200x630.jpg",
+        "twitter:image:alt": "ChatGPT Plus 兑换码怎么用？从领取到核对开通结果"
+      },
+      "jsonld": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BlogPosting",
+          "author": {
+            "@id": "https://www.qzweb.cloud/#organization",
+            "@type": "Organization",
+            "name": "π星卡社",
+            "url": "https://www.qzweb.cloud/about"
+          },
+          "datePublished": "2026-11-09T08:33:59Z",
+          "description": "按本站订单领取 PAIPLUS 卡密、确认账号资格、完成兑换并核对订阅状态，说明发码与开通的区别及常见异常处理。",
+          "headline": "ChatGPT Plus 兑换码怎么用？从领取到核对开通结果",
+          "inLanguage": "zh-CN",
+          "mainEntityOfPage": "https://www.qzweb.cloud/blog/chatgpt-plus-code-guide",
+          "publisher": {
+            "@id": "https://www.qzweb.cloud/#organization"
+          },
+          "url": "https://www.qzweb.cloud/blog/chatgpt-plus-code-guide"
+        },
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://www.qzweb.cloud/#organization",
+              "@type": "Organization",
+              "contactPoint": {
+                "@type": "ContactPoint",
+                "contactType": "customer support",
+                "url": "https://www.qzweb.cloud/about"
+              },
+              "description": "π星卡社提供 AI 数字商品与第三方订阅服务。查看 ChatGPT Plus 自助兑换码、人工充值的适用条件、使用教程和售后说明，按商品与订单指引领取交付内容。",
+              "hasMerchantReturnPolicy": {
+                "@id": "https://www.qzweb.cloud/blog/purchase-and-agent-guide#merchant-return-policy",
+                "@type": "MerchantReturnPolicy",
+                "merchantReturnLink": "https://www.qzweb.cloud/blog/purchase-and-agent-guide"
+              },
+              "logo": "https://www.qzweb.cloud/media/storefront-20261020/patrick-logo.webp",
+              "name": "π星卡社",
+              "url": "https://www.qzweb.cloud/"
+            },
+            {
+              "@id": "https://www.qzweb.cloud/#website",
+              "@type": "WebSite",
+              "name": "π星卡社",
+              "publisher": {
+                "@id": "https://www.qzweb.cloud/#organization"
+              },
+              "url": "https://www.qzweb.cloud/"
+            }
+          ]
+        },
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "item": "https://www.qzweb.cloud/",
+                  "name": "首页",
+                  "position": 1
+                },
+                {
+                  "@type": "ListItem",
+                  "item": "https://www.qzweb.cloud/blog",
+                  "name": "博客",
+                  "position": 2
+                },
+                {
+                  "@type": "ListItem",
+                  "item": "https://www.qzweb.cloud/blog/chatgpt-plus-code-guide",
+                  "name": "ChatGPT Plus 兑换码怎么用？从领取到核对开通结果",
+                  "position": 3
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "text": "ChatGPT Plus 兑换码怎么用？从领取到核对开通结果 - π星卡社\nπ星卡社\n·\n商品中心\n·\n文章\n·\n关于我们\nChatGPT Plus 兑换码怎么用？从领取到核对开通结果\n2026-11-09\n按本站订单领取 PAIPLUS 卡密、确认账号资格、完成兑换并核对订阅状态，说明发码与开通的区别及常见异常处理。\n在 π星卡社收到 Plus 兑换码后，还需要按订单提供的入口完成兑换，再核对目标账号的订阅状态。\n“订单已付款”“卡密已交付”和“Plus 已开通”是不同状态；收到卡密本身不代表订阅已经生效。\n整理：π星卡社｜流程核验：2026 年 11 月 9 日。本文适用于本站\nChatGPT Plus 自助兑换码商品\n。本站为独立第三方服务平台，与 OpenAI 无隶属关系；本站 PAIPLUS 卡密是本站服务凭证，不代表 OpenAI 官方礼品卡。其他渠道的卡密应按原订单说明使用。\n第一步：先确认账号符合商品条件\n本商品适用于从未开通过会员的新账号，或原订阅已到期／掉订阅至少 10 分钟的账号，最终以兑换预检结果为准。操作前确认登录的是自己准备充值的账号，核对当前套餐与订阅状态。\n如果 Plus 尚未到期，不要直接套用本教程。先阅读\n未到期续费说明\n，确认是否需要等待到期，或选择另有覆盖规则的商品。\n第二步：下单后保存查询信息\n在商品页确认商品、规格、数量、实时售价和购买条件，再按结算页完成付款。\n保存本站订单号与订单查询所需信息。付款完成后，从本站订单页面核对支付状态和交付情况。\n已完成付款但订单仍未确认时，保留支付成功截图并联系本站客服核查。不要为了获取卡密再次支付同一笔需求。\n第三步：在订单中领取卡密并打开兑换指引\n付款确认后，本商品自动发放本站 PAIPLUS 卡密。打开对应订单，按页面提示查看交付内容，使用订单交付说明中的本站兑换中心入口。卡密、兑换入口及操作要求以该笔订单显示为准。\n公开教程不展示实际卡密，也不替代订单内的交付说明。不要从陌生聊天消息中的链接进入兑换页面，不要把卡密、账号凭据或会话信息贴到公开评论、群聊或客服 Agent 对话中。\n第四步：核对目标账号，再按页面提示操作\n确认兑换页面与订单指引一致，核对卡密所对应的套餐。\n按页面提示完成账号与资格核验，确认目标账号无误再提交。\n如果预检不通过，先阅读具体提示，停止重复提交，联系本站客服核对商品是否适用。\n提交后保留处理结果，按页面提示查询进度。处理中没有统一的完成时限，不要反复下单。\n如页面要求提供账号会话信息，应把它按密码级别保护，并先了解该信息会授予什么权限。本站客服不应通过私聊索要账号密码、邮箱密码、验证码或双重验证恢复码；对输入内容或页面来源有疑问时，先停止操作并核实。\n第五步：同时核对兑换结果和账号状态\n先看兑换页面是否记录处理成功，再回到同一 ChatGPT 账号查看套餐状态和有效期。界面暂未更新时，可以在确认账号及登录方式后刷新或重新登录。若购买的是官方应用商店订阅，应按对应官方渠道的恢复购买说明处理，不能把这一步当作本站卡密的通用激活方式。\n本商品订阅期限为一个月，实际起止时间以开通记录为准。请保留必要的订单和状态记录，遇到异常时方便核查。\n常见问题：应该向客服提供什么？\n卡密无效或显示已使用：\n提供本站订单号、报错文字和遮挡敏感信息的截图，由客服核实，不直接承诺补发或退款。\n显示成功，但账号仍未开通：\n核对是不是同一账号，提供处理结果与套餐状态截图；不要公开完整卡密或登录 token。\n卡密已发出但没有使用：\n可联系本站客服申请退款；需核实有效且未使用，并销毁后办理。\n订阅中途掉了：\n按商品售后规则核算实际剩余时长，保留掉订阅时间和截图。订阅质保不包含账号封禁。\n人工客服服务时间为北京时间 07:00—24:00，不保证即时回复。退款方式、处理时间及特殊情况由客服核实说明；完整政策请查看\n商品说明\n。\n相关说明\n购买前仍不确定方式，可先看\nChatGPT 充值方式与购买检查清单\n。官方账号状态与订阅信息可参考\nOpenAI 的 Plus 帮助说明\n；本站兑换步骤以订单页面当时显示为准。\n继续了解 GPT 充值\nGPT 充值方案与购买须知\n交付、退款申请与售后说明\n商品中心\n·\n博客\n·\n公告\n·\n关于我们\n·\nGPT（卡冲）\n·\nGemini\n·\nGrok\n·\nTelegram会员链接\n·\nGPT可覆盖充值（ios谷歌支付）\n·\n服务条款\n·\n隐私政策"
+    },
+    "/blog/chatgpt-code-region-check": {
+      "canonical": [
+        "https://www.qzweb.cloud/blog/chatgpt-code-region-check"
+      ],
+      "meta": {
+        "viewport": "width=device-width, initial-scale=1",
+        "description": "地区、套餐与原订阅条件需要分别核对。通过购买清单、预检失败处理和售后边界，减少买错兑换码的情况。",
+        "og:title": "不同地区的 GPT 兑换码能通用吗？购买前如何核对？ - π星卡社",
+        "og:description": "地区、套餐与原订阅条件需要分别核对。通过购买清单、预检失败处理和售后边界，减少买错兑换码的情况。",
+        "og:url": "https://www.qzweb.cloud/blog/chatgpt-code-region-check",
+        "og:site_name": "π星卡社",
+        "og:type": "article",
+        "og:image": "https://www.qzweb.cloud/media/seo-share/qzweb-og-1200x630.jpg",
+        "og:image:width": "1200",
+        "og:image:height": "630",
+        "og:image:alt": "不同地区的 GPT 兑换码能通用吗？购买前如何核对？",
+        "twitter:card": "summary_large_image",
+        "twitter:title": "不同地区的 GPT 兑换码能通用吗？购买前如何核对？ - π星卡社",
+        "twitter:description": "地区、套餐与原订阅条件需要分别核对。通过购买清单、预检失败处理和售后边界，减少买错兑换码的情况。",
+        "twitter:image": "https://www.qzweb.cloud/media/seo-share/qzweb-og-1200x630.jpg",
+        "twitter:image:alt": "不同地区的 GPT 兑换码能通用吗？购买前如何核对？"
+      },
+      "jsonld": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BlogPosting",
+          "author": {
+            "@id": "https://www.qzweb.cloud/#organization",
+            "@type": "Organization",
+            "name": "π星卡社",
+            "url": "https://www.qzweb.cloud/about"
+          },
+          "datePublished": "2026-11-10T05:40:08Z",
+          "description": "地区、套餐与原订阅条件需要分别核对。通过购买清单、预检失败处理和售后边界，减少买错兑换码的情况。",
+          "headline": "不同地区的 GPT 兑换码能通用吗？购买前如何核对？",
+          "inLanguage": "zh-CN",
+          "mainEntityOfPage": "https://www.qzweb.cloud/blog/chatgpt-code-region-check",
+          "publisher": {
+            "@id": "https://www.qzweb.cloud/#organization"
+          },
+          "url": "https://www.qzweb.cloud/blog/chatgpt-code-region-check"
+        },
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://www.qzweb.cloud/#organization",
+              "@type": "Organization",
+              "contactPoint": {
+                "@type": "ContactPoint",
+                "contactType": "customer support",
+                "url": "https://www.qzweb.cloud/about"
+              },
+              "description": "π星卡社提供 AI 数字商品与第三方订阅服务。查看 ChatGPT Plus 自助兑换码、人工充值的适用条件、使用教程和售后说明，按商品与订单指引领取交付内容。",
+              "hasMerchantReturnPolicy": {
+                "@id": "https://www.qzweb.cloud/blog/purchase-and-agent-guide#merchant-return-policy",
+                "@type": "MerchantReturnPolicy",
+                "merchantReturnLink": "https://www.qzweb.cloud/blog/purchase-and-agent-guide"
+              },
+              "logo": "https://www.qzweb.cloud/media/storefront-20261020/patrick-logo.webp",
+              "name": "π星卡社",
+              "url": "https://www.qzweb.cloud/"
+            },
+            {
+              "@id": "https://www.qzweb.cloud/#website",
+              "@type": "WebSite",
+              "name": "π星卡社",
+              "publisher": {
+                "@id": "https://www.qzweb.cloud/#organization"
+              },
+              "url": "https://www.qzweb.cloud/"
+            }
+          ]
+        },
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "item": "https://www.qzweb.cloud/",
+                  "name": "首页",
+                  "position": 1
+                },
+                {
+                  "@type": "ListItem",
+                  "item": "https://www.qzweb.cloud/blog",
+                  "name": "博客",
+                  "position": 2
+                },
+                {
+                  "@type": "ListItem",
+                  "item": "https://www.qzweb.cloud/blog/chatgpt-code-region-check",
+                  "name": "不同地区的 GPT 兑换码能通用吗？购买前如何核对？",
+                  "position": 3
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "text": "不同地区的 GPT 兑换码能通用吗？购买前如何核对？ - π星卡社\nπ星卡社\n·\n商品中心\n·\n文章\n·\n关于我们\n不同地区的 GPT 兑换码能通用吗？购买前如何核对？\n2026-11-10\n地区、套餐与原订阅条件需要分别核对。通过购买清单、预检失败处理和售后边界，减少买错兑换码的情况。\n不同地区、不同套餐的 GPT 兑换码不能默认通用。\n“GPT 兑换码”是商品交付方式的描述，不足以证明它是全球通用的官方礼品卡。是否适用，要同时核对服务支持地区、商品要求、目标账号状态和当前兑换结果。\n整理：\nπ星卡社\n｜资料核验日期：2026-11-10。本站为独立第三方平台，商品名称用于说明适用服务，不表示官方授权。\n先分清三种“地区”条件\n官方服务支持地区：\n决定相关服务是否在当地提供。OpenAI 公布了 ChatGPT 支持国家和地区，并说明在列表以外访问或提供访问可能导致账号受限。购买兑换码不会改变这项规则。请查阅\nOpenAI 当前支持地区列表\n，不要把本文当作地区白名单。\n商品限定的地区与渠道：\n同样写着 Plus 或 Pro，商品可能针对不同的地区、付款渠道或资格。以当前商品详情为准，不要根据另一款商品的经验推断通用。\n账号现有的订阅状态：\n新开通、到期续费、未到期覆盖可能对应不同条件。某地区商品可买，并不代表当前账号可以立即兑换。\n购买前照着这张清单核对\n项目\n需要确认的问题\n商品与套餐\n具体是 Plus、Pro 还是其他服务？档位与周期是否符合需求？\n地区与资格\n商品明确支持哪些账号条件？有没有新用户、优惠资格或渠道要求？\n已有订阅\n是否已经到期？原订阅来自网页、iOS 还是其他渠道？\n交付方式\n付款后领取兑换码自行操作，还是由人工处理？\n售后范围\n预检失败、兑换失败和开通后异常分别如何处理？使用期限和质保期是否相同？\n可以先从\nGPT 充值方案与购买须知\n进入对应商品，核对当前说明。不要仅凭便宜、库存充足或标题中包含某地区，就认为适用于自己的账号。\n预检提示地区或账号不适用，怎么办？\n先停止兑换，保存错误提示、商品名称与操作时间，通过\n本站客服\n核对。不要反复使用同一兑换码尝试不同账号，也不要为了通过预检伪造地区资料。客服确认前，不建议另买一张不同地区的码继续试错。\n有预检步骤的商品，应按当前交付说明操作；没有看到预检入口时，不能自行寻找陌生网站上传账号凭证。完整卡密、密码和会话信息都不应出现在公开截图里。\n已经购买了不匹配的商品，能退换吗？\n需要结合商品说明、卡密使用状态和核查结果判断。购买前可以先问清“未使用但账号不符合条件”与“已经尝试兑换”的处理差别，不要把所有商品理解为无条件退换。本站不在这篇通用指南中增加统一退款承诺。\n续费与覆盖规则见\nChatGPT Plus 到期续费说明\n；完成兑换但会员仍未显示，可按\n会员未显示排查指南\n确认问题停在哪一步。\n延伸阅读：\n菲区 ChatGPT 充值怎么选、怎么兑\n。\n继续了解 GPT 充值\nChatGPT 充值方式与账号条件\n交付、退款申请与售后说明\n商品中心\n·\n博客\n·\n公告\n·\n关于我们\n·\nGPT（卡冲）\n·\nGemini\n·\nGrok\n·\nTelegram会员链接\n·\nGPT可覆盖充值（ios谷歌支付）\n·\n服务条款\n·\n隐私政策"
+    },
+    "/blog/chatgpt-payment-methods": {
+      "canonical": [
+        "https://www.qzweb.cloud/blog/chatgpt-payment-methods"
+      ],
+      "meta": {
+        "viewport": "width=device-width, initial-scale=1",
+        "description": "了解官方订阅与本站第三方充值的区别，对比 Plus 自助兑换码和人工覆盖充值，购买前核对账号条件、交付方式与售后规则。",
+        "og:title": "ChatGPT 充值方式有哪些？订阅渠道、账号条件与注意事项 - π星卡社",
+        "og:description": "了解官方订阅与本站第三方充值的区别，对比 Plus 自助兑换码和人工覆盖充值，购买前核对账号条件、交付方式与售后规则。",
+        "og:url": "https://www.qzweb.cloud/blog/chatgpt-payment-methods",
+        "og:site_name": "π星卡社",
+        "og:type": "article",
+        "og:image": "https://www.qzweb.cloud/media/seo-share/qzweb-og-1200x630.jpg",
+        "og:image:width": "1200",
+        "og:image:height": "630",
+        "og:image:alt": "ChatGPT 充值方式有哪些？订阅渠道、账号条件与注意事项",
+        "twitter:card": "summary_large_image",
+        "twitter:title": "ChatGPT 充值方式有哪些？订阅渠道、账号条件与注意事项 - π星卡社",
+        "twitter:description": "了解官方订阅与本站第三方充值的区别，对比 Plus 自助兑换码和人工覆盖充值，购买前核对账号条件、交付方式与售后规则。",
+        "twitter:image": "https://www.qzweb.cloud/media/seo-share/qzweb-og-1200x630.jpg",
+        "twitter:image:alt": "ChatGPT 充值方式有哪些？订阅渠道、账号条件与注意事项"
+      },
+      "jsonld": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BlogPosting",
+          "author": {
+            "@id": "https://www.qzweb.cloud/#organization",
+            "@type": "Organization",
+            "name": "π星卡社",
+            "url": "https://www.qzweb.cloud/about"
+          },
+          "datePublished": "2026-11-09T08:33:59Z",
+          "description": "了解官方订阅与本站第三方充值的区别，对比 Plus 自助兑换码和人工覆盖充值，购买前核对账号条件、交付方式与售后规则。",
+          "headline": "ChatGPT 充值方式有哪些？订阅渠道、账号条件与注意事项",
+          "inLanguage": "zh-CN",
+          "mainEntityOfPage": "https://www.qzweb.cloud/blog/chatgpt-payment-methods",
+          "publisher": {
+            "@id": "https://www.qzweb.cloud/#organization"
+          },
+          "url": "https://www.qzweb.cloud/blog/chatgpt-payment-methods"
+        },
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://www.qzweb.cloud/#organization",
+              "@type": "Organization",
+              "contactPoint": {
+                "@type": "ContactPoint",
+                "contactType": "customer support",
+                "url": "https://www.qzweb.cloud/about"
+              },
+              "description": "π星卡社提供 AI 数字商品与第三方订阅服务。查看 ChatGPT Plus 自助兑换码、人工充值的适用条件、使用教程和售后说明，按商品与订单指引领取交付内容。",
+              "hasMerchantReturnPolicy": {
+                "@id": "https://www.qzweb.cloud/blog/purchase-and-agent-guide#merchant-return-policy",
+                "@type": "MerchantReturnPolicy",
+                "merchantReturnLink": "https://www.qzweb.cloud/blog/purchase-and-agent-guide"
+              },
+              "logo": "https://www.qzweb.cloud/media/storefront-20261020/patrick-logo.webp",
+              "name": "π星卡社",
+              "url": "https://www.qzweb.cloud/"
+            },
+            {
+              "@id": "https://www.qzweb.cloud/#website",
+              "@type": "WebSite",
+              "name": "π星卡社",
+              "publisher": {
+                "@id": "https://www.qzweb.cloud/#organization"
+              },
+              "url": "https://www.qzweb.cloud/"
+            }
+          ]
+        },
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "item": "https://www.qzweb.cloud/",
+                  "name": "首页",
+                  "position": 1
+                },
+                {
+                  "@type": "ListItem",
+                  "item": "https://www.qzweb.cloud/blog",
+                  "name": "博客",
+                  "position": 2
+                },
+                {
+                  "@type": "ListItem",
+                  "item": "https://www.qzweb.cloud/blog/chatgpt-payment-methods",
+                  "name": "ChatGPT 充值方式有哪些？订阅渠道、账号条件与注意事项",
+                  "position": 3
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "text": "ChatGPT 充值方式有哪些？订阅渠道、账号条件与注意事项 - π星卡社\nπ星卡社\n·\n商品中心\n·\n文章\n·\n关于我们\nChatGPT 充值方式有哪些？订阅渠道、账号条件与注意事项\n2026-11-09\n了解官方订阅与本站第三方充值的区别，对比 Plus 自助兑换码和人工覆盖充值，购买前核对账号条件、交付方式与售后规则。\n想给自己的 ChatGPT 账号开通 Plus，先区分官方订阅和第三方充值服务，再核对账号状态、交付方式与售后条件。\n在 π星卡社，自助兑换码和人工覆盖充值是两种不同商品：是否能用于未到期账号、何时发码、剩余订阅时间如何计算，都需要分别确认。\n整理：π星卡社｜资料核验：2026 年 11 月 9 日。本文由本站销售方编写；本站为独立第三方服务平台，与 OpenAI 无隶属关系。文中 ChatGPT、Plus 等名称用于说明服务适用对象，不表示官方授权或合作。\n一、常见的 ChatGPT 付费方式有什么区别？\n通过 ChatGPT 官网订阅\n在\nChatGPT 官网\n登录自己的账号，通过账号内的升级入口选择套餐。可用支付方式、币种、税费和最终金额，以账号所在地的结算页面为准。官方订阅的账单与退款问题应向对应官方渠道查询。\n通过手机应用订阅\n使用官方 iOS 或 Android 应用内的订阅入口时，账单通常由 Apple App Store 或 Google Play 管理。更换购买渠道前，应先确认当前订阅由谁扣费，避免在不同渠道重复订阅；网页订单与应用商店订单的管理入口可能不同。\n购买本站提供的第三方充值服务\n本站两款 Plus 商品都用于客户自己的账号。下单后领取卡密，再按对应订单中的指引完成操作。\n本站收款、发出卡密和目标账号开通订阅，是三个需要分别核对的状态。\n本站 PAIPLUS 卡密属于本站服务的兑换凭证，不应理解成 OpenAI 官方发行的礼品卡。\n二、本站两款 Plus 商品怎么选？\n核对项目\n自助兑换码\n人工覆盖充值\n适用账号\n从未订阅，或原订阅已到期／掉订阅至少 10 分钟；以预检为准\n支持未到期及跨套餐覆盖，需按本商品条件核对\n交付方式\n付款成功后自动发放本站 PAIPLUS 卡密\n付款后人工发放卡密，通常在付款当天内发货\n订阅计时\n一个月，起止时间以实际开通记录为准\n充值成功起重新计算一个月，原剩余时间不保留\n处理结果\n收到卡密后仍需完成兑换并核对结果\n人工发货不等于当天一定开通或到账\n查看实时价格、库存和完整条款：\nPlus 自助兑换码商品\n、\nPlus 人工覆盖充值商品\n。本文不固定展示价格，避免文章中的旧价格影响购买判断。\n三、购买前检查这五件事\n确认购买目标。\n需要的是自己的账号订阅、成品账号还是其他数字商品？本页对比的两款商品都是自己的账号充值，不交付成品账号。\n确认账号状态。\n查看当前套餐、有效期和原扣费渠道。仍有有效订阅时，先阅读\n未到期续费与覆盖充值说明\n。\n确认最终订单。\n核对商品、规格、数量、总价和当时可选的支付渠道，不把其他商家的支付方式当作本站承诺。\n确认交付与开通步骤。\n保存订单查询信息；自动发码也需要客户继续操作。具体过程见\n兑换码领取与使用教程\n。\n确认售后范围。\n这两款商品保障本次订阅权益，不包含账号封禁。掉订阅退款按实付金额、实际总时长及掉订阅时的剩余时长核算。\n四、几个容易混淆的问题\n充值 Plus 会同时得到 API 余额吗？\nChatGPT 订阅与 API 平台采用不同的计费系统。购买本站 Plus 订阅商品，不等于购买 API 余额；不要用订阅订单推断 API 的可用额度。\n为什么不统一承诺几分钟到账？\n自动发码、人工发货、提交兑换和最终开通各有不同状态。我们按商品页说明交付，最终结果以处理记录为准；遇到预检失败或处理中，应先查询订单并联系本站客服，不要因暂时未更新而重复付款。\n充值服务能保证账号不被限制吗？\n订阅权益与账号验证、使用规则是不同事项。需要客户自行完成的平台验证不能以充值代替，本站不作“永久不封”或“绕过验证”的承诺。\n五、资料来源与下一步\nOpenAI：ChatGPT Plus 说明\nOpenAI：币种与支付方式说明\nOpenAI：ChatGPT 与 API 账单管理\n官方规则以其最新说明及实际账号页面为准；本站商品条件、价格、库存和售后以对应商品与订单记录为准。需要帮助时请提供本站订单号和已遮挡敏感信息的截图，勿向客服发送密码、登录 token 或完整卡密。\n延伸阅读：\n菲区 ChatGPT 充值怎么选、怎么兑\n。\n继续了解 GPT 充值\nGPT 充值方案与购买须知\n交付、退款申请与售后说明\n商品中心\n·\n博客\n·\n公告\n·\n关于我们\n·\nGPT（卡冲）\n·\nGemini\n·\nGrok\n·\nTelegram会员链接\n·\nGPT可覆盖充值（ios谷歌支付）\n·\n服务条款\n·\n隐私政策"
+    }
+  },
+  "errors": [],
+  "robots": "User-agent: *\nDisallow: /api/\nAllow: /api/v1/public/config$\nAllow: /api/v1/public/config?\nAllow: /api/v1/public/products$\nAllow: /api/v1/public/products?\nAllow: /api/v1/public/categories$\nAllow: /api/v1/public/categories?\nAllow: /api/v1/public/posts$\nAllow: /api/v1/public/posts?\nAllow: /api/v1/public/post-categories$\nAllow: /api/v1/public/post-categories?\nAllow: /api/v1/public/banners$\nAllow: /api/v1/public/banners?\nAllow: /api/v1/public/member-levels$\nAllow: /api/v1/public/member-levels?\nAllow: /api/v1/public/products/\nAllow: /api/v1/public/posts/\nDisallow: /admin/\nDisallow: /me/\nDisallow: /cart\nDisallow: /checkout\nDisallow: /pay\nDisallow: /orders/\nDisallow: /recharge-orders/\nDisallow: /guest/\nDisallow: /auth/\n\nSitemap: https://www.qzweb.cloud/sitemap.xml\n",
+  "robots_matches": {
+    "/cart": false,
+    "/cart/": false,
+    "/cart?utm=test": false,
+    "/cart/?utm=test": false,
+    "/cart?next=/checkout": false,
+    "/cart/checkout": false,
+    "/cart/api": false,
+    "/cart/extra": false,
+    "/cartoon": false,
+    "/cart-old": false,
+    "/checkout": false,
+    "/pay": false,
+    "/orders/1": false,
+    "/recharge-orders/1": false,
+    "/admin/": false,
+    "/auth/login": false,
+    "/me/": false,
+    "/guest/orders": false,
+    "/api/private": false,
+    "/api/v1/public/products": true,
+    "/api/v1/public/products?search=Plus": true,
+    "/sitemap.xml": true,
+    "/me": true,
+    "/guest": true,
+    "/admin": true,
+    "/auth": true,
+    "/orders": true,
+    "/recharge-orders": true,
+    "/payment-guide": false
+  },
+  "sitemap_urls": [
+    "https://www.qzweb.cloud/",
+    "https://www.qzweb.cloud/products",
+    "https://www.qzweb.cloud/blog",
+    "https://www.qzweb.cloud/notice",
+    "https://www.qzweb.cloud/about",
+    "https://www.qzweb.cloud/terms",
+    "https://www.qzweb.cloud/privacy",
+    "https://www.qzweb.cloud/categories/gpt-recharge",
+    "https://www.qzweb.cloud/categories/gemini",
+    "https://www.qzweb.cloud/categories/grok",
+    "https://www.qzweb.cloud/categories/telegram-premium-links",
+    "https://www.qzweb.cloud/categories/gpt-overwrite-topup",
+    "https://www.qzweb.cloud/products/chatgpt-go-code-egypt",
+    "https://www.qzweb.cloud/products/chatgpt-plus-code",
+    "https://www.qzweb.cloud/products/chatgpt-pro-100-ph",
+    "https://www.qzweb.cloud/products/chatgpt-pro-200-ph",
+    "https://www.qzweb.cloud/products/chatgpt-pro-200-renew-ph",
+    "https://www.qzweb.cloud/products/chatgpt-pro-500-ph",
+    "https://www.qzweb.cloud/products/chatgpt-pro-500-egypt",
+    "https://www.qzweb.cloud/products/chatgpt-pro-100-egypt",
+    "https://www.qzweb.cloud/products/gemini-pro-18m-warranty",
+    "https://www.qzweb.cloud/products/gemini-pro-18m-no-warranty",
+    "https://www.qzweb.cloud/products/ellaix-grok-ultra-yearly",
+    "https://www.qzweb.cloud/products/ellaix-grok-ultra-monthly",
+    "https://www.qzweb.cloud/products/ellaix-grok-super-yearly",
+    "https://www.qzweb.cloud/products/ellaix-grok-super-monthly",
+    "https://www.qzweb.cloud/products/ellaix-grok-premium-yearly",
+    "https://www.qzweb.cloud/products/ellaix-grok-premium-monthly",
+    "https://www.qzweb.cloud/products/ellaix-grok-plus-yearly",
+    "https://www.qzweb.cloud/products/ellaix-grok-plus-monthly",
+    "https://www.qzweb.cloud/products/chatgpt-pro-200-manual",
+    "https://www.qzweb.cloud/products/chatgpt-pro-100-manual",
+    "https://www.qzweb.cloud/products/chatgpt-plus-manual",
+    "https://www.qzweb.cloud/products/chatgpt-go-manual",
+    "https://www.qzweb.cloud/products/telegram-premium-3m",
+    "https://www.qzweb.cloud/products/telegram-premium-6m",
+    "https://www.qzweb.cloud/products/telegram-premium-12m",
+    "https://www.qzweb.cloud/blog/chatgpt-ph-recharge-guide",
+    "https://www.qzweb.cloud/blog/chatgpt-membership-not-active",
+    "https://www.qzweb.cloud/blog/chatgpt-plus-vs-api-balance",
+    "https://www.qzweb.cloud/blog/chatgpt-code-region-check",
+    "https://www.qzweb.cloud/blog/chatgpt-payment-methods",
+    "https://www.qzweb.cloud/blog/chatgpt-plus-code-guide",
+    "https://www.qzweb.cloud/blog/chatgpt-plus-renewal-rules",
+    "https://www.qzweb.cloud/blog/binance-usdt-payment-guide",
+    "https://www.qzweb.cloud/blog/okx-usdt-payment-guide",
+    "https://www.qzweb.cloud/blog/purchase-and-agent-guide"
+  ],
+  "catalog": [
+    {
+      "id": 29,
+      "slug": "chatgpt-go-code-egypt",
+      "title": {
+        "zh-CN": "ChatGPT Go 兑换码｜埃及｜自动发码"
+      },
+      "tags": [
+        "ChatGpt 埃及"
+      ],
+      "price_amount": "39.99",
+      "effective_price_amount": "39.99",
+      "stock_status": "in_stock",
+      "stock_quantity_hidden": false,
+      "is_sold_out": false,
+      "stock_display": "exact",
+      "skus": [
+        {
+          "id": 29,
+          "sku_code": "QZWEB-4",
+          "spec_values": {},
+          "price_amount": "39.99",
+          "manual_stock_total": 0,
+          "manual_stock_sold": 0,
+          "auto_stock_available": 8782,
+          "upstream_stock": 8782,
+          "stock_status": "in_stock",
+          "stock_display_mode": "exact",
+          "stock_display": "exact",
+          "stock_quantity_hidden": false,
+          "is_sold_out": false,
+          "is_active": true,
+          "effective_price_amount": "39.99"
+        }
+      ]
+    },
+    {
+      "id": 30,
+      "slug": "chatgpt-plus-code",
+      "title": {
+        "zh-CN": "ChatGPT Plus 兑换码｜自动发码"
+      },
+      "tags": [
+        "ChatGpt 菲区"
+      ],
+      "price_amount": "130.00",
+      "effective_price_amount": "130.00",
+      "stock_status": "in_stock",
+      "stock_quantity_hidden": false,
+      "is_sold_out": false,
+      "stock_display": "exact",
+      "skus": [
+        {
+          "id": 30,
+          "sku_code": "QZWEB-5",
+          "spec_values": {},
+          "price_amount": "130.00",
+          "manual_stock_total": 0,
+          "manual_stock_sold": 0,
+          "auto_stock_available": 8513,
+          "upstream_stock": 8513,
+          "stock_status": "in_stock",
+          "stock_display_mode": "exact",
+          "stock_display": "exact",
+          "stock_quantity_hidden": false,
+          "is_sold_out": false,
+          "is_active": true,
+          "effective_price_amount": "130.00"
+        }
+      ]
+    },
+    {
+      "id": 31,
+      "slug": "chatgpt-pro-200-ph",
+      "title": {
+        "zh-CN": "ChatGPT Pro 200美金 兑换码｜菲区｜自动发码"
+      },
+      "tags": [
+        "ChatGpt 菲区"
+      ],
+      "price_amount": "1200.00",
+      "effective_price_amount": "1200.00",
+      "stock_status": "in_stock",
+      "stock_quantity_hidden": false,
+      "is_sold_out": false,
+      "stock_display": "exact",
+      "skus": [
+        {
+          "id": 31,
+          "sku_code": "QZWEB-55",
+          "spec_values": {},
+          "price_amount": "1200.00",
+          "manual_stock_total": 0,
+          "manual_stock_sold": 0,
+          "auto_stock_available": 9578,
+          "upstream_stock": 9578,
+          "stock_status": "in_stock",
+          "stock_display_mode": "exact",
+          "stock_display": "exact",
+          "stock_quantity_hidden": false,
+          "is_sold_out": false,
+          "is_active": true,
+          "effective_price_amount": "1200.00"
+        }
+      ]
+    },
+    {
+      "id": 32,
+      "slug": "chatgpt-pro-200-renew-ph",
+      "title": {
+        "zh-CN": "ChatGPT Pro 200美金 续费绑卡｜菲区｜自动发码"
+      },
+      "tags": [
+        "ChatGpt 菲区"
+      ],
+      "price_amount": "1200.00",
+      "effective_price_amount": "1200.00",
+      "stock_status": "in_stock",
+      "stock_quantity_hidden": false,
+      "is_sold_out": false,
+      "stock_display": "exact",
+      "skus": [
+        {
+          "id": 32,
+          "sku_code": "QZWEB-7",
+          "spec_values": {},
+          "price_amount": "1200.00",
+          "manual_stock_total": 0,
+          "manual_stock_sold": 0,
+          "auto_stock_available": 9949,
+          "upstream_stock": 9949,
+          "stock_status": "in_stock",
+          "stock_display_mode": "exact",
+          "stock_display": "exact",
+          "stock_quantity_hidden": false,
+          "is_sold_out": false,
+          "is_active": true,
+          "effective_price_amount": "1200.00"
+        }
+      ]
+    },
+    {
+      "id": 33,
+      "slug": "chatgpt-pro-500-ph",
+      "title": {
+        "zh-CN": "ChatGPT Pro 500美金 兑换码｜菲区｜自动发码"
+      },
+      "tags": [
+        "ChatGpt 菲区"
+      ],
+      "price_amount": "3380.00",
+      "effective_price_amount": "3380.00",
+      "stock_status": "in_stock",
+      "stock_quantity_hidden": false,
+      "is_sold_out": false,
+      "stock_display": "exact",
+      "skus": [
+        {
+          "id": 33,
+          "sku_code": "QZWEB-56",
+          "spec_values": {},
+          "price_amount": "3380.00",
+          "manual_stock_total": 0,
+          "manual_stock_sold": 0,
+          "auto_stock_available": 9997,
+          "upstream_stock": 9997,
+          "stock_status": "in_stock",
+          "stock_display_mode": "exact",
+          "stock_display": "exact",
+          "stock_quantity_hidden": false,
+          "is_sold_out": false,
+          "is_active": true,
+          "effective_price_amount": "3380.00"
+        }
+      ]
+    },
+    {
+      "id": 35,
+      "slug": "chatgpt-pro-500-egypt",
+      "title": {
+        "zh-CN": "ChatGPT Pro 500美金 兑换码｜埃及｜自动发码"
+      },
+      "tags": [
+        "ChatGPT埃及"
+      ],
+      "price_amount": "3250.00",
+      "effective_price_amount": "3250.00",
+      "stock_status": "in_stock",
+      "stock_quantity_hidden": false,
+      "is_sold_out": false,
+      "stock_display": "exact",
+      "skus": [
+        {
+          "id": 35,
+          "sku_code": "QZWEB-58",
+          "spec_values": {},
+          "price_amount": "3250.00",
+          "manual_stock_total": 0,
+          "manual_stock_sold": 0,
+          "auto_stock_available": 9983,
+          "upstream_stock": 9983,
+          "stock_status": "in_stock",
+          "stock_display_mode": "exact",
+          "stock_display": "exact",
+          "stock_quantity_hidden": false,
+          "is_sold_out": false,
+          "is_active": true,
+          "effective_price_amount": "3250.00"
+        }
+      ]
+    },
+    {
+      "id": 37,
+      "slug": "chatgpt-pro-100-egypt",
+      "title": {
+        "zh-CN": "ChatGPT Pro 100美金 兑换码｜埃及｜自动发码"
+      },
+      "tags": [
+        "ChatGPT埃及"
+      ],
+      "price_amount": "680.00",
+      "effective_price_amount": "680.00",
+      "stock_status": "in_stock",
+      "stock_quantity_hidden": false,
+      "is_sold_out": false,
+      "stock_display": "exact",
+      "skus": [
+        {
+          "id": 37,
+          "sku_code": "QZWEB-57",
+          "spec_values": {},
+          "price_amount": "680.00",
+          "manual_stock_total": 0,
+          "manual_stock_sold": 0,
+          "auto_stock_available": 9725,
+          "upstream_stock": 9725,
+          "stock_status": "in_stock",
+          "stock_display_mode": "exact",
+          "stock_display": "exact",
+          "stock_quantity_hidden": false,
+          "is_sold_out": false,
+          "is_active": true,
+          "effective_price_amount": "680.00"
+        }
+      ]
+    },
+    {
+      "id": 40,
+      "slug": "gemini-pro-18m-warranty",
+      "title": {
+        "zh-CN": "预售｜Gemini Pro 18 个月｜直充自有账号｜一个月质保"
+      },
+      "tags": [
+        "Gemini"
+      ],
+      "price_amount": "28.00",
+      "effective_price_amount": "28.00",
+      "stock_status": "out_of_stock",
+      "stock_quantity_hidden": true,
+      "is_sold_out": true,
+      "stock_display": "out_of_stock",
+      "skus": [
+        {
+          "id": 40,
+          "sku_code": "QZWEB-52",
+          "spec_values": {
+            "套餐": "预售【质保一个月】Gemini Pro18个月"
+          },
+          "price_amount": "28.00",
+          "manual_stock_total": 0,
+          "manual_stock_sold": 0,
+          "auto_stock_available": 0,
+          "upstream_stock": 0,
+          "stock_status": "out_of_stock",
+          "stock_display_mode": "status",
+          "stock_display": "out_of_stock",
+          "stock_quantity_hidden": true,
+          "is_sold_out": true,
+          "is_active": true,
+          "effective_price_amount": "28.00"
+        }
+      ]
+    },
+    {
+      "id": 41,
+      "slug": "gemini-pro-18m-no-warranty",
+      "title": {
+        "zh-CN": "预售｜Gemini Pro 18 个月｜直充自有账号｜无持续订阅质保"
+      },
+      "tags": [
+        "Gemini"
+      ],
+      "price_amount": "21.00",
+      "effective_price_amount": "21.00",
+      "stock_status": "out_of_stock",
+      "stock_quantity_hidden": true,
+      "is_sold_out": true,
+      "stock_display": "out_of_stock",
+      "skus": [
+        {
+          "id": 41,
+          "sku_code": "QZWEB-53",
+          "spec_values": {
+            "套餐": "预售【无质保】Gemini Pro18个月"
+          },
+          "price_amount": "21.00",
+          "manual_stock_total": 0,
+          "manual_stock_sold": 0,
+          "auto_stock_available": 0,
+          "upstream_stock": 0,
+          "stock_status": "out_of_stock",
+          "stock_display_mode": "status",
+          "stock_display": "out_of_stock",
+          "stock_quantity_hidden": true,
+          "is_sold_out": true,
+          "is_active": true,
+          "effective_price_amount": "21.00"
+        }
+      ]
+    },
+    {
+      "id": 45,
+      "slug": "chatgpt-pro-100-ph",
+      "title": {
+        "zh-CN": "ChatGPT Pro 100美金 兑换码｜菲区｜自动发码"
+      },
+      "tags": [
+        "ChatGpt 菲区"
+      ],
+      "price_amount": "700.00",
+      "effective_price_amount": "700.00",
+      "stock_status": "in_stock",
+      "stock_quantity_hidden": false,
+      "is_sold_out": false,
+      "stock_display": "exact",
+      "skus": [
+        {
+          "id": 45,
+          "sku_code": "QZWEB-6",
+          "spec_values": {},
+          "price_amount": "700.00",
+          "manual_stock_total": 0,
+          "manual_stock_sold": 0,
+          "auto_stock_available": 9909,
+          "upstream_stock": 9909,
+          "stock_status": "in_stock",
+          "stock_display_mode": "exact",
+          "stock_display": "exact",
+          "stock_quantity_hidden": false,
+          "is_sold_out": false,
+          "is_active": true,
+          "effective_price_amount": "700.00"
+        }
+      ]
+    },
+    {
+      "id": 54,
+      "slug": "chatgpt-pro-200-manual",
+      "title": {
+        "zh-CN": "ChatGPT Pro 200美金｜代充｜人工发货"
+      },
+      "tags": [
+        "86GameStore"
+      ],
+      "price_amount": "1478.00",
+      "effective_price_amount": "1478.00",
+      "stock_status": "in_stock",
+      "stock_quantity_hidden": false,
+      "is_sold_out": false,
+      "stock_display": "exact",
+      "skus": [
+        {
+          "id": 54,
+          "sku_code": "86gamestore-82",
+          "spec_values": {},
+          "price_amount": "1478.00",
+          "manual_stock_total": 488,
+          "manual_stock_sold": 0,
+          "auto_stock_available": 0,
+          "upstream_stock": 0,
+          "stock_status": "in_stock",
+          "stock_display_mode": "exact",
+          "stock_display": "exact",
+          "stock_quantity_hidden": false,
+          "is_sold_out": false,
+          "is_active": true,
+          "effective_price_amount": "1478.00"
+        }
+      ]
+    },
+    {
+      "id": 55,
+      "slug": "chatgpt-pro-100-manual",
+      "title": {
+        "zh-CN": "ChatGPT Pro 100美金｜代充｜人工发货"
+      },
+      "tags": [
+        "86GameStore"
+      ],
+      "price_amount": "680.00",
+      "effective_price_amount": "680.00",
+      "stock_status": "in_stock",
+      "stock_quantity_hidden": false,
+      "is_sold_out": false,
+      "stock_display": "exact",
+      "skus": [
+        {
+          "id": 55,
+          "sku_code": "86gamestore-83",
+          "spec_values": {},
+          "price_amount": "680.00",
+          "manual_stock_total": 41,
+          "manual_stock_sold": 0,
+          "auto_stock_available": 0,
+          "upstream_stock": 0,
+          "stock_status": "in_stock",
+          "stock_display_mode": "exact",
+          "stock_display": "exact",
+          "stock_quantity_hidden": false,
+          "is_sold_out": false,
+          "is_active": true,
+          "effective_price_amount": "680.00"
+        }
+      ]
+    },
+    {
+      "id": 57,
+      "slug": "chatgpt-plus-manual",
+      "title": {
+        "zh-CN": "ChatGPT Plus｜代充｜人工发货"
+      },
+      "tags": [
+        "86GameStore"
+      ],
+      "price_amount": "145.00",
+      "effective_price_amount": "145.00",
+      "stock_status": "in_stock",
+      "stock_quantity_hidden": false,
+      "is_sold_out": false,
+      "stock_display": "exact",
+      "skus": [
+        {
+          "id": 57,
+          "sku_code": "86gamestore-88",
+          "spec_values": {},
+          "price_amount": "145.00",
+          "manual_stock_total": 171,
+          "manual_stock_sold": 0,
+          "auto_stock_available": 0,
+          "upstream_stock": 0,
+          "stock_status": "in_stock",
+          "stock_display_mode": "exact",
+          "stock_display": "exact",
+          "stock_quantity_hidden": false,
+          "is_sold_out": false,
+          "is_active": true,
+          "effective_price_amount": "145.00"
+        }
+      ]
+    },
+    {
+      "id": 59,
+      "slug": "chatgpt-go-manual",
+      "title": {
+        "zh-CN": "ChatGPT Go｜代充｜人工发货"
+      },
+      "tags": [
+        "86GameStore"
+      ],
+      "price_amount": "39.99",
+      "effective_price_amount": "39.99",
+      "stock_status": "in_stock",
+      "stock_quantity_hidden": false,
+      "is_sold_out": false,
+      "stock_display": "exact",
+      "skus": [
+        {
+          "id": 59,
+          "sku_code": "86gamestore-10010",
+          "spec_values": {},
+          "price_amount": "39.99",
+          "manual_stock_total": 375,
+          "manual_stock_sold": 1,
+          "auto_stock_available": 0,
+          "upstream_stock": 0,
+          "stock_status": "in_stock",
+          "stock_display_mode": "exact",
+          "stock_display": "exact",
+          "stock_quantity_hidden": false,
+          "is_sold_out": false,
+          "is_active": true,
+          "effective_price_amount": "39.99"
+        }
+      ]
+    },
+    {
+      "id": 60,
+      "slug": "telegram-premium-3m",
+      "title": {
+        "zh-CN": "Telegram Premium 3 个月｜礼品激活链接｜人工发货"
+      },
+      "tags": [
+        "86GameStore"
+      ],
+      "price_amount": "115.00",
+      "effective_price_amount": "115.00",
+      "stock_status": "in_stock",
+      "stock_quantity_hidden": false,
+      "is_sold_out": false,
+      "stock_display": "exact",
+      "skus": [
+        {
+          "id": 60,
+          "sku_code": "86gamestore-10004",
+          "spec_values": {},
+          "price_amount": "115.00",
+          "manual_stock_total": 10,
+          "manual_stock_sold": 0,
+          "auto_stock_available": 0,
+          "upstream_stock": 0,
+          "stock_status": "in_stock",
+          "stock_display_mode": "exact",
+          "stock_display": "exact",
+          "stock_quantity_hidden": false,
+          "is_sold_out": false,
+          "is_active": true,
+          "effective_price_amount": "115.00"
+        }
+      ]
+    },
+    {
+      "id": 61,
+      "slug": "telegram-premium-6m",
+      "title": {
+        "zh-CN": "Telegram Premium 6 个月｜礼品激活链接｜人工发货"
+      },
+      "tags": [
+        "86GameStore"
+      ],
+      "price_amount": "158.00",
+      "effective_price_amount": "158.00",
+      "stock_status": "low_stock",
+      "stock_quantity_hidden": false,
+      "is_sold_out": false,
+      "stock_display": "exact",
+      "skus": [
+        {
+          "id": 61,
+          "sku_code": "86gamestore-10005",
+          "spec_values": {},
+          "price_amount": "158.00",
+          "manual_stock_total": 3,
+          "manual_stock_sold": 0,
+          "auto_stock_available": 0,
+          "upstream_stock": 0,
+          "stock_status": "low_stock",
+          "stock_display_mode": "exact",
+          "stock_display": "exact",
+          "stock_quantity_hidden": false,
+          "is_sold_out": false,
+          "is_active": true,
+          "effective_price_amount": "158.00"
+        }
+      ]
+    },
+    {
+      "id": 62,
+      "slug": "telegram-premium-12m",
+      "title": {
+        "zh-CN": "Telegram Premium 12 个月｜礼品激活链接｜人工发货"
+      },
+      "tags": [
+        "86GameStore"
+      ],
+      "price_amount": "278.00",
+      "effective_price_amount": "278.00",
+      "stock_status": "low_stock",
+      "stock_quantity_hidden": false,
+      "is_sold_out": false,
+      "stock_display": "exact",
+      "skus": [
+        {
+          "id": 62,
+          "sku_code": "86gamestore-10006",
+          "spec_values": {},
+          "price_amount": "278.00",
+          "manual_stock_total": 3,
+          "manual_stock_sold": 0,
+          "auto_stock_available": 0,
+          "upstream_stock": 0,
+          "stock_status": "low_stock",
+          "stock_display_mode": "exact",
+          "stock_display": "exact",
+          "stock_quantity_hidden": false,
+          "is_sold_out": false,
+          "is_active": true,
+          "effective_price_amount": "278.00"
+        }
+      ]
+    },
+    {
+      "id": 66,
+      "slug": "ellaix-grok-plus-monthly",
+      "title": {
+        "zh-CN": "Grok Plus 月付兑换码"
+      },
+      "tags": [
+        "Grok",
+        "Plus",
+        "月付",
+        "自动发码"
+      ],
+      "price_amount": "88.00",
+      "effective_price_amount": "88.00",
+      "stock_status": "out_of_stock",
+      "stock_quantity_hidden": false,
+      "is_sold_out": true,
+      "stock_display": "exact",
+      "skus": [
+        {
+          "id": 66,
+          "sku_code": "ELLAIX-100",
+          "spec_values": {},
+          "price_amount": "88.00",
+          "manual_stock_total": 0,
+          "manual_stock_sold": 0,
+          "auto_stock_available": 0,
+          "upstream_stock": 0,
+          "stock_status": "out_of_stock",
+          "stock_display_mode": "exact",
+          "stock_display": "exact",
+          "stock_quantity_hidden": false,
+          "is_sold_out": true,
+          "is_active": true,
+          "effective_price_amount": "88.00"
+        }
+      ]
+    },
+    {
+      "id": 67,
+      "slug": "ellaix-grok-plus-yearly",
+      "title": {
+        "zh-CN": "Grok Plus 年付兑换码"
+      },
+      "tags": [
+        "Grok",
+        "Plus",
+        "年付",
+        "自动发码"
+      ],
+      "price_amount": "658.00",
+      "effective_price_amount": "658.00",
+      "stock_status": "in_stock",
+      "stock_quantity_hidden": false,
+      "is_sold_out": false,
+      "stock_display": "exact",
+      "skus": [
+        {
+          "id": 67,
+          "sku_code": "ELLAIX-101",
+          "spec_values": {},
+          "price_amount": "658.00",
+          "manual_stock_total": 0,
+          "manual_stock_sold": 0,
+          "auto_stock_available": 10000,
+          "upstream_stock": 10000,
+          "stock_status": "in_stock",
+          "stock_display_mode": "exact",
+          "stock_display": "exact",
+          "stock_quantity_hidden": false,
+          "is_sold_out": false,
+          "is_active": true,
+          "effective_price_amount": "658.00"
+        }
+      ]
+    },
+    {
+      "id": 68,
+      "slug": "ellaix-grok-premium-monthly",
+      "title": {
+        "zh-CN": "Grok Premium 月付兑换码"
+      },
+      "tags": [
+        "Grok",
+        "Premium",
+        "月付",
+        "自动发码"
+      ],
+      "price_amount": "288.00",
+      "effective_price_amount": "288.00",
+      "stock_status": "in_stock",
+      "stock_quantity_hidden": false,
+      "is_sold_out": false,
+      "stock_display": "exact",
+      "skus": [
+        {
+          "id": 68,
+          "sku_code": "ELLAIX-102",
+          "spec_values": {},
+          "price_amount": "288.00",
+          "manual_stock_total": 0,
+          "manual_stock_sold": 0,
+          "auto_stock_available": 9992,
+          "upstream_stock": 9992,
+          "stock_status": "in_stock",
+          "stock_display_mode": "exact",
+          "stock_display": "exact",
+          "stock_quantity_hidden": false,
+          "is_sold_out": false,
+          "is_active": true,
+          "effective_price_amount": "288.00"
+        }
+      ]
+    },
+    {
+      "id": 69,
+      "slug": "ellaix-grok-premium-yearly",
+      "title": {
+        "zh-CN": "Grok Premium 年付兑换码"
+      },
+      "tags": [
+        "Grok",
+        "Premium",
+        "年付",
+        "自动发码"
+      ],
+      "price_amount": "2348.00",
+      "effective_price_amount": "2348.00",
+      "stock_status": "in_stock",
+      "stock_quantity_hidden": false,
+      "is_sold_out": false,
+      "stock_display": "exact",
+      "skus": [
+        {
+          "id": 69,
+          "sku_code": "ELLAIX-103",
+          "spec_values": {},
+          "price_amount": "2348.00",
+          "manual_stock_total": 0,
+          "manual_stock_sold": 0,
+          "auto_stock_available": 10000,
+          "upstream_stock": 10000,
+          "stock_status": "in_stock",
+          "stock_display_mode": "exact",
+          "stock_display": "exact",
+          "stock_quantity_hidden": false,
+          "is_sold_out": false,
+          "is_active": true,
+          "effective_price_amount": "2348.00"
+        }
+      ]
+    },
+    {
+      "id": 70,
+      "slug": "ellaix-grok-super-monthly",
+      "title": {
+        "zh-CN": "Grok Super 月付兑换码"
+      },
+      "tags": [
+        "Grok",
+        "Super",
+        "月付",
+        "自动发码"
+      ],
+      "price_amount": "748.00",
+      "effective_price_amount": "748.00",
+      "stock_status": "in_stock",
+      "stock_quantity_hidden": false,
+      "is_sold_out": false,
+      "stock_display": "exact",
+      "skus": [
+        {
+          "id": 70,
+          "sku_code": "ELLAIX-104",
+          "spec_values": {},
+          "price_amount": "748.00",
+          "manual_stock_total": 0,
+          "manual_stock_sold": 0,
+          "auto_stock_available": 9997,
+          "upstream_stock": 9997,
+          "stock_status": "in_stock",
+          "stock_display_mode": "exact",
+          "stock_display": "exact",
+          "stock_quantity_hidden": false,
+          "is_sold_out": false,
+          "is_active": true,
+          "effective_price_amount": "748.00"
+        }
+      ]
+    },
+    {
+      "id": 71,
+      "slug": "ellaix-grok-super-yearly",
+      "title": {
+        "zh-CN": "Grok Super 年付兑换码"
+      },
+      "tags": [
+        "Grok",
+        "Super",
+        "年付",
+        "自动发码"
+      ],
+      "price_amount": "7288.00",
+      "effective_price_amount": "7288.00",
+      "stock_status": "in_stock",
+      "stock_quantity_hidden": false,
+      "is_sold_out": false,
+      "stock_display": "exact",
+      "skus": [
+        {
+          "id": 71,
+          "sku_code": "ELLAIX-105",
+          "spec_values": {},
+          "price_amount": "7288.00",
+          "manual_stock_total": 0,
+          "manual_stock_sold": 0,
+          "auto_stock_available": 10000,
+          "upstream_stock": 10000,
+          "stock_status": "in_stock",
+          "stock_display_mode": "exact",
+          "stock_display": "exact",
+          "stock_quantity_hidden": false,
+          "is_sold_out": false,
+          "is_active": true,
+          "effective_price_amount": "7288.00"
+        }
+      ]
+    },
+    {
+      "id": 72,
+      "slug": "ellaix-grok-ultra-monthly",
+      "title": {
+        "zh-CN": "Grok Ultra 月付兑换码"
+      },
+      "tags": [
+        "Grok",
+        "Ultra",
+        "月付",
+        "自动发码"
+      ],
+      "price_amount": "1668.00",
+      "effective_price_amount": "1668.00",
+      "stock_status": "in_stock",
+      "stock_quantity_hidden": false,
+      "is_sold_out": false,
+      "stock_display": "exact",
+      "skus": [
+        {
+          "id": 72,
+          "sku_code": "ELLAIX-106",
+          "spec_values": {},
+          "price_amount": "1668.00",
+          "manual_stock_total": 0,
+          "manual_stock_sold": 0,
+          "auto_stock_available": 9999,
+          "upstream_stock": 9999,
+          "stock_status": "in_stock",
+          "stock_display_mode": "exact",
+          "stock_display": "exact",
+          "stock_quantity_hidden": false,
+          "is_sold_out": false,
+          "is_active": true,
+          "effective_price_amount": "1668.00"
+        }
+      ]
+    },
+    {
+      "id": 73,
+      "slug": "ellaix-grok-ultra-yearly",
+      "title": {
+        "zh-CN": "Grok Ultra 年付兑换码"
+      },
+      "tags": [
+        "Grok",
+        "Ultra",
+        "年付",
+        "自动发码"
+      ],
+      "price_amount": "15348.00",
+      "effective_price_amount": "15348.00",
+      "stock_status": "in_stock",
+      "stock_quantity_hidden": false,
+      "is_sold_out": false,
+      "stock_display": "exact",
+      "skus": [
+        {
+          "id": 73,
+          "sku_code": "ELLAIX-107",
+          "spec_values": {},
+          "price_amount": "15348.00",
+          "manual_stock_total": 0,
+          "manual_stock_sold": 0,
+          "auto_stock_available": 10000,
+          "upstream_stock": 10000,
+          "stock_status": "in_stock",
+          "stock_display_mode": "exact",
+          "stock_display": "exact",
+          "stock_quantity_hidden": false,
+          "is_sold_out": false,
+          "is_active": true,
+          "effective_price_amount": "15348.00"
+        }
+      ]
+    }
+  ],
+  "tagged_products": [
+    {
+      "id": 30,
+      "slug": "chatgpt-plus-code",
+      "title": {
+        "zh-CN": "ChatGPT Plus 兑换码｜自动发码"
+      },
+      "tags": [
+        "ChatGpt 菲区"
+      ],
+      "price_amount": "130.00",
+      "effective_price_amount": "130.00",
+      "stock_status": "in_stock",
+      "stock_quantity_hidden": false,
+      "is_sold_out": false,
+      "stock_display": "exact",
+      "skus": [
+        {
+          "id": 30,
+          "sku_code": "QZWEB-5",
+          "spec_values": {},
+          "price_amount": "130.00",
+          "manual_stock_total": 0,
+          "manual_stock_sold": 0,
+          "auto_stock_available": 8513,
+          "upstream_stock": 8513,
+          "stock_status": "in_stock",
+          "stock_display_mode": "exact",
+          "stock_display": "exact",
+          "stock_quantity_hidden": false,
+          "is_sold_out": false,
+          "is_active": true,
+          "effective_price_amount": "130.00"
+        }
+      ]
+    },
+    {
+      "id": 31,
+      "slug": "chatgpt-pro-200-ph",
+      "title": {
+        "zh-CN": "ChatGPT Pro 200美金 兑换码｜菲区｜自动发码"
+      },
+      "tags": [
+        "ChatGpt 菲区"
+      ],
+      "price_amount": "1200.00",
+      "effective_price_amount": "1200.00",
+      "stock_status": "in_stock",
+      "stock_quantity_hidden": false,
+      "is_sold_out": false,
+      "stock_display": "exact",
+      "skus": [
+        {
+          "id": 31,
+          "sku_code": "QZWEB-55",
+          "spec_values": {},
+          "price_amount": "1200.00",
+          "manual_stock_total": 0,
+          "manual_stock_sold": 0,
+          "auto_stock_available": 9578,
+          "upstream_stock": 9578,
+          "stock_status": "in_stock",
+          "stock_display_mode": "exact",
+          "stock_display": "exact",
+          "stock_quantity_hidden": false,
+          "is_sold_out": false,
+          "is_active": true,
+          "effective_price_amount": "1200.00"
+        }
+      ]
+    },
+    {
+      "id": 32,
+      "slug": "chatgpt-pro-200-renew-ph",
+      "title": {
+        "zh-CN": "ChatGPT Pro 200美金 续费绑卡｜菲区｜自动发码"
+      },
+      "tags": [
+        "ChatGpt 菲区"
+      ],
+      "price_amount": "1200.00",
+      "effective_price_amount": "1200.00",
+      "stock_status": "in_stock",
+      "stock_quantity_hidden": false,
+      "is_sold_out": false,
+      "stock_display": "exact",
+      "skus": [
+        {
+          "id": 32,
+          "sku_code": "QZWEB-7",
+          "spec_values": {},
+          "price_amount": "1200.00",
+          "manual_stock_total": 0,
+          "manual_stock_sold": 0,
+          "auto_stock_available": 9949,
+          "upstream_stock": 9949,
+          "stock_status": "in_stock",
+          "stock_display_mode": "exact",
+          "stock_display": "exact",
+          "stock_quantity_hidden": false,
+          "is_sold_out": false,
+          "is_active": true,
+          "effective_price_amount": "1200.00"
+        }
+      ]
+    },
+    {
+      "id": 33,
+      "slug": "chatgpt-pro-500-ph",
+      "title": {
+        "zh-CN": "ChatGPT Pro 500美金 兑换码｜菲区｜自动发码"
+      },
+      "tags": [
+        "ChatGpt 菲区"
+      ],
+      "price_amount": "3380.00",
+      "effective_price_amount": "3380.00",
+      "stock_status": "in_stock",
+      "stock_quantity_hidden": false,
+      "is_sold_out": false,
+      "stock_display": "exact",
+      "skus": [
+        {
+          "id": 33,
+          "sku_code": "QZWEB-56",
+          "spec_values": {},
+          "price_amount": "3380.00",
+          "manual_stock_total": 0,
+          "manual_stock_sold": 0,
+          "auto_stock_available": 9997,
+          "upstream_stock": 9997,
+          "stock_status": "in_stock",
+          "stock_display_mode": "exact",
+          "stock_display": "exact",
+          "stock_quantity_hidden": false,
+          "is_sold_out": false,
+          "is_active": true,
+          "effective_price_amount": "3380.00"
+        }
+      ]
+    },
+    {
+      "id": 45,
+      "slug": "chatgpt-pro-100-ph",
+      "title": {
+        "zh-CN": "ChatGPT Pro 100美金 兑换码｜菲区｜自动发码"
+      },
+      "tags": [
+        "ChatGpt 菲区"
+      ],
+      "price_amount": "700.00",
+      "effective_price_amount": "700.00",
+      "stock_status": "in_stock",
+      "stock_quantity_hidden": false,
+      "is_sold_out": false,
+      "stock_display": "exact",
+      "skus": [
+        {
+          "id": 45,
+          "sku_code": "QZWEB-6",
+          "spec_values": {},
+          "price_amount": "700.00",
+          "manual_stock_total": 0,
+          "manual_stock_sold": 0,
+          "auto_stock_available": 9909,
+          "upstream_stock": 9909,
+          "stock_status": "in_stock",
+          "stock_display_mode": "exact",
+          "stock_display": "exact",
+          "stock_quantity_hidden": false,
+          "is_sold_out": false,
+          "is_active": true,
+          "effective_price_amount": "700.00"
+        }
+      ]
+    }
+  ],
+  "plus": {
+    "id": 30,
+    "slug": "chatgpt-plus-code",
+    "title": {
+      "zh-CN": "ChatGPT Plus 兑换码｜自动发码"
+    },
+    "tags": [
+      "ChatGpt 菲区"
+    ],
+    "description": {
+      "zh-CN": "ChatGPT Plus 自助充值至自己的账号，付款成功后自动发放本站 PAIPLUS 卡密。适用账号须通过预检，领取后按订单指引完成兑换。"
+    },
+    "content": {
+      "zh-CN": "<p>本商品由 π星卡社提供第三方服务，与 OpenAI 无隶属关系。ChatGPT、Plus 等名称用于说明服务适用对象，不表示官方授权或合作。</p><h3>商品与交付</h3><p>ChatGPT Plus 兑换码，充值至客户自己的账号，不是成品号。付款成功后自动发码。</p><h3>适用账号</h3><p>适用于从未开通过会员的新账号，或原有订阅已到期、掉订阅至少 10 分钟的账号。最终是否符合条件以兑换预检结果为准。</p><h3>订阅期限</h3><p>订阅期限为一个月；具体起止时间以实际开通记录为准。</p><h3>兑换说明</h3><p>本商品发放本站 PAIPLUS 卡密，请在订单交付说明中打开本站兑换中心。请按兑换页面的步骤操作，核对目标账号及套餐后提交。</p><p>收到卡密不代表订阅已经开通，请在兑换页面查询处理结果。</p><h3>订阅质保</h3><p>质保范围为本次订阅权益，不包含账号封禁。</p><p>订阅有效期内发生掉订阅，可申请退还未使用部分。退款以本笔订单实际付款金额为基数，按实际订阅总时长和剩余时长计算。剩余时长从实际掉订阅时间起算，不从联系客服时间起算，也不固定按 30 天折算。</p><p>应退金额＝本笔订单实付金额 × 实际掉订阅时的剩余订阅时长 ÷ 实际订阅总时长。</p><p>也可选择补差价重新开通一个月：应补差价＝重新开通时的商品售价－本次应退的剩余金额。此方式需要客户补差价，并非免费补开。</p><h3>退款金额核算与材料</h3><p>退款按实际订阅起止时间与实际掉订阅时间核算，不按固定 30 天计算；最终金额四舍五入保留两位小数。请提供本站订单号和掉订阅截图，由客服核实时间、资格和金额。</p><p>可按重新开通时售价减去应退剩余金额，补差价重新开通一个月；不是免费补开。特殊差额情况请联系客服核实。</p><h3>未使用卡密退款</h3><p>卡密已发出但尚未兑换，可以联系客服申请退款；须由客服核实卡密有效且未使用，销毁后再办理退款。</p><h3>账号核对</h3><p>请在提交前核对目标账号。客户自行填错 UID 或选错账号且充值成功后，不支持因此退款或转到其他账号，需自行承担责任；是否充值成功及责任归属由客服核实。本条不取消本商品适用的订阅质保。</p><h3>退款方式与处理时间</h3><p>应退金额按适用规则核算；不保证退款方式、渠道或原路退回，微信、支付宝等由客户与客服协商。没有固定退款完成或到账时效，以客服告知为准。</p><h3>异常处理与客服时间</h3><p>兑换失败、卡密无效或提示已使用，请提供本站订单号和报错截图。已付款但订单仍显示未付款，请提供订单号和支付成功截图。由人工客服核实处理，不承诺直接补发或退款。</p><p>兑换仍在处理中或权益未到账时，请按兑换页面提示操作；出现异常请提供订单号和截图联系客服，没有统一等待或到账时限。</p><p>人工客服在线时间：北京时间 07:00—24:00，不保证即时回复。请勿在客服 Agent 对话中发送密码、登录 token 或完整卡密。</p><h3>需要帮助</h3><p>请提供本站订单号并描述遇到的问题，勿向客服发送账号密码。</p><p>微信：Cqz0924ttxk；QQ：1669268759；Telegram：@czq_piestar。</p><h3>购买前常见问题</h3><p><strong>Plus 还没到期，可以用这款兑换码吗？</strong>本商品需满足上述适用账号条件，最终以兑换预检为准。未到期账号先阅读<a href=\"/blog/chatgpt-plus-renewal-rules\">到期续费与覆盖充值的区别</a>，不要直接按可覆盖商品的规则购买。</p><p><strong>自动发码就是自动开通了吗？</strong>不是。领取本站 PAIPLUS 卡密后，还要按订单交付指引完成兑换并核对账号状态。详见<a href=\"/blog/chatgpt-plus-code-guide\">兑换码领取与使用教程</a>。</p><p><strong>不知道该选哪种方式？</strong>可先阅读<a href=\"/blog/chatgpt-payment-methods\">ChatGPT 充值方式与购买检查清单</a>，再根据账号条件选择商品。</p>"
+    },
+    "seo_meta": {
+      "description": {
+        "en-US": "",
+        "zh-CN": "ChatGPT Plus 自助充值服务，付款后自动交付本站 PAIPLUS 卡密。查看适用账号、兑换步骤与订阅售后条件；收到卡密后仍需完成激活。π星卡社为独立第三方服务平台。",
+        "zh-TW": ""
+      },
+      "keywords": {
+        "en-US": "",
+        "zh-CN": "ChatGPT Plus充值兑换码,ChatGPT Plus自助充值,π星卡社",
+        "zh-TW": ""
+      },
+      "title": {
+        "zh-CN": "ChatGPT Plus 充值兑换码｜自助激活与购买须知"
+      }
+    },
+    "category": {
+      "id": 9,
+      "parent_id": 0,
+      "slug": "gpt-recharge",
+      "name": {
+        "en-US": "GPT",
+        "zh-CN": "GPT（卡冲）",
+        "zh-TW": "GPT"
+      },
+      "icon": "/catalog-products/qzweb/categories/4-7b19d7bf095bddd5574df0d27301dda5.png",
+      "sort_order": 1000,
+      "slug_aliases": [
+        "qzweb-category-4"
+      ]
+    }
+  },
+  "status": "passed",
+  "catalog_changes": [
+    {
+      "id": 55,
+      "before": {
+        "id": 55,
+        "slug": "chatgpt-pro-100-manual",
+        "title": {
+          "zh-CN": "ChatGPT Pro 100美金｜代充｜人工发货"
+        },
+        "tags": [
+          "86GameStore"
+        ],
+        "price_amount": "680.00",
+        "effective_price_amount": "680.00",
+        "stock_status": "in_stock",
+        "stock_quantity_hidden": false,
+        "is_sold_out": false,
+        "stock_display": "exact",
+        "skus": [
+          {
+            "id": 55,
+            "sku_code": "86gamestore-83",
+            "spec_values": {},
+            "price_amount": "680.00",
+            "manual_stock_total": 42,
+            "manual_stock_sold": 0,
+            "auto_stock_available": 0,
+            "upstream_stock": 0,
+            "stock_status": "in_stock",
+            "stock_display_mode": "exact",
+            "stock_display": "exact",
+            "stock_quantity_hidden": false,
+            "is_sold_out": false,
+            "is_active": true,
+            "effective_price_amount": "680.00"
+          }
+        ]
+      },
+      "after": {
+        "id": 55,
+        "slug": "chatgpt-pro-100-manual",
+        "title": {
+          "zh-CN": "ChatGPT Pro 100美金｜代充｜人工发货"
+        },
+        "tags": [
+          "86GameStore"
+        ],
+        "price_amount": "680.00",
+        "effective_price_amount": "680.00",
+        "stock_status": "in_stock",
+        "stock_quantity_hidden": false,
+        "is_sold_out": false,
+        "stock_display": "exact",
+        "skus": [
+          {
+            "id": 55,
+            "sku_code": "86gamestore-83",
+            "spec_values": {},
+            "price_amount": "680.00",
+            "manual_stock_total": 41,
+            "manual_stock_sold": 0,
+            "auto_stock_available": 0,
+            "upstream_stock": 0,
+            "stock_status": "in_stock",
+            "stock_display_mode": "exact",
+            "stock_display": "exact",
+            "stock_quantity_hidden": false,
+            "is_sold_out": false,
+            "is_active": true,
+            "effective_price_amount": "680.00"
+          }
+        ]
+      }
+    },
+    {
+      "id": 57,
+      "before": {
+        "id": 57,
+        "slug": "chatgpt-plus-manual",
+        "title": {
+          "zh-CN": "ChatGPT Plus｜代充｜人工发货"
+        },
+        "tags": [
+          "86GameStore"
+        ],
+        "price_amount": "145.00",
+        "effective_price_amount": "145.00",
+        "stock_status": "in_stock",
+        "stock_quantity_hidden": false,
+        "is_sold_out": false,
+        "stock_display": "exact",
+        "skus": [
+          {
+            "id": 57,
+            "sku_code": "86gamestore-88",
+            "spec_values": {},
+            "price_amount": "145.00",
+            "manual_stock_total": 172,
+            "manual_stock_sold": 0,
+            "auto_stock_available": 0,
+            "upstream_stock": 0,
+            "stock_status": "in_stock",
+            "stock_display_mode": "exact",
+            "stock_display": "exact",
+            "stock_quantity_hidden": false,
+            "is_sold_out": false,
+            "is_active": true,
+            "effective_price_amount": "145.00"
+          }
+        ]
+      },
+      "after": {
+        "id": 57,
+        "slug": "chatgpt-plus-manual",
+        "title": {
+          "zh-CN": "ChatGPT Plus｜代充｜人工发货"
+        },
+        "tags": [
+          "86GameStore"
+        ],
+        "price_amount": "145.00",
+        "effective_price_amount": "145.00",
+        "stock_status": "in_stock",
+        "stock_quantity_hidden": false,
+        "is_sold_out": false,
+        "stock_display": "exact",
+        "skus": [
+          {
+            "id": 57,
+            "sku_code": "86gamestore-88",
+            "spec_values": {},
+            "price_amount": "145.00",
+            "manual_stock_total": 171,
+            "manual_stock_sold": 0,
+            "auto_stock_available": 0,
+            "upstream_stock": 0,
+            "stock_status": "in_stock",
+            "stock_display_mode": "exact",
+            "stock_display": "exact",
+            "stock_quantity_hidden": false,
+            "is_sold_out": false,
+            "is_active": true,
+            "effective_price_amount": "145.00"
+          }
+        ]
+      }
+    }
+  ]
+}
