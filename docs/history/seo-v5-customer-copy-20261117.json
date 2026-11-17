@@ -1,0 +1,170 @@
+{
+  "recorded_at": "2026-11-17T02:30:12.999395+00:00",
+  "site": "https://www.qzweb.cloud",
+  "status": "production_copy_fixed_and_verified",
+  "manifest_sha256": "e7e45490cc02a1b14538b5110c53bd8e656ad3bbb6b9f2dd051ce84a2964e94f",
+  "changed_products": 8,
+  "text_replacements": 13,
+  "changed_json_fields": 10,
+  "changed_updated_at_fields": 8,
+  "database_tables_audited": 75,
+  "non_target_values_preserved": true,
+  "binaries_assets_nginx_redeployed": false,
+  "brotli_enabled": false,
+  "runtime_unchanged": true,
+  "incident": {
+    "first_commit_time": "2026-11-17T02:14:06.437597+00:00",
+    "initial_report_serialization_failed": true,
+    "json_blob_to_text_temporarily_prevented_body_reading": true,
+    "storage_type_repaired_at": "2026-11-17T02:19:13.854885+00:00",
+    "storage_fields_repaired": 10,
+    "full_cli_on_original_backup_verified": true,
+    "production_full_apply_repeated": false,
+    "final_report_contains_reversible_blob_values": true
+  },
+  "validation": {
+    "public_checks": 27,
+    "public_status": "passed",
+    "affected_product_count": 8,
+    "list_summary_pages": [
+      "/",
+      "/products",
+      "/categories/gpt-recharge"
+    ],
+    "normal_and_googlebot_full_html_checked": true,
+    "full_api_copy_matches_exact_approved_replacements": true,
+    "sitemap_lastmod": {
+      "/products/telegram-premium-3m": "2026-11-17",
+      "/products/telegram-premium-12m": "2026-11-17",
+      "/products/chatgpt-pro-100-ph": "2026-11-17",
+      "/products/chatgpt-pro-200-ph": "2026-11-17",
+      "/products/chatgpt-pro-500-ph": "2026-11-17",
+      "/products/chatgpt-pro-100-egypt": "2026-11-17",
+      "/products/chatgpt-go-code-egypt": "2026-11-17",
+      "/products/chatgpt-go-manual": "2026-11-17"
+    },
+    "customer_browser": "Go Egypt detail, summary and FAQ rendered correctly",
+    "migration_regression_tests": {
+      "passed": 3,
+      "failed": 0
+    },
+    "source_scope": {
+      "status": "passed",
+      "files": [
+        "docs/catalog/seo-v5/telegram-premium-3m.html",
+        "docs/catalog/seo-v5/telegram-premium-12m.html",
+        "docs/catalog/seo-v5/chatgpt-pro-100-ph.html",
+        "docs/catalog/seo-v5/chatgpt-pro-200-ph.html",
+        "docs/catalog/seo-v5/chatgpt-pro-500-ph.html",
+        "docs/catalog/seo-v5/chatgpt-pro-100-egypt.html",
+        "docs/catalog/seo-v5/chatgpt-go-code-egypt.html",
+        "docs/catalog/seo-v5/chatgpt-go-manual.html",
+        "docs/catalog/seo-v5/copy.json"
+      ],
+      "only_exact_reviewed_text_replacements": true
+    },
+    "initial_failures_retained": [
+      "production report bytes serialization",
+      "production SQLite BLOB type",
+      "Windows test subprocess encoding and SQLite handle cleanup",
+      "source audit repeated identical description text"
+    ]
+  },
+  "search_console": {
+    "sitemap": {
+      "url": "https://www.qzweb.cloud/sitemap.xml",
+      "submitted": "2026-11-17",
+      "ui_result": "已成功提交站点地图",
+      "new_crawl_not_yet_verified": true
+    },
+    "requests": [
+      {
+        "path": "/terms",
+        "previouslyIndexed": true,
+        "request": "accepted",
+        "time": "2026-11-17T02:15:05.189Z"
+      },
+      {
+        "path": "/privacy",
+        "previouslyIndexed": true,
+        "request": "accepted",
+        "time": "2026-11-17T02:19:42.726Z"
+      },
+      {
+        "path": "/blog",
+        "previouslyIndexed": true,
+        "request": "accepted",
+        "time": "2026-11-17T02:23:50.133Z"
+      },
+      {
+        "path": "/notice",
+        "previouslyIndexed": true,
+        "request": "accepted",
+        "time": "2026-11-17T02:24:57.577Z"
+      },
+      {
+        "path": "/about",
+        "previouslyIndexed": true,
+        "request": "accepted",
+        "time": "2026-11-17T02:26:21.948Z"
+      },
+      {
+        "path": "/categories/gemini",
+        "previouslyIndexed": false,
+        "previousReason": "重复网页，用户未选定规范网页",
+        "lastCrawl": "2026-11-16 00:09:27",
+        "oldGoogleCanonical": "https://www.qzweb.cloud/blog",
+        "request": "accepted",
+        "time": "2026-11-17T02:27:59.956Z"
+      },
+      {
+        "path": "/categories/grok",
+        "previouslyIndexed": true,
+        "request": "accepted",
+        "time": "2026-11-17T02:28:48.743Z"
+      },
+      {
+        "path": "/categories/telegram-premium-links",
+        "previouslyIndexed": true,
+        "request": "quota_exceeded",
+        "uiMessage": "抱歉！我们无法处理这项请求，因为您今天已经超出了每日配额。请明天再尝试提交此网址。",
+        "time": "2026-11-17T02:29:40.015Z"
+      }
+    ],
+    "accepted_count": 7,
+    "pending_allowed_urls": [
+      "/categories/telegram-premium-links",
+      "/categories/gpt-overwrite-topup",
+      "/products/telegram-premium-6m",
+      "/products/chatgpt-pro-500-egypt",
+      "/products/chatgpt-pro-200-renew-ph",
+      "/products/chatgpt-pro-100-manual",
+      "/products/chatgpt-pro-200-manual",
+      "/products/gemini-pro-18m-warranty",
+      "/products/gemini-pro-18m-no-warranty"
+    ],
+    "awaiting_user_reinspection_do_not_submit": [
+      "/products/telegram-premium-3m",
+      "/products/telegram-premium-12m",
+      "/products/chatgpt-pro-100-ph",
+      "/products/chatgpt-pro-200-ph",
+      "/products/chatgpt-pro-500-ph",
+      "/products/chatgpt-pro-100-egypt",
+      "/products/chatgpt-go-code-egypt",
+      "/products/chatgpt-go-manual"
+    ],
+    "old_urls_submitted": false,
+    "indexing_or_ranking_not_guaranteed": true
+  },
+  "maintenance_source_committed_or_pushed_at_verification": false,
+  "source_archive": {
+    "branch": "codex/seo-v5-customer-copy-20261117",
+    "base_commit": "71c7357018592eb537fc75b97467152b6ad46730",
+    "files_included": 14,
+    "purpose": "User-authorized source and verification-record archive for Grok review",
+    "merge_main": false,
+    "deployment_or_production_apply": false,
+    "gsc_resubmission": false
+  },
+  "evidence_directory": "work/seo-v5-customer-copy/"
+}
