@@ -4,7 +4,7 @@
   "engineering_document": {
     "url": "https://drive.google.com/file/d/1fufVkk7FzU6qbMeMYZoZTrQ5y2Z_Gb6-/view",
     "name": "qzweb-blog-ph-chatgpt-engineering-doc.md",
-    "precedence": "The owner's explicit instruction to omit the account-sale keyword overrides the optional FAQ in the document."
+    "precedence": "店主于 2026-11-17 明确批准发布并提供第六条成品号 FAQ；本次授权取代此前暂缓该 FAQ 的草稿限制。"
   },
   "products": [
     {
@@ -78,6 +78,11 @@
         "https://www.qzweb.cloud/products/chatgpt-pro-500-egypt"
       ],
       "evidence_file": "review-fact-checks.json"
+    },
+    {
+      "claim": "本站提供 ChatGPT 成品号，具体规格与价格通过关于页客服核实；不新增独立商品入口。",
+      "source": "店主于当前 Codex 对话直接提供并批准的 FAQ 原文",
+      "confirmed_on": "2026-11-17"
     }
   ],
   "public_response_evidence": [
