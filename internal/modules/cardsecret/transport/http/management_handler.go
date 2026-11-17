@@ -39,6 +39,10 @@ func (h *AdminHandler) manageCards(c *gin.Context, operation string) {
 		response.Error(c, response.CodeBadRequest, "请填写销毁原因，并确认永久停用这张本站卡密。")
 		return
 	}
+	if operation == "manual-status" && (!input.Confirmed || strings.TrimSpace(input.Reason) == "" || len([]rune(input.Reason)) > 500 || !cardIdentity.MatchString(input.RequestID) || len(input.ExpectedState) < 32 || len(input.ExpectedState) > 128 || (input.Status != "used" && input.Status != "unused" && input.Status != "invalid")) {
+		response.Error(c, response.CodeBadRequest, "请选择状态、填写核验说明并明确确认修改。")
+		return
+	}
 	result, err := h.management.Call(c.Request.Context(), operation, input, adminID)
 	if operation != "cards" {
 		logger.Infow("admin_paiplus_card_access", "admin_id", adminID, "card_id", input.CardID, "action", operation, "success", err == nil)
@@ -55,7 +59,8 @@ func (h *AdminHandler) manageCards(c *gin.Context, operation string) {
 	response.Success(c, result)
 }
 
-func (h *AdminHandler) QueryPAIPLUSCards(c *gin.Context) { h.manageCards(c, "cards") }
-func (h *AdminHandler) RevealPAIPLUSCard(c *gin.Context) { h.manageCards(c, "detail") }
-func (h *AdminHandler) CheckPAIPLUSCard(c *gin.Context)  { h.manageCards(c, "check") }
-func (h *AdminHandler) RevokePAIPLUSCard(c *gin.Context) { h.manageCards(c, "revoke") }
+func (h *AdminHandler) QueryPAIPLUSCards(c *gin.Context)       { h.manageCards(c, "cards") }
+func (h *AdminHandler) RevealPAIPLUSCard(c *gin.Context)       { h.manageCards(c, "detail") }
+func (h *AdminHandler) CheckPAIPLUSCard(c *gin.Context)        { h.manageCards(c, "check") }
+func (h *AdminHandler) RevokePAIPLUSCard(c *gin.Context)       { h.manageCards(c, "revoke") }
+func (h *AdminHandler) ManualPAIPLUSCardStatus(c *gin.Context) { h.manageCards(c, "manual-status") }

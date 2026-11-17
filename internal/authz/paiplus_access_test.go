@@ -11,7 +11,7 @@ func TestPAIPLUSManagementRequiresSeparatePermissions(t *testing.T) {
 		if err := svc.SetAdminRoles(51, []string{role}); err != nil {
 			t.Fatal(err)
 		}
-		for _, action := range []string{"query", "reveal", "check", "revoke"} {
+		for _, action := range []string{"query", "reveal", "check", "revoke", "manual-status"} {
 			allowed, err := svc.EnforceAdmin(51, "/admin/card-secrets/paiplus/"+action, "POST")
 			if err != nil || allowed != (role == "operations") {
 				t.Fatalf("role=%s action=%s allowed=%v err=%v", role, action, allowed, err)
@@ -24,7 +24,7 @@ func TestPAIPLUSManagementRequiresSeparatePermissions(t *testing.T) {
 	if err := svc.SetAdminRoles(52, []string{"paiplus_viewer"}); err != nil {
 		t.Fatal(err)
 	}
-	for _, action := range []string{"reveal", "check", "revoke"} {
+	for _, action := range []string{"reveal", "check", "revoke", "manual-status"} {
 		allowed, err := svc.EnforceAdmin(52, "/admin/card-secrets/paiplus/"+action, "POST")
 		if err != nil || allowed {
 			t.Fatalf("query-only role received %s", action)

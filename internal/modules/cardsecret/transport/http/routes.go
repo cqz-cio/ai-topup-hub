@@ -22,4 +22,5 @@ func RegisterAdminRoutes(admin gin.IRoutes, handler *AdminHandler) {
 	admin.POST("/card-secrets/paiplus/reveal", handler.RevealPAIPLUSCard)
 	admin.POST("/card-secrets/paiplus/check", handler.CheckPAIPLUSCard)
 	admin.POST("/card-secrets/paiplus/revoke", handler.RevokePAIPLUSCard)
+	admin.POST("/card-secrets/paiplus/manual-status", handler.ManualPAIPLUSCardStatus)
 }
