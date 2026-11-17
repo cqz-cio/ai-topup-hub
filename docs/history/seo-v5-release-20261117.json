@@ -1,0 +1,216 @@
+{
+  "status": "deployed_and_verified",
+  "release": "20261117-092000",
+  "base": "https://www.qzweb.cloud",
+  "deployed_at": "2026-11-17T01:42:09.524014+00:00",
+  "recorded_at": "2026-11-17T01:53:39.846081+00:00",
+  "build_source": "37d25c7b54bc19427232008dca540141e38920a4",
+  "main_merge": "928872570b17bbce0742a76806c94b0ca1e505f7",
+  "source_ci": {
+    "run": 43995724901,
+    "jobs_passed": 4,
+    "url": "https://github.com/cqz-cio/ai-topup-hub/actions/runs/43995724901"
+  },
+  "binary_sha256": "ff58df642e4409b57c79a8eb2b516a39992f6e788a3cebd8ac5b189b5084386a",
+  "content": {
+    "changed_fields": 60,
+    "rows_changed": 16,
+    "tables_checked": 75,
+    "non_copy_fields_preserved": true,
+    "idempotent": true,
+    "copy_sha256": "b5ca033580c0321b38727cd5d900ec859aa1e42843d4c30b518d38abe8006c7c",
+    "mode": "approved-publication",
+    "backup": "/srv/zhixiang/backups/before-seo-v5-20261117-092000/content-apply/seo-v5-20261117T014205966883Z",
+    "time": "2026-11-17T01:42:05.966581+00:00"
+  },
+  "verification": {
+    "v5": {
+      "requests": 69,
+      "pages": 24,
+      "status": "passed"
+    },
+    "v4": {
+      "requests": 30,
+      "pages": 8,
+      "status": "passed"
+    },
+    "cache": {
+      "requests": 14,
+      "status": "passed"
+    },
+    "browser": {
+      "views": 13,
+      "widths": [
+        1440,
+        390,
+        320
+      ],
+      "status": "passed",
+      "no_script": "Full product text and FAQ readable",
+      "css_failure": "Readable public content recovered"
+    },
+    "business_browser": {
+      "checks": [
+        "Product search matches 3 Telegram products",
+        "Default ascending and selectable descending prices",
+        "Add product, change quantity and reload cart",
+        "Guest checkout and payment choices render without submitting",
+        "Cart item removable",
+        "Member order access requires login"
+      ],
+      "write_requests": 0,
+      "member_redirect": "/auth/login",
+      "checkout_example": {
+        "subtotal_cny": 1400,
+        "fee_cny": 22.4,
+        "total_cny": 1422.4,
+        "submitted": false
+      }
+    }
+  },
+  "preservation": {
+    "user_files": 497,
+    "preserved_old_user_files": 13358,
+    "preserved_admin_files": 1962,
+    "redemption_preserved": true,
+    "other_service_pids_preserved": true,
+    "private_configuration_preserved": true,
+    "shared_scripts_preserved": true,
+    "nginx_files_checked": 26,
+    "content_idempotent": true,
+    "prices_payments_settings_preserved": true,
+    "business_tables_checked": 75
+  },
+  "operational_runtime_changes": {
+    "admin_login_logs": {
+      "before_rows": 13312,
+      "after_rows": 13314,
+      "changed_columns": [],
+      "inserted": 2,
+      "removed": 0
+    },
+    "admins": {
+      "before_rows": 2,
+      "after_rows": 2,
+      "changed_columns": [
+        "last_login_at"
+      ],
+      "inserted": 0,
+      "removed": 0
+    },
+    "chain_payment_cursors": {
+      "before_rows": 2,
+      "after_rows": 2,
+      "changed_columns": [
+        "next_block",
+        "previous_hash",
+        "updated_at"
+      ],
+      "inserted": 0,
+      "removed": 0
+    },
+    "ellaix_catalog_items": {
+      "before_rows": 49,
+      "after_rows": 49,
+      "changed_columns": [
+        "expected_updated",
+        "last_seen",
+        "missing_count"
+      ],
+      "inserted": 0,
+      "removed": 0
+    },
+    "ellaix_catalog_meta": {
+      "before_rows": 1,
+      "after_rows": 1,
+      "changed_columns": [
+        "last_at"
+      ],
+      "inserted": 0,
+      "removed": 0
+    },
+    "product_mappings": {
+      "before_rows": 63,
+      "after_rows": 63,
+      "changed_columns": [
+        "last_synced_at",
+        "updated_at"
+      ],
+      "inserted": 0,
+      "removed": 0
+    },
+    "product_skus": {
+      "before_rows": 97,
+      "after_rows": 97,
+      "changed_columns": [
+        "manual_stock_total",
+        "updated_at"
+      ],
+      "inserted": 0,
+      "removed": 0
+    },
+    "products": {
+      "before_rows": 97,
+      "after_rows": 97,
+      "changed_columns": [
+        "content_json",
+        "description_json",
+        "images",
+        "manual_stock_total",
+        "seo_meta_json",
+        "updated_at"
+      ],
+      "inserted": 0,
+      "removed": 0
+    },
+    "sku_mappings": {
+      "before_rows": 63,
+      "after_rows": 63,
+      "changed_columns": [
+        "stock_synced_at",
+        "updated_at",
+        "upstream_stock"
+      ],
+      "inserted": 0,
+      "removed": 0
+    }
+  },
+  "stock_services": {
+    "both_result": "success",
+    "both_exit_status": 0,
+    "both_timers": "active",
+    "reports_fresh": true
+  },
+  "backup": "/srv/zhixiang/backups/before-seo-v5-20261117-092000",
+  "limitations": [
+    "No real order, payment, procurement, redemption, refund or test email.",
+    "No assertion of Google reindexing, ranking or AI recommendation.",
+    "Current admin/redemption artifacts retained; v5 admin UI not independently deployed.",
+    "This archive does not assert complete admin/redemption source parity with latest production."
+  ],
+  "retained_failures": [
+    "Initial browser readiness timeout; separate network diagnosis and final 13-view run passed.",
+    "Initial checkout test incorrectly expected buttons; actual radio selectors and final business run passed.",
+    "Initial source CI directory-file budget failure; test relocated and all four jobs passed.",
+    "SSH/transfer and staged Nginx newline failures happened before production cutover; final transfer hashes and syntax passed."
+  ],
+  "cleanup": {
+    "status": "passed",
+    "removed_temporary_transfers": [
+      "/tmp/qzweb-seo-v5-20261117-092000-content.tar.gz",
+      "/tmp/qzweb-seo-v5-20261117-092000-release.tar.gz",
+      "/tmp/qzweb-seo-v5-20261117-092000-parts"
+    ],
+    "production_backup_preserved": "/srv/zhixiang/backups/before-seo-v5-20261117-092000"
+  },
+  "private_evidence_sha256": {
+    "v5-public.json": "5e808c029ca316df3335f4fbe1adecc7297566002298810f3f90efa525cee18d",
+    "v4-public.json": "1ce7daf966ea1ce7151dc42bf9355016385d7666255634b876febd2afeb786a9",
+    "cache-check.json": "5c35aa8fecb46e2d47bd084fd6c7ed4de6039b1ee3f2ee96f403712cc0fba43b",
+    "browser-final.json": "4743da82d60ae45d1d74a50c4394030b353316715a7bb1cfe156f9ec1c80ec4e",
+    "business-browser-final.json": "99d324eb5dcd41376ada191135e286c4980c82a8e33811b08617a77ed394c92a",
+    "final_remote.json": "b0bf5c6c3572c61073c90a9ffb2f9dd7d7c1b6d067b1730e7b961c79d1543311",
+    "cutover_remote.json": "cf2b4c51518598263c5f69f1b6e082e8e7f92819df60d1f48a1a64f48a9f6a9c",
+    "cleanup_remote.json": "4340408edda9b4e7a0955cb8df4e38577a6eb4126039a3c9f0c4fcf05b1e615b"
+  }
+}
