@@ -91,6 +91,11 @@ func (s *Service) GenerateRobots(baseURL string) string {
 	b.WriteString("Disallow: /admin/\n")
 	b.WriteString("Disallow: /me/\n")
 	b.WriteString("Disallow: /cart\n")
+	// Let crawlers read the public cart shell's noindex header, including its
+	// query/trailing-slash variants. Keep /cart/* and other /cart prefixes blocked.
+	for _, path := range []string{"/cart$", "/cart?", "/cart/$", "/cart/?"} {
+		b.WriteString("Allow: " + path + "\n")
+	}
 	b.WriteString("Disallow: /checkout\n")
 	b.WriteString("Disallow: /pay\n")
 	b.WriteString("Disallow: /orders/\n")
