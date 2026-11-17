@@ -13,5 +13,6 @@
     "internal/modules/cardsecret/transport/http/manual_status_test.go": "6605f3c3c6c74133db9f7f91e83b05fddecb73b2412c9febd3fa0af7e54feb78"
   },
   "scope": "Preserve already deployed manual card-status backend during SEO v5 release; no new card-state changes",
-  "admin_and_redemption": "Keep current production artifacts unchanged; this archival patch only preserves Go routes/contracts/authorization and tests."
+  "admin_and_redemption": "Keep current production artifacts unchanged; this archival patch only preserves Go routes/contracts/authorization and tests.",
+  "test_layout_adjustment": "manual_status_test.go moved to the existing integrationtest directory and uses the exported constructor; production code stays byte-identical. This keeps directory file budgets intact."
 }

@@ -1,14 +1,17 @@
-package cardsecrethttp
+package integrationtest
 
 import (
 	"context"
 	"encoding/json"
 	"github.com/dujiao-next/internal/modules/cardsecret/contract"
+	cardsecrethttp "github.com/dujiao-next/internal/modules/cardsecret/transport/http"
 	"github.com/gin-gonic/gin"
 	"net/http/httptest"
 	"strings"
 	"testing"
 )
+
+type unusedManualCardService struct{ cardsecrethttp.Service }
 
 type manualManagementStub struct {
 	calls     int
@@ -40,7 +43,7 @@ func TestManualStatusUsesAuthenticatedActorAndValidatesInput(t *testing.T) {
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			stub := &manualManagementStub{}
-			handler := &AdminHandler{management: stub}
+			handler := cardsecrethttp.NewAdminHandler(&unusedManualCardService{}, stub)
 			body, _ := json.Marshal(map[string]any{"card_id": "card-fixture-123456", "request_id": "request-fixture-123456", "status": "used", "reason": "已核对", "confirmed": tc.confirmed, "expected_state": tc.state, "actor": "shop-admin:999"})
 			w := httptest.NewRecorder()
 			c, _ := gin.CreateTestContext(w)
