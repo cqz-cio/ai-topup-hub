@@ -1,8 +1,8 @@
 {
-  "checked_at_utc": "2026-11-17T07:04:42.114582+00:00",
+  "checked_at_utc": "2026-11-17T07:48:25.645216+00:00",
   "method": "Anonymous HTTPS GET for unique in-body internal links",
-  "total": 12,
-  "passed": 12,
+  "total": 15,
+  "passed": 15,
   "results": [
     {
       "url": "https://www.qzweb.cloud/about",
@@ -69,6 +69,22 @@
       "passed": true
     },
     {
+      "url": "https://www.qzweb.cloud/products/chatgpt-plus-code",
+      "http_status": 200,
+      "final_url": "https://www.qzweb.cloud/products/chatgpt-plus-code",
+      "response_sha256": "2539b9a94366dee3acb5a0695997559986d51ac7b4815d7e9e82854f8f432c70",
+      "canonical": "https://www.qzweb.cloud/products/chatgpt-plus-code",
+      "passed": true
+    },
+    {
+      "url": "https://www.qzweb.cloud/products/chatgpt-pro-100-egypt",
+      "http_status": 200,
+      "final_url": "https://www.qzweb.cloud/products/chatgpt-pro-100-egypt",
+      "response_sha256": "9e5fee13441a049e9009e34187cc593870b2673ea27f6ee8656771e55ee3a8de",
+      "canonical": "https://www.qzweb.cloud/products/chatgpt-pro-100-egypt",
+      "passed": true
+    },
+    {
       "url": "https://www.qzweb.cloud/products/chatgpt-pro-100-ph",
       "http_status": 200,
       "final_url": "https://www.qzweb.cloud/products/chatgpt-pro-100-ph",
@@ -90,6 +106,14 @@
       "final_url": "https://www.qzweb.cloud/products/chatgpt-pro-200-renew-ph",
       "response_sha256": "e2766c1e362f266f6e5db547f2897712ace10362bdd40f6d00c55d4a03932b57",
       "canonical": "https://www.qzweb.cloud/products/chatgpt-pro-200-renew-ph",
+      "passed": true
+    },
+    {
+      "url": "https://www.qzweb.cloud/products/chatgpt-pro-500-egypt",
+      "http_status": 200,
+      "final_url": "https://www.qzweb.cloud/products/chatgpt-pro-500-egypt",
+      "response_sha256": "20b0e0ef9d08b1e621ecb84b464928d1df6f0bc6fc3f7adc1e76ca4a8bdef478",
+      "canonical": "https://www.qzweb.cloud/products/chatgpt-pro-500-egypt",
       "passed": true
     },
     {

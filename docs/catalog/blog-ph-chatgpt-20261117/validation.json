@@ -1,10 +1,10 @@
 {
-  "checked_at_utc": "2026-11-17T07:03:27.782109+00:00",
+  "checked_at_utc": "2026-11-17T07:47:41.396019+00:00",
   "status": "passed",
   "scope": "Draft body, metadata, Markdown parity and actual repository SSR; no production mutation",
   "base_commit": "7276bac1c0f350dd605062e1ba0dd15ece7786a8",
-  "body_cjk_characters": 2011,
-  "body_nonwhitespace_characters": 2474,
+  "body_cjk_characters": 2130,
+  "body_nonwhitespace_characters": 2673,
   "summary_cjk_characters": 89,
   "h2_sections": 7,
   "visible_faq_count": 5,
@@ -18,7 +18,7 @@
   ],
   "markdown_visible_text_matches_html": true,
   "markdown_links_match_html": true,
-  "internal_links_unique": 12,
+  "internal_links_unique": 15,
   "all_required_internal_links_present": true,
   "draft_is_noindex": true,
   "publication_date_deliberately_unset": true,
@@ -35,44 +35,44 @@
   ],
   "files_sha256": {
     "catalog.json": "4e506433ae205220a63a5259cbf9b44fe52b5289ec75d4c6db8e38fb0b9ff581",
-    "chatgpt-ph-recharge-guide.html": "2da623d65564172732dd3102e65a2fa5c9160f15989442249b0431efce831cd1",
-    "chatgpt-ph-recharge-guide.md": "402b157c5a896bacd31e9c72d3f95b085b3cfb7190dcb55f238e8a4a9925e655",
-    "preview.html": "5f4f883b97d66a98098ab2dec1fad462b0547e9f1939a3fb56563bf0b52c949a",
-    "sources.json": "5053330e614d7e3f105796ca06edf8bbf7f1ea6b6b82dd7b143800c8594aec71",
-    "README.md": "b206f91652f7c573a91ee8817304b166452ef8d621cbfeb7f40d6d794027a361",
-    "link-checks.json": "1d5aa444b79673eaa4cee5954db52bc8bf29dfb2d4e30ecef28619dde7f6d7b0",
-    "preview-desktop.jpg": "c4937545f6ee6fe8856ce31d5fb4ec4909852d659c33e0401d7263ba288d188d"
+    "chatgpt-ph-recharge-guide.html": "732a739be912c004746ece727ba3fbdaf48035a3017044daf45cd62330cbbf6f",
+    "chatgpt-ph-recharge-guide.md": "daff62045ee678bfda8e4ed0a6bccccc3cda7d9e8dedb3ab776b27aff743da8f",
+    "link-checks.json": "56dc9f85d800d4d867982b2c74ff870f8289c1f1bb72667d6bc2d0ba5ad72075",
+    "preview-desktop.jpg": "2cd6341bf7e659df6dd0e9fc9bb1dfbe43203b12cf0f6ce7242c9abf6c75230a",
+    "preview.html": "78f74b95c946be0f28e329d204f0aee26b7ec6bddf3c8e9ab971c9ca5480349d",
+    "README.md": "d93f0fa12aea9a32b59fc116b857585e380a9341af21c0c1ad703cfdd805d930",
+    "review-fact-checks.json": "6a57621556985253c1138ad692134a7757c6b731219e015b58e023a0c7145c9d",
+    "sources.json": "74e21e804f72346474f54e4bc864ad3ee60b5b16d87c8c9d8f6d88042c367e5d"
   },
+  "record_type": "local_review_revision_validation_before_git_submission",
+  "review_document": "https://drive.google.com/file/d/1XQpZOtSGpH9rJclSMOFIOY6g5LAnqKJb/view",
   "git_branch": "codex/blog-ph-chatgpt-20261117",
-  "git_head": "7276bac1c0f350dd605062e1ba0dd15ece7786a8",
-  "origin_main_at_review": "7276bac1c0f350dd605062e1ba0dd15ece7786a8",
-  "tracked_application_changes": [],
-  "new_files": [
-    "docs/catalog/blog-ph-chatgpt-20261117/README.md",
-    "docs/catalog/blog-ph-chatgpt-20261117/catalog.json",
-    "docs/catalog/blog-ph-chatgpt-20261117/chatgpt-ph-recharge-guide.html",
-    "docs/catalog/blog-ph-chatgpt-20261117/chatgpt-ph-recharge-guide.md",
-    "docs/catalog/blog-ph-chatgpt-20261117/link-checks.json",
-    "docs/catalog/blog-ph-chatgpt-20261117/preview.html",
-    "docs/catalog/blog-ph-chatgpt-20261117/sources.json",
-    "docs/catalog/blog-ph-chatgpt-20261117/validation.json"
-  ],
-  "commit_created": false,
-  "pushed": false,
+  "git_head_at_validation": "57d04fae459c4f0dcfffe7514e824e619be804a8",
   "deployed": false,
   "production_database_written": false,
-  "internal_links_http_200_and_self_canonical": 12,
+  "gsc_submitted": false,
+  "changed_original_body_blocks": 6,
+  "metadata_unchanged": true,
+  "internal_links_http_200_and_self_canonical": 15,
+  "fact_review_passed": true,
+  "production_new_page_checked_at_utc": "2026-11-17T07:45:31.240156+00:00",
   "browser_review": {
     "viewport": {
-      "height": 855,
+      "height": 911,
       "width": 1920
     },
     "document_width": 1905,
     "table_rows": 4,
     "h2_sections": 7,
     "console_warnings_or_errors_observed": 0,
-    "screenshot_local": "work/blog-ph-chatgpt-20261117/preview-desktop.jpg",
-    "screenshot_file": "preview-desktop.jpg"
+    "screenshot_file": "preview-desktop.jpg",
+    "screenshot_focus": "修订后的 FAQ"
+  },
+  "previous_validation": {
+    "commit": "57d04fae459c4f0dcfffe7514e824e619be804a8",
+    "body_cjk_characters": 2011,
+    "internal_links": 12,
+    "note": "初稿技术验证没有发现事实引用范围过宽，本轮按审阅意见收窄。"
   },
   "execution_notes": [
     {
@@ -102,18 +102,40 @@
       "stage": "Initial staged whitespace check",
       "detail": "The link-check JSON used Windows CRLF; normalized only line endings to LF, with JSON values unchanged.",
       "log_local": "work/codex-logs/20261117-152849-blog-ph-staged-check.log"
+    },
+    {
+      "stage": "blog-ph-review-facts",
+      "status": "passed",
+      "elapsed_seconds": 8.52,
+      "log_local": "work/codex-logs/20261117-154524-blog-ph-review-facts.log"
+    },
+    {
+      "stage": "blog-ph-review-render",
+      "status": "passed",
+      "elapsed_seconds": 1.51,
+      "log_local": "work/codex-logs/20261117-154636-blog-ph-review-render.log"
+    },
+    {
+      "stage": "blog-ph-review-package",
+      "status": "passed",
+      "elapsed_seconds": 1.03,
+      "log_local": "work/codex-logs/20261117-154740-blog-ph-review-package.log"
+    },
+    {
+      "stage": "blog-ph-review-links",
+      "status": "passed",
+      "elapsed_seconds": 6.52,
+      "log_local": "work/codex-logs/20261117-154819-blog-ph-review-links.log"
     }
   ],
-  "record_type": "local_draft_validation_snapshot_before_git_submission",
-  "git_status_note": "Git 状态字段为完成本地验证时的快照。后续仅获授权提交推送，当前分支提交信息以 Git 历史为准；不合并、不上线。",
+  "facts_evidence_file": "review-fact-checks.json",
+  "revision_commit_created_at_validation": false,
+  "revision_pushed_at_validation": false,
+  "git_status_note": "Git 状态字段为本地验证完成时的快照；本轮后续已获仅提交推送的授权，实际分支状态以 Git 历史为准。",
   "submission_preparation": {
-    "prepared_at_utc": "2026-11-17T07:28:13.957417+00:00",
-    "authorization": "仅将草稿与验证记录提交推送到独立分支，供 Grok 审核；不合并、不上线。",
-    "article_content_changed": false,
-    "preview_screenshot_archived": true,
-    "file_count": 9,
-    "format_only_changes": [
-      "link-checks.json: CRLF converted to LF; JSON values unchanged"
-    ]
+    "prepared_at_utc": "2026-11-17T07:55:52.491649+00:00",
+    "authorization": "仅提交推送本次修订稿与验证记录；不合并、不上线。",
+    "article_content_changed_since_validation": false,
+    "changed_files": 9
   }
 }

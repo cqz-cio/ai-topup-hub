@@ -68,6 +68,16 @@
       "urls": [
         "https://help.openai.com/en/articles/7947663-chatgpt-supported-countries"
       ]
+    },
+    {
+      "claim": "目前公开目录另有埃及 Pro 100、500；渠道句分别引用菲区 Pro 100 与埃及 Pro 500 页，不按档位配对或推断相同资格。",
+      "urls": [
+        "https://www.qzweb.cloud/categories/gpt-recharge",
+        "https://www.qzweb.cloud/products/chatgpt-pro-100-ph",
+        "https://www.qzweb.cloud/products/chatgpt-pro-100-egypt",
+        "https://www.qzweb.cloud/products/chatgpt-pro-500-egypt"
+      ],
+      "evidence_file": "review-fact-checks.json"
     }
   ],
   "public_response_evidence": [
@@ -156,5 +166,12 @@
     "商品价格和库存为动态数据，正文不写固定人民币售价或库存承诺。",
     "公开 URL 不存在不能排除后台已有同名未发布记录；发布审批后须再次核对 slug 唯一性。",
     "此次只核对公开事实与本地草稿，不代表 Google 收录、排名或 AI 引用。"
-  ]
+  ],
+  "review_revision": {
+    "review_url": "https://drive.google.com/file/d/1XQpZOtSGpH9rJclSMOFIOY6g5LAnqKJb/view",
+    "revision_base_commit": "57d04fae459c4f0dcfffe7514e824e619be804a8",
+    "fact_check_file": "review-fact-checks.json",
+    "fetched_at_utc": "2026-11-17T07:45:32.944236+00:00",
+    "scope": "本次补核渠道说明出处及埃及 200 的公开缺失；其余初稿来源保留原核验日期。"
+  }
 }
