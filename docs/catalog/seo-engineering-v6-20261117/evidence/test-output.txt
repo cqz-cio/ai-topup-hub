@@ -1,0 +1,36 @@
+SEO v6 local validation — 2026-11-17
+
+go test -v ./internal/modules/sitemap/... ./internal/web ./internal/architecture
+ok  	github.com/dujiao-next/internal/modules/sitemap/application	0.096s
+--- PASS: TestSitemapServiceGenerateRobotsIncludesSitemapURL (0.00s)
+--- PASS: TestSitemapServiceGenerateRejectsEmptyBaseURL (0.00s)
+--- PASS: TestRobotsAllowsOnlyPublicCartEntrypoints (0.00s)
+ok  	github.com/dujiao-next/internal/modules/sitemap/integrationtest	0.171s
+ok  	github.com/dujiao-next/internal/modules/sitemap/transport/http	1.139s
+--- PASS: TestPublicCartGETAndHEADRemainNonIndexableUncachedShells (0.00s)
+ok  	github.com/dujiao-next/internal/web	2.202s
+ok  	github.com/dujiao-next/internal/architecture	0.704s
+133 top-level tests / 799 including subtests passed.
+
+pnpm test (frontend/user)
+✔ XorPay preview charges 1.6% rounded up to the cent (1.9241ms)
+ℹ tests 278
+ℹ suites 0
+ℹ pass 278
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 24610.6059
+
+python -m unittest discover -s scripts -p test_seo_v6_review.py -v: 2 passed.
+node --experimental-strip-types scripts/check-seo-v6-drafts.mjs: 6 pairs, none > 0.85.
+git diff --check: passed.
+
+Full Windows go test ./...: FAILED in existing logger/selfupdate packages.
+logger TestNewReleaseWritesToConfiguredFile: release.log held open during TempDir cleanup.
+selfupdate: unsupported_os / POSIX 0500 write permissions / locking and rollback tests not portable to Windows.
+No unrelated test changes. Full Linux validation remains the PR CI gate.
+
+Public before and after: 27 requests each, 25 products, 47 sitemap URLs, errors=[]; expected current cart crawl=blocked.
+Prices/effective prices/status unchanged; SKU55 total42->41, SKU57 total172->171. No production writes.

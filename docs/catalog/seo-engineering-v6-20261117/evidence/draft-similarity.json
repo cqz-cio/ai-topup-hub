@@ -1,0 +1,43 @@
+{
+  "algorithm": "existing normalizeProductContent + 3-gram Jaccard",
+  "threshold": 0.85,
+  "scope": "incremental drafts only; approved full content must be rechecked before any future publication",
+  "rows": [
+    {
+      "left": "draft-category.html",
+      "right": "draft-plus.html",
+      "similarity": 0.051964512040557666,
+      "nearDuplicate": false
+    },
+    {
+      "left": "draft-category.html",
+      "right": "draft-ph-guide.html",
+      "similarity": 0.07083333333333333,
+      "nearDuplicate": false
+    },
+    {
+      "left": "draft-category.html",
+      "right": "draft-ready-account.html",
+      "similarity": 0.022900763358778626,
+      "nearDuplicate": false
+    },
+    {
+      "left": "draft-plus.html",
+      "right": "draft-ph-guide.html",
+      "similarity": 0.058902275769745646,
+      "nearDuplicate": false
+    },
+    {
+      "left": "draft-plus.html",
+      "right": "draft-ready-account.html",
+      "similarity": 0.026785714285714284,
+      "nearDuplicate": false
+    },
+    {
+      "left": "draft-ph-guide.html",
+      "right": "draft-ready-account.html",
+      "similarity": 0.004777070063694267,
+      "nearDuplicate": false
+    }
+  ]
+}

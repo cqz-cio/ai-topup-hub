@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow"><title>SEO v6 第一阶段 · 审阅预览</title>
+<style>
+:root{font-family:system-ui,"Microsoft YaHei",sans-serif;color:#183b36;background:#f1f5f3;line-height:1.75}
+*{box-sizing:border-box}body{margin:0}header,main{max-width:1040px;margin:auto;padding:24px}
+header h1{font-size:clamp(23px,4vw,36px);line-height:1.3;margin-bottom:12px}nav{display:flex;flex-wrap:wrap;gap:8px 22px}
+a{color:#146653;text-underline-offset:3px;overflow-wrap:anywhere}a:focus-visible,summary:focus-visible{outline:3px solid #207d66;outline-offset:4px}
+.warning{background:#fff1cd;border-left:4px solid #a06500;padding:14px 18px;border-radius:8px}
+.draft{padding:24px;background:white;border:1px solid #d5e2db;border-radius:14px;margin-bottom:26px;scroll-margin-top:16px}
+.eyebrow{font-size:14px;color:#5a6d64;border-bottom:1px solid #d5e2db;padding-bottom:14px;font-weight:700}
+h2{font-size:22px;line-height:1.45}h1{font-size:28px}td,th{text-align:left;vertical-align:top;padding:12px;border:1px solid #d5e2db}
+table{width:100%;border-collapse:collapse;font-size:14px}th{background:#edf4ef}.table-scroll{overflow-x:auto}td{min-width:130px}
+.pending{background:#fff1cd}li{margin-block:8px}details{padding:12px;border:1px solid #c8dbcf;border-radius:10px}summary{cursor:pointer;font-weight:650}
+.notice{border:1px solid #c8dbcf;border-radius:10px;background:#f5faf7;padding:14px;margin-bottom:12px}
+.proposed-main{min-height:190px;padding:24px;border:1px dashed #9cb9ab;border-radius:10px;background:#f7faf8}
+small{color:#52645c}@media(max-width:600px){header,main{padding:16px}.draft{padding:16px}h2{font-size:20px}ul,ol{padding-left:24px}}
+</style></head><body>
+<header><p>π星卡社 / SEO v6 / 第一阶段</p><h1>让规则可核对，让文案有依据</h1>
+<div class="warning">仅供店主与 Grok 审阅。草稿未批准发布；Plus 地区等待书面答复。当前运行代码仅调整 cart 的 robots 精确例外。</div>
+<p>这里展示增量草稿，不替换已发布 v5 正文、退款条款或六条菲区 FAQ。商品链接打开现网已发布内容，不代表本稿已上线。</p>
+<nav><a href="#category">分类对照</a><a href="#plus">Plus 操作</a><a href="#ph">菲区路线</a><a href="#account">成品号</a><a href="#notice-proposal">轻提示提案</a><a href="owner-questions.md">书面确认清单</a></nav></header><main>
+<section class="draft" id="category"><p class="eyebrow">审阅草稿 · GPT 分类页 · 选择对照补充</p><!-- REVIEW DRAFT ONLY. Proposed addition to existing GPT category; no runtime import. -->
+<section>
+<h2>按目标套餐和账号状态选择</h2>
+<p>先看希望开通的套餐，再看账号当前的订阅状态。下表中的“100/200/500美金”沿用商品档位名称，不是本站人民币售价，也不代表承诺的使用次数。当前售价与库存请查看商品卡片或详情页。</p>
+<div class="table-scroll"><table>
+<thead><tr><th>商品入口</th><th>交付与账号</th><th>选择前核对</th><th>地区标注</th></tr></thead>
+<tbody>
+<tr><td><a href="https://www.qzweb.cloud/products/chatgpt-plus-code">Plus 自助兑换码</a></td><td>自动发放 PAIPLUS 卡密，充值至自己的账号；不是成品号。</td><td>新账号或订阅已到期、掉订阅至少 10 分钟；最终以预检为准。</td><td class="pending">待书面答复：标签与教程存在冲突，本单元格禁止发布。</td></tr>
+<tr><td><a href="https://www.qzweb.cloud/products/chatgpt-pro-100-ph">Pro 100美金普通开通</a></td><td>自动发码，充值至自己的账号。</td><td>先核对该商品的新账号／到期条件，再完成预检。</td><td>标题明确标注菲区。</td></tr>
+<tr><td><a href="https://www.qzweb.cloud/products/chatgpt-pro-200-ph">Pro 200美金普通开通</a></td><td>自动发码，充值至自己的账号。</td><td>与下方“续费绑卡”分开选择，不将普通开通视为覆盖充值。</td><td>标题明确标注菲区。</td></tr>
+<tr><td><a href="https://www.qzweb.cloud/products/chatgpt-pro-500-ph">Pro 500美金普通开通</a></td><td>自动发码，充值至自己的账号。</td><td>账号资格以本商品正文和预检为准，不按档位数字推断权益。</td><td>标题明确标注菲区。</td></tr>
+<tr><td><a href="https://www.qzweb.cloud/products/chatgpt-pro-200-renew-ph">Pro 200美金续费绑卡</a></td><td>自动发码，面向当前仍为 Pro 10x 的自有账号。</td><td>按交付指引绑卡后联系客服确认；不能套用普通开通条件。</td><td>标题明确标注菲区。</td></tr>
+<tr><td><a href="https://www.qzweb.cloud/products/chatgpt-plus-manual">Plus 人工充值</a></td><td>人工处理；资料和交付以本商品说明为准。</td><td>未到期时先查看本商品的覆盖条件，不把规则移用到兑换码。</td><td>不由其他商品的标签推断适用地区。</td></tr>
+</tbody></table></div>
+<p>想知道领取后如何操作，请阅读<a href="https://www.qzweb.cloud/blog/chatgpt-plus-code-guide">Plus 兑换码使用说明</a>或<a href="https://www.qzweb.cloud/blog/chatgpt-ph-recharge-guide">菲区 Pro 选品与兑换教程</a>。若目标是成品号，请先到<a href="https://www.qzweb.cloud/about">既有客服入口</a>咨询，不要把自有账号充值当成账号交付。</p>
+</section>
+</section>
+<section class="draft" id="plus"><p class="eyebrow">审阅草稿 · Plus 商品页 · 操作说明补充</p><!-- REVIEW DRAFT ONLY. Insert after existing account conditions; retain existing guarantees/refund text and three FAQs verbatim. -->
+<section>
+<h2>购买前先判断这是不是你需要的服务</h2>
+<p>这款商品是把 Plus 订阅充值到你自己的 ChatGPT 账号。付款后领取本站 PAIPLUS 卡密，再按订单指引进入兑换中心；收到卡密和账号开通是两个步骤。</p>
+<ul>
+<li>目标是 Plus：不要按 Pro 的档位名称选购；两者不是同一套餐。</li>
+<li>从未开通过会员，或原订阅已经到期、掉订阅至少 10 分钟：继续核对本页全部条件，最终资格以兑换预检为准。</li>
+<li>目前仍有订阅：先读<a href="https://www.qzweb.cloud/blog/chatgpt-plus-renewal-rules">到期续费与覆盖充值说明</a>，不要默认本兑换码支持覆盖。</li>
+<li>希望获得一个成品账号：本商品不提供成品号；请经<a href="https://www.qzweb.cloud/about">客服入口</a>另行咨询实际可提供的服务。</li>
+</ul>
+<h2>从领取到核对结果</h2>
+<ol>
+<li>先核对目标账号、当前订阅状态及所选商品。本页售价与库存以页面当前显示为准。</li>
+<li>从订单交付说明打开对应的兑换入口，不从陌生人发来的链接提交凭证。</li>
+<li>按兑换页面完成预检，提交前再核对账号和套餐。出现不适用提示时先停止，并联系客服核实。</li>
+<li>提交后查看处理状态，再回到目标账号核对订阅。付款成功或领取成功本身都不能证明开通完成。</li>
+</ol>
+<p>需要协助时，提供本站订单号、操作时间及脱敏报错截图。不要公开卡密、密码或登录 token。处理中不要重复购买来试错；具体异常及售后仍按本页原有条款处理。</p>
+</section>
+</section>
+<section class="draft" id="ph"><p class="eyebrow">审阅草稿 · 菲区教程 · 路线对照补充</p><!-- REVIEW DRAFT ONLY. Incremental replacement of comparison/instructions, not replacement of the published six FAQs. -->
+<section>
+<h2>普通开通与续费绑卡：分两条操作路线</h2>
+<p>这里仅比较已经标明菲区的四款 Pro。100、200、500美金是本站商品的档位名称，不能换算成保证的使用次数或官方额度。价格请打开对应商品查看，不用本文作为价目表。</p>
+<div class="table-scroll"><table>
+<thead><tr><th>路线</th><th>商品</th><th>开始前</th><th>交付后</th></tr></thead>
+<tbody>
+<tr><td>普通开通</td><td><a href="https://www.qzweb.cloud/products/chatgpt-pro-100-ph">100美金</a>、<a href="https://www.qzweb.cloud/products/chatgpt-pro-200-ph">200美金</a>、<a href="https://www.qzweb.cloud/products/chatgpt-pro-500-ph">500美金</a></td><td>核对新账号或已到期、掉订阅至少 10 分钟条件；满足文字描述仍要预检。</td><td>领取 PAIPLUS 卡密，按订单指引预检、确认账号与套餐、提交并查询结果。</td></tr>
+<tr><td>续费绑卡</td><td><a href="https://www.qzweb.cloud/products/chatgpt-pro-200-renew-ph">200美金续费绑卡</a></td><td>核对账号当前仍为 Pro 10x；不要借用普通开通的到期条件。</td><td>依订单说明绑卡，再联系客服确认；仅领码或绑卡不能视为订阅已确认。</td></tr>
+</tbody></table></div>
+<h2>到哪一步应停下来核对</h2>
+<p>如果订阅尚未到期，先看<a href="https://www.qzweb.cloud/blog/chatgpt-plus-renewal-rules">现有续费与覆盖说明</a>，再核对所选 Pro 的独立条件；不要直接照搬 Plus 的规则。地区或账号资格不清楚时，先咨询客服。</p>
+<p>预检显示不适用时，保存实际提示和操作时间，通过<a href="https://www.qzweb.cloud/about">客服入口</a>核实；不要修改地区资料或轮换账号反复尝试。</p>
+<p>提交后仍在处理时，按兑换页面查询；权益未显示可参照<a href="https://www.qzweb.cloud/blog/chatgpt-membership-not-active">充值后会员未显示的排查说明</a>。不要把付款记录、卡密领取记录或单张截图当成最终开通证明。</p>
+</section>
+</section>
+<section class="draft" id="account"><p class="eyebrow">审阅草稿 · 成品号说明页 · 尚未注册 URL</p><!-- REVIEW DRAFT ONLY. Suggested URL /blog/chatgpt-ready-account-guide is NOT registered. -->
+<article>
+<h1>ChatGPT 成品号咨询说明</h1>
+<p>π星卡社也提供 ChatGPT 成品号，具体可提供的规格和价格，请通过<a href="https://www.qzweb.cloud/about">关于页面的既有客服入口</a>确认。当前公开目录没有独立的成品号商品页，本文不列出套餐、售价或交付时效。</p>
+<h2>与自有账号充值的区别</h2>
+<p>本站 Plus 和菲区 Pro 兑换码用于向客户自己的账号充值；成品号是另一类咨询服务。不要因兑换码商品写着“自动发码”，就把它理解为会交付一个账号。</p>
+<h2>咨询前准备什么</h2>
+<p>先说明你希望给已有账号充值，还是咨询成品号。就具体服务向客服核对交付物、规格、账号归属、可进行的安全操作和售后范围，再决定是否购买。请勿通过公开评论发送密码、登录 token 或完整卡密。</p>
+<p>本站为独立第三方服务平台，名称用于说明服务适用对象，不表示 OpenAI 官方授权或合作。</p>
+</article>
+</section>
+<section class="draft" id="notice-proposal"><p class="eyebrow">交互提案 · 未改商城组件或公告配置</p>
+<h2>首页购买提醒：不遮住商品</h2>
+<div class="notice">先核对套餐和账号条件；自动发码后仍要按订单指引完成兑换。
+<a href="https://www.qzweb.cloud/blog/purchase-and-agent-guide">购买与交付说明</a></div>
+<details><summary>查看购买提醒</summary><p>套餐及账号条件以商品详情为准。收到卡密后，还需进入订单交付说明的兑换入口，核对目标账号与套餐并完成兑换。</p>
+<p>完整风险与购买条件继续在<a href="https://www.qzweb.cloud/blog/purchase-and-agent-guide">既有说明</a>保留。代理合作及疑问请通过<a href="https://www.qzweb.cloud/about">原客服入口</a>咨询。</p></details>
+<div class="proposed-main"><h3>页面主要内容仍在正常文档流中</h3><p>提示默认收起，无全屏遮罩、无强制焦点跳转；本区域只是评审布局示例，不是商品或库存数据。</p></div>
+</section><small>本地预览 / noindex / 无写库与发布功能。截图需求见 owner-questions.md；没有伪造订单或兑换截图。</small>
+</main></body></html>
