@@ -9,7 +9,8 @@
 
 - [可直接打开的 HTML 预览](preview.html)；本次本地入口 http://127.0.0.1:5186/preview.html。
 - [Plus 来源/前端/SEO 盘点](plus-inventory.md)。
-- [店主四问、条件 A/B、真实素材和成品号边界](owner-questions.md)。
+- [店主确认、原四问、真实素材和成品号边界](owner-questions.md)。
+- [截图取材说明与真实查单入口](screenshot-materials.md)。
 - [首页弹窗实测与轻提示提案](popup-review.md)。
 - [后续发布与定向回退纪律](publication-plan.md)。
 - [站外人工清单](manual-outreach.md)。
@@ -55,7 +56,9 @@ Allow: /cart/?
 | 本目录 draft-*.html | 分类、Plus、菲区教程的增量段及成品号草稿；不是可直接导入的完整正式稿 |
 | 本目录说明与 evidence/ | 来源、待确认问题、实测截图与输出 |
 
-分类草稿含明显的待答复单元格，仅用于 review；未从 docs 导入生产。Plus 原退款/质保正文与三个 FAQ、菲区教程六个 FAQ/BlogPosting/BreadcrumbList 均未替换。没有新路由、SKU、媒体覆盖或内容迁移。内容审批后必须先合成为完整稿再检查全文相似度，当前增量片段之间约 0.005–0.071，均未触发 >0.85 告警。
+店主后续确认“按商品信息来，去掉吧”，以及成品号 Plus 一个月订阅、订阅质保一个月、115 元/个。分类草稿的待答复单元格已替换为原商品资格/预检说明；教程草稿补充套餐区分句，去标签计划只针对 #30。确认原文见 [owner-confirmation.json](owner-confirmation.json)，字段计划见 [content-change-plan.json](content-change-plan.json)。这些更新未导入生产。
+
+Plus 原退款/质保正文与三个 FAQ、菲区教程六个 FAQ/BlogPosting/BreadcrumbList 均未替换。没有新路由、SKU、媒体覆盖或内容迁移。未把去标签解释为全球通用，也未给成品号新增退款、换号或安全承诺。最终全文仍须按原去噪 3-gram Jaccard 算法复核，当前增量比较见 evidence/draft-similarity.json。
 
 ## 验证与限制
 
@@ -69,6 +72,8 @@ Allow: /cart/?
 - 未登录后台或 GSC、未新建订单、未支付、未采购；没有新的收录/排名验证。
 
 详见 [测试输出](evidence/test-output.txt)、[浏览器记录](evidence/browser.json)、[前快照](evidence/public-before.json)、[后快照](evidence/public-after.json) 与 [相似度](evidence/draft-similarity.json)。
+
+店主补充后的本轮只改 docs 和预览生成器，未再改运行代码。重新生成预览、检查六对草稿相似度及 diff 格式；浏览器再次核对桌面、390/320 宽度、成品号三项事实和分类待答复单元格已移除。新增公开查单入口截图（无输入、无提交）及成品号 390px 预览，见 [本轮记录](evidence/owner-followup.json)。此前前端/Go 成绩不当作本轮重新执行；新提交的 CI 以 PR 检查为准。
 
 ## 重跑（在独立工作区）
 

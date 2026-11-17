@@ -36,7 +36,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}th{background:#edf4ef}.
 small{color:#52645c}@media(max-width:600px){header,main{padding:16px}.draft{padding:16px}h2{font-size:20px}ul,ol{padding-left:24px}}
 </style></head><body>
 <header><p>π星卡社 / SEO v6 / 第一阶段</p><h1>让规则可核对，让文案有依据</h1>
-<div class="warning">仅供店主与 Grok 审阅。草稿未批准发布；Plus 地区等待书面答复。当前运行代码仅调整 cart 的 robots 精确例外。</div>
+<div class="warning">仅供店主与 Grok 审阅。已按店主回复整理：去掉 Plus 的菲区标签，保留商品原有资格；成品号为 Plus 一个月订阅、订阅质保一个月、115 元/个。此处是更新后的审阅稿，尚未发布。</div>
 <p>这里展示增量草稿，不替换已发布 v5 正文、退款条款或六条菲区 FAQ。商品链接打开现网已发布内容，不代表本稿已上线。</p>
 <nav><a href="#category">分类对照</a><a href="#plus">Plus 操作</a><a href="#ph">菲区路线</a><a href="#account">成品号</a><a href="#notice-proposal">轻提示提案</a><a href="owner-questions.md">书面确认清单</a></nav></header><main>
 """ + "\n".join(sections) + """

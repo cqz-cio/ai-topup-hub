@@ -6,37 +6,37 @@
     {
       "left": "draft-category.html",
       "right": "draft-plus.html",
-      "similarity": 0.051964512040557666,
+      "similarity": 0.054707379134860054,
       "nearDuplicate": false
     },
     {
       "left": "draft-category.html",
       "right": "draft-ph-guide.html",
-      "similarity": 0.07083333333333333,
+      "similarity": 0.08005249343832022,
       "nearDuplicate": false
     },
     {
       "left": "draft-category.html",
       "right": "draft-ready-account.html",
-      "similarity": 0.022900763358778626,
+      "similarity": 0.02857142857142857,
       "nearDuplicate": false
     },
     {
       "left": "draft-plus.html",
       "right": "draft-ph-guide.html",
-      "similarity": 0.058902275769745646,
+      "similarity": 0.05764411027568922,
       "nearDuplicate": false
     },
     {
       "left": "draft-plus.html",
       "right": "draft-ready-account.html",
-      "similarity": 0.026785714285714284,
+      "similarity": 0.03372434017595308,
       "nearDuplicate": false
     },
     {
       "left": "draft-ph-guide.html",
       "right": "draft-ready-account.html",
-      "similarity": 0.004777070063694267,
+      "similarity": 0.013043478260869565,
       "nearDuplicate": false
     }
   ]

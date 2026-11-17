@@ -1,0 +1,39 @@
+{
+  "recorded_at": "2026-11-17T15:27:12Z",
+  "scope": "owner-directed review drafts only",
+  "production_changes": false,
+  "draft_preview": {
+    "url": "http://127.0.0.1:5186/preview.html",
+    "account_heading": "ChatGPT Plus 成品号｜一个月订阅",
+    "subscription": "一个月",
+    "subscription_warranty": "一个月",
+    "price": "115 元/个",
+    "category_pending_cell_present": false,
+    "viewports": [
+      {"width": 1289, "height": 931, "scroll_width": 1274},
+      {"width": 390, "height": 844, "scroll_width": 390},
+      {"width": 320, "height": 740, "scroll_width": 320}
+    ],
+    "broken_fragment_links": [],
+    "screenshot": "owner-account-preview-390.png",
+    "screenshot_sha256": "6ea45418aa85cb5813d515419cf195a96ef3c4858a2ebc390dcfacded8c781cd"
+  },
+  "screenshot_material": {
+    "id": "S0",
+    "url": "https://www.qzweb.cloud/guest/orders",
+    "screenshot": "guest-order-entry-owner-followup.png",
+    "width": 1289,
+    "height": 931,
+    "screenshot_sha256": "159f0875d93b829ecf4986dd4d6b5f4428509f1fd84543dc123149e6297337e8",
+    "inputs": [
+      {"type": "email", "filled": false},
+      {"type": "password", "filled": false},
+      {"type": "text", "filled": false}
+    ],
+    "submitted": false,
+    "satisfies_S1_to_S5": false,
+    "remaining": ["S1", "S2", "S3", "S4", "S5"]
+  },
+  "no_order_creation_payment_purchase_or_redemption": true,
+  "previous_full_test_results_not_rerun_for_this_docs_followup": true
+}

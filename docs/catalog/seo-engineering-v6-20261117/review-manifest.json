@@ -9,7 +9,10 @@
     "name": "qzweb-seo-engineering-report-v6.md",
     "content_sha256": "a3712b95549299b4045aeb1623ba93ecd782dbbe5cf634958ce478277888aec9"
   },
-  "content_approval": "pending_owner_written_answers",
+  "content_approval": "owner_directed_tag_removal_and_account_facts_recorded; release_not_executed",
+  "owner_confirmation": "owner-confirmation.json",
+  "content_change_plan": "content-change-plan.json",
+  "owner_followup_evidence": "evidence/owner-followup.json",
   "merged": false,
   "deployed": false,
   "production_database_writes": false,

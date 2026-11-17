@@ -42,4 +42,4 @@
 
 ## 后续
 
-店主的四个原问题及条件 A/B 在 [owner-questions.md](owner-questions.md)。未获答复，商品字段、标签、教程、SEO/结构化数据全部保持现状；cart 代码可独立审核。
+店主后续明确“按商品信息来，去掉吧”。已在审阅稿去掉分类表的待答复单元格，并用套餐区别句替换教程中的旧标注断言；#30 去标签字段计划见 [content-change-plan.json](content-change-plan.json)。没有推断可用地区，也没有执行生产更新。原商品资格、SEO/结构化数据与四款 Pro 标签保留；cart 仍可独立审核。
