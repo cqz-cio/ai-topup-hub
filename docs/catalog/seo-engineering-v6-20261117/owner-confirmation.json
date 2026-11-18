@@ -1,6 +1,13 @@
 {
   "recorded_at": "2026-11-17T15:21:03Z",
   "source": "本对话店主回复",
+  "followup_2026_11_18": {
+    "fulfillment": "付款之后自动收到卡密和账号信息",
+    "use": "拿到账号后按交付要求使用",
+    "subscription_lapse_during_warranty": ["按剩余天数退还对应金额", "按优惠价补购一个成品号"],
+    "homepage": "保留现有弹窗",
+    "screenshots": "店主交由编辑决定，本轮审阅纯文字稿"
+  },
   "owner_message": "按商品信息来   去掉吧   成品号plus 一个月订阅  质保订阅一个月 115一个        第4个不知道你帮我做一下吧",
   "scope": "更新 v6 审阅稿与待发布字段清单；未执行生产变更",
   "plus": {
@@ -17,7 +24,7 @@
     "owner_quoted_price_cny": "115.00",
     "price_unit": "个",
     "publication": "说明页草稿；不创建 SKU、不改现有商品售价",
-    "still_unspecified": [
+    "unspecified_at_2026_11_17": [
       "具体交付物与交付时间",
       "账号归属与换绑、安全操作",
       "订阅质保处理方式、退款或补号规则"

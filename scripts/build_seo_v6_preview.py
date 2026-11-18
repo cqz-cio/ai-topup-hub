@@ -36,18 +36,11 @@ table{width:100%;border-collapse:collapse;font-size:14px}th{background:#edf4ef}.
 small{color:#52645c}@media(max-width:600px){header,main{padding:16px}.draft{padding:16px}h2{font-size:20px}ul,ol{padding-left:24px}}
 </style></head><body>
 <header><p>π星卡社 / SEO v6 / 第一阶段</p><h1>让规则可核对，让文案有依据</h1>
-<div class="warning">审阅稿 · 2026-11-18。购物车抓取规则、Plus 标签和教程中的套餐区分句已上线。下列分类对照、操作说明、成品号页面和首页轻提示供本轮审阅。</div>
+<div class="warning">审阅稿 · 2026-11-18。首页保留现有弹窗。本轮审阅分类对照、操作说明和成品号页面的文字。</div>
 <p>这里展示增量草稿，不替换已发布 v5 正文、退款条款或六条菲区 FAQ。商品链接打开现网已发布内容，不代表本稿已上线。</p>
-<nav><a href="#category">分类对照</a><a href="#plus">Plus 操作</a><a href="#ph">菲区路线</a><a href="#account">成品号</a><a href="#notice-proposal">轻提示提案</a><a href="owner-questions.md">书面确认清单</a></nav></header><main>
+<nav><a href="#category">分类对照</a><a href="#plus">Plus 操作</a><a href="#ph">菲区路线</a><a href="#account">成品号</a><a href="followup-20261118.md">审阅记录</a></nav></header><main>
 """ + "\n".join(sections) + """
-<section class="draft" id="notice-proposal"><p class="eyebrow">交互提案 · 未改商城组件或公告配置</p>
-<h2>首页购买提醒：不遮住商品</h2>
-<div class="notice">先核对套餐和账号条件；自动发码后仍要按订单指引完成兑换。
-<a href="https://www.qzweb.cloud/blog/purchase-and-agent-guide">购买与交付说明</a></div>
-<details><summary>查看购买提醒</summary><p>套餐及账号条件以商品详情为准。收到卡密后，还需进入订单交付说明的兑换入口，核对目标账号与套餐并完成兑换。</p>
-<p>完整风险与购买条件继续在<a href="https://www.qzweb.cloud/blog/purchase-and-agent-guide">既有说明</a>保留。代理合作及疑问请通过<a href="https://www.qzweb.cloud/about">原客服入口</a>咨询。</p></details>
-<div class="proposed-main"><h3>页面主要内容仍在正常文档流中</h3><p>提示默认收起，无全屏遮罩、无强制焦点跳转；本区域只是评审布局示例，不是商品或库存数据。</p></div>
-</section><small>本地预览 / noindex / 无写库与发布功能。截图需求见 owner-questions.md；没有伪造订单或兑换截图。</small>
+<small>本地文字审阅稿</small>
 </main></body></html>
 """
     (DOCS / "preview.html").write_bytes(html.encode("utf-8"))

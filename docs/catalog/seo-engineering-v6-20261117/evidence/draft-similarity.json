@@ -18,7 +18,7 @@
     {
       "left": "draft-category.html",
       "right": "draft-ready-account.html",
-      "similarity": 0.03114754098360656,
+      "similarity": 0.026415094339622643,
       "nearDuplicate": false
     },
     {
@@ -30,13 +30,13 @@
     {
       "left": "draft-plus.html",
       "right": "draft-ready-account.html",
-      "similarity": 0.03372434017595308,
+      "similarity": 0.04377104377104377,
       "nearDuplicate": false
     },
     {
       "left": "draft-ph-guide.html",
       "right": "draft-ready-account.html",
-      "similarity": 0.013043478260869565,
+      "similarity": 0.011532125205930808,
       "nearDuplicate": false
     }
   ]

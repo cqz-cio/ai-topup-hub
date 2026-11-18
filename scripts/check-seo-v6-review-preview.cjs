@@ -19,8 +19,13 @@ const dir = resolve(__dirname, "../docs/catalog/seo-engineering-v6-20261117");
         assert.ok(await table.evaluate(el => { el.scrollLeft = el.scrollWidth; const moved = el.scrollLeft > 0; el.scrollLeft = 0; return moved; }));
       }
       await page.locator("#category").screenshot({ path: join(dir, "evidence", "followup-category-" + width + ".png") });
-      await page.locator("#notice-proposal summary").click();
-      assert.equal(await page.locator("#notice-proposal details").getAttribute("open"), "");
+      assert.equal(await page.locator("#notice-proposal, a[href='#notice-proposal']").count(), 0);
+      const account = page.locator("#account");
+      const copy = await account.innerText();
+      for (const term of ["115 元", "订阅质保一个月", "自动发货", "卡密和账号信息", "按剩余天数退还", "按优惠价补购"]) {
+        assert.ok(copy.includes(term), term);
+      }
+      assert.equal(await account.locator("img").count(), 0);
       await page.close();
       console.log(width, "passed");
     }
