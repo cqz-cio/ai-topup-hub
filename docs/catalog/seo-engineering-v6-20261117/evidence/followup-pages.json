@@ -1,0 +1,578 @@
+{
+  "checked_at": "2026-11-18T02:54:55.365095+00:00",
+  "baseline_at": "2026-11-17T14:51:51.189636+00:00",
+  "catalog_at": "2026-11-18T02:49:36.627242+00:00",
+  "removed_from_sitemap": [
+    "/categories/gemini",
+    "/categories/gpt-overwrite-topup",
+    "/categories/telegram-premium-links",
+    "/products/chatgpt-go-manual",
+    "/products/chatgpt-plus-manual",
+    "/products/chatgpt-pro-100-manual",
+    "/products/chatgpt-pro-200-manual",
+    "/products/gemini-pro-18m-no-warranty",
+    "/products/gemini-pro-18m-warranty",
+    "/products/telegram-premium-12m",
+    "/products/telegram-premium-3m",
+    "/products/telegram-premium-6m"
+  ],
+  "added_to_sitemap": [],
+  "draft_targets": [
+    "/about",
+    "/blog/chatgpt-membership-not-active",
+    "/blog/chatgpt-ph-recharge-guide",
+    "/blog/chatgpt-plus-code-guide",
+    "/blog/chatgpt-plus-renewal-rules",
+    "/products/chatgpt-plus-code",
+    "/products/chatgpt-pro-100-ph",
+    "/products/chatgpt-pro-200-ph",
+    "/products/chatgpt-pro-200-renew-ph",
+    "/products/chatgpt-pro-500-ph"
+  ],
+  "pages": {
+    "/": {
+      "status": 200,
+      "canonical": [
+        "https://www.qzweb.cloud/"
+      ],
+      "visible_chars": 2717,
+      "draft_markers": []
+    },
+    "/about": {
+      "status": 200,
+      "canonical": [
+        "https://www.qzweb.cloud/about"
+      ],
+      "visible_chars": 1103,
+      "draft_markers": []
+    },
+    "/blog": {
+      "status": 200,
+      "canonical": [
+        "https://www.qzweb.cloud/blog"
+      ],
+      "visible_chars": 955,
+      "draft_markers": []
+    },
+    "/blog/binance-usdt-payment-guide": {
+      "status": 200,
+      "canonical": [
+        "https://www.qzweb.cloud/blog/binance-usdt-payment-guide"
+      ],
+      "visible_chars": 2312,
+      "draft_markers": []
+    },
+    "/blog/chatgpt-code-region-check": {
+      "status": 200,
+      "canonical": [
+        "https://www.qzweb.cloud/blog/chatgpt-code-region-check"
+      ],
+      "visible_chars": 1257,
+      "draft_markers": []
+    },
+    "/blog/chatgpt-membership-not-active": {
+      "status": 200,
+      "canonical": [
+        "https://www.qzweb.cloud/blog/chatgpt-membership-not-active"
+      ],
+      "visible_chars": 1425,
+      "draft_markers": []
+    },
+    "/blog/chatgpt-payment-methods": {
+      "status": 200,
+      "canonical": [
+        "https://www.qzweb.cloud/blog/chatgpt-payment-methods"
+      ],
+      "visible_chars": 1891,
+      "draft_markers": []
+    },
+    "/blog/chatgpt-ph-recharge-guide": {
+      "status": 200,
+      "canonical": [
+        "https://www.qzweb.cloud/blog/chatgpt-ph-recharge-guide"
+      ],
+      "visible_chars": 3260,
+      "draft_markers": [],
+      "catalog_links": [
+        "/categories/gpt-recharge",
+        "/categories/grok",
+        "/products/chatgpt-plus-code",
+        "/products/chatgpt-pro-100-egypt",
+        "/products/chatgpt-pro-100-ph",
+        "/products/chatgpt-pro-200-ph",
+        "/products/chatgpt-pro-200-renew-ph",
+        "/products/chatgpt-pro-500-egypt",
+        "/products/chatgpt-pro-500-ph"
+      ]
+    },
+    "/blog/chatgpt-plus-code-guide": {
+      "status": 200,
+      "canonical": [
+        "https://www.qzweb.cloud/blog/chatgpt-plus-code-guide"
+      ],
+      "visible_chars": 1745,
+      "draft_markers": []
+    },
+    "/blog/chatgpt-plus-renewal-rules": {
+      "status": 200,
+      "canonical": [
+        "https://www.qzweb.cloud/blog/chatgpt-plus-renewal-rules"
+      ],
+      "visible_chars": 1894,
+      "draft_markers": []
+    },
+    "/blog/chatgpt-plus-vs-api-balance": {
+      "status": 200,
+      "canonical": [
+        "https://www.qzweb.cloud/blog/chatgpt-plus-vs-api-balance"
+      ],
+      "visible_chars": 1471,
+      "draft_markers": []
+    },
+    "/blog/chatgpt-ready-account-guide": {
+      "status": 404
+    },
+    "/blog/okx-usdt-payment-guide": {
+      "status": 200,
+      "canonical": [
+        "https://www.qzweb.cloud/blog/okx-usdt-payment-guide"
+      ],
+      "visible_chars": 2391,
+      "draft_markers": []
+    },
+    "/blog/purchase-and-agent-guide": {
+      "status": 200,
+      "canonical": [
+        "https://www.qzweb.cloud/blog/purchase-and-agent-guide"
+      ],
+      "visible_chars": 1966,
+      "draft_markers": []
+    },
+    "/categories/gemini": {
+      "status": 404
+    },
+    "/categories/gpt-overwrite-topup": {
+      "status": 404
+    },
+    "/categories/gpt-recharge": {
+      "status": 200,
+      "canonical": [
+        "https://www.qzweb.cloud/categories/gpt-recharge"
+      ],
+      "visible_chars": 2650,
+      "draft_markers": [],
+      "catalog_links": [
+        "/categories/gpt-recharge",
+        "/categories/grok",
+        "/products/chatgpt-go-code-egypt",
+        "/products/chatgpt-plus-code",
+        "/products/chatgpt-pro-100-egypt",
+        "/products/chatgpt-pro-100-ph",
+        "/products/chatgpt-pro-200-ph",
+        "/products/chatgpt-pro-200-renew-ph",
+        "/products/chatgpt-pro-500-egypt",
+        "/products/chatgpt-pro-500-ph"
+      ]
+    },
+    "/categories/grok": {
+      "status": 200,
+      "canonical": [
+        "https://www.qzweb.cloud/categories/grok"
+      ],
+      "visible_chars": 1123,
+      "draft_markers": []
+    },
+    "/categories/telegram-premium-links": {
+      "status": 404
+    },
+    "/notice": {
+      "status": 200,
+      "canonical": [
+        "https://www.qzweb.cloud/notice"
+      ],
+      "visible_chars": 200,
+      "draft_markers": []
+    },
+    "/privacy": {
+      "status": 200,
+      "canonical": [
+        "https://www.qzweb.cloud/privacy"
+      ],
+      "visible_chars": 2077,
+      "draft_markers": []
+    },
+    "/products": {
+      "status": 200,
+      "canonical": [
+        "https://www.qzweb.cloud/products"
+      ],
+      "visible_chars": 2429,
+      "draft_markers": []
+    },
+    "/products/chatgpt-go-code-egypt": {
+      "status": 200,
+      "canonical": [
+        "https://www.qzweb.cloud/products/chatgpt-go-code-egypt"
+      ],
+      "visible_chars": 2224,
+      "draft_markers": []
+    },
+    "/products/chatgpt-go-manual": {
+      "status": 404
+    },
+    "/products/chatgpt-plus-code": {
+      "status": 200,
+      "canonical": [
+        "https://www.qzweb.cloud/products/chatgpt-plus-code"
+      ],
+      "visible_chars": 1949,
+      "draft_markers": [],
+      "catalog_links": [
+        "/categories/gpt-recharge",
+        "/categories/grok",
+        "/products/chatgpt-go-code-egypt",
+        "/products/chatgpt-pro-100-egypt",
+        "/products/chatgpt-pro-100-ph",
+        "/products/chatgpt-pro-200-ph",
+        "/products/chatgpt-pro-200-renew-ph",
+        "/products/chatgpt-pro-500-egypt",
+        "/products/chatgpt-pro-500-ph"
+      ]
+    },
+    "/products/chatgpt-plus-manual": {
+      "status": 404
+    },
+    "/products/chatgpt-pro-100-egypt": {
+      "status": 200,
+      "canonical": [
+        "https://www.qzweb.cloud/products/chatgpt-pro-100-egypt"
+      ],
+      "visible_chars": 2267,
+      "draft_markers": []
+    },
+    "/products/chatgpt-pro-100-manual": {
+      "status": 404
+    },
+    "/products/chatgpt-pro-100-ph": {
+      "status": 200,
+      "canonical": [
+        "https://www.qzweb.cloud/products/chatgpt-pro-100-ph"
+      ],
+      "visible_chars": 2225,
+      "draft_markers": []
+    },
+    "/products/chatgpt-pro-200-manual": {
+      "status": 404
+    },
+    "/products/chatgpt-pro-200-ph": {
+      "status": 200,
+      "canonical": [
+        "https://www.qzweb.cloud/products/chatgpt-pro-200-ph"
+      ],
+      "visible_chars": 2194,
+      "draft_markers": []
+    },
+    "/products/chatgpt-pro-200-renew-ph": {
+      "status": 200,
+      "canonical": [
+        "https://www.qzweb.cloud/products/chatgpt-pro-200-renew-ph"
+      ],
+      "visible_chars": 2157,
+      "draft_markers": []
+    },
+    "/products/chatgpt-pro-500-egypt": {
+      "status": 200,
+      "canonical": [
+        "https://www.qzweb.cloud/products/chatgpt-pro-500-egypt"
+      ],
+      "visible_chars": 2286,
+      "draft_markers": []
+    },
+    "/products/chatgpt-pro-500-ph": {
+      "status": 200,
+      "canonical": [
+        "https://www.qzweb.cloud/products/chatgpt-pro-500-ph"
+      ],
+      "visible_chars": 2182,
+      "draft_markers": []
+    },
+    "/products/ellaix-grok-plus-monthly": {
+      "status": 200,
+      "canonical": [
+        "https://www.qzweb.cloud/products/ellaix-grok-plus-monthly"
+      ],
+      "visible_chars": 1234,
+      "draft_markers": []
+    },
+    "/products/ellaix-grok-plus-yearly": {
+      "status": 200,
+      "canonical": [
+        "https://www.qzweb.cloud/products/ellaix-grok-plus-yearly"
+      ],
+      "visible_chars": 1237,
+      "draft_markers": []
+    },
+    "/products/ellaix-grok-premium-monthly": {
+      "status": 200,
+      "canonical": [
+        "https://www.qzweb.cloud/products/ellaix-grok-premium-monthly"
+      ],
+      "visible_chars": 1253,
+      "draft_markers": []
+    },
+    "/products/ellaix-grok-premium-yearly": {
+      "status": 200,
+      "canonical": [
+        "https://www.qzweb.cloud/products/ellaix-grok-premium-yearly"
+      ],
+      "visible_chars": 1219,
+      "draft_markers": []
+    },
+    "/products/ellaix-grok-super-monthly": {
+      "status": 200,
+      "canonical": [
+        "https://www.qzweb.cloud/products/ellaix-grok-super-monthly"
+      ],
+      "visible_chars": 1239,
+      "draft_markers": []
+    },
+    "/products/ellaix-grok-super-yearly": {
+      "status": 200,
+      "canonical": [
+        "https://www.qzweb.cloud/products/ellaix-grok-super-yearly"
+      ],
+      "visible_chars": 1223,
+      "draft_markers": []
+    },
+    "/products/ellaix-grok-ultra-monthly": {
+      "status": 200,
+      "canonical": [
+        "https://www.qzweb.cloud/products/ellaix-grok-ultra-monthly"
+      ],
+      "visible_chars": 1224,
+      "draft_markers": []
+    },
+    "/products/ellaix-grok-ultra-yearly": {
+      "status": 200,
+      "canonical": [
+        "https://www.qzweb.cloud/products/ellaix-grok-ultra-yearly"
+      ],
+      "visible_chars": 1278,
+      "draft_markers": []
+    },
+    "/products/gemini-pro-18m-no-warranty": {
+      "status": 404
+    },
+    "/products/gemini-pro-18m-warranty": {
+      "status": 404
+    },
+    "/products/qzweb-5": {
+      "status": 301,
+      "location": "/products/chatgpt-plus-code"
+    },
+    "/products/telegram-premium-12m": {
+      "status": 404
+    },
+    "/products/telegram-premium-3m": {
+      "status": 404
+    },
+    "/products/telegram-premium-6m": {
+      "status": 404
+    },
+    "/terms": {
+      "status": 200,
+      "canonical": [
+        "https://www.qzweb.cloud/terms"
+      ],
+      "visible_chars": 2555,
+      "draft_markers": []
+    }
+  },
+  "errors": [],
+  "catalog_comparison": {
+    "before_count": 25,
+    "after_count": 16,
+    "removed_ids": [
+      40,
+      41,
+      54,
+      55,
+      57,
+      59,
+      60,
+      61,
+      62
+    ],
+    "added_ids": [],
+    "product_price_changes": [],
+    "sku_changes": [
+      {
+        "product_id": 29,
+        "sku_id": 29,
+        "before": {
+          "id": 29,
+          "sku_code": "QZWEB-4",
+          "spec_values": {},
+          "price_amount": "39.99",
+          "manual_stock_total": 0,
+          "manual_stock_sold": 0,
+          "auto_stock_available": 8782,
+          "upstream_stock": 8782,
+          "stock_status": "in_stock",
+          "stock_display_mode": "exact",
+          "stock_display": "exact",
+          "stock_quantity_hidden": false,
+          "is_sold_out": false,
+          "is_active": true,
+          "effective_price_amount": "39.99"
+        },
+        "after": {
+          "id": 29,
+          "sku_code": "QZWEB-4",
+          "spec_values": {},
+          "price_amount": "39.99",
+          "manual_stock_total": 0,
+          "manual_stock_sold": 0,
+          "auto_stock_available": 8779,
+          "upstream_stock": 8779,
+          "stock_status": "in_stock",
+          "stock_display_mode": "exact",
+          "stock_display": "exact",
+          "stock_quantity_hidden": false,
+          "is_sold_out": false,
+          "is_active": true,
+          "effective_price_amount": "39.99"
+        }
+      },
+      {
+        "product_id": 30,
+        "sku_id": 30,
+        "before": {
+          "id": 30,
+          "sku_code": "QZWEB-5",
+          "spec_values": {},
+          "price_amount": "130.00",
+          "manual_stock_total": 0,
+          "manual_stock_sold": 0,
+          "auto_stock_available": 8513,
+          "upstream_stock": 8513,
+          "stock_status": "in_stock",
+          "stock_display_mode": "exact",
+          "stock_display": "exact",
+          "stock_quantity_hidden": false,
+          "is_sold_out": false,
+          "is_active": true,
+          "effective_price_amount": "130.00"
+        },
+        "after": {
+          "id": 30,
+          "sku_code": "QZWEB-5",
+          "spec_values": {},
+          "price_amount": "130.00",
+          "manual_stock_total": 0,
+          "manual_stock_sold": 0,
+          "auto_stock_available": 8478,
+          "upstream_stock": 8478,
+          "stock_status": "in_stock",
+          "stock_display_mode": "exact",
+          "stock_display": "exact",
+          "stock_quantity_hidden": false,
+          "is_sold_out": false,
+          "is_active": true,
+          "effective_price_amount": "130.00"
+        }
+      },
+      {
+        "product_id": 31,
+        "sku_id": 31,
+        "before": {
+          "id": 31,
+          "sku_code": "QZWEB-55",
+          "spec_values": {},
+          "price_amount": "1200.00",
+          "manual_stock_total": 0,
+          "manual_stock_sold": 0,
+          "auto_stock_available": 9578,
+          "upstream_stock": 9578,
+          "stock_status": "in_stock",
+          "stock_display_mode": "exact",
+          "stock_display": "exact",
+          "stock_quantity_hidden": false,
+          "is_sold_out": false,
+          "is_active": true,
+          "effective_price_amount": "1200.00"
+        },
+        "after": {
+          "id": 31,
+          "sku_code": "QZWEB-55",
+          "spec_values": {},
+          "price_amount": "1200.00",
+          "manual_stock_total": 0,
+          "manual_stock_sold": 0,
+          "auto_stock_available": 9572,
+          "upstream_stock": 9572,
+          "stock_status": "in_stock",
+          "stock_display_mode": "exact",
+          "stock_display": "exact",
+          "stock_quantity_hidden": false,
+          "is_sold_out": false,
+          "is_active": true,
+          "effective_price_amount": "1200.00"
+        }
+      },
+      {
+        "product_id": 37,
+        "sku_id": 37,
+        "before": {
+          "id": 37,
+          "sku_code": "QZWEB-57",
+          "spec_values": {},
+          "price_amount": "680.00",
+          "manual_stock_total": 0,
+          "manual_stock_sold": 0,
+          "auto_stock_available": 9725,
+          "upstream_stock": 9725,
+          "stock_status": "in_stock",
+          "stock_display_mode": "exact",
+          "stock_display": "exact",
+          "stock_quantity_hidden": false,
+          "is_sold_out": false,
+          "is_active": true,
+          "effective_price_amount": "680.00"
+        },
+        "after": {
+          "id": 37,
+          "sku_code": "QZWEB-57",
+          "spec_values": {},
+          "price_amount": "680.00",
+          "manual_stock_total": 0,
+          "manual_stock_sold": 0,
+          "auto_stock_available": 9723,
+          "upstream_stock": 9723,
+          "stock_status": "in_stock",
+          "stock_display_mode": "exact",
+          "stock_display": "exact",
+          "stock_quantity_hidden": false,
+          "is_sold_out": false,
+          "is_active": true,
+          "effective_price_amount": "680.00"
+        }
+      }
+    ]
+  },
+  "core_links_to_removed_pages": {
+    "/blog/chatgpt-ph-recharge-guide": [],
+    "/categories/gpt-recharge": [],
+    "/products/chatgpt-plus-code": []
+  },
+  "visible_faq": {
+    "/products/chatgpt-plus-code": {
+      "question_count": 3,
+      "all_visible": true
+    },
+    "/blog/chatgpt-ph-recharge-guide": {
+      "question_count": 6,
+      "all_visible": true
+    }
+  }
+}

@@ -1,5 +1,7 @@
 # 首页弹窗复现与轻提示提案
 
+2026-11-18 店主决定保留现有弹窗。本页存档此前的复现和提案，当前文字送审预览已移除轻提示。
+
 2026-11-17 在 Orca 实际浏览器访问公开首页。只读访问和浏览器本地关闭设置，无登录、无订单、无采购。截图来自真实页面，没有生成或改绘界面。测试最初两个公告存储键均为空；结束恢复为最初状态。
 
 ## 复现记录
@@ -27,4 +29,4 @@
 
 已有关闭偏好应被尊重；轻提示即使浏览器不能保存偏好也不能阻挡主内容。键盘可操作、关闭/展开有清楚名称，390/320 下可读；不新增自动任务。
 
-预览的建议提示位于 [preview.html](preview.html#notice-proposal)。这是体验改善；没有本站被排名处罚的证据，不承诺搜索表现。依据：[Google 插页说明](https://developers.google.com/search/docs/appearance/avoid-intrusive-interstitials?hl=zh-cn)。
+旧提案截图见[收起状态](evidence/preview-notice-320.png)和[展开状态](evidence/preview-notice-open-320.png)。当时提案针对手机阅读体验，没有本站受到排名处罚的证据。依据：[Google 插页说明](https://developers.google.com/search/docs/appearance/avoid-intrusive-interstitials?hl=zh-cn)。
