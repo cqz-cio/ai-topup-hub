@@ -2,6 +2,57 @@
 
 店主明确授权在复核后只上线 cart 抓取例外和两处已列明内容修改。北京时间 **00:18:18**，后端切换至 **20261118-000600**；33 次正式公开请求和八项验收通过。其它 v6 草稿没有发布。
 
+## 11 月 18 日后续只读调查
+
+**调查结论。** 00:18 上线时的 sitemap 有 47 条。随后 3 个分类停用，既有公开目录规则使这 3 个分类页和 9 个商品页返回 404，sitemap 减至 35 条。11:50 单独上线成品号说明页后增至 36 条。本轮匿名 GET 实测，当前 sitemap 的 **36/36** 个地址均返回 200。
+
+### 分类数据与后台操作记录
+
+以下均为 2026-11-18 北京时间。对照 v6 切换前备份与调查时正式库，三个分类的 `is_active` 均从 1 变为 0；后台访问日志在下列时刻记录了对应状态接口的成功请求。分类及其 9 个商品的 `deleted_at` 在两次查询中均为空，9 个商品自身的 `is_active` 均为 1。
+
+| 分类 | 状态操作时间 | 后台请求 | 影响范围 |
+| --- | --- | --- | --- |
+| #20 GPT 人工及覆盖充值 | 09:56:05 | `PATCH /api/v1/admin/categories/20/active`，HTTP 200 | 1 个分类页、4 个商品页 |
+| #19 Telegram Premium | 09:56:37 | `PATCH /api/v1/admin/categories/19/active`，HTTP 200 | 1 个分类页、3 个商品页 |
+| #11 Gemini | 09:56:44 | `PATCH /api/v1/admin/categories/11/active`，HTTP 200 | 1 个分类页、2 个商品页 |
+
+分类开关更新分类的 `is_active`；公开商品查询同时要求商品上架、所属分类启用，sitemap 也按公开商品和启用分类生成。这些条件在 v6 之前已经存在。重新启用任一分类，可能同时公开其下仍在上架状态的商品。[分类状态写入](../internal/modules/catalog/category/infrastructure/gormstore/store.go) · [商品可见性规则](../internal/modules/catalog/product/store/gormstore/product_store.go) · [sitemap 生成规则](../internal/modules/sitemap/application/service.go)
+
+### 12 个旧地址及入链检查
+
+逐一请求下表地址，并扫描当前 sitemap 全部 36 页的服务端 HTML 和桌面浏览器渲染后的链接，同时匹配已登记的旧别名。下表“未发现”只覆盖这 36 个匿名公开页面，不涵盖登录后页面、历史订单或站外来源。
+
+| 完整 URL | 原页面类型 | 实测 HTTP | 扫描范围内的入链 |
+| --- | --- | --- | --- |
+| <https://www.qzweb.cloud/categories/gpt-overwrite-topup> | GPT 人工及覆盖充值分类 #20 | 404 | 未发现 |
+| <https://www.qzweb.cloud/products/chatgpt-go-manual> | Go 人工充值商品 #59 | 404 | 未发现 |
+| <https://www.qzweb.cloud/products/chatgpt-plus-manual> | Plus 人工充值商品 #57 | 404 | 未发现 |
+| <https://www.qzweb.cloud/products/chatgpt-pro-100-manual> | Pro 100 美金人工充值商品 #55 | 404 | 未发现 |
+| <https://www.qzweb.cloud/products/chatgpt-pro-200-manual> | Pro 200 美金人工充值商品 #54 | 404 | 未发现 |
+| <https://www.qzweb.cloud/categories/telegram-premium-links> | Telegram Premium 分类 #19 | 404 | 未发现 |
+| <https://www.qzweb.cloud/products/telegram-premium-3m> | Telegram 三个月商品 #60 | 404 | 未发现 |
+| <https://www.qzweb.cloud/products/telegram-premium-6m> | Telegram 六个月商品 #61 | 404 | 未发现 |
+| <https://www.qzweb.cloud/products/telegram-premium-12m> | Telegram 十二个月商品 #62 | 404 | 未发现 |
+| <https://www.qzweb.cloud/categories/gemini> | Gemini 分类 #11 | 404 | 未发现 |
+| <https://www.qzweb.cloud/products/gemini-pro-18m-warranty> | Gemini 18 个月有质保商品 #40 | 404 | 未发现 |
+| <https://www.qzweb.cloud/products/gemini-pro-18m-no-warranty> | Gemini 18 个月无质保商品 #41 | 404 | 未发现 |
+
+### 已上线项目复核
+
+| 项目 | 只读验收结果 |
+| --- | --- |
+| 成品号说明页 | 正式正文与 [main 归档](catalog/ready-account-guide/content.html) 一致：115 元/个、一个月 Plus 订阅、付款后自动交付卡密和账号信息、一个月订阅质保，质保期内掉订阅可按剩余天数退款或按优惠价补购。正文仅链接客服入口，该目标返回 200；无 Plus 商品链接或图片。页面 200、自身 canonical、SSR 正文、BlogPosting 与 BreadcrumbList、博客列表入口及 sitemap 均已核验。390px、320px 实测可见正文，无横向溢出。发布前备份与调查时的 SKU 主键集合一致，各 97 个；文章 #11 单独新增。 |
+| 购物车 | 5 种公开入口各测 GET、HEAD，共 10/10 通过。入口及其查询串允许抓取，返回 200、`X-Robots-Tag: noindex, nofollow`、`Cache-Control: no-cache`。购物车未进 sitemap，结账、支付、订单、后台、鉴权及购物车子路径等 12 个对照路径仍受 robots 限制。 |
+| Plus 标签与教程 | 正式目录中 #30 标签为空，四款菲区 Pro 保留原标签。区分 Plus 与四款 Pro 的批准句在教程中出现一次，旧句已移除。去标签有[店主书面确认](catalog/seo-engineering-v6-20261117/owner-confirmation.json)，未据此推定地区资格。 |
+| 归档脚本 | 只读计算服务器备份内 `content_update.py` 与 [main 原件](history/seo-v6-20261118/content_update.py) 的 SHA-256，二者一致，均为 `2d2b6fb0a123d406e66a6cbec721f3186e0e7630ae3bdae561ed24a47ada90e2`。核验限于此文件，未导入或执行脚本。 |
+| 搜索效果 | Google 实际收录和排名效果仍为**未验证**。本轮未登录 GSC 或请求编入索引。 |
+
+### 仍待店主决定
+
+**三个分类维持停用，去留待店主确认。** 访问日志能证实状态接口的请求时间和结果。已核对的提交、上线记录和书面确认中，未找到店主明确批准停用这三个分类的指令；操作者身份、停用意图与期限均待确认。本轮不恢复分类或商品、不删除页面、不新增跳转，不为补足 sitemap 数量调整可见性。
+
+GPT 充值分类页、Plus 商品页及菲区教程的增强文案继续暂缓。首页保留现有弹窗，S1–S5 截图待取得真实、获准公开的脱敏素材后再议。此次只补充调查记录。
+
 ## 程序、备份与范围
 
 - PR #12 的审阅提交 `a5c30b63b803f23ddea5048c631dae5c32cd5982`，Linux CI [44114800099](https://github.com/cqz-cio/ai-topup-hub/actions/runs/44114800099) 四项通过。执行时最新 main 为 `781fcd1062bbccfa4a25fe5d0f7dad051a5b8885`，robots 生成代码未漂移。
