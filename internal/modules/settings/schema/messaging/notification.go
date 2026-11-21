@@ -208,15 +208,15 @@ func NotificationCenterDefaultSetting() NotificationCenterSetting {
 			WalletRechargeSuccess: NotificationSceneTemplate{
 				ZHCN: NotificationLocalizedTemplate{
 					Title: "用户充值成功通知",
-					Body:  "用户：{{customer_label}}\n邮箱：{{customer_email}}\n充值单号：{{recharge_no}}\n充值金额：{{amount}} {{currency}}\n支付渠道：{{payment_channel}}",
+					Body:  "用户：{{customer_label}}\n邮箱：{{customer_email}}\n充值单号：{{recharge_no}}\n充值金额：{{amount}} {{currency}}\n用户实付金额：{{paid_amount}}\n支付渠道：{{payment_channel}}",
 				},
 				ZHTW: NotificationLocalizedTemplate{
 					Title: "用戶儲值成功通知",
-					Body:  "用戶：{{customer_label}}\n郵箱：{{customer_email}}\n儲值單號：{{recharge_no}}\n儲值金額：{{amount}} {{currency}}\n支付渠道：{{payment_channel}}",
+					Body:  "用戶：{{customer_label}}\n郵箱：{{customer_email}}\n儲值單號：{{recharge_no}}\n儲值金額：{{amount}} {{currency}}\n用戶實付金額：{{paid_amount}}\n支付渠道：{{payment_channel}}",
 				},
 				ENUS: NotificationLocalizedTemplate{
 					Title: "Wallet Recharge Succeeded",
-					Body:  "Customer: {{customer_label}}\nEmail: {{customer_email}}\nRecharge No: {{recharge_no}}\nAmount: {{amount}} {{currency}}\nChannel: {{payment_channel}}",
+					Body:  "Customer: {{customer_label}}\nEmail: {{customer_email}}\nRecharge No: {{recharge_no}}\nAmount: {{amount}} {{currency}}\nAmount paid: {{paid_amount}}\nChannel: {{payment_channel}}",
 				},
 			},
 			OrderPaidSuccess: NotificationSceneTemplate{
@@ -590,7 +590,12 @@ func DecodeNotificationCenterSetting(raw jsonmap.JSON, fallback NotificationCent
 
 	if templatesMap := settingsvalue.ToStringAnyMap(raw["templates"]); templatesMap != nil {
 		if sceneMap := settingsvalue.ToStringAnyMap(templatesMap["wallet_recharge_success"]); sceneMap != nil {
-			next.Templates.WalletRechargeSuccess = notificationSceneTemplateFromMap(sceneMap, next.Templates.WalletRechargeSuccess)
+			defaults := next.Templates.WalletRechargeSuccess
+			saved := notificationSceneTemplateFromMap(sceneMap, defaults)
+			upgradeRechargeBody(&saved.ZHCN, defaults.ZHCN)
+			upgradeRechargeBody(&saved.ZHTW, defaults.ZHTW)
+			upgradeRechargeBody(&saved.ENUS, defaults.ENUS)
+			next.Templates.WalletRechargeSuccess = saved
 		}
 		if sceneMap := settingsvalue.ToStringAnyMap(templatesMap["order_paid_success"]); sceneMap != nil {
 			next.Templates.OrderPaidSuccess = notificationSceneTemplateFromMap(sceneMap, next.Templates.OrderPaidSuccess)
@@ -609,6 +614,20 @@ func DecodeNotificationCenterSetting(raw jsonmap.JSON, fallback NotificationCent
 	}
 
 	return next
+}
+
+// Upgrade a saved copy of the prior default without replacing a merchant's custom copy.
+func upgradeRechargeBody(saved *NotificationLocalizedTemplate, current NotificationLocalizedTemplate) {
+	lines := strings.Split(current.Body, "\n")
+	for i, line := range lines {
+		if strings.Contains(line, "{{paid_amount}}") {
+			previous := strings.Join(append(lines[:i], lines[i+1:]...), "\n")
+			if strings.ReplaceAll(saved.Body, "\r\n", "\n") == previous {
+				saved.Body = current.Body
+			}
+			return
+		}
+	}
 }
 
 func notificationSceneTemplateFromMap(raw map[string]interface{}, fallback NotificationSceneTemplate) NotificationSceneTemplate {

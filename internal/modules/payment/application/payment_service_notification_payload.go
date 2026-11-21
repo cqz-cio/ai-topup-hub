@@ -76,6 +76,7 @@ func (s *PaymentService) buildWalletRechargeNotificationPayload(recharge *wallet
 		"recharge_no":     strings.TrimSpace(recharge.RechargeNo),
 		"amount":          recharge.Amount.String(),
 		"currency":        strings.ToUpper(strings.TrimSpace(recharge.Currency)),
+		"paid_amount":     walletRechargePaidAmount(recharge, payment),
 		"provider_type":   providerType,
 		"channel_type":    channelType,
 		"payment_channel": paymentChannel,
@@ -86,6 +87,31 @@ func (s *PaymentService) buildWalletRechargeNotificationPayload(recharge *wallet
 		payload["payment_id"] = fmt.Sprintf("%d", payment.ID)
 	}
 	return payload
+}
+
+// The wallet credit and the settled payment can have different amounts or currencies.
+func walletRechargePaidAmount(recharge *walletdomain.RechargeOrder, payment *paymentdomain.Payment) string {
+	amount, currency := recharge.PayableAmount, recharge.Currency
+	switch strings.ToLower(strings.TrimSpace(recharge.ProviderType)) {
+	case "bscusdt", "plasmausdt", "tronusdt":
+		if payment != nil {
+			// These gateways match the exact token quantity before confirming payment.
+			quantity := notificationPayloadString(payment.ProviderPayload, "chain_amount")
+			token := notificationPayloadString(payment.ProviderPayload, "token_id")
+			if value, err := decimal.NewFromString(quantity); err == nil && value.IsPositive() && token != "" {
+				return quantity + " " + token
+			}
+		}
+		return "—"
+	}
+	if payment != nil && payment.Amount.IsPositive() && strings.TrimSpace(payment.Currency) != "" {
+		amount, currency = payment.Amount, payment.Currency
+	}
+	currency = strings.ToUpper(strings.TrimSpace(currency))
+	if !amount.IsPositive() || currency == "" {
+		return "—"
+	}
+	return amount.String() + " " + currency
 }
 
 func (s *PaymentService) buildManualFulfillmentNotificationPayload(order *orderdomain.Order, parent *orderdomain.Order) jsonmap.JSON {

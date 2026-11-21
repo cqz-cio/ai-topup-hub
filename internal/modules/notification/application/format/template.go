@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/dujiao-next/internal/constants"
 	settingsmessaging "github.com/dujiao-next/internal/modules/settings/schema/messaging"
 	"github.com/dujiao-next/internal/queue"
 	"github.com/dujiao-next/internal/shared/jsonmap"
@@ -22,6 +23,10 @@ func BuildTemplateVariables(payload queue.NotificationDispatchPayload) map[strin
 	data["biz_type"] = strings.TrimSpace(payload.BizType)
 	data["biz_id"] = fmt.Sprintf("%d", payload.BizID)
 	data["occurred_at"] = time.Now().Format("2006-01-02 15:04:05")
+	if payload.EventType == constants.NotificationEventWalletRechargeSuccess && data["paid_amount"] == nil {
+		// Notifications queued before paid amounts were captured have no settlement snapshot.
+		data["paid_amount"] = "—"
+	}
 	return data
 }
 

@@ -19,6 +19,10 @@ func ApplyTestVariables(target map[string]interface{}, defaults map[string]inter
 	if target == nil || len(defaults) == 0 {
 		return
 	}
+	// A preview of a real recharge must never borrow the example payment amount.
+	if defaults["paid_amount"] != nil && target["paid_amount"] == nil && (target["recharge_no"] != nil || target["amount"] != nil) {
+		target["paid_amount"] = "—"
+	}
 	for key, value := range defaults {
 		if _, exists := target[key]; exists {
 			continue
@@ -37,6 +41,7 @@ func BuildTestVariables(scene, locale string) map[string]interface{} {
 			"recharge_no":     "RC202603230001",
 			"amount":          "100.00",
 			"currency":        "USD",
+			"paid_amount":     "101.60 USD",
 			"payment_channel": "epay/alipay",
 		}
 	case constants.NotificationEventOrderPaidSuccess:
