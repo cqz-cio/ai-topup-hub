@@ -266,7 +266,11 @@ func isEditorial(slug string) bool {
 // Products reuses the same anonymous projection as the home and category pages.
 func (s *source) Products(ctx context.Context) (publicpage.Page, error) {
 	items, err := s.catalogItems(ctx, "")
-	return publicpage.Page{Kind: "products", Path: "/products", Title: publiccontent.PageTitle("productsTitle"), Summary: "使用期限与质保期不同，购买前请分别确认。", SEODescription: publiccontent.PageDescription("products"), Items: items}, err
+	description := publiccontent.PageDescription("products")
+	if !isMainSite(ctx) {
+		description = publiccontent.PageDescription("resellerProducts")
+	}
+	return publicpage.Page{Kind: "products", Path: "/products", Title: publiccontent.PageTitle("productsTitle"), Summary: "使用期限与质保期不同，购买前请分别确认。", SEODescription: description, Items: items}, err
 }
 
 func (s *source) Terms(ctx context.Context) (publicpage.Page, error) {

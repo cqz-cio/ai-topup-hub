@@ -61,7 +61,7 @@ func TestRechargeCategoryUsesCanonicalURLAndActualEditorialDate(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, entry := range entries {
-		if strings.HasSuffix(entry.Location, "/categories/gpt-recharge") && entry.LastModified != "2026-11-17" {
+		if strings.HasSuffix(entry.Location, "/categories/gpt-recharge") && entry.LastModified != "2026-11-27" {
 			t.Fatal(entry)
 		}
 		if strings.HasSuffix(entry.Location, "/categories/other") && entry.LastModified != "2026-10-02" {

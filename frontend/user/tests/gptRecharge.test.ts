@@ -1,6 +1,16 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { appendRechargeLinks as appendLinks, gptRecharge, gptRechargeHtml, resolveRechargeGuide, rechargeHtml } from '../src/utils/gptRecharge.ts'
+import { rechargeCardIntro, appendRechargeLinks as appendLinks, gptRecharge, gptRechargeHtml, resolveRechargeGuide, rechargeHtml, rewriteCatalogLinks } from '../src/utils/gptRecharge.ts'
+
+test('selection advice follows the reviewed product copy only on the main Chinese automatic cards', () => {
+  const product = { id: 31, fulfillment_type: 'auto', description: { 'zh-CN': '适用账号。领取兑换码。' } }
+  for (const id of [30, 31, 32]) assert.equal(rechargeCardIntro({ ...product, id }, 'zh-CN', false), '适用账号')
+  assert.equal(rechargeCardIntro({ ...product, id: 45 }, 'zh-CN', false), '')
+  assert.equal(rechargeCardIntro({ ...product, fulfillment_type: 'manual' }, 'zh-CN', false), '')
+  assert.equal(rechargeCardIntro(product, 'zh-CN', true), '')
+  assert.equal(rechargeCardIntro(product, 'en-US', false), '')
+  assert.equal(rechargeCardIntro({ ...product, description: undefined }, 'zh-CN', false), '')
+})
 
 const links = Object.fromEntries(Object.keys(gptRecharge.catalogIdentities).map(path => [path, path]))
 const appendRechargeLinks = (...args: Parameters<typeof appendLinks>) => appendLinks(...args.slice(0, 5) as [string, 'product' | 'article', string, string, boolean], links)
@@ -30,7 +40,7 @@ test('recharge guide uses existing category and article URLs without price snaps
   assert.equal(gptRecharge.path, '/categories/gpt-recharge')
   for (const slug of gptRecharge.blogSlugs) assert.ok(gptRechargeHtml.includes(`/blog/${slug}`))
   assert.ok(gptRechargeHtml.includes('/products/chatgpt-plus-code'))
-  assert.ok(gptRechargeHtml.includes('/products/chatgpt-plus-manual'))
+  assert.doesNotMatch(gptRechargeHtml, /chatgpt-plus-manual|86gamestore-88|gpt-overwrite-topup/)
   assert.ok(gptRechargeHtml.includes('独立第三方'))
   assert.doesNotMatch(gptRechargeHtml, /¥|￥|[0-9]+元|保证.*排名|官方授权服务|零风险/)
 })
@@ -43,7 +53,10 @@ test('permanent identities keep fixed links and filters on the migrated owner th
   assert.deepEqual(resolved.productCategories, ['gpt-recharge-2', 'gpt-overwrite-topup-2'])
   const html = rechargeHtml(resolved)
   assert.ok(html.includes('href="/products/chatgpt-plus-code-2"'))
-  assert.ok(html.includes('href="/products/chatgpt-plus-manual-2"'))
+  assert.doesNotMatch(html, /chatgpt-plus-manual/)
+  const historical = '<a href="/products/86gamestore-88">历史订单</a>'
+  assert.ok(rewriteCatalogLinks(historical, targets).includes('href="/products/chatgpt-plus-manual-2"'))
+  assert.doesNotMatch(rewriteCatalogLinks(historical, {}), /href=/)
   assert.ok(!html.includes('href="/products/chatgpt-plus-code"'))
   assert.ok(appendLinks('', 'product', 'example', 'gpt-recharge-2', false, targets).includes('/categories/gpt-recharge-2'))
   assert.equal(appendLinks('', 'product', 'other-owner', 'gpt-recharge', false, targets), '')

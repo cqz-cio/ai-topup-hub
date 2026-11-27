@@ -1,4 +1,5 @@
 import guide from '../../../../internal/platform/publiccontent/gpt-recharge.json' with { type: 'json' }
+import { storefrontText, type StorefrontProduct } from './storefront.ts'
 
 export const gptRecharge = guide
 export const gptRechargeHtml = guide.sections.map(section => `<h2>${section.title}</h2>${section.html}`).join('')
@@ -23,6 +24,18 @@ export function resolveRechargeGuide(links: CatalogLinks) {
     sections: guide.sections.map(section => ({ ...section, html: rewriteCatalogLinks(section.html, links) })),
     relatedLinks: guide.relatedLinks.map(link => ({ ...link, path: link.path in guide.catalogIdentities ? links[link.path] || '' : link.path })).filter(link => link.path),
   }
+}
+
+// These product descriptions begin with the main store's reviewed selection advice.
+const selectionCopyIds = new Set([30, 31, 32])
+
+export function rechargeCardIntro(
+  product: Pick<StorefrontProduct, 'id' | 'description' | 'fulfillment_type'>,
+  locale: string,
+  isReseller: boolean,
+): string {
+  if (isReseller || locale !== 'zh-CN' || product.fulfillment_type !== 'auto' || !selectionCopyIds.has(product.id)) return ''
+  return storefrontText(product.description, locale).split(/[。！？\r\n]/u, 1)[0]?.trim() || ''
 }
 
 export function rechargeHtml(resolved: ReturnType<typeof resolveRechargeGuide>): string {
