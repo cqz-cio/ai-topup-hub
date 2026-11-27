@@ -130,7 +130,7 @@ import { schemaJSON } from '../utils/siteIdentity'
 import { categoryPageTitle } from '../utils/pageTitles'
 import type { PublicCategory } from '../utils/category'
 import { seoText } from '../utils/seo'
-import { resolveRechargeGuide, rechargeHtml } from '../utils/gptRecharge'
+import { rechargeCardIntro, resolveRechargeGuide, rechargeHtml } from '../utils/gptRecharge'
 import ProductDetailContent from '../components/product/ProductDetailContent.vue'
 import AnnouncementModal from '../components/AnnouncementModal.vue'
 import CodexCreditsSection from '../components/commerce/CodexCreditsSection.vue'
@@ -328,6 +328,7 @@ const cardProps = (product: StorefrontProduct) => ({
   image: failedImages.value.has(product.slug) ? '' : productImage(product),
   priority: priorityProducts.value.has(product.slug),
   details: displayDetails(product),
+  selectionIntro: rechargeCardIntro(product, appStore.locale, appStore.isResellerTenant),
   fulfillmentType: product.fulfillment_type,
   purchaseType: product.purchase_type,
   price: formattedPrice(product),
@@ -399,7 +400,7 @@ const copyWechat = async () => {
 const catalogSeoDescription = computed(() => {
   if (isRechargePage.value) return gptRecharge.value.summary
   if (!catalogOnly) return undefined
-  if (!currentCategory.value) return pageDescription('products')
+  if (!currentCategory.value) return pageDescription(appStore.isResellerTenant ? 'resellerProducts' : 'products')
   const saved = seoText(currentCategory.value.seo_meta?.description, appStore.locale)
   const name = categoryHeading.value || ''
   return needsDescription(saved, name) ? catalogDescription(name, orderedProducts.value.map(productTitle)) : saved

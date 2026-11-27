@@ -13,7 +13,8 @@
         <div><dt>{{ t('shopUi.warranty') }}</dt><dd>{{ details.warranty }}</dd></div>
       </dl>
       <dl v-else class="product-facts">
-        <div><dt>{{ t('shopUi.deliveryMethod') }}</dt><dd>{{ t(fulfillmentType === 'auto' ? 'shopUi.automatic' : 'shopUi.manual') }}</dd></div>
+        <div v-if="selectionIntro"><dt>{{ t('productDetail.description') }}</dt><dd>{{ selectionIntro }}</dd></div>
+        <div v-else><dt>{{ t('shopUi.deliveryMethod') }}</dt><dd>{{ t(fulfillmentType === 'auto' ? 'shopUi.automatic' : 'shopUi.manual') }}</dd></div>
         <div><dt>{{ t('shopUi.purchaseMethod') }}</dt><dd>{{ t(purchaseType === 'member' ? 'shopUi.memberOnly' : 'shopUi.guestAvailable') }}</dd></div>
         <div><dt>{{ t('shopUi.usageWarranty') }}</dt><dd>{{ t('shopUi.checkDetails') }}</dd></div>
       </dl>
@@ -46,6 +47,7 @@ const props = defineProps<{
   category: string
   image: string
   details?: StorefrontDisplayDetails
+  selectionIntro?: string
   fulfillmentType?: string
   purchaseType?: string
   price: string

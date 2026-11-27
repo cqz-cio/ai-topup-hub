@@ -7,22 +7,22 @@
   },
   "categorySlug": "gpt-recharge",
   "path": "/categories/gpt-recharge",
-  "updatedAt": "2026-11-17",
+  "updatedAt": "2026-11-27",
   "title": "GPT 充值",
-  "seoTitle": "GPT充值｜ChatGPT Plus、Pro 方案与购买须知",
-  "summary": "了解 ChatGPT Plus、Pro 的充值方式，先核对账号地区、当前订阅和开通条件，再选择兑换码或人工充值。下方为自助兑换商品，未到期或需要覆盖充值请查看对应人工商品。",
+  "seoTitle": "GPT 充值｜ChatGPT Plus、Pro、Go 兑换码选购",
+  "summary": "给自己的 ChatGPT 账号充值，可在这里比较 Plus、Pro 和 Go 兑换码。购买前先核对商品标注的地区和账号条件。选择菲区 Pro 200 美金时，请区分普通开通和已有 Pro 10x 的续费绑卡。已购用户可从订单查看本款兑换说明。",
   "sections": [
     {
-      "title": "Plus、Pro 充值怎么选？",
-      "html": "<p>给自己的 ChatGPT 账号充值，请先区分自助兑换和人工充值。本站提供独立第三方服务，不是 OpenAI 官方网站，也不代表官方授权。</p><ul><li><a href=\"/products/chatgpt-plus-code\">ChatGPT Plus 自助兑换码</a>：付款后在订单内领取，按说明完成账号预检和兑换。</li><li><a href=\"/products/chatgpt-plus-manual\">ChatGPT Plus 人工充值</a>：适用条件、覆盖方式和交付时间请以该商品说明为准。</li><li>ChatGPT Pro：本页商品按地区、套餐档位与新开通／续费区分；如需人工处理，可查看<a href=\"/categories/gpt-overwrite-topup\">GPT 人工及覆盖充值商品</a>。</li></ul><p>这些商品用于 ChatGPT 订阅，不是 OpenAI API 余额，也不是给现有账号购买 Codex 点数。</p>"
+      "title": "Plus、Pro 和 Go 怎么选？",
+      "html": "<p>π星卡社提供独立第三方兑换码服务。先看自己的账号状态，再选套餐。Go 的适用条件请查看下方 Go 商品卡。</p><ul><li><a href=\"/products/chatgpt-plus-code\">查看 Plus 账号条件</a>，核对是否适合首次开通或原订阅到期后使用。</li><li><a href=\"/blog/chatgpt-ph-recharge-guide\">比较菲区 Pro 开通与续费</a>，尤其注意两款 Pro 200 美金适用的账号状态。</li><li><a href=\"/blog/chatgpt-plus-code-guide\">已买 Plus 兑换码，查看使用步骤</a>。其他商品请从本笔订单查看对应指引。</li></ul>"
     },
     {
       "title": "充值前需要确认什么？",
-      "html": "<ol><li>确认登录的是需要充值的账号，查看当前套餐、到期时间和原订阅渠道。</li><li>核对商品要求的账号地区、支付方式及新开通或续费资格；不同地区、档位的兑换码不能默认通用。</li><li>已有订阅时，先阅读<a href=\"/blog/chatgpt-plus-renewal-rules\">Plus 到期续费与覆盖充值的区别</a>。剩余时间是否保留、能否叠加，应按所选商品规则确认；Pro 不直接套用 Plus 规则。</li><li>不确定账号是否适用时，先联系本站客服确认，再购买。</li></ol>"
+      "html": "<ol><li>确认登录的是需要充值的账号，查看当前套餐、到期时间和原订阅渠道。</li><li>核对商品要求的账号地区、支付方式及新开通或续费资格；不同地区、档位的兑换码不能默认通用。</li><li>已有订阅时，先阅读<a href=\"/blog/chatgpt-plus-renewal-rules\">Plus 到期后怎么续费</a>。剩余时间是否保留、能否叠加，应按所选商品规则确认；Pro 不直接套用 Plus 规则。</li><li>不确定账号是否适用时，先联系本站客服确认，再购买。</li></ol>"
     },
     {
       "title": "GPT 充值多少钱，付款后收到什么？",
-      "html": "<p>商品卡片显示当前售价和库存；具体规格、优惠、可用支付渠道及手续费，在商品详情和结算页核对。不要把不同地区或套餐档位的价格当成同一种服务比较。</p><p>自动发码商品的交付内容在订单内领取，收到兑换码并不等于账号已经开通，需要继续按说明兑换。人工商品按详情要求提交必要资料并等待处理。游客请保存下单邮箱与查询密码，通过<a href=\"/guest/orders\">游客查单</a>领取；会员可到<a href=\"/me/orders\">我的订单</a>查看。</p>"
+      "html": "<p>商品卡片显示当前售价和库存；具体规格、优惠、可用支付渠道及手续费，在商品详情和结算页核对。不要把不同地区或套餐档位的价格当成同一种服务比较。</p><p>自动发码商品的交付内容在订单内领取，收到兑换码并不等于账号已经开通，需要继续按说明兑换。游客请保存下单邮箱与查询密码，通过<a href=\"/guest/orders\">游客查单</a>领取；会员可到<a href=\"/me/orders\">我的订单</a>查看。</p>"
     },
     {
       "title": "如何确认成功，失败了怎么办？",
@@ -30,7 +30,7 @@
     },
     {
       "title": "GPT 充值与使用指南",
-      "html": "<ul><li><a href=\"/blog/chatgpt-payment-methods\">ChatGPT 充值方式有哪些？订阅渠道、账号条件与注意事项</a></li><li><a href=\"/blog/chatgpt-plus-code-guide\">ChatGPT Plus 兑换码怎么用？从领取到核对开通结果</a></li><li><a href=\"/blog/chatgpt-plus-renewal-rules\">ChatGPT Plus 没到期能充值吗？到期续费与覆盖充值的区别</a></li><li><a href=\"/blog/chatgpt-membership-not-active\">ChatGPT 充值后没有显示会员，应该怎么排查？</a></li><li><a href=\"/blog/chatgpt-plus-vs-api-balance\">ChatGPT Plus 订阅和 API 余额有什么区别？</a></li><li><a href=\"/blog/chatgpt-code-region-check\">不同地区的 GPT 兑换码能通用吗？购买前如何核对？</a></li><li><a href=\"/blog/chatgpt-ph-recharge-guide\">菲区 ChatGPT 充值怎么选、怎么兑</a></li></ul><p>本文帮助你选择本站服务，产品名称仅用于说明服务对象。具体订阅功能与官方规则请以相应产品的官方说明为准。</p>"
+      "html": "<ul><li><a href=\"/blog/chatgpt-payment-methods\">ChatGPT Plus 充值方式怎么选？</a></li><li><a href=\"/blog/chatgpt-plus-renewal-rules\">ChatGPT Plus 到期后怎么续费？</a></li><li><a href=\"/blog/chatgpt-membership-not-active\">ChatGPT 充值后没有显示会员，应该怎么排查？</a></li><li><a href=\"/blog/chatgpt-plus-vs-api-balance\">ChatGPT Plus 订阅和 API 余额有什么区别？</a></li><li><a href=\"/blog/chatgpt-code-region-check\">不同地区的 GPT 兑换码能通用吗？购买前如何核对？</a></li></ul><p>本文帮助你选择本站服务，产品名称仅用于说明服务对象。具体订阅功能与官方规则请以相应产品的官方说明为准。</p>"
     }
   ],
   "productCategories": [
