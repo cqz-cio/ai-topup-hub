@@ -83,3 +83,8 @@
 +  const historical = '<a href="/products/86gamestore-88">历史订单</a>'
 +  assert.ok(rewriteCatalogLinks(historical, targets).includes('href="/products/chatgpt-plus-manual-2"'))
 +  assert.doesNotMatch(rewriteCatalogLinks(historical, {}), /href=/)
+--- a/internal/modules/sitemap/application/service_test.go
++++ b/internal/modules/sitemap/application/service_test.go
+@@ -64 +64 @@ func TestRechargeCategoryUsesCanonicalURLAndActualEditorialDate(t *testing.T) {
+-		if strings.HasSuffix(entry.Location, "/categories/gpt-recharge") && entry.LastModified != "2026-11-17" {
++		if strings.HasSuffix(entry.Location, "/categories/gpt-recharge") && entry.LastModified != "2026-11-27" {
