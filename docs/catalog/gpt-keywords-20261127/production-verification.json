@@ -1,0 +1,360 @@
+{
+  "release": "20261127-105013",
+  "published_beijing": "2026-11-27T11:11:57+08:00",
+  "last_checks_beijing": "2026-11-27T11:14:22+08:00",
+  "source_commit": "b9d11be351aa106fbd44c11a03b79ee39fde9a9e",
+  "main_merge": "b1408ff2ee3ab54c436e35c8cde850f360d90ec9",
+  "pull_request": "https://github.com/cqz-cio/ai-topup-hub/pull/15",
+  "release_basis": "/srv/zhixiang-front/releases/20261127-102200",
+  "ci": {
+    "checks": {
+      "Verify installer": "SUCCESS",
+      "Verify API": "FAILURE",
+      "Verify release config": "SUCCESS",
+      "Verify fullstack build": "SUCCESS"
+    },
+    "pre_existing_api_failures": [
+      "TestGoPackagesStayWithinFileBudgets",
+      "TestPaymentCallbackImplementationIsSplitByResponsibility"
+    ],
+    "baseline": "https://github.com/cqz-cio/ai-topup-hub/actions/runs/44856522126",
+    "release_check": "https://github.com/cqz-cio/ai-topup-hub/actions/runs/45932406734/job/140287788431"
+  },
+  "content": {
+    "target_fields_verified_via_public_api": 25,
+    "hidden_manual_urls": {
+      "chatgpt-plus-manual": {
+        "code": 404,
+        "noindex": true
+      },
+      "chatgpt-go-manual": {
+        "code": 404,
+        "noindex": true
+      }
+    },
+    "previous_plus_redirect": 301,
+    "sitemap_public_urls": 27,
+    "category_lastmod": "2026-11-27",
+    "category_lastmod_verified_beijing": "2026-11-27T11:14:22+08:00",
+    "preserved_article_dates": 11
+  },
+  "search_visibility_tests": {
+    "public_html_pages": 27,
+    "anonymous_user_agents": {
+      "google": [
+        "https://www.qzweb.cloud/categories/gpt-recharge",
+        "https://www.qzweb.cloud/products/chatgpt-plus-code",
+        "https://www.qzweb.cloud/products/chatgpt-pro-200-ph",
+        "https://www.qzweb.cloud/products/chatgpt-pro-200-renew-ph"
+      ],
+      "bing": [
+        "https://www.qzweb.cloud/categories/gpt-recharge",
+        "https://www.qzweb.cloud/products/chatgpt-plus-code",
+        "https://www.qzweb.cloud/products/chatgpt-pro-200-ph",
+        "https://www.qzweb.cloud/products/chatgpt-pro-200-renew-ph"
+      ],
+      "oai": [
+        "https://www.qzweb.cloud/categories/gpt-recharge",
+        "https://www.qzweb.cloud/products/chatgpt-plus-code",
+        "https://www.qzweb.cloud/products/chatgpt-pro-200-ph",
+        "https://www.qzweb.cloud/products/chatgpt-pro-200-renew-ph"
+      ]
+    },
+    "content_read_from_initial_html_without_javascript": true,
+    "robots_access_checks": 12,
+    "approved_category_sections": 5,
+    "approved_product_body_blocks_verified": {
+      "/products/chatgpt-plus-code": 33,
+      "/products/chatgpt-pro-200-ph": 35,
+      "/products/chatgpt-pro-200-renew-ph": 34
+    },
+    "core_pages": [
+      {
+        "url": "https://www.qzweb.cloud/categories/gpt-recharge",
+        "h1": "GPT 充值",
+        "visible_character_count": 2264,
+        "canonical": "https://www.qzweb.cloud/categories/gpt-recharge",
+        "visible_questions_in_faq_schema": 0
+      },
+      {
+        "url": "https://www.qzweb.cloud/products/chatgpt-plus-code",
+        "h1": "ChatGPT Plus 兑换码｜菲区｜自动发码",
+        "visible_character_count": 1875,
+        "canonical": "https://www.qzweb.cloud/products/chatgpt-plus-code",
+        "visible_questions_in_faq_schema": 3
+      },
+      {
+        "url": "https://www.qzweb.cloud/products/chatgpt-pro-200-ph",
+        "h1": "ChatGPT Pro 200美金 兑换码｜菲区｜自动发码",
+        "visible_character_count": 1991,
+        "canonical": "https://www.qzweb.cloud/products/chatgpt-pro-200-ph",
+        "visible_questions_in_faq_schema": 3
+      },
+      {
+        "url": "https://www.qzweb.cloud/products/chatgpt-pro-200-renew-ph",
+        "h1": "ChatGPT Pro 200美金 续费绑卡｜菲区｜自动发码",
+        "visible_character_count": 1903,
+        "canonical": "https://www.qzweb.cloud/products/chatgpt-pro-200-renew-ph",
+        "visible_questions_in_faq_schema": 3
+      }
+    ]
+  },
+  "commerce": {
+    "currency": "CNY",
+    "all_desktop_purchase_checks": [
+      {
+        "slug": "chatgpt-go-code-egypt",
+        "price_CNY": 39.99,
+        "selected_product": "ChatGPT Go 兑换码｜埃及｜自动发码",
+        "category_buy_link": true,
+        "buy_now_enabled": true,
+        "cart_button_enabled": true,
+        "guest_cart_item_checked": false,
+        "checkout_item": true,
+        "all_8_card_prices_and_links": true
+      },
+      {
+        "slug": "chatgpt-plus-code",
+        "price_CNY": 130,
+        "selected_product": "ChatGPT Plus 兑换码｜菲区｜自动发码",
+        "category_buy_link": true,
+        "buy_now_enabled": true,
+        "cart_button_enabled": true,
+        "guest_cart_item_checked": true,
+        "checkout_item": true,
+        "all_8_card_prices_and_links": true
+      },
+      {
+        "slug": "chatgpt-pro-100-ph",
+        "price_CNY": 700,
+        "selected_product": "ChatGPT Pro 100美金 兑换码｜菲区｜自动发码",
+        "category_buy_link": true,
+        "buy_now_enabled": true,
+        "cart_button_enabled": true,
+        "guest_cart_item_checked": false,
+        "checkout_item": true,
+        "all_8_card_prices_and_links": true
+      },
+      {
+        "slug": "chatgpt-pro-200-ph",
+        "price_CNY": 1200,
+        "selected_product": "ChatGPT Pro 200美金 兑换码｜菲区｜自动发码",
+        "category_buy_link": true,
+        "buy_now_enabled": true,
+        "cart_button_enabled": true,
+        "guest_cart_item_checked": true,
+        "checkout_item": true,
+        "all_8_card_prices_and_links": true
+      },
+      {
+        "slug": "chatgpt-pro-200-renew-ph",
+        "price_CNY": 1200,
+        "selected_product": "ChatGPT Pro 200美金 续费绑卡｜菲区｜自动发码",
+        "category_buy_link": true,
+        "buy_now_enabled": true,
+        "cart_button_enabled": true,
+        "guest_cart_item_checked": true,
+        "checkout_item": true,
+        "all_8_card_prices_and_links": true
+      },
+      {
+        "slug": "chatgpt-pro-500-ph",
+        "price_CNY": 3380,
+        "selected_product": "ChatGPT Pro 500美金 兑换码｜菲区｜自动发码",
+        "category_buy_link": true,
+        "buy_now_enabled": true,
+        "cart_button_enabled": true,
+        "guest_cart_item_checked": false,
+        "checkout_item": true,
+        "all_8_card_prices_and_links": true
+      },
+      {
+        "slug": "chatgpt-pro-500-egypt",
+        "price_CNY": 3250,
+        "selected_product": "ChatGPT Pro 500美金 兑换码｜智利｜自动发码",
+        "category_buy_link": true,
+        "buy_now_enabled": true,
+        "cart_button_enabled": true,
+        "guest_cart_item_checked": false,
+        "checkout_item": true,
+        "all_8_card_prices_and_links": true
+      },
+      {
+        "slug": "chatgpt-pro-100-egypt",
+        "price_CNY": 680,
+        "selected_product": "ChatGPT Pro 100美金 兑换码｜智利｜自动发码",
+        "category_buy_link": true,
+        "buy_now_enabled": true,
+        "cart_button_enabled": true,
+        "guest_cart_item_checked": false,
+        "checkout_item": true,
+        "all_8_card_prices_and_links": true
+      }
+    ],
+    "price_stock_before_beijing": "2026-11-27T10:55:19+08:00",
+    "price_stock_after_beijing": "2026-11-27T11:12:17+08:00",
+    "public_products": [
+      {
+        "url": "https://www.qzweb.cloud/products/chatgpt-go-code-egypt",
+        "price_cny": "39.99",
+        "in_stock": true,
+        "stock_before": 7787,
+        "stock_after": 7787,
+        "offer_price": "39.99",
+        "offer_availability": "https://schema.org/InStock"
+      },
+      {
+        "url": "https://www.qzweb.cloud/products/chatgpt-plus-code",
+        "price_cny": "130.00",
+        "in_stock": true,
+        "stock_before": 6556,
+        "stock_after": 6554,
+        "offer_price": "130.00",
+        "offer_availability": "https://schema.org/InStock"
+      },
+      {
+        "url": "https://www.qzweb.cloud/products/chatgpt-pro-100-ph",
+        "price_cny": "700.00",
+        "in_stock": true,
+        "stock_before": 9875,
+        "stock_after": 9875,
+        "offer_price": "700.00",
+        "offer_availability": "https://schema.org/InStock"
+      },
+      {
+        "url": "https://www.qzweb.cloud/products/chatgpt-pro-200-ph",
+        "price_cny": "1200.00",
+        "in_stock": true,
+        "stock_before": 9463,
+        "stock_after": 9463,
+        "offer_price": "1200.00",
+        "offer_availability": "https://schema.org/InStock"
+      },
+      {
+        "url": "https://www.qzweb.cloud/products/chatgpt-pro-200-renew-ph",
+        "price_cny": "1200.00",
+        "in_stock": true,
+        "stock_before": 9945,
+        "stock_after": 9945,
+        "offer_price": "1200.00",
+        "offer_availability": "https://schema.org/InStock"
+      },
+      {
+        "url": "https://www.qzweb.cloud/products/chatgpt-pro-500-ph",
+        "price_cny": "3380.00",
+        "in_stock": true,
+        "stock_before": 9997,
+        "stock_after": 9997,
+        "offer_price": "3380.00",
+        "offer_availability": "https://schema.org/InStock"
+      },
+      {
+        "url": "https://www.qzweb.cloud/products/chatgpt-pro-500-egypt",
+        "price_cny": "3250.00",
+        "in_stock": true,
+        "stock_before": 9977,
+        "stock_after": 9977,
+        "offer_price": "3250.00",
+        "offer_availability": "https://schema.org/InStock"
+      },
+      {
+        "url": "https://www.qzweb.cloud/products/chatgpt-pro-100-egypt",
+        "price_cny": "680.00",
+        "in_stock": true,
+        "stock_before": 9606,
+        "stock_after": 9606,
+        "offer_price": "680.00",
+        "offer_availability": "https://schema.org/InStock"
+      }
+    ],
+    "inventory_sync": {
+      "zhixiang-stock-sync": {
+        "active": "active",
+        "last_result": "success",
+        "report_age_seconds": 64
+      },
+      "zhixiang-86gamestore-stock-sync": {
+        "active": "active",
+        "last_result": "success",
+        "report_age_seconds": 35
+      }
+    },
+    "browsers": [
+      {
+        "viewport_width_px": 1440,
+        "checks": [
+          {
+            "slug": "chatgpt-plus-code",
+            "price_CNY": 130,
+            "selected_product": "ChatGPT Plus 兑换码｜菲区｜自动发码",
+            "category_buy_link": true,
+            "buy_now_enabled": true,
+            "cart_button_enabled": true,
+            "checkout_item": true,
+            "all_8_card_prices_and_links": true
+          },
+          {
+            "slug": "chatgpt-pro-200-ph",
+            "price_CNY": 1200,
+            "selected_product": "ChatGPT Pro 200美金 兑换码｜菲区｜自动发码",
+            "category_buy_link": true,
+            "buy_now_enabled": true,
+            "cart_button_enabled": true,
+            "checkout_item": true,
+            "all_8_card_prices_and_links": true
+          },
+          {
+            "slug": "chatgpt-pro-200-renew-ph",
+            "price_CNY": 1200,
+            "selected_product": "ChatGPT Pro 200美金 续费绑卡｜菲区｜自动发码",
+            "category_buy_link": true,
+            "buy_now_enabled": true,
+            "cart_button_enabled": true,
+            "checkout_item": true,
+            "all_8_card_prices_and_links": true
+          }
+        ],
+        "page_errors": [],
+        "real_order_created": false
+      },
+      {
+        "viewport_width_px": 390,
+        "checks": [
+          {
+            "slug": "chatgpt-plus-code",
+            "price_CNY": 130,
+            "selected_product": "ChatGPT Plus 兑换码｜菲区｜自动发码",
+            "category_buy_link": true,
+            "buy_now_enabled": true,
+            "cart_button_enabled": true,
+            "checkout_item": true,
+            "all_8_card_prices_and_links": true
+          },
+          {
+            "slug": "chatgpt-pro-200-ph",
+            "price_CNY": 1200,
+            "selected_product": "ChatGPT Pro 200美金 兑换码｜菲区｜自动发码",
+            "category_buy_link": true,
+            "buy_now_enabled": true,
+            "cart_button_enabled": true,
+            "checkout_item": true,
+            "all_8_card_prices_and_links": true
+          },
+          {
+            "slug": "chatgpt-pro-200-renew-ph",
+            "price_CNY": 1200,
+            "selected_product": "ChatGPT Pro 200美金 续费绑卡｜菲区｜自动发码",
+            "category_buy_link": true,
+            "buy_now_enabled": true,
+            "cart_button_enabled": true,
+            "checkout_item": true,
+            "all_8_card_prices_and_links": true
+          }
+        ],
+        "page_errors": [],
+        "real_order_created": false
+      }
+    ]
+  },
+  "indexing_request_submitted": false
+}
